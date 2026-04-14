@@ -1,0 +1,268 @@
+@startuml modelo_dominio
+title Diagrama de Domínio - Sistema de Gestão de Hotel de Animais
+
+skinparam style strictuml
+skinparam shadowing false
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam nodesep 90
+skinparam ranksep 100
+skinparam dpi 180
+skinparam ArrowColor #2F2F2F
+skinparam ClassBorderColor #2F2F2F
+skinparam ClassBackgroundColor #FFFFFF
+skinparam ClassFontColor #1F1F1F
+skinparam ClassHeaderBackgroundColor #F3F3F3
+skinparam EnumBorderColor #2F2F2F
+skinparam EnumBackgroundColor #FFFFFF
+
+top to bottom direction
+
+' ======================
+' CLASSES DE DOMÍNIO
+' ======================
+
+package "Segurança e Perfis" {
+class Utilizador {
+  - username : String
+  - passwordHash : String
+  - ativo : boolean
+  - perfil : PerfilAcesso
+}
+
+enum PerfilAcesso {
+  Diretor
+  Rececao
+  Cuidador
+  Veterinario
+  Limpeza
+}
+}
+
+package "Clientes e Animais" {
+class Tutor {
+  - nome : String
+  - nif : String
+  - contacto : String
+}
+
+class Animal {
+  - nome : String
+  - especie : String
+  - raca : String
+  - necessidadesEspeciais : String
+}
+
+class PlanoCuidados {
+  - versao : int
+  - ativo : boolean
+}
+
+class ItemPlanoCuidado {
+  - tipo : String
+  - periodicidade : String
+  - observacoes : String
+}
+
+class HistorialClinico {
+}
+
+class IntervencaoClinica {
+  - dataHora : DateTime
+  - descricao : String
+  - custo : double
+}
+
+class Prescricao {
+  - descricao : String
+}
+
+class RegistoEstadoSaude {
+  - dataHora : DateTime
+  - descricao : String
+}
+}
+
+package "Operação do Hotel" {
+class Alojamento {
+  - id : int
+  - tipo : String
+  - especieSuportada : String
+  - estadoLimpeza : EstadoLimpeza
+}
+
+class Reserva {
+  - codigo : String
+  - dataInicio : Date
+  - dataFim : Date
+  - estado : EstadoReserva
+}
+
+class Estadia {
+  - codigo : String
+  - dataInicio : Date
+  - dataFim : Date
+  - estado : EstadoEstadia
+}
+
+class Cuidado {
+  - tipo : String
+  - dataHora : DateTime
+}
+
+class NotaTurno {
+  - descricao : String
+  - dataHora : DateTime
+}
+
+class RegistoLimpeza {
+  - dataHora : DateTime
+  - observacoes : String
+}
+}
+
+package "Faturação" {
+class Fatura {
+  - numero : String
+  - dataEmissao : DateTime
+  - total : double
+}
+
+class Pagamento {
+  - valor : double
+  - metodo : MetodoPagamento
+  - estado : EstadoPagamento
+}
+
+class ServicoExtra {
+  - tipo : String
+  - custo : double
+}
+}
+
+package "Gestão e Análise" {
+class Relatorio {
+  - tipo : String
+  - periodoInicio : Date
+  - periodoFim : Date
+  - dataGeracao : DateTime
+}
+}
+
+enum EstadoLimpeza {
+  Pendente
+  Concluido
+}
+
+enum EstadoReserva {
+  Confirmada
+  Cancelada
+}
+
+enum EstadoEstadia {
+  EmCurso
+  Encerrada
+}
+
+enum MetodoPagamento {
+  Numerario
+  Cartao
+  MBWay
+  Transferencia
+}
+
+enum EstadoPagamento {
+  Liquidado
+  Pendente
+}
+
+' ======================
+' RELAÇÕES
+' ======================
+
+Tutor "1" o-- "0..*" Animal : possui
+Animal "1" *-- "1" PlanoCuidados
+PlanoCuidados "1" *-- "1..*" ItemPlanoCuidado
+
+Animal "1" -- "0..*" Reserva
+Reserva "1" -- "1" Alojamento
+Reserva "1" --> "0..1" Estadia : origina check-in
+
+Animal "1" -- "0..*" Estadia
+Estadia "1" -- "1" Alojamento
+Estadia "1" --> "1" Reserva : resulta de
+
+Estadia "1" *-- "0..*" Cuidado
+Cuidado "0..*" -left-> "1" Utilizador : registado por
+
+Reserva "1" *-- "0..*" NotaTurno
+NotaTurno "0..*" -left-> "1" Utilizador : criada por
+
+Estadia "1" *-- "0..*" RegistoEstadoSaude
+RegistoEstadoSaude "0..*" -left-> "1" Utilizador : registado por
+
+Estadia "1" *-- "1" Fatura
+Fatura "1" *-- "0..*" Pagamento
+
+Estadia "1" *-- "0..*" ServicoExtra
+ServicoExtra "0..*" -up-> "1" Utilizador : registado por
+
+Animal "1" *-- "1" HistorialClinico
+HistorialClinico "1" *-- "0..*" IntervencaoClinica
+IntervencaoClinica "1" o-- "0..*" Prescricao
+IntervencaoClinica "0..*" -up-> "1" Utilizador : veterinário
+IntervencaoClinica "0..*" --> "0..1" ServicoExtra : pode originar
+
+Alojamento "1" *-- "0..*" RegistoLimpeza
+RegistoLimpeza "0..*" -left-> "1" Utilizador : efetuado por
+
+Relatorio "0..*" -left-> "1" Utilizador : gerado por
+
+' Dependências explícitas para enums
+Utilizador ..> PerfilAcesso : usa
+Alojamento ..> EstadoLimpeza : usa
+Reserva ..> EstadoReserva : usa
+Estadia ..> EstadoEstadia : usa
+Pagamento ..> MetodoPagamento : usa
+Pagamento ..> EstadoPagamento : usa
+
+' Guias invisíveis para estabilizar a disposição
+Utilizador -[hidden]down- Tutor
+Utilizador -[hidden]left- Estadia
+Tutor -[hidden]down- Reserva
+Reserva -[hidden]right- Estadia
+Estadia -[hidden]down- Fatura
+Animal -[hidden]right- HistorialClinico
+Alojamento -[hidden]down- RegistoLimpeza
+Fatura -[hidden]right- Relatorio
+
+' ======================
+' REGRAS DE NEGÓCIO (NOTAS)
+' ======================
+
+note right of Alojamento
+Um alojamento só está disponível quando:
+- estadoLimpeza = Concluido
+- não existe estadia ativa
+- é compatível com a espécie do animal
+end note
+
+note right of Estadia
+É iniciada no check-in
+e termina no check-out.
+No check-in é processado o pagamento
+integral da estadia.
+end note
+
+note bottom of Fatura
+No check-out podem ser adicionados
+serviços extra com custo associado.
+Pagamentos podem ficar pendentes.
+end note
+
+note left of Utilizador
+Autenticação por credenciais individuais.
+Permissões determinadas por perfil.
+end note
+
+@enduml
