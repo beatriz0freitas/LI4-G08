@@ -1,50 +1,91 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+Version change: template placeholder version to 1.0.0
+Modified principles: placeholder principles replaced with Domain Scope First; Scenario-Driven Requirements; Modular Separation of Concerns; Verification Before Expansion; Data Integrity, Security, and Operational Reliability
+Added sections: Project Scope and Quality Constraints; Delivery Workflow and Review Gates
+Removed sections: none
+Templates checked: .specify/templates/plan-template.md checked and aligned; .specify/templates/spec-template.md checked and aligned; .specify/templates/tasks-template.md checked and aligned; .specify/templates/commands/ no files found
+Follow-up TODOs: none
+-->
+
+# LI4-G08 Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Domain Scope First
+Every requirement, design decision, and implementation task MUST stay inside the hotel-for-animals domain described by the project brief. Version 1 covers only dogs and cats, and every feature MUST be traceable to a stakeholder need, a user story, and a measurable acceptance criterion. Scope changes, new animal categories, or new business capabilities require an explicit amendment before they are treated as in scope.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Scenario-Driven Requirements
+Requirements MUST be written as verifiable scenarios, not as vague intentions. Ambiguous terms such as fast, easy, simple, or real time are forbidden unless they are quantified. Each feature MUST define the actor, preconditions, observable behavior, failure cases, and success criteria so that the result can be tested independently.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Modular Separation of Concerns
+The system MUST be decomposed into cohesive domain capabilities: reservations, stay management, care records, clinical history, billing, reporting, and access control. Cross-cutting concerns such as validation, persistence, logging, and authentication MUST be shared and centralized rather than duplicated in each feature. Interfaces and data contracts SHOULD be stable before implementation begins.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Verification Before Expansion
+No feature is complete until it has an explicit verification path. Every user story MUST have acceptance scenarios and a test strategy before implementation is considered done, and new work MUST be delivered in small, independently testable increments. Contract changes, workflow changes, and data model changes require regression coverage before they are accepted.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Data Integrity, Security, and Operational Reliability
+Business data MUST remain consistent under concurrent use, especially for reservations, occupancy, payments, and clinical records. Access control MUST follow least privilege, personal data MUST be protected according to the project's privacy obligations, and important actions MUST be auditable. Availability checks, check-in/check-out actions, and billing operations MUST remain responsive enough for front-desk use, and failures MUST be visible through logging and recoverable behavior.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Project Scope and Quality Constraints
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### In Scope for the First Release
+- Reservation and occupancy management for animal accommodation.
+- Check-in and check-out workflows.
+- Daily care registration and handover notes between staff.
+- Clinical history and intervention records.
+- Billing, payments, and service extras.
+- Operational dashboards and period-based reporting.
+- Role-based access for director, reception, caregivers, cleaning staff, and veterinary responsibility.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+### Out of Scope for the First Release
+- Support for species other than dogs and cats.
+- Client-facing portals, mobile apps, and self-service bookings unless explicitly added later.
+- Machine learning recommendations, predictive analytics, and automation that changes business decisions without human approval.
+- Infrastructure or platform choices that are not required by the approved plan.
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+### Quality Constraints
+- Requirements MUST be measurable, testable, and traceable from stakeholder need to final acceptance.
+- The project MUST prevent overbooking and preserve consistency between reservations, stays, and cleaning state.
+- User-facing operations MUST be simple enough for non-technical staff to perform after minimal training.
+- Key actions SHOULD complete within a few seconds for front-desk use, and availability lookups SHOULD feel near immediate.
+- Documentation, diagrams, prompts, and decisions MUST remain versioned with the repository.
+- The project MAY use AI assistance, but AI output is always a draft until a human reviews and approves it.
+- All significant technical and architectural decisions MUST be recorded in a decision log (`docs/decisions/`) to ensure a clear audit trail for project evaluation.
+
+### Normative Basis
+- Sommerville, I. (2016). Software Engineering (10th ed.). Pearson Education.
+- The project should follow Sommerville's guidance on clear requirements, iterative validation, modular design, traceability, and disciplined quality control.
+- Where relevant, the project SHOULD also stay consistent with common software engineering quality expectations such as verifiability, maintainability, reliability, and security.
+
+## Delivery Workflow and Review Gates
+
+### Required Workflow
+1. Start from the constitution and the project brief before writing any feature spec.
+2. Produce the feature specification before the implementation plan.
+3. Produce the implementation plan before tasks.
+4. Produce tasks before implementation.
+5. Validate each stage against the constitution before moving forward.
+
+### Review Gates
+- A feature spec MUST include prioritized user stories, edge cases, functional requirements, and success criteria.
+- A plan MUST show the technical context, the constitution check, and the chosen structure.
+- Tasks MUST be organized by user story so that each story can be implemented and tested independently.
+- Implementation MUST not begin until the story being worked on is approved and traceable.
+- Any deviation from the constitution MUST be justified in the plan and revisited before merge.
+
+### AI and Workspace Guidance
+- Workspace-shared prompts, agents, and instructions SHOULD live in `.github/` so the team can version and review them.
+- Reusable prompting patterns and examples SHOULD also be documented under `docs/llm-patterns/` when they are part of the project workflow.
+- Personal experiments that are not meant for the team MAY stay outside version control.
+- Generated content MUST be reviewed by a human before it is treated as authoritative.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution is the highest local process authority for the project. It overrides informal practices, ad hoc prompting habits, and conflicting guidance in lower-level documents. Any amendment MUST state the reason for the change, list the affected principles or sections, and identify the downstream artifacts that need updates.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+Versioning follows semantic rules: a MAJOR bump is required for principle removal or redefinition; a MINOR bump is required for a new principle or materially expanded guidance; and a PATCH bump is required for wording clarifications or non-semantic refinements. Ratification happens when the team accepts the constitution for active use, and the ratified version MUST be updated whenever an amendment is approved.
+
+Every significant milestone MUST include a constitution check during review of the spec, the plan, and the task list. If a change conflicts with the constitution, the change is rejected until either the artifact is corrected or the constitution is formally amended.
+
+**Version**: 1.0.1 | **Ratified**: 2026-04-19 | **Last Amended**: 2026-04-19
