@@ -55,11 +55,15 @@ Como utilizador, quero exportar os diagramas em formatos standard (imagem, PDF),
 ## Functional Requirements
 
 1. Devem ser criados diagramas de classes, sequência e componentes, utilizando PlantUML ou Mermaid.
-2. Os diagramas devem ser claros, simples e facilmente compreendidos por todos os membros da equipa.
-3. A documentação deve permitir a atualização fácil dos diagramas sempre que houver alterações na arquitetura.
-4. Os diagramas devem poder ser exportados em formatos standard (imagem, PDF).
-5. Devem ser incluídos outros diagramas relevantes (ex: casos de uso, domínio) se necessário para clarificar a arquitetura.
-6. Toda a documentação deve estar organizada e acessível num local centralizado do projeto.
+2. Todos os diagramas devem seguir estritamente os standards UML, respeitando as regras da linguagem (ex: notação, símbolos, relações, agrupamentos) tal como implementado em ferramentas como Visual Paradigm.
+3. Não devem ser inventadas cores, símbolos ou estilos não standard; usar apenas o que é definido pela especificação UML.
+4. Os diagramas devem ser claros, simples e facilmente compreendidos por todos os membros da equipa.
+5. A documentação deve permitir a atualização fácil dos diagramas sempre que houver alterações na arquitetura.
+6. Os diagramas devem poder ser exportados em formatos standard (imagem, PDF).
+7. Devem ser incluídos outros diagramas relevantes (ex: casos de uso, domínio) se necessário para clarificar a arquitetura.
+8. Toda a documentação deve estar organizada e acessível num local centralizado do projeto.
+9. Devem ser incluídos diagramas de sequência para os principais fluxos do sistema: reserva, check-in, check-out, cuidados, faturação, limpeza e intervenção do veterinário.
+
 
 ## Success Criteria
 
@@ -74,7 +78,6 @@ Como utilizador, quero exportar os diagramas em formatos standard (imagem, PDF),
 - Diagrama de Classes
 - Diagrama de Sequência
 - Diagrama de Componentes
-- Outros diagramas relevantes (casos de uso, domínio)
 - Documentação centralizada
 
 ## Assumptions
