@@ -1,56 +1,14 @@
 # Feature Specification: arquitetura-projeto
 
-**Feature Branch**: `[001-arquitetura-projeto]`  
-**Created**: 2026-04-21  
-**Status**: Draft  
-**Input**: User description: "quero criar a arquitetura do projeto, para ir de encontro á fase 2 de #file:20252026-UM-LEI-LI4-Enunciado-Trabalho-Pratico.pdf, os diagramas é para criar em plantuml ou mermaid, tem que ter diagramas  de  classes,  sequência  e  componentes e outros que aches necessários, mantém tudo muito claro e simples"
+**Feature Branch**: `[001-arquitetura-projeto]`
+**Created**: 2026-04-21
+**Status**: Draft
+**Input**: User description: "quero modelar a arquitetura do projeto, para ir de encontro á fase 2 de #file:20252026-UM-LEI-LI4-Enunciado-Trabalho-Pratico.pdf, os diagramas é para criar em plantuml ou mermaid, tem que ter diagramas  de  classes,  sequência  e  componentes e outros que aches necessários, mantém tudo muito claro e simples"
 
-## User Scenarios & Testing *(mandatory)*
-
-### User Story 1 - Visualizar Arquitetura (Priority: P1)
-
-Como membro da equipa, quero visualizar a arquitetura do projeto de forma clara e simples, para compreender rapidamente a estrutura e os principais componentes do sistema.
-
-**Why this priority**: Permite alinhar toda a equipa e facilitar a comunicação e planeamento das próximas fases.
-
-**Independent Test**: Pode ser testado ao apresentar os diagramas e verificar se todos os elementos essenciais estão representados e compreendidos pelos membros da equipa.
-
-**Acceptance Scenarios**:
-
-1. **Given** a equipa acede à documentação, **When** consulta os diagramas, **Then** compreende a estrutura geral do sistema.
-2. **Given** um novo membro entra na equipa, **When** lê a documentação, **Then** entende rapidamente os principais componentes e fluxos.
-
----
-
-### User Story 2 - Atualizar Diagramas (Priority: P2)
-
-Como responsável pela documentação, quero poder atualizar facilmente os diagramas (classes, sequência, componentes), para garantir que a arquitetura está sempre alinhada com o desenvolvimento.
-
-**Why this priority**: Mantém a documentação útil e relevante ao longo do projeto.
-
-**Independent Test**: Pode ser testado ao modificar um componente e atualizar o diagrama correspondente, verificando se a alteração é refletida de forma clara.
-
-**Acceptance Scenarios**:
-
-1. **Given** uma alteração na arquitetura, **When** o diagrama é atualizado, **Then** a documentação reflete corretamente a nova estrutura.
-2. **Given** um diagrama desatualizado, **When** é revisto, **Then** passa a estar em conformidade com o sistema atual.
-
----
-
-### User Story 3 - Exportar Diagramas (Priority: P3)
-
-Como utilizador, quero exportar os diagramas em formatos standard (imagem, PDF), para partilhar facilmente com stakeholders externos.
-
-**Why this priority**: Facilita a comunicação com partes interessadas fora da equipa técnica.
-
-**Independent Test**: Pode ser testado ao exportar um diagrama e verificar a sua legibilidade e integridade.
-
-**Acceptance Scenarios**:
-
-1. **Given** um diagrama criado, **When** é exportado, **Then** mantém a clareza e todos os elementos essenciais.
-2. **Given** a necessidade de partilha externa, **When** o diagrama é enviado, **Then** o destinatário compreende a arquitetura apresentada.
-
----
+## Contexto
+Sistema de gestão de hotel para animais (cães e gatos) — web app em 3 camadas.
+Objetivo: produzir toda a documentação de arquitetura da Etapa 2 do projeto LI4-G08,
+seguindo Sommerville (Cap. 5 e 7) e as normas UML 2.5.
 
 ## Functional Requirements
 
@@ -103,3 +61,110 @@ Como utilizador, quero exportar os diagramas em formatos standard (imagem, PDF),
 
 ### Atualização dos requisitos
 - Os diagramas de classes e componentes devem apresentar todas as classes, métodos, atributos e relações detalhadas, garantindo o máximo de detalhe possível para apoiar análise e implementação.
+
+### Diagramas Obrigatórios
+
+1. **Diagrama de Classes** em Mermaid (`.mmd`):
+   - Entidades obrigatórias com atributos tipados e métodos completos:
+     - `Tutor`, `Colaborador` (com papel: Rececionista | Veterinário | Cuidador | Responsável Limpeza )
+     - `Animal` (espécie: Cão | Gato), `HistorialClínico`, `IntervençãoClínica`
+     - `Alojamento` (tipologia: Canino | Felino; estadoLimpeza: enumerado),
+       `Reserva`, `Estadia`, `Cuidado`, `Nota`
+     - `ServiçoExtra`, `Fatura`, `Pagamento`
+   - Incluir classes de Service e Repository 
+   - Representar todas as relações com cardinalidades corretas:
+     - Tutor 1 → * Animal
+     - Animal 1 → 1 HistorialClínico
+     - HistorialClínico 1 → * IntervençãoClínica
+     - Reserva * → 1 Tutor, * → 1 Animal, * → 1 Alojamento
+     - Reserva 1 → 0..1 Estadia
+     - Estadia 1 → * Cuidado, 1 → * Nota, 1 → * ServiçoExtra, 1 → 1 Fatura
+     - Fatura 1 → * Pagamento
+   - Visibilidade UML (`+`, `-`, `#`) em todos os atributos e métodos
+
+2. **Diagramas de Sequência** — um ficheiro `.mmd` e um `.txt` por fluxo:
+   - Formato `.txt` deve ser PlantUML válido, importável no Visual Paradigm sem erros
+   - Participantes: objetos de domínio e serviços (ex: `:ReservaService`, `:Estadia`,
+     `:AlojamentoRepository`) — **sem HTTP, sem Controllers, sem endpoints REST**
+   - Fluxos obrigatórios:
+     - `seq-reserva` — verificação de disponibilidade do Alojamento, criação e confirmação
+       de Reserva, associação Tutor + Animal + Alojamento
+     - `seq-checkin` — validação da Reserva, criação da Estadia, atualização do estado
+       do Alojamento para ocupado
+     - `seq-checkout` — encerramento da Estadia, agregação de ServiçosExtra, cálculo e
+       emissão de Fatura, atualização do estado do Alojamento para pendente de limpeza
+     - `seq-cuidado` — registo de Cuidado diário (alimentação, medicação, higiene, atividade)
+       por Cuidador, associado à Estadia
+     - `seq-nota` — registo de Nota de turno associada à Estadia por Colaborador
+     - `seq-servico-extra` — registo de ServiçoExtra por Cuidador ou Veterinário,
+       associado à Estadia com impacto na Fatura
+     - `seq-veterinario` — registo de IntervençãoClínica no HistorialClínico do Animal
+       e, se aplicável, criação de ServiçoExtra na Estadia
+     - `seq-limpeza` — atualização do estado de limpeza do Alojamento por Colaborador;
+       quando concluída, Alojamento fica disponível
+     - `seq-pagamento` — registo de Pagamento associado à Fatura; suporte a múltiplos
+       Pagamentos por Fatura
+
+3. **Diagrama de Componentes** em Mermaid (`.mmd`):
+   - Módulos lógicos: Reservas, Estadias, Cuidados, ServiçosExtra, Faturação,
+     Limpeza, GestãoAnimais, GestãoUtilizadores
+   - Camadas: Frontend, API/Backend, Base de Dados
+   - Notação UML (`<<component>>`, `<<interface>>`)
+
+4. **Diagrama de Casos de Uso** em Mermaid (`.mmd`):
+   - Atores: Tutor, Rececionista, Veterinário, Cuidador, Administrador
+   - Casos de uso cobrindo todos os fluxos de sequência definidos acima
+
+### Requisitos de Qualidade
+5. Notação UML 2.5 estrita — sem cores ou estilos custom.
+6. Ficheiros `.txt` PlantUML importáveis no Visual Paradigm via File > Import > PlantUML.
+7. Cada ficheiro em `docs/architecture/` com cabeçalho: nome, tipo, data, descrição breve.
+8. Regras de negócio refletidas nos diagramas:
+   - Alojamento disponível apenas se limpeza concluída E sem Estadia ativa
+   - Alojamento só aceita a espécie correspondente à sua tipologia
+   - Reserva origina no máximo uma Estadia
+   - Estadia tem exatamente uma Fatura
+
+## Estrutura de Ficheiros Esperada
+
+docs/
+└── architecture/
+    ├── class-domain.mmd
+    ├── component.mmd
+    ├── seq-reserva.mmd
+    ├── seq-reserva.txt
+    ├── seq-checkin.mmd
+    ├── seq-checkin.txt
+    ├── seq-checkout.mmd
+    ├── seq-checkout.txt
+    ├── seq-cuidado.mmd
+    ├── seq-cuidado.txt
+    ├── seq-nota.mmd
+    ├── seq-nota.txt
+    ├── seq-servico-extra.mmd
+    ├── seq-servico-extra.txt
+    ├── seq-veterinario.mmd
+    ├── seq-veterinario.txt
+    ├── seq-limpeza.mmd
+    ├── seq-limpeza.txt
+    ├── seq-pagamento.mmd
+    ├── seq-pagamento.txt
+    └── decisions/
+    └── ADR-001-arquitetura-camadas.md
+
+## Success Criteria
+- Todos os diagramas existem, renderizam sem erros e seguem UML 2.5.
+- Ficheiros `.txt` importam sem erros no Visual Paradigm.
+- Diagrama de classes tem os quatro packages com todas as entidades, relações e cardinalidades.
+- Diagramas de sequência mostram apenas lógica de negócio (sem HTTP/endpoints).
+- Regras de negócio críticas estão explicitamente modeladas.
+
+## Out of Scope
+- Endpoints REST, payloads, status codes HTTP → ficam em `docs/api/`
+- Implementação de código-fonte
+- Schema SQL ou detalhes de base de dados
+
+## Assumptions
+- Diagramas de sequência seguem design-level (Sommerville Cap. 7), não system-level
+- Visual Paradigm suporta importação via File > Import > PlantUML
+- A stack tecnológica não altera o modelo de domínio

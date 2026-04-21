@@ -1,22 +1,22 @@
 # Tasks: arquitetura-projeto
 
 ## Phase 1: Setup
-- [ ] T001 Criar diretórios para diagramas e decisões em docs/architecture/
+- [x] T001 Criar diretórios para diagramas e decisões em docs/architecture/
 
 ## Phase 2: Fundacional
 - [ ] T002 Instalar/extender suporte a PlantUML e Mermaid para geração de diagramas
 - [ ] T003 Definir convenções de nomeação e organização dos ficheiros de diagramas
 
 ## Phase 3: User Story 1 (P1) - Visualizar Arquitetura
-- [ ] T004 [P] [US1] Criar diagrama de classes completo em docs/architecture/diagramas/classes.mmd
-- [ ] T005 [P] [US1] Criar diagrama de sequência de reserva em docs/architecture/diagramas/sequencia-reserva.mmd
-- [ ] T006 [P] [US1] Criar diagrama de sequência de check-in em docs/architecture/diagramas/sequencia-checkin.mmd
-- [ ] T007 [P] [US1] Criar diagrama de sequência de check-out em docs/architecture/diagramas/sequencia-checkout.mmd
-- [ ] T008 [P] [US1] Criar diagrama de sequência de cuidados em docs/architecture/diagramas/sequencia-cuidados.mmd
-- [ ] T009 [P] [US1] Criar diagrama de sequência de faturação em docs/architecture/diagramas/sequencia-faturacao.mmd
-- [ ] T010 [P] [US1] Criar diagrama de sequência de limpeza em docs/architecture/diagramas/sequencia-limpeza.mmd
-- [ ] T011 [P] [US1] Criar diagrama de sequência de intervenção do veterinário em docs/architecture/diagramas/sequencia-veterinario.mmd
-- [ ] T012 [P] [US1] Criar diagrama de componentes em docs/architecture/diagramas/componentes.mmd
+- [x] T004 [P] [US1] Criar diagrama de classes completo em docs/architecture/diagramas/classes.mmd
+- [x] T005 [P] [US1] Criar diagrama de sequência de reserva em docs/architecture/diagramas/sequencia-reserva.mmd
+- [x] T006 [P] [US1] Criar diagrama de sequência de check-in em docs/architecture/diagramas/sequencia-checkin.mmd
+- [x] T007 [P] [US1] Criar diagrama de sequência de check-out em docs/architecture/diagramas/sequencia-checkout.mmd
+- [x] T008 [P] [US1] Criar diagrama de sequência de cuidados em docs/architecture/diagramas/sequencia-cuidados.mmd
+- [x] T009 [P] [US1] Criar diagrama de sequência de faturação em docs/architecture/diagramas/sequencia-faturacao.mmd
+- [x] T010 [P] [US1] Criar diagrama de sequência de limpeza em docs/architecture/diagramas/sequencia-limpeza.mmd
+- [x] T011 [P] [US1] Criar diagrama de sequência de intervenção do veterinário em docs/architecture/diagramas/sequencia-veterinario.mmd
+- [x] T012 [P] [US1] Criar diagrama de componentes em docs/architecture/diagramas/componentes.mmd
 - [ ] T013 [US1] Rever diagramas com equipa e validar clareza e cobertura
 
 ## Phase 4: User Story 2 (P2) - Atualizar Diagramas
