@@ -1,0 +1,29 @@
+---
+title: Diagrama de Sequência - Cuidados
+description: Fluxo de registo de um cuidado a um animal durante a estadia.
+---
+sequenceDiagram
+    actor Cuidador
+    participant CuidadoService
+    participant CuidadoRepository
+    participant EstadiaRepository
+
+    Cuidador->>CuidadoService: registarCuidado(dadosCuidado)
+    activate CuidadoService
+
+    CuidadoService->>EstadiaRepository: findById(estadiaId)
+    activate EstadiaRepository
+    EstadiaRepository-->>CuidadoService: estadia
+    deactivate EstadiaRepository
+
+    alt estadia.foiEncerrada() == false
+        CuidadoService->>CuidadoRepository: save(novoCuidado)
+        activate CuidadoRepository
+        CuidadoRepository-->>CuidadoService: cuidadoRegistado
+        deactivate CuidadoRepository
+
+        CuidadoService-->>Cuidador: Cuidado registado com sucesso
+    else
+        CuidadoService-->>Cuidador: Erro: Estadia já encerrada
+    end
+    deactivate CuidadoService

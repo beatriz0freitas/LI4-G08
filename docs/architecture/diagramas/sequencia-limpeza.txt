@@ -1,0 +1,26 @@
+@startuml
+title Diagrama de Sequência - Limpeza
+actor ResponsavelLimpeza
+participant AlojamentoService
+participant AlojamentoRepository
+
+ResponsavelLimpeza -> AlojamentoService: atualizarEstadoLimpeza(alojamentoId, "Concluido")
+activate AlojamentoService
+
+AlojamentoService -> AlojamentoRepository: findById(alojamentoId)
+activate AlojamentoRepository
+AlojamentoRepository --> AlojamentoService: alojamento
+deactivate AlojamentoRepository
+
+alt alojamento.estadoLimpeza != "Concluido"
+    AlojamentoService -> AlojamentoRepository: update(alojamento.setEstadoLimpeza("Concluido"))
+    activate AlojamentoRepository
+    AlojamentoRepository --> AlojamentoService
+    deactivate AlojamentoRepository
+
+    AlojamentoService --> ResponsavelLimpeza: Estado de limpeza atualizado
+else
+    AlojamentoService --> ResponsavelLimpeza: Erro: Alojamento já se encontra limpo
+end
+deactivate AlojamentoService
+@enduml

@@ -1,0 +1,38 @@
+@startuml
+title Diagrama de Sequência - Check-out
+actor Rececionista
+participant EstadiaService
+participant FaturacaoService
+participant EstadiaRepository
+participant AlojamentoService
+
+Rececionista -> EstadiaService: encerrarEstadia(estadiaId, colaboradorId)
+activate EstadiaService
+
+EstadiaService -> EstadiaRepository: findById(estadiaId)
+activate EstadiaRepository
+EstadiaRepository --> EstadiaService: estadia
+deactivate EstadiaRepository
+
+alt estadia.foiEncerrada() == false
+    EstadiaService -> FaturacaoService: gerarFatura(estadia)
+    activate FaturacaoService
+    FaturacaoService --> EstadiaService: faturaGerada
+    deactivate FaturacaoService
+
+    EstadiaService -> EstadiaRepository: update(estadia.setEstado("Encerrada"))
+    activate EstadiaRepository
+    EstadiaRepository --> EstadiaService
+    deactivate EstadiaRepository
+
+    EstadiaService -> AlojamentoService: atualizarEstadoLimpeza(alojamentoId, "Pendente")
+    activate AlojamentoService
+    AlojamentoService --> EstadiaService
+    deactivate AlojamentoService
+
+    EstadiaService --> Rececionista: checkOutRealizado(faturaGerada)
+else
+    EstadiaService --> Rececionista: Erro: Estadia já encerrada
+end
+deactivate EstadiaService
+@enduml

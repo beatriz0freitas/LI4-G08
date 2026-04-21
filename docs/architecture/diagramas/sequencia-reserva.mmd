@@ -1,0 +1,42 @@
+---
+title: Diagrama de Sequência - Reserva
+description: Fluxo de criação e confirmação de uma reserva.
+---
+sequenceDiagram
+    actor Tutor
+    participant ReservaService
+    participant AlojamentoService
+    participant AlojamentoRepository
+    participant ReservaRepository
+
+    Tutor->>ReservaService: criarReserva(dadosReserva)
+    activate ReservaService
+
+    ReservaService->>AlojamentoService: verificarDisponibilidade(alojamentoId, dataInicio, dataFim)
+    activate AlojamentoService
+
+    AlojamentoService->>AlojamentoRepository: findById(alojamentoId)
+    activate AlojamentoRepository
+    AlojamentoRepository-->>AlojamentoService: alojamento
+    deactivate AlojamentoRepository
+
+    AlojamentoService->>AlojamentoRepository: findEstadiasConflitantes(alojamentoId, dataInicio, dataFim)
+    activate AlojamentoRepository
+    AlojamentoRepository-->>AlojamentoService: 0 estadias
+    deactivate AlojamentoRepository
+    
+    AlojamentoService->>ReservaRepository: findReservasConflitantes(alojamentoId, dataInicio, dataFim)
+    activate ReservaRepository
+    ReservaRepository-->>AlojamentoService: 0 reservas
+    deactivate ReservaRepository
+
+    AlojamentoService-->>ReservaService: true (disponível)
+    deactivate AlojamentoService
+
+    ReservaService->>ReservaRepository: save(novaReserva)
+    activate ReservaRepository
+    ReservaRepository-->>ReservaService: reservaCriada
+    deactivate ReservaRepository
+
+    ReservaService-->>Tutor: reservaConfirmada
+    deactivate ReservaService

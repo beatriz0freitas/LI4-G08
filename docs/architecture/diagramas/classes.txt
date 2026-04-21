@@ -1,0 +1,353 @@
+@startuml
+title Diagrama de Classes
+
+abstract class Utilizador {
+  +Long id
+  +Boolean ativo
+  +DateTime criadoEm
+  +DateTime atualizadoEm
+}
+
+class Tutor extends Utilizador {
+  +String nome
+  +String nif
+  +String email
+  +String contacto
+  +String endereco
+  +possuiAnimais() : Collection<Animal>
+}
+
+class Colaborador extends Utilizador {
+  +String nome
+  +String email
+  +String contacto
+  +PerfilAcesso perfilAcesso
+  +temPermissao(operacao : String) : Boolean
+}
+
+class Animal {
+  +Long id
+  +String nome
+  +Especie especie
+  +String raca
+  +Date dataNascimento
+  +Double peso
+  +String estadoSaude
+  +String necessidadesAlimentares
+  +String medicacaoEmCurso
+  +String necessidadesEspeciais
+}
+
+class Alojamento {
+  +Long id
+  +TipoAlojamento tipo
+  +Especie especieSuportada
+  +EstadoLimpeza estadoLimpeza
+  +String numero
+  +Integer capacidade
+  +Double precoDiario
+  +estaDisponivel(dataInicio : Date, dataFim : Date) : Boolean
+  +estaDisponivel() : Boolean
+  +suportaEspecie(especie : Especie) : Boolean
+  +podeSerReservado() : Boolean
+}
+
+class Reserva {
+  +Long id
+  +String codigo
+  +Date dataInicio
+  +Date dataFim
+  +EstadoReserva estado
+  +DateTime criadaEm
+  +DateTime atualizadaEm
+  +podeIniciarEstadia() : Boolean
+  +estaCancelada() : Boolean
+  +estaVencida() : Boolean
+}
+
+class Estadia {
+  +Long id
+  +String codigo
+  +DateTime dataCheckIn
+  +DateTime dataCheckOut
+  +EstadoEstadia estado
+  +DateTime criadaEm
+  +DateTime encerradaEm
+  +foiEncerrada() : Boolean
+  +temPagamentoPendente() : Boolean
+}
+
+class Cuidado {
+  +Long id
+  +TipoCuidado tipo
+  +String descricao
+  +DateTime dataHora
+  +DateTime criadoEm
+  +pertenceAoMesmoTurno(outroCuidado : Cuidado) : Boolean
+}
+
+class Nota {
+  +Long id
+  +String descricao
+  +DateTime dataHora
+  +Turno turno
+  +DateTime criadaEm
+}
+
+class ServicoExtra {
+  +Long id
+  +TipoServicoExtra tipo
+  +String descricao
+  +Double custo
+  +DateTime data
+  +DateTime criadoEm
+  +podeSerAlterado() : Boolean
+}
+
+class Fatura {
+  +Long id
+  +String numero
+  +DateTime dataEmissao
+  +Double valorBase
+  +Double desconto
+  +Double total
+  +EstadoFatura estado
+  +String observacoes
+  +DateTime criadaEm
+  +estaQuitada() : Boolean
+  +temSaldoPendente() : Double
+  +podeSerAlterada() : Boolean
+}
+
+class Pagamento {
+  +Long id
+  +Double valor
+  +MetodoPagamento metodo
+  +EstadoPagamento estado
+  +Date dataVencimento
+  +DateTime dataPagamento
+  +String motivo
+  +DateTime criadoEm
+}
+
+class HistorialClinico {
+  +Long id
+}
+
+class IntervencaoClinica {
+  +Long id
+  +DateTime dataHora
+  +String descricao
+  +Double custo
+  +DateTime criadoEm
+}
+
+class Prescricao {
+  +Long id
+  +String descricao
+  +Date dataInicio
+  +Date dataFim
+}
+
+class AplicacaoPrescricao {
+  +Long id
+  +DateTime dataHora
+  +String observacoes
+}
+
+class EventoAuditoria {
+  +Long id
+  +TipoEvento tipoEvento
+  +String entidadeAfetada
+  +Long idEntidade
+  +String alteracoes
+  +DateTime dataHora
+  +String ipOrigem
+  +String detalhes
+}
+
+class RegistoLimpeza {
+  +Long id
+  +DateTime dataHora
+  +String observacoes
+}
+
+class ItemPlanoCuidado {
+  +String tipo
+  +String periodicidade
+  +String observacoes
+}
+
+Tutor "1" -- "0..*" Animal : possui
+Reserva "1" -- "1" Tutor
+Reserva "1" -- "1" Animal
+Reserva "1" -- "1" Alojamento
+Estadia "1" -- "1" Reserva
+Estadia "1" -- "1" Animal
+Estadia "1" -- "1" Alojamento
+Estadia "1" -- "1" Colaborador : criadoPor
+Estadia "1" -- "1" Colaborador : atualizadoPor
+Estadia "1" -- "0..*" Cuidado
+Cuidado "1" -- "1" Colaborador : realizadoPor
+Estadia "1" -- "0..*" Nota
+Nota "1" -- "1" Colaborador : criadaPor
+Estadia "1" -- "0..*" ServicoExtra
+ServicoExtra "1" -- "1" Colaborador : registadoPor
+Estadia "1" -- "1" Fatura
+Fatura "1" -- "0..*" Pagamento
+Animal "1" -- "1" HistorialClinico
+HistorialClinico "1" -- "0..*" IntervencaoClinica
+IntervencaoClinica "1" -- "1" Colaborador : realizadoPor
+IntervencaoClinica "0..1" -- "0..1" ServicoExtra : servicoExtraAssociado
+IntervencaoClinica "1" -- "0..*" Prescricao
+Prescricao "1" -- "0..*" AplicacaoPrescricao
+AplicacaoPrescricao "1" -- "1" Colaborador : aplicadoPor
+EventoAuditoria "1" -- "1" Colaborador : utilizador
+Alojamento "1" -- "0..*" RegistoLimpeza
+RegistoLimpeza "1" -- "1" Colaborador : efetuadoPor
+Estadia "1" -- "0..*" ItemPlanoCuidado : cuidadosPlaneados
+
+enum PerfilAcesso {
+  Diretor
+  Rececionista
+  Cuidador
+  Veterinario
+  ResponsavelLimpeza
+}
+
+enum Especie {
+  Cao
+  Gato
+}
+
+enum TipoAlojamento {
+  Canino
+  Felino
+}
+
+enum EstadoLimpeza {
+  Pendente
+  EmLimpeza
+  Concluido
+}
+
+enum EstadoReserva {
+  Confirmada
+  Cancelada
+}
+
+enum EstadoEstadia {
+  EmCurso
+  Encerrada
+}
+
+enum EstadoFatura {
+  Emitida
+  Paga
+  ParcialmPendente
+}
+
+enum MetodoPagamento {
+  Numerario
+  Cartao
+  MBWay
+  Transferencia
+}
+
+enum EstadoPagamento {
+  Liquidado
+  Pendente
+}
+
+enum TipoCuidado {
+  Alimentacao
+  Medicacao
+  Higiene
+  Atividade
+  Observacao
+}
+
+enum TipoServicoExtra {
+  Banho
+  Passeio
+  Tosquia
+  MedicacaoPrescrita
+  Outro
+}
+
+enum TipoEvento {
+  CRIACAO
+  ATUALIZACAO
+  DELECAO
+  CHECK_IN
+  CHECK_OUT
+  PAGAMENTO_REGISTADO
+  SERVICO_EXTRA_REGISTADO
+  LIMPEZA_CONCLUIDA
+}
+
+enum Turno {
+  Matutino
+  Vespertino
+  Noturno
+}
+
+package "Services" {
+  class ReservaService {
+    +criarReserva(tutor, animal, alojamento, dataInicio, dataFim) : Reserva
+    +confirmarReserva(reserva) : void
+    +cancelarReserva(reserva) : void
+    +consultarDisponibilidade(alojamento, dataInicio, dataFim, especie) : Boolean
+  }
+
+  class EstadiaService {
+    +iniciarEstadia(reserva, colaborador) : Estadia
+    +encerrarEstadia(estadia, colaborador) : void
+  }
+
+  class AlojamentoService {
+    +verificarDisponibilidade(alojamento, dataInicio, dataFim) : Boolean
+    +atualizarEstadoLimpeza(alojamento, novoEstado) : void
+  }
+
+  class FaturacaoService {
+    +gerarFatura(estadia) : Fatura
+    +registarPagamento(fatura, pagamento) : void
+  }
+
+  class AnimalService {
+    +criarAnimal(tutor, dados) : Animal
+    +consultarHistorialClinico(animal) : HistorialClinico
+  }
+
+  class UtilizadorService {
+    +autenticar(username, password) : Utilizador
+    +criarColaborador(dados, perfil) : Colaborador
+  }
+  
+  class CuidadoService {}
+  class RelatorioService {}
+}
+
+package "Repositories" {
+  interface ReservaRepository <<Repository>>
+  interface EstadiaRepository <<Repository>>
+  interface AlojamentoRepository <<Repository>>
+  interface FaturaRepository <<Repository>>
+  interface PagamentoRepository <<Repository>>
+  interface AnimalRepository <<Repository>>
+  interface UtilizadorRepository <<Repository>>
+  interface CuidadoRepository <<Repository>>
+  interface TutorRepository <<Repository>>
+}
+
+ReservaService ..> ReservaRepository
+EstadiaService ..> EstadiaRepository
+EstadiaService ..> FaturacaoService
+AlojamentoService ..> AlojamentoRepository
+FaturacaoService ..> FaturaRepository
+FaturacaoService ..> PagamentoRepository
+AnimalService ..> AnimalRepository
+UtilizadorService ..> UtilizadorRepository
+
+@enduml
