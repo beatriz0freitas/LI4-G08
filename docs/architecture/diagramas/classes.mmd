@@ -3,7 +3,7 @@ title: Diagrama de Classes
 description: Modelo de domínio completo do sistema de gestão de hotel para animais.
 ---
 classDiagram
-    direction LR
+    direction TB
 
     class Utilizador {
         <<Abstract>>
@@ -19,7 +19,6 @@ classDiagram
         +String email
         +String contacto
         +String endereco
-        +possuiAnimais() Collection~Animal~
     }
     Utilizador <|-- Tutor
 
@@ -72,9 +71,9 @@ classDiagram
         +estaCancelada() Boolean
         +estaVencida() Boolean
     }
-    Reserva -- "1" Tutor
-    Reserva -- "1" Animal
-    Reserva -- "1" Alojamento
+    Tutor "1" -- "0..*" Reserva : efetua
+    Animal "1" -- "0..*" Reserva : reservadoEm
+    Alojamento "1" -- "0..*" Reserva : aloca
 
     class Estadia {
         +Long id
@@ -91,6 +90,7 @@ classDiagram
     Estadia -- "1" Animal
     Estadia -- "1" Alojamento
     Estadia -- "1" Colaborador : criadoPor
+    Estadia -- "1" Colaborador : atualizadoPor
 
     class Cuidado {
         +Long id
@@ -245,7 +245,7 @@ classDiagram
         <<enumeration>>
         Emitida
         Paga
-        ParcialmPendente
+        ParcialPendente
     }
 
     class MetodoPagamento {
@@ -278,18 +278,6 @@ classDiagram
         Tosquia
         MedicacaoPrescrita
         Outro
-    }
-
-    class TipoEvento {
-        <<enumeration>>
-        CRIACAO
-        ATUALIZACAO
-        DELECAO
-        CHECK_IN
-        CHECK_OUT
-        PAGAMENTO_REGISTADO
-        SERVICO_EXTRA_REGISTADO
-        LIMPEZA_CONCLUIDA
     }
 
     class Turno {
@@ -328,6 +316,39 @@ classDiagram
     }
     FaturacaoService ..> FaturaRepository
     FaturacaoService ..> EstadiaRepository
+    FaturacaoService ..> PagamentoRepository
+
+    class ServicoExtraService {
+        +registarServicoExtra(estadia, tipo, descricao, custo, colaborador) ServicoExtra
+        +alterarServicoExtra(servicoExtra, dados) void
+    }
+    ServicoExtraService ..> ServicoExtraRepository
+    ServicoExtraService ..> EstadiaRepository
+
+    class NotaService {
+        +registarNota(estadia, turno, descricao, colaborador) Nota
+        +listarNotasPorEstadia(estadia) Collection~Nota~
+    }
+    NotaService ..> NotaRepository
+    NotaService ..> EstadiaRepository
+
+    class ClinicaService {
+        +registarIntervencao(animal, colaborador, descricao, custo) IntervencaoClinica
+        +criarPrescricao(intervencao, descricao, dataInicio, dataFim) Prescricao
+        +registarAplicacao(prescricao, colaborador, observacoes) AplicacaoPrescricao
+    }
+    ClinicaService ..> IntervencaoClinicaRepository
+    ClinicaService ..> PrescricaoRepository
+    ClinicaService ..> AplicacaoPrescricaoRepository
+    ClinicaService ..> AnimalRepository
+    ClinicaService ..> HistorialClinicoRepository
+
+    class LimpezaService {
+        +registarLimpeza(alojamento, colaborador, observacoes) RegistoLimpeza
+        +atualizarEstadoAlojamento(alojamento, novoEstado) void
+    }
+    LimpezaService ..> RegistoLimpezaRepository
+    LimpezaService ..> AlojamentoRepository
 
     class AnimalService {
         +criarAnimal(tutor, nome, especie, raca, dataNascimento) Animal
@@ -348,7 +369,21 @@ classDiagram
     CuidadoService ..> CuidadoRepository
     CuidadoService ..> EstadiaRepository
 
-    class RelatorioService
+    class Relatorio {
+        +Date inicio
+        +Date fim
+        +String tipo
+        +String conteudo
+    }
+
+    class RelatorioService {
+        +emitirOcupacao(inicio, fim) Relatorio
+        +emitirFaturacao(inicio, fim) Relatorio
+        +emitirCuidados(inicio, fim) Relatorio
+    }
+    RelatorioService ..> EstadiaRepository
+    RelatorioService ..> FaturaRepository
+    RelatorioService ..> CuidadoRepository
 
     class ReservaRepository { <<Repository>> }
     class EstadiaRepository { <<Repository>> }
@@ -359,3 +394,28 @@ classDiagram
     class UtilizadorRepository { <<Repository>> }
     class CuidadoRepository { <<Repository>> }
     class TutorRepository { <<Repository>> }
+    class ServicoExtraRepository { <<Repository>> }
+    class NotaRepository { <<Repository>> }
+    class IntervencaoClinicaRepository { <<Repository>> }
+    class PrescricaoRepository { <<Repository>> }
+    class AplicacaoPrescricaoRepository { <<Repository>> }
+    class RegistoLimpezaRepository { <<Repository>> }
+    class HistorialClinicoRepository { <<Repository>> }
+
+    %% Mapeamento explícito Repository -> Entidade
+    ReservaRepository ..> Reserva
+    EstadiaRepository ..> Estadia
+    AlojamentoRepository ..> Alojamento
+    FaturaRepository ..> Fatura
+    PagamentoRepository ..> Pagamento
+    AnimalRepository ..> Animal
+    UtilizadorRepository ..> Utilizador
+    CuidadoRepository ..> Cuidado
+    TutorRepository ..> Tutor
+    ServicoExtraRepository ..> ServicoExtra
+    NotaRepository ..> Nota
+    IntervencaoClinicaRepository ..> IntervencaoClinica
+    PrescricaoRepository ..> Prescricao
+    AplicacaoPrescricaoRepository ..> AplicacaoPrescricao
+    RegistoLimpezaRepository ..> RegistoLimpeza
+    HistorialClinicoRepository ..> HistorialClinico
