@@ -44,7 +44,7 @@ classDiagram
         +String medicacaoEmCurso
         +String necessidadesEspeciais
     }
-    Tutor "1" -- "0..*" Animal : possui
+    Tutor "1" o-- "0..*" Animal : possui
 
     class Alojamento {
         +Long id
@@ -72,9 +72,9 @@ classDiagram
         +estaCancelada() Boolean
         +estaVencida() Boolean
     }
-    Reserva "1" -- "1" Tutor
-    Reserva "1" -- "1" Animal
-    Reserva "1" -- "1" Alojamento
+    Reserva -- "1" Tutor
+    Reserva -- "1" Animal
+    Reserva -- "1" Alojamento
 
     class Estadia {
         +Long id
@@ -87,11 +87,10 @@ classDiagram
         +foiEncerrada() Boolean
         +temPagamentoPendente() Boolean
     }
-    Estadia "1" -- "1" Reserva
-    Estadia "1" -- "1" Animal
-    Estadia "1" -- "1" Alojamento
-    Estadia "1" -- "1" Colaborador : criadoPor
-    Estadia "1" -- "1" Colaborador : atualizadoPor
+    Estadia -- "1" Reserva
+    Estadia -- "1" Animal
+    Estadia -- "1" Alojamento
+    Estadia -- "1" Colaborador : criadoPor
 
     class Cuidado {
         +Long id
@@ -101,18 +100,18 @@ classDiagram
         +DateTime criadoEm
         +pertenceAoMesmoTurno(outroCuidado) Boolean
     }
-    Estadia "1" -- "0..*" Cuidado
-    Cuidado "1" -- "1" Colaborador : realizadoPor
+    Estadia "1" *-- "0..*" Cuidado
+    Cuidado -- "1" Colaborador : realizadoPor
 
     class Nota {
         +Long id
         +String descricao
         +DateTime dataHora
         +Turno turno
-        +DateTime criadaEm
+        +DateTime criadoEm
     }
-    Estadia "1" -- "0..*" Nota
-    Nota "1" -- "1" Colaborador : criadaPor
+    Estadia "1" *-- "0..*" Nota
+    Nota -- "1" Colaborador : criadaPor
 
     class ServicoExtra {
         +Long id
@@ -123,8 +122,8 @@ classDiagram
         +DateTime criadoEm
         +podeSerAlterado() Boolean
     }
-    Estadia "1" -- "0..*" ServicoExtra
-    ServicoExtra "1" -- "1" Colaborador : registadoPor
+    Estadia "1" *-- "0..*" ServicoExtra
+    ServicoExtra -- "1" Colaborador : registadoPor
 
     class Fatura {
         +Long id
@@ -152,12 +151,12 @@ classDiagram
         +String motivo
         +DateTime criadoEm
     }
-    Fatura "1" -- "0..*" Pagamento
+    Fatura "1" *-- "0..*" Pagamento
 
     class HistorialClinico {
         +Long id
     }
-    Animal "1" -- "1" HistorialClinico
+    Animal "1" *-- "1" HistorialClinico
 
     class IntervencaoClinica {
         +Long id
@@ -166,8 +165,8 @@ classDiagram
         +Double custo
         +DateTime criadoEm
     }
-    HistorialClinico "1" -- "0..*" IntervencaoClinica
-    IntervencaoClinica "1" -- "1" Colaborador : realizadoPor
+    HistorialClinico "1" *-- "0..*" IntervencaoClinica
+    IntervencaoClinica -- "1" Colaborador : realizadoPor
     IntervencaoClinica "0..1" -- "0..1" ServicoExtra : servicoExtraAssociado
 
     class Prescricao {
@@ -176,44 +175,32 @@ classDiagram
         +Date dataInicio
         +Date dataFim
     }
-    IntervencaoClinica "1" -- "0..*" Prescricao
+    IntervencaoClinica "1" *-- "0..*" Prescricao
 
     class AplicacaoPrescricao {
         +Long id
         +DateTime dataHora
         +String observacoes
     }
-    Prescricao "1" -- "0..*" AplicacaoPrescricao
-    AplicacaoPrescricao "1" -- "1" Colaborador : aplicadoPor
-
-    class EventoAuditoria {
-        +Long id
-        +TipoEvento tipoEvento
-        +String entidadeAfetada
-        +Long idEntidade
-        +String alteracoes
-        +DateTime dataHora
-        +String ipOrigem
-        +String detalhes
-    }
-    EventoAuditoria "1" -- "1" Colaborador : utilizador
+    Prescricao "1" *-- "0..*" AplicacaoPrescricao
+    AplicacaoPrescricao -- "1" Colaborador : aplicadoPor
 
     class RegistoLimpeza {
         +Long id
         +DateTime dataHora
         +String observacoes
     }
-    Alojamento "1" -- "0..*" RegistoLimpeza
-    RegistoLimpeza "1" -- "1" Colaborador : efetuadoPor
+    Alojamento "1" *-- "0..*" RegistoLimpeza
+    RegistoLimpeza -- "1" Colaborador : efetuadoPor
 
     class ItemPlanoCuidado {
         +String tipo
         +String periodicidade
         +String observacoes
     }
-    Estadia "1" -- "0..*" ItemPlanoCuidado : cuidadosPlaneados
+    Estadia "1" *-- "0..*" ItemPlanoCuidado : cuidadosPlaneados
 
-    %% Enums
+      %% Enums
     class PerfilAcesso {
         <<enumeration>>
         Diretor
@@ -312,7 +299,6 @@ classDiagram
         Noturno
     }
 
-    %% Camadas de Serviço e Repositório (representação simplificada)
     class ReservaService {
         +criarReserva(tutor, animal, alojamento, dataInicio, dataFim) Reserva
         +confirmarReserva(reserva) void
@@ -320,6 +306,7 @@ classDiagram
         +consultarDisponibilidade(alojamento, dataInicio, dataFim, especie) Boolean
     }
     ReservaService ..> ReservaRepository
+    ReservaService ..> AlojamentoRepository
 
     class EstadiaService {
         +iniciarEstadia(reserva, colaborador) Estadia
@@ -327,6 +314,7 @@ classDiagram
     }
     EstadiaService ..> EstadiaRepository
     EstadiaService ..> FaturacaoService
+    EstadiaService ..> ReservaRepository
 
     class AlojamentoService {
         +verificarDisponibilidade(alojamento, dataInicio, dataFim) Boolean
@@ -339,13 +327,14 @@ classDiagram
         +registarPagamento(fatura, pagamento) void
     }
     FaturacaoService ..> FaturaRepository
-    FaturacaoService ..> PagamentoRepository
+    FaturacaoService ..> EstadiaRepository
 
     class AnimalService {
-        +criarAnimal(tutor, dados) Animal
+        +criarAnimal(tutor, nome, especie, raca, dataNascimento) Animal
         +consultarHistorialClinico(animal) HistorialClinico
     }
     AnimalService ..> AnimalRepository
+    AnimalService ..> TutorRepository
 
     class UtilizadorService {
         +autenticar(username, password) Utilizador
@@ -353,33 +342,20 @@ classDiagram
     }
     UtilizadorService ..> UtilizadorRepository
 
-    class CuidadoService
+    class CuidadoService {
+        +registarCuidado(estadia, cuidado) void
+    }
+    CuidadoService ..> CuidadoRepository
+    CuidadoService ..> EstadiaRepository
+
     class RelatorioService
 
-    class ReservaRepository {
-        <<Repository>>
-    }
-    class EstadiaRepository {
-        <<Repository>>
-    }
-    class AlojamentoRepository {
-        <<Repository>>
-    }
-    class FaturaRepository {
-        <<Repository>>
-    }
-    class PagamentoRepository {
-        <<Repository>>
-    }
-    class AnimalRepository {
-        <<Repository>>
-    }
-    class UtilizadorRepository {
-        <<Repository>>
-    }
-    class CuidadoRepository {
-        <<Repository>>
-    }
-    class TutorRepository {
-        <<Repository>>
-    }
+    class ReservaRepository { <<Repository>> }
+    class EstadiaRepository { <<Repository>> }
+    class AlojamentoRepository { <<Repository>> }
+    class FaturaRepository { <<Repository>> }
+    class PagamentoRepository { <<Repository>> }
+    class AnimalRepository { <<Repository>> }
+    class UtilizadorRepository { <<Repository>> }
+    class CuidadoRepository { <<Repository>> }
+    class TutorRepository { <<Repository>> }
