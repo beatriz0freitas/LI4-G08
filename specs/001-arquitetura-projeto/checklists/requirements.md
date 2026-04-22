@@ -21,6 +21,9 @@
 - [x] Edge cases are identified
 - [x] Scope is clearly bounded
 - [x] Dependencies and assumptions identified
+- [x] Use cases UC-01..UC-13 existem em `docs/requirements/use-cases/`
+- [x] Existe mapeamento Use Case -> metodos principais no spec
+- [x] Existe mapeamento Use Case -> diagramas de sequencia obrigatorios
 
 ## Feature Readiness
 
@@ -28,7 +31,9 @@
 - [x] User scenarios cover primary flows
 - [x] Feature meets measurable outcomes defined in Success Criteria
 - [x] No implementation details leak into specification
+- [x] Cobertura funcional validada com base nos use cases
 
 ## Notes
 
-- Todos os itens da checklist estão completos. A especificação está pronta para a próxima fase.
+- Todos os itens da checklist estao completos.
+- A especificacao inclui rastreabilidade entre use cases, metodos e diagramas.

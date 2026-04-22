@@ -96,8 +96,18 @@ Como analista funcional, quero enumeracoes e invariantes de negocio corretamente
 - **FR-032**: O repositorio MUST manter estrutura centralizada de documentacao em `docs/architecture/`, incluindo os ficheiros obrigatorios de classes, componentes e sequencia.
 - **FR-033**: O diagrama de classes MUST explicitar as regras de negocio criticas: disponibilidade de alojamento, compatibilidade especie-tipologia, reserva com no maximo uma estadia e estadia com exatamente uma fatura.
 - **FR-034**: O projeto SHOULD incluir outros diagramas relevantes (ex.: casos de uso, dominio) quando contribuirem para clarificar arquitetura.
+- **FR-035**: O modelo de classes MUST ser validado contra os use cases documentados em `docs/requirements/use-cases/`, garantindo que os metodos de service e dominio cobrem explicitamente os fluxos UC-01 a UC-13.
+- **FR-036**: Os diagramas de sequencia MUST ser rastreaveis a use cases, com mapeamento explicito minimo: `UC-04->seq-reserva`, `UC-06->seq-checkin`, `UC-07->seq-checkout`, `UC-09->seq-cuidados`, `UC-08->seq-faturacao`, `UC-12->seq-limpeza`, `UC-11->seq-veterinario`.
+- **FR-037**: O spec MUST incluir uma matriz de rastreabilidade entre use cases e metodos/chamadas principais para suportar revisao de cobertura funcional antes da implementacao.
 
 ### Contrato Explicito para Geracao do Diagrama de Classes
+
+#### 0. Rastreabilidade obrigatoria com Use Cases
+
+- Fonte oficial de casos de uso: `docs/requirements/use-cases/README.md` e ficheiros `UC-01.md` a `UC-13.md`.
+- Cada metodo de service relevante no diagrama de classes deve referenciar pelo menos um use case que o justifica.
+- Cada use case UC-01..UC-13 deve ter cobertura por metodos no modelo (service e/ou dominio).
+- Operacoes sem use case associado devem ser marcadas como suporte tecnico interno.
 
 
 #### 1. Services obrigatorios como interface + implementacao
@@ -206,6 +216,24 @@ Como analista funcional, quero enumeracoes e invariantes de negocio corretamente
 - Participantes devem representar objetos de dominio e services/repositorios relevantes.
 - Proibido modelar HTTP, endpoint, controller ou payload de API.
 - Mensagens devem refletir ordem de negocio do caso de uso.
+
+#### 4. Mapeamento minimo Use Case -> Sequencia
+
+- `UC-04 Criar Reserva` -> `seq-reserva`
+- `UC-06 Registar Check-in` -> `seq-checkin`
+- `UC-07 Registar Check-out` -> `seq-checkout`
+- `UC-09 Registar Cuidados Diarios` -> `seq-cuidados`
+- `UC-08 Processar Faturacao e Pagamento` -> `seq-faturacao`
+- `UC-12 Registar Limpeza de Alojamento` -> `seq-limpeza`
+- `UC-11 Gerir Historial Clinico` -> `seq-veterinario`
+
+### Matriz de Rastreabilidade (Use Cases -> Metodos)
+
+Antes da validacao final da arquitetura, deve existir uma matriz simples que ligue:
+
+- Use Case (UC-01..UC-13)
+- Service/metodo principal que implementa o fluxo
+- Diagrama(s) onde o fluxo aparece (classes/sequencia/componentes)
 
 ### Contrato Explicito para Geracao do Diagrama de Componentes
 
