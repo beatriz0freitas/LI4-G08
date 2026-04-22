@@ -31,7 +31,7 @@ Gerar e validar os artefactos arquiteturais da feature `001-arquitetura-projeto`
 ## Passo 3 - Produzir diagramas de sequencia
 
 1. Produzir/atualizar os 7 fluxos obrigatorios em `.mmd`
-2. Produzir pares equivalentes em `.txt` PlantUML
+2. Produzir pares equivalentes em `.txt` em sintaxe compatível com WebSequenceDiagrams (www.websequencediagrams.com)
 3. Validar mapeamento minimo:
    - UC-04 -> seq-reserva
    - UC-06 -> seq-checkin

@@ -89,7 +89,7 @@ Como analista funcional, quero enumeracoes e invariantes de negocio corretamente
 - **FR-025**: O projeto MUST produzir diagramas de classes, sequencia e componentes em PlantUML ou Mermaid.
 - **FR-026**: Todos os diagramas MUST seguir UML 2.5 estrita (notacao, simbolos, relacoes e agrupamentos), sem estilos fora do standard.
 - **FR-027**: O projeto MUST produzir diagramas de sequencia para os fluxos: reserva, check-in, check-out, cuidados, faturacao, limpeza e intervencao veterinaria.
-- **FR-028**: Para cada fluxo de sequencia obrigatorio, o projeto MUST manter ficheiro `.mmd` e ficheiro `.txt` PlantUML importavel no Visual Paradigm.
+- **FR-028**: Para cada fluxo de sequencia obrigatorio, o projeto MUST manter ficheiro `.mmd` e ficheiro `.txt` em formato compatível com WebSequenceDiagrams (www.websequencediagrams.com), importavel no Visual Paradigm.
 - **FR-029**: Os diagramas de sequencia MUST modelar apenas logica de negocio (sem HTTP, sem controllers, sem endpoints).
 - **FR-030**: Os ficheiros de arquitetura MUST ser exportaveis para formatos standard de partilha (imagem/PDF) sem perda semantica.
 - **FR-031**: Cada ficheiro em `docs/architecture/` MUST conter cabecalho com nome, tipo, data e descricao breve.

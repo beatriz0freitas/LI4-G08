@@ -17,7 +17,7 @@ Define o contrato dos diagramas de sequencia de negocio.
 ## Formato obrigatorio
 
 - Um ficheiro Mermaid (`.mmd`) por fluxo
-- Um ficheiro PlantUML (`.txt`) por fluxo, importavel no Visual Paradigm
+- Um ficheiro `.txt` por fluxo em sintaxe compatível com WebSequenceDiagrams (www.websequencediagrams.com), importavel no Visual Paradigm
 
 ## Regras de modelacao
 
