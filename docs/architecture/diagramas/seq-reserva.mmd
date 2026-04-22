@@ -1,0 +1,16 @@
+sequenceDiagram
+  autonumber
+  participant Colaborador
+  participant ReservaService
+  participant AlojamentoRepository
+  participant ReservaRepository
+
+  Colaborador->>ReservaService: criarReserva(dados)
+  ReservaService->>AlojamentoRepository: findDisponiveis(inicio, fim, especie)
+  ReservaService->>ReservaRepository: findByAlojamentoAndPeriodo(alojamento, inicio, fim)
+  alt indisponivel
+    ReservaService-->>Colaborador: AlojamentoIndisponivelException
+  else disponivel
+    ReservaService->>ReservaRepository: save(reserva)
+    ReservaService-->>Colaborador: reserva criada
+  end

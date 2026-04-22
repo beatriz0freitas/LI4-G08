@@ -1,0 +1,12 @@
+sequenceDiagram
+  autonumber
+  participant Colaborador
+  participant AlojamentoService
+  participant AlojamentoRepository
+  participant AlojamentoStateListener
+
+  Colaborador->>AlojamentoService: registarLimpeza(alojamentoId)
+  AlojamentoService->>AlojamentoRepository: findByEstadoLimpeza(PendenteLimpeza)
+  AlojamentoService->>AlojamentoRepository: save(alojamentoConcluido)
+  AlojamentoService->>AlojamentoStateListener: estadoAlterado(alojamento)
+  AlojamentoService-->>Colaborador: limpeza registada

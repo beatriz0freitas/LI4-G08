@@ -33,3 +33,10 @@ Exemplo: `ADR-001-services-vs-facades.md`
 Os requisitos de rastreabilidade e fundamentacao arquitetural do feature estao definidos no spec:
 - `FR-023` em `specs/001-arquitetura-projeto/spec.md`
 - secao "Registo de Decisoes (obrigatorio)" em `specs/001-arquitetura-projeto/research.md`
+
+## Artefactos relacionados
+
+- [Traceability Matrix](../../requirements/use-cases/traceability.md)
+- [Diagrama de Classes](../diagramas/classes.mmd)
+- [Diagrama de Componentes](../diagramas/componentes.mmd)
+- [Diagramas de Sequencia](../diagramas/)

@@ -1,5 +1,7 @@
 # Use Cases
 
+- [Traceability Matrix](traceability.md)
+
 - [UC-01 - Autenticar no Sistema](UC-01.md)
 - [UC-02 - Consultar Disponibilidade de Alojamentos](UC-02.md)
 - [UC-03 - Registar Tutor e Animal](UC-03.md)
@@ -13,3 +15,7 @@
 - [UC-11 - Gerir Historial Clinico](UC-11.md)
 - [UC-12 - Registar Limpeza de Alojamento](UC-12.md)
 - [UC-13 - Consultar Dashboard e Gerar Relatorios](UC-13.md)
+
+## Apoio de rastreabilidade
+
+- [Traceability Matrix](traceability.md) liga UC-01..UC-13 aos services, metodos e diagramas de arquitetura.

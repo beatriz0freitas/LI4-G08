@@ -1,0 +1,53 @@
+flowchart LR
+  subgraph Frontend[Frontend]
+    portal[Tutor Portal]
+    painel[Painel de Colaborador]
+  end
+
+  subgraph Backend[Backend/API]
+    api[[API Facade]]
+    auth[Gestao de Utilizadores]
+    animais[Gestao de Animais]
+    reservas[Reservas]
+    estadias[Estadias]
+    cuidados[Cuidados]
+    faturacao[Faturacao]
+    limpeza[Limpeza]
+    relatorios[Relatorios]
+    clinica[Clinica]
+  end
+
+  subgraph DB[Base de Dados]
+    db[(Persistencia)]
+  end
+
+  portal --> api
+  painel --> api
+
+  api --> auth
+  api --> animais
+  api --> reservas
+  api --> estadias
+  api --> cuidados
+  api --> faturacao
+  api --> limpeza
+  api --> relatorios
+  api --> clinica
+
+  auth --> db
+  animais --> db
+  reservas --> db
+  estadias --> db
+  cuidados --> db
+  faturacao --> db
+  limpeza --> db
+  relatorios --> db
+  clinica --> db
+
+  reservas -. usa .-> animais
+  estadias -. usa .-> reservas
+  faturacao -. usa .-> estadias
+  clinica -. usa .-> animais
+
+  classDef component fill:#f7f7f7,stroke:#333,stroke-width:1px;
+  class api,auth,animais,reservas,estadias,cuidados,faturacao,limpeza,relatorios,clinica,portal,painel,db component;

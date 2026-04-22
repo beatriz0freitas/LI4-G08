@@ -1,0 +1,523 @@
+classDiagram
+direction TB
+
+%% dominio
+namespace dominio {
+class Tutor {
+  +UUID id
+  +String nome
+  +String nif
+  +String email
+  +String contacto
+  +String endereco
+}
+
+class Colaborador {
+  +UUID id
+  +String nome
+  +String email
+  +String contacto
+  +PerfilAcesso perfilAcesso
+}
+
+class Animal {
+  +UUID id
+  +String nome
+  +String especie
+  +String raca
+  +EstadoSaude estadoSaude
+  +String necessidadesEspeciais
+}
+
+class HistorialClinico {
+  +UUID id
+  +IntervencaoClinica getUltimaIntervencao()
+  +boolean temPrescricaoAtiva()
+}
+
+class IntervencaoClinica {
+  +UUID id
+  +DateTime dataHora
+  +String descricao
+  +Decimal custo
+}
+
+class Alojamento {
+  +UUID id
+  +String tipoAlojamento
+  +EstadoLimpeza estadoLimpeza
+  +Integer capacidade
+  +Decimal precoDiario
+}
+
+class Reserva {
+  +UUID id
+  +String codigo
+  +Date dataInicio
+  +Date dataFim
+  +EstadoReserva estadoReserva
+  +Colaborador criadaPor
+}
+
+class Estadia {
+  +UUID id
+  +String codigo
+  +DateTime dataCheckIn
+  +DateTime dataCheckOut
+  +String estadoEstadia
+}
+
+class Cuidado {
+  +UUID id
+  +TipoCuidado tipoCuidado
+  +String descricao
+  +DateTime dataHora
+  +Colaborador realizadoPor
+}
+
+class Nota {
+  +UUID id
+  +String descricao
+  +DateTime dataHora
+  +Colaborador criadaPor
+}
+
+class ServicoExtra {
+  +UUID id
+  +TipoServicoExtra tipoServicoExtra
+  +String descricao
+  +Decimal custo
+  +Colaborador registadoPor
+  +Date data
+}
+
+class Fatura {
+  +UUID id
+  +String numero
+  +Date dataEmissao
+  +Decimal valorBase
+  +Decimal desconto
+  +Decimal total
+  +EstadoFatura estadoFatura
+}
+
+class Pagamento {
+  +UUID id
+  +Decimal valor
+  +MetodoPagamento metodoPagamento
+  +EstadoPagamento estadoPagamento
+  +DateTime dataPagamento
+  +Date dataVencimento
+}
+
+}
+
+namespace fachada {
+class ApiFacade {
+  +autenticar()
+  +consultarDisponibilidade()
+  +registarReserva()
+  +registarCheckIn()
+  +registarCheckOut()
+  +gerirFaturacao()
+  +gerirClinica()
+  +gerarRelatorios()
+}
+
+}
+
+%% servico
+namespace servico {
+class UtilizadorService {
+  +autenticar(email: String, palavraPasse: String)
+  +registarTutor(tutor: Tutor)
+}
+
+class UtilizadorServiceImpl {
+  +autenticar(email: String, palavraPasse: String)
+  +registarTutor(tutor: Tutor)
+}
+
+class AnimalService {
+  +registarAnimal(animal: Animal)
+  +atualizarEstadoSaude(animal: Animal, estado: EstadoSaude)
+}
+
+class AnimalServiceImpl {
+  +registarAnimal(animal: Animal)
+  +atualizarEstadoSaude(animal: Animal, estado: EstadoSaude)
+}
+
+class ClinicaService {
+  +registarIntervencaoClinica(animal: Animal, intervencao: IntervencaoClinica)
+  +consultarHistorial(animal: Animal)
+}
+
+class ClinicaServiceImpl {
+  +registarIntervencaoClinica(animal: Animal, intervencao: IntervencaoClinica)
+  +consultarHistorial(animal: Animal)
+}
+
+class AlojamentoService {
+  +consultarDisponibilidade(inicio: Date, fim: Date, especie: String)
+  +registarLimpeza(alojamento: Alojamento)
+}
+
+class AlojamentoServiceImpl {
+  +consultarDisponibilidade(inicio: Date, fim: Date, especie: String)
+  +registarLimpeza(alojamento: Alojamento)
+}
+
+class ReservaService {
+  +criarReserva()
+  +cancelarReserva()
+}
+
+class ReservaServiceImpl {
+  +criarReserva()
+  +cancelarReserva()
+}
+
+class EstadiaService {
+  +registarCheckIn()
+  +registarCheckOut()
+  +registarCuidadoDiario()
+  +registarServicoExtra()
+}
+
+class EstadiaServiceImpl {
+  +registarCheckIn()
+  +registarCheckOut()
+  +registarCuidadoDiario()
+  +registarServicoExtra()
+}
+
+class FaturacaoService {
+  +emitirFatura()
+  +recalcularFatura()
+}
+
+class FaturacaoServiceImpl {
+  +emitirFatura()
+  +recalcularFatura()
+}
+
+class PagamentoService {
+  +registarPagamento()
+  +validarPagamento()
+}
+
+class PagamentoServiceImpl {
+  +registarPagamento()
+  +validarPagamento()
+}
+
+class RelatorioService {
+  +gerarDashboard()
+  +gerarRelatorios()
+}
+
+class RelatorioServiceImpl {
+  +gerarDashboard()
+  +gerarRelatorios()
+}
+
+}
+
+%% repositorio
+namespace repositorio {
+class AlojamentoRepository {
+  +findDisponiveis(inicio, fim, especie)
+  +findByEstadoLimpeza(estado)
+  +save(alojamento)
+}
+
+class AlojamentoRepositoryImpl {
+  +findDisponiveis(inicio, fim, especie)
+  +findByEstadoLimpeza(estado)
+  +save(alojamento)
+}
+
+class ReservaRepository {
+  +findByAlojamentoAndPeriodo(alojamento, inicio, fim)
+  +findByAnimal(animal)
+  +findByEstado(estado)
+  +save(reserva)
+}
+
+class ReservaRepositoryImpl {
+  +findByAlojamentoAndPeriodo(alojamento, inicio, fim)
+  +findByAnimal(animal)
+  +findByEstado(estado)
+  +save(reserva)
+}
+
+class EstadiaRepository {
+  +findEmCurso()
+  +findByAnimal(animal)
+  +findByPeriodo(inicio, fim)
+  +save(estadia)
+}
+
+class EstadiaRepositoryImpl {
+  +findEmCurso()
+  +findByAnimal(animal)
+  +findByPeriodo(inicio, fim)
+  +save(estadia)
+}
+
+class FaturaRepository {
+  +findPendentes()
+  +findByPeriodo(inicio, fim)
+  +save(fatura)
+}
+
+class FaturaRepositoryImpl {
+  +findPendentes()
+  +findByPeriodo(inicio, fim)
+  +save(fatura)
+}
+
+class PagamentoRepository {
+  +findByEstado(estado)
+  +findByFatura(fatura)
+  +save(pagamento)
+}
+
+class PagamentoRepositoryImpl {
+  +findByEstado(estado)
+  +findByFatura(fatura)
+  +save(pagamento)
+}
+
+class AnimalRepository {
+  +findByTutor(tutor)
+  +save(animal)
+}
+
+class AnimalRepositoryImpl {
+  +findByTutor(tutor)
+  +save(animal)
+}
+
+class HistorialClinicoRepository {
+  +findByAnimal(animal)
+  +save(historial)
+}
+
+class HistorialClinicoRepositoryImpl {
+  +findByAnimal(animal)
+  +save(historial)
+}
+
+}
+
+%% fabrica
+namespace fabrica {
+class FaturaFactory {
+  +criar(estadia, estrategia)
+}
+
+}
+
+%% estrategia
+namespace estrategia {
+class EstrategiaCalculoFatura {
+  +calcular(estadia)
+}
+
+class CalculoStandard {
+  +calcular(estadia)
+}
+
+class AlojamentoStateListener {
+  +estadoAlterado(alojamento)
+}
+
+}
+
+%% excecao
+namespace excecao {
+class ReservaNaoConfirmadaException
+class AlojamentoIndisponivelException
+class PagamentoPendenteException
+class AnimalEmEstadiaException
+
+}
+
+%% enumeracoes
+namespace enumeracoes {
+class EstadoSaude {
+  Estavel
+  EmObservacao
+  Critico
+}
+
+class EstadoReserva {
+  Pendente
+  Confirmada
+  Cancelada
+}
+
+class MetodoPagamento {
+  Numerario
+  Cartao
+  MBWay
+  Transferencia
+  MBReference
+}
+
+class TipoCuidado {
+  Alimentacao
+  Higiene
+  Passeio
+  Medicao
+}
+
+class TipoServicoExtra {
+  MedicacaoPrescrita
+  BanhoExtra
+  Tosquia
+  Transporte
+}
+
+class EstadoLimpeza {
+  Concluido
+  PendenteLimpeza
+  Ocupado
+}
+
+class EstadoFatura {
+  Emitida
+  ParcialPendente
+  Paga
+}
+
+class EstadoPagamento {
+  Pendente
+  Liquidado
+}
+
+class PerfilAcesso {
+  Admin
+  Colaborador
+  Veterinario
+  Tutor
+}
+
+}
+
+%% facade and service boundaries
+ApiFacade --> UtilizadorService : autentica/regista
+ApiFacade --> AnimalService : coordena
+ApiFacade --> ClinicaService : coordena
+ApiFacade --> AlojamentoService : coordena
+ApiFacade --> ReservaService : coordena
+ApiFacade --> EstadiaService : coordena
+ApiFacade --> FaturacaoService : coordena
+ApiFacade --> PagamentoService : coordena
+ApiFacade --> RelatorioService : coordena
+
+UtilizadorService ..> AnimalService : suporta onboarding
+ReservaService ..> UtilizadorService : valida tutor
+ReservaService ..> AnimalService : valida animal
+ReservaService ..> AlojamentoService : valida disponibilidade
+EstadiaService ..> ReservaService : confirma reserva
+EstadiaService ..> AnimalService : atualiza estado
+EstadiaService ..> AlojamentoService : liberta/ocupa alojamento
+FaturacaoService ..> EstadiaService : consome estadia
+FaturacaoService ..> FaturaFactory : cria fatura
+FaturacaoService ..> EstrategiaCalculoFatura : calcula custos
+PagamentoService ..> FaturacaoService : associa fatura
+RelatorioService ..> FaturacaoService : recolhe indicadores
+RelatorioService ..> EstadiaService : recolhe estadias
+ClinicaService ..> AnimalService : consulta animal
+ClinicaService ..> EstadiaService : referencia estadia
+AlojamentoService ..> AlojamentoStateListener : notifica limpeza
+
+%% service to repository wiring
+UtilizadorService ..> AnimalRepository : consulta/regista
+AnimalService ..> AnimalRepository : persiste animal
+AnimalService ..> HistorialClinicoRepository : atualiza historial
+ClinicaService ..> HistorialClinicoRepository : regista intervencao
+AlojamentoService ..> AlojamentoRepository : consulta disponibilidade
+AlojamentoService ..> AlojamentoRepository : altera limpeza
+ReservaService ..> ReservaRepository : cria/cancela reserva
+EstadiaService ..> EstadiaRepository : cria/fecha estadia
+EstadiaService ..> ReservaRepository : valida reserva
+FaturacaoService ..> EstadiaRepository : calcula base
+FaturacaoService ..> FaturaRepository : emite fatura
+PagamentoService ..> FaturaRepository : associa fatura
+PagamentoService ..> PagamentoRepository : regista pagamento
+RelatorioService ..> FaturaRepository : consulta faturacao
+RelatorioService ..> EstadiaRepository : consulta estadias
+RelatorioService ..> ReservaRepository : consulta reservas
+
+%% domain ownership for enums
+Animal --> EstadoSaude : estadoSaude
+Reserva --> EstadoReserva : estadoReserva
+Alojamento --> EstadoLimpeza : estadoLimpeza
+Cuidado --> TipoCuidado : tipoCuidado
+ServicoExtra --> TipoServicoExtra : tipoServicoExtra
+Fatura --> EstadoFatura : estadoFatura
+Pagamento --> EstadoPagamento : estadoPagamento
+Pagamento --> MetodoPagamento : metodoPagamento
+Colaborador --> PerfilAcesso : perfilAcesso
+
+Tutor "1" --> "0..*" Animal : possui
+Tutor "1" --> "0..*" Reserva : referencia operacional
+Colaborador "1" --> "0..*" Reserva : cria
+Colaborador "1" --> "0..*" Estadia : executa
+Animal "1" --> "1" HistorialClinico : tem
+HistorialClinico "1" --> "0..*" IntervencaoClinica : agrega
+Alojamento "1" --> "0..*" Reserva : suporta
+Alojamento "1" --> "0..*" Estadia : suporta
+Reserva "0..1" --> "1" Estadia : origina
+Estadia "1" --> "1" Reserva : base
+Estadia "*" --> "1" Tutor : rastreia
+Estadia "*" --> "1" Animal : inclui
+Estadia "*" --> "1" Alojamento : ocupa
+Estadia "1" --> "1" Fatura : gera
+Estadia "1" --> "0..*" Cuidado : regista
+Estadia "1" --> "0..*" Nota : inclui
+Estadia "1" --> "0..*" ServicoExtra : adiciona
+Fatura "*" --> "1" Tutor : pertence
+Fatura "1" --> "1..*" Pagamento : recebe
+IntervencaoClinica "0..1" --> "0..1" ServicoExtra : associacao opcional
+
+UtilizadorService <|.. UtilizadorServiceImpl
+AnimalService <|.. AnimalServiceImpl
+ClinicaService <|.. ClinicaServiceImpl
+AlojamentoService <|.. AlojamentoServiceImpl
+ReservaService <|.. ReservaServiceImpl
+EstadiaService <|.. EstadiaServiceImpl
+FaturacaoService <|.. FaturacaoServiceImpl
+PagamentoService <|.. PagamentoServiceImpl
+RelatorioService <|.. RelatorioServiceImpl
+
+AlojamentoRepository <|.. AlojamentoRepositoryImpl
+ReservaRepository <|.. ReservaRepositoryImpl
+EstadiaRepository <|.. EstadiaRepositoryImpl
+FaturaRepository <|.. FaturaRepositoryImpl
+PagamentoRepository <|.. PagamentoRepositoryImpl
+AnimalRepository <|.. AnimalRepositoryImpl
+HistorialClinicoRepository <|.. HistorialClinicoRepositoryImpl
+
+EstrategiaCalculoFatura <|.. CalculoStandard
+FaturaFactory ..> EstrategiaCalculoFatura : usa
+AlojamentoStateListener ..> Alojamento : observa
+
+UtilizadorService ..> ReservaNaoConfirmadaException
+ReservaService ..> AlojamentoIndisponivelException
+EstadiaService ..> PagamentoPendenteException
+ClinicaService ..> AnimalEmEstadiaException
+
+note for Alojamento "RD-01: disponibilidade depende de periodo, especie e estado de limpeza."
+note for Reserva "RD-02: uma reserva confirmada pode originar no maximo uma estadia."
+note for Estadia "RD-03: uma estadia exige exatamente uma fatura."
+note for Fatura "RD-04: a fatura suporta relatorio financeiro e auditoria por tutor."
+note for Animal "RD-05: o estado de saude deve ser um enum fechado."
+note for IntervencaoClinica "RD-06: a intervencao clinica pode originar um servico extra opcional."
+note for Cuidado "RD-07: os cuidados diários sao registados pela estadia, nao pelo controller."
+note for AlojamentoStateListener "RD-08: mudancas de estado de alojamento notificam limpeza."
+note for ReservaRepository "RD-09: consultas por periodo e estado sao obrigatorias para rastreabilidade."

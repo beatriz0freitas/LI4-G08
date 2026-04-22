@@ -1,0 +1,19 @@
+sequenceDiagram
+  autonumber
+  participant Colaborador
+  participant FaturacaoService
+  participant EstadiaRepository
+  participant EstrategiaCalculoFatura
+  participant FaturaFactory
+  participant FaturaRepository
+  participant PagamentoService
+  participant PagamentoRepository
+
+  Colaborador->>FaturacaoService: emitirFatura(estadiaId)
+  FaturacaoService->>EstadiaRepository: findByPeriodo(inicio, fim)
+  FaturacaoService->>EstrategiaCalculoFatura: calcular(estadia)
+  FaturacaoService->>FaturaFactory: criar(estadia, estrategia)
+  FaturacaoService->>FaturaRepository: save(fatura)
+  Colaborador->>PagamentoService: registarPagamento(fatura, metodo)
+  PagamentoService->>PagamentoRepository: save(pagamento)
+  PagamentoService-->>Colaborador: pagamento registado

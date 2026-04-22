@@ -1,0 +1,10 @@
+sequenceDiagram
+  autonumber
+  participant Colaborador
+  participant EstadiaService
+  participant EstadiaRepository
+
+  Colaborador->>EstadiaService: registarCuidadoDiario(estadiaId, cuidado)
+  EstadiaService->>EstadiaRepository: findByAnimal(animal)
+  EstadiaService->>EstadiaRepository: save(estadiaAtualizada)
+  EstadiaService-->>Colaborador: cuidado registado

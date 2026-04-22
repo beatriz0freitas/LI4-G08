@@ -86,6 +86,19 @@ README.md
 
 **Structure Decision**: Manter o trabalho arquitetural dividido entre `specs/001-arquitetura-projeto/` (artefactos de planeamento e contratos) e `docs/architecture/` + `docs/requirements/use-cases/` (fonte oficial de diagramas e requisitos operacionais), para garantir rastreabilidade clara entre definicao e execucao.
 
+### Final Artifact Inventory
+
+- `docs/requirements/use-cases/traceability.md`
+- `docs/architecture/diagramas/classes.mmd`
+- `docs/architecture/diagramas/componentes.mmd`
+- `docs/architecture/diagramas/seq-reserva.mmd` / `seq-reserva.txt`
+- `docs/architecture/diagramas/seq-checkin.mmd` / `seq-checkin.txt`
+- `docs/architecture/diagramas/seq-checkout.mmd` / `seq-checkout.txt`
+- `docs/architecture/diagramas/seq-cuidados.mmd` / `seq-cuidados.txt`
+- `docs/architecture/diagramas/seq-faturacao.mmd` / `seq-faturacao.txt`
+- `docs/architecture/diagramas/seq-limpeza.mmd` / `seq-limpeza.txt`
+- `docs/architecture/diagramas/seq-veterinario.mmd` / `seq-veterinario.txt`
+
 ## Complexity Tracking
 
 Sem violacoes da constituicao que exijam excecao formal nesta fase.

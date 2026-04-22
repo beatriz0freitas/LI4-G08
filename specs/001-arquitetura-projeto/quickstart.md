@@ -57,3 +57,16 @@ Gerar e validar os artefactos arquiteturais da feature `001-arquitetura-projeto`
 - Artefactos UML completos e coerentes
 - Rastreabilidade entre requisitos, use cases, metodos e diagramas
 - Documentacao pronta para `/speckit.tasks`
+
+## Inventario Final Esperado
+
+- `docs/requirements/use-cases/traceability.md`
+- `docs/architecture/diagramas/classes.mmd`
+- `docs/architecture/diagramas/componentes.mmd`
+- `docs/architecture/diagramas/seq-reserva.mmd` e `seq-reserva.txt`
+- `docs/architecture/diagramas/seq-checkin.mmd` e `seq-checkin.txt`
+- `docs/architecture/diagramas/seq-checkout.mmd` e `seq-checkout.txt`
+- `docs/architecture/diagramas/seq-cuidados.mmd` e `seq-cuidados.txt`
+- `docs/architecture/diagramas/seq-faturacao.mmd` e `seq-faturacao.txt`
+- `docs/architecture/diagramas/seq-limpeza.mmd` e `seq-limpeza.txt`
+- `docs/architecture/diagramas/seq-veterinario.mmd` e `seq-veterinario.txt`

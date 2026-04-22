@@ -1,0 +1,21 @@
+@startuml
+autonumber
+actor Colaborador
+participant EstadiaService
+participant EstadiaRepository
+participant FaturacaoService
+participant PagamentoRepository
+participant AlojamentoStateListener
+
+Colaborador -> EstadiaService : registarCheckOut(estadiaId)
+EstadiaService -> EstadiaRepository : findEmCurso()
+EstadiaService -> PagamentoRepository : findByEstado(Pendente)
+alt pagamentos pendentes
+  EstadiaService --> Colaborador : PagamentoPendenteException
+else sem pendencias
+  EstadiaService -> FaturacaoService : emitirFatura(estadia)
+  EstadiaService -> EstadiaRepository : save(estadiaEncerrada)
+  EstadiaService -> AlojamentoStateListener : estadoAlterado(alojamento)
+  EstadiaService --> Colaborador : check-out registado
+end
+@enduml
