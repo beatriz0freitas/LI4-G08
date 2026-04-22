@@ -1,19 +1,16 @@
-@startuml
-autonumber
+title Registar Check-in
 actor Colaborador
 participant EstadiaService
 participant ReservaRepository
 participant EstadiaRepository
 participant AlojamentoStateListener
-
-Colaborador -> EstadiaService : registarCheckIn(reservaId)
-EstadiaService -> ReservaRepository : findByEstado(Confirmada)
+Colaborador->EstadiaService: registarCheckIn(reservaId)
+EstadiaService->ReservaRepository: findByEstado(Confirmada)
 alt reserva nao confirmada
-  EstadiaService --> Colaborador : ReservaNaoConfirmadaException
+EstadiaService->Colaborador: ReservaNaoConfirmadaException
 else reserva valida
-  EstadiaService -> EstadiaRepository : save(estadia)
-  EstadiaService -> AlojamentoStateListener : estadoAlterado(alojamento)
-  AlojamentoStateListener --> EstadiaService : estado atualizado
-  EstadiaService --> Colaborador : check-in registado
+EstadiaService->EstadiaRepository: save(estadia)
+EstadiaService->AlojamentoStateListener: estadoAlterado(alojamento)
+AlojamentoStateListener->EstadiaService: estado atualizado
+EstadiaService->Colaborador: check-in registado
 end
-@enduml

@@ -1,0 +1,75 @@
+@startuml Arquitetura de Componentes - LI4
+!define FRONTEND_COLOR #E3F2FD
+!define BACKEND_COLOR #FFF3E0
+!define DATABASE_COLOR #F3E5F5
+!define EXTERNAL_COLOR #FFEBEE
+
+skinparam backgroundColor FFFACD
+skinparam component {
+    BackgroundColor FFFFFF
+    BorderColor #333
+    ArrowColor #333
+}
+
+' ==================== FRONTEND COMPONENTS ====================
+package "Frontend" #FRONTEND_COLOR {
+  component [Tutor Portal] as portal
+  component [Painel de Colaborador] as painel
+}
+
+' ==================== API GATEWAY ====================
+package "API Gateway" #FDD835 {
+  component [API Facade] as apigw
+}
+
+' ==================== BACKEND SERVICES ====================
+package "Backend / Serviços de Domínio" #BACKEND_COLOR {
+  component [Gestão de Utilizadores] as auth
+  component [Gestão de Animais] as animais
+  component [Reservas] as reservas
+  component [Estadias] as estadias
+  component [Cuidados Diários] as cuidados
+  component [Faturação] as faturacao
+  component [Limpeza] as limpeza
+  component [Relatórios] as relatorios
+  component [Clínica] as clinica
+}
+
+' ==================== PERSISTENCE ====================
+package "Persistência" #F3E5F5 {
+  database [Base de Dados] as db
+}
+
+' ==================== FRONTEND TO API ====================
+portal --> apigw : HTTP/REST
+painel --> apigw : HTTP/REST
+
+' ==================== API TO SERVICES ====================
+apigw --> auth : autentica
+apigw --> animais : coordena
+apigw --> reservas : coordena
+apigw --> estadias : coordena
+apigw --> cuidados : coordena
+apigw --> faturacao : coordena
+apigw --> limpeza : coordena
+apigw --> relatorios : coordena
+apigw --> clinica : coordena
+
+' ==================== SERVICES TO DATABASE ====================
+auth --> db : persiste
+animais --> db : persiste
+reservas --> db : persiste
+estadias --> db : persiste
+cuidados --> db : persiste
+faturacao --> db : persiste
+limpeza --> db : persiste
+relatorios --> db : consulta
+clinica --> db : persiste
+
+' ==================== SERVICE DEPENDENCIES ====================
+reservas -.-> animais : utiliza
+estadias -.-> reservas : utiliza
+faturacao -.-> estadias : utiliza
+clinica -.-> animais : utiliza
+
+@enduml
