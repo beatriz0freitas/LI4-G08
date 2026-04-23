@@ -120,7 +120,7 @@ package "Domínio" #DOMAIN_COLOR {
 
 ' ==================== FACADE ====================
 package "Fachada" #FDD835 {
-  class ApiFacade {
+  class GestHotelFacade {
     +autenticar()
     +consultarDisponibilidade()
     +registarReserva()
@@ -407,15 +407,15 @@ package "Enumerações" #ENUM_COLOR {
 ' ==================== RELATIONSHIPS ====================
 
 ' Facade to Services
-ApiFacade --> UtilizadorService : utiliza
-ApiFacade --> AnimalService : utiliza
-ApiFacade --> ClinicaService : utiliza
-ApiFacade --> AlojamentoService : utiliza
-ApiFacade --> ReservaService : utiliza
-ApiFacade --> EstadiaService : utiliza
-ApiFacade --> FaturacaoService : utiliza
-ApiFacade --> PagamentoService : utiliza
-ApiFacade --> RelatorioService : utiliza
+GestHotelFacade --> UtilizadorService : utiliza
+GestHotelFacade --> AnimalService : utiliza
+GestHotelFacade --> ClinicaService : utiliza
+GestHotelFacade --> AlojamentoService : utiliza
+GestHotelFacade --> ReservaService : utiliza
+GestHotelFacade --> EstadiaService : utiliza
+GestHotelFacade --> FaturacaoService : utiliza
+GestHotelFacade --> PagamentoService : utiliza
+GestHotelFacade --> RelatorioService : utiliza
 
 ' Services to Services
 UtilizadorService -.-> AnimalService : suporta onboarding

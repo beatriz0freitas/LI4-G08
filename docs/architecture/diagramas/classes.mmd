@@ -113,7 +113,7 @@ class Pagamento {
 }
 
 namespace fachada {
-class ApiFacade {
+class GestHotelFacade {
   +autenticar()
   +consultarDisponibilidade()
   +registarReserva()
@@ -408,15 +408,15 @@ class PerfilAcesso {
 }
 
 %% facade and service boundaries
-ApiFacade --> UtilizadorService : autentica/regista
-ApiFacade --> AnimalService : coordena
-ApiFacade --> ClinicaService : coordena
-ApiFacade --> AlojamentoService : coordena
-ApiFacade --> ReservaService : coordena
-ApiFacade --> EstadiaService : coordena
-ApiFacade --> FaturacaoService : coordena
-ApiFacade --> PagamentoService : coordena
-ApiFacade --> RelatorioService : coordena
+GestHotelFacade --> UtilizadorService : autentica/regista
+GestHotelFacade --> AnimalService : coordena
+GestHotelFacade --> ClinicaService : coordena
+GestHotelFacade --> AlojamentoService : coordena
+GestHotelFacade --> ReservaService : coordena
+GestHotelFacade --> EstadiaService : coordena
+GestHotelFacade --> FaturacaoService : coordena
+GestHotelFacade --> PagamentoService : coordena
+GestHotelFacade --> RelatorioService : coordena
 
 UtilizadorService ..> AnimalService : suporta onboarding
 ReservaService ..> UtilizadorService : valida tutor
