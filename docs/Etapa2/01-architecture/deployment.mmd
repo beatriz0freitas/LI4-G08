@@ -1,0 +1,41 @@
+%% Diagrama de Implantação — Hotel de Animais
+%% Ambiente de produção: rede local do hotel
+
+graph LR
+
+    subgraph LAN["Rede Local do Hotel"]
+
+        subgraph ClienteA["Posto de Receção"]
+            BrowserRC["Browser\n(Chrome/Firefox)"]
+        end
+
+        subgraph ClienteB["Posto de Cuidados"]
+            BrowserCU["Browser\n(Chrome/Firefox)"]
+        end
+
+        subgraph ClienteC["Posto Veterinário"]
+            BrowserVT["Browser\n(Chrome/Firefox)"]
+        end
+
+        subgraph ClienteD["Posto de Limpeza"]
+            BrowserLP["Browser\n(Chrome/Firefox)"]
+        end
+
+        subgraph Servidor["Servidor de Aplicação (Linux / Windows Server)"]
+            JVM["JVM 21\nSpring Boot 3\n(Tomcat embarcado :8080)"]
+        end
+
+        subgraph BDServer["Servidor de Base de Dados"]
+            MySQL["MySQL 8\n(:3306)"]
+            Backup["Backup diário\n(mysqldump agendado)"]
+        end
+
+    end
+
+    BrowserRC -->|HTTP :8080| JVM
+    BrowserCU -->|HTTP :8080| JVM
+    BrowserVT -->|HTTP :8080| JVM
+    BrowserLP -->|HTTP :8080| JVM
+
+    JVM -->|JDBC :3306| MySQL
+    MySQL -.->|agendado| Backup

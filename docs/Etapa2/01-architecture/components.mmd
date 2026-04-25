@@ -1,0 +1,115 @@
+%% Diagrama de Componentes — Hotel de Animais
+%% Arquitetura Spring MVC em camadas (Etapa 2)
+
+graph TB
+
+    subgraph Browser["Browser (Utilizador)"]
+        UI["Interface Web\n(Thymeleaf HTML + Bootstrap 5)"]
+    end
+
+    subgraph SpringBoot["Servidor Spring Boot 3 (Tomcat embarcado)"]
+
+        subgraph Security["Spring Security 6"]
+            SF["SecurityFilterChain\n(BCrypt + Sessão HTTP + CSRF)"]
+        end
+
+        subgraph Controllers["Camada de Apresentação (@Controller)"]
+            AC["AuthController"]
+            ALC["AlojamentoController"]
+            TAC["TutorAnimalController"]
+            RC["ReservaController"]
+            EC["EstadiaController"]
+            PC["PagamentoController"]
+            SEC["ServicoExtraController"]
+            CC["ClinicaController"]
+            LC["LimpezaController"]
+            RLC["RelatorioController"]
+            COC["ColaboradorController"]
+        end
+
+        subgraph Services["Camada de Aplicação (@Service + @Transactional)"]
+            CS["ColaboradorService"]
+            ALS["AlojamentoService"]
+            TS["TutorService"]
+            ANS["AnimalService"]
+            RS["ReservaService"]
+            ES["EstadiaService"]
+            SES["ServicoExtraService"]
+            CLS["ClinicaService"]
+            PS["PagamentoService"]
+            LS["LimpezaService"]
+            RLS["RelatorioService"]
+        end
+
+        subgraph Domain["Camada de Domínio (@Entity + Enums)"]
+            COL["Colaborador"]
+            TUT["Tutor"]
+            ANI["Animal"]
+            ALO["Alojamento"]
+            RES["Reserva"]
+            EST["Estadia"]
+            PAG["Pagamento"]
+            SRV["ServicoExtra"]
+            INT["IntervencaoClinica"]
+            REG["RegistoCuidado"]
+            NOT["Nota"]
+        end
+
+        subgraph Repositories["Camada de Dados (@Repository — Spring Data JPA)"]
+            CR["ColaboradorRepository"]
+            ALR["AlojamentoRepository"]
+            TR["TutorRepository"]
+            ANR["AnimalRepository"]
+            RR["ReservaRepository"]
+            ER["EstadiaRepository"]
+            SR["ServicoExtraRepository"]
+            CLR["ClinicaRepository"]
+            PR["PagamentoRepository"]
+            RCR["RegistoCuidadoRepository"]
+        end
+
+    end
+
+    subgraph Database["Base de Dados"]
+        MySQL["MySQL 8\n(prod) / H2 (testes)"]
+    end
+
+    %% Fluxo de pedido
+    UI -->|HTTP GET/POST| SF
+    SF -->|autorizado| Controllers
+    Controllers --> Services
+    Services --> Domain
+    Services --> Repositories
+    Repositories -->|JPA/Hibernate| MySQL
+
+    %% Ligações Controller → Service
+    AC --> CS
+    ALC --> ALS
+    TAC --> TS
+    TAC --> ANS
+    RC --> RS
+    EC --> ES
+    PC --> PS
+    SEC --> SES
+    CC --> CLS
+    CC --> ANS
+    LC --> LS
+    RLC --> RLS
+    COC --> CS
+
+    %% Ligações Service → Repository (principais)
+    CS --> CR
+    ALS --> ALR
+    TS --> TR
+    ANS --> ANR
+    RS --> RR
+    RS --> ALR
+    ES --> ER
+    ES --> RR
+    SES --> SR
+    CLS --> CLR
+    PS --> PR
+    LS --> ALR
+    RLS --> RR
+    RLS --> ER
+    RLS --> PR
