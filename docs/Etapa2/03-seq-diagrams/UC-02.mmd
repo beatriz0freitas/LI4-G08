@@ -1,0 +1,18 @@
+sequenceDiagram
+    autonumber
+    actor FuncionarioOuDiretor
+    participant AlojamentoController
+    participant IAlojamentoService
+    participant AlojamentoRepository
+
+    FuncionarioOuDiretor->>AlojamentoController: consultar disponibilidade(periodo, especie)
+    AlojamentoController->>IAlojamentoService: consultarDisponibilidade(inicio, fim, especie)
+    IAlojamentoService->>AlojamentoRepository: findDisponiveis(inicio, fim, especie)
+    AlojamentoRepository-->>IAlojamentoService: lista de alojamentos
+    alt lista vazia
+        IAlojamentoService-->>AlojamentoController: sem alojamentos disponiveis
+        AlojamentoController-->>FuncionarioOuDiretor: apresentar indisponibilidade
+    else alojamentos encontrados
+        IAlojamentoService-->>AlojamentoController: lista de alojamentos disponiveis
+        AlojamentoController-->>FuncionarioOuDiretor: apresentar resultados
+    end

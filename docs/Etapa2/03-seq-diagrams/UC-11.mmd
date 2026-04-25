@@ -1,0 +1,25 @@
+sequenceDiagram
+    autonumber
+    actor MedicoVeterinario
+    participant ClinicaController
+    participant IClinicaService
+    participant AnimalRepository
+    participant HistorialClinico
+    participant IServicoExtraService
+
+    MedicoVeterinario->>ClinicaController: consultar animal ou alteracoes recentes
+    ClinicaController->>IClinicaService: consultarHistorial(animalId)
+    IClinicaService->>AnimalRepository: findById(animalId)
+    AnimalRepository-->>IClinicaService: animal e historial
+    IClinicaService-->>ClinicaController: historial clinico
+    ClinicaController-->>MedicoVeterinario: mostrar historial
+
+    MedicoVeterinario->>ClinicaController: registar intervencao(prescricao, custo)
+    ClinicaController->>IClinicaService: registarIntervencaoClinica(dto)
+    IClinicaService->>HistorialClinico: adicionarIntervencao(dto)
+    alt intervencao com custo associado
+        IClinicaService->>IServicoExtraService: registarServicoExtra(dto)
+        IServicoExtraService-->>IClinicaService: custo adicionado a fatura
+    end
+    IClinicaService-->>ClinicaController: intervencao registada
+    ClinicaController-->>MedicoVeterinario: confirmar registo

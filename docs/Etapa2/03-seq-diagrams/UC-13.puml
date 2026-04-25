@@ -1,0 +1,34 @@
+@startuml UC-13
+title UC-13 - Consultar Dashboard e Gerar Relatorios
+
+autonumber
+actor Diretor
+participant RelatorioController
+participant IRelatorioService
+participant ReservaRepository
+participant EstadiaRepository
+participant PagamentoRepository
+
+Diretor -> RelatorioController : abrir dashboard
+RelatorioController -> IRelatorioService : gerarDashboard()
+IRelatorioService -> ReservaRepository : obter indicadores de ocupacao
+IRelatorioService -> EstadiaRepository : obter estadias em curso
+IRelatorioService -> PagamentoRepository : obter pagamentos pendentes
+IRelatorioService --> RelatorioController : dashboard
+RelatorioController --> Diretor : apresentar indicadores
+
+Diretor -> RelatorioController : gerar relatorio(periodo)
+RelatorioController -> IRelatorioService : gerarRelatorioPeriodo(inicio, fim)
+IRelatorioService -> ReservaRepository : consultar dados do periodo
+IRelatorioService -> EstadiaRepository : consultar dados do periodo
+IRelatorioService -> PagamentoRepository : consultar dados do periodo
+
+alt sem dados para o periodo
+  IRelatorioService --> RelatorioController : sem dados
+  RelatorioController --> Diretor : informar ausencia de dados
+else dados disponiveis
+  IRelatorioService --> RelatorioController : relatorio gerado
+  RelatorioController --> Diretor : permitir exportacao
+end
+
+@enduml

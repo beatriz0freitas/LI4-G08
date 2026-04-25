@@ -1,0 +1,30 @@
+@startuml UC-04
+title UC-04 - Criar Reserva
+
+autonumber
+actor FuncionarioRececao
+participant ReservaController
+participant IAlojamentoService
+participant IReservaService
+participant AlojamentoRepository
+participant ReservaRepository
+
+FuncionarioRececao -> ReservaController : iniciar criacao da reserva
+ReservaController -> IAlojamentoService : consultarDisponibilidade(inicio, fim, especie)
+IAlojamentoService -> AlojamentoRepository : findDisponiveis(inicio, fim, especie)
+AlojamentoRepository --> IAlojamentoService : lista de alojamentos disponiveis
+
+alt nenhum alojamento disponivel
+  IAlojamentoService --> ReservaController : indisponibilidade
+  ReservaController --> FuncionarioRececao : sugerir datas alternativas
+else alojamento disponivel
+  FuncionarioRececao -> ReservaController : selecionar alojamento e confirmar dados
+  ReservaController -> IReservaService : criarReserva(dto)
+  IReservaService -> ReservaRepository : save(reserva)
+  IReservaService -> AlojamentoRepository : bloquearPeriodo(alojamento)
+  ReservaRepository --> IReservaService : reserva criada
+  IReservaService --> ReservaController : reserva confirmada
+  ReservaController --> FuncionarioRececao : mostrar confirmacao
+end
+
+@enduml

@@ -1,0 +1,20 @@
+sequenceDiagram
+    autonumber
+    actor ResponsavelLimpeza
+    participant LimpezaController
+    participant IAlojamentoService
+    participant AlojamentoRepository
+
+    ResponsavelLimpeza->>LimpezaController: consultar alojamentos pendentes
+    LimpezaController->>IAlojamentoService: listarPendenteLimpeza()
+    IAlojamentoService->>AlojamentoRepository: findPendentesLimpeza()
+    AlojamentoRepository-->>IAlojamentoService: lista de alojamentos
+    IAlojamentoService-->>LimpezaController: alojamentos pendentes
+    LimpezaController-->>ResponsavelLimpeza: mostrar lista
+
+    ResponsavelLimpeza->>LimpezaController: marcar alojamento como limpo
+    LimpezaController->>IAlojamentoService: registarLimpezaConcluida(alojamentoId)
+    IAlojamentoService->>AlojamentoRepository: updateEstadoLimpeza(CONCLUIDO)
+    IAlojamentoService->>AlojamentoRepository: verificar disponibilidade para nova reserva
+    IAlojamentoService-->>LimpezaController: alojamento limpo
+    LimpezaController-->>ResponsavelLimpeza: confirmar conclusao
