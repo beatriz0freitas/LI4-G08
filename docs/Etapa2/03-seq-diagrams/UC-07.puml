@@ -1,0 +1,29 @@
+@startuml UC-07
+title UC-07 - Registar Check-out
+
+autonumber
+actor FuncionarioRececao
+participant EstadiaController
+participant IEstadiaService
+participant IPagamentoService
+participant EstadiaRepository
+participant AlojamentoRepository
+
+FuncionarioRececao -> EstadiaController : localizar estadia em curso
+EstadiaController -> IEstadiaService : registarCheckOut(estadiaId)
+IEstadiaService -> EstadiaRepository : findEmCurso(estadiaId)
+EstadiaRepository --> IEstadiaService : resumo da estadia
+
+alt existem servicos adicionais
+  IEstadiaService -> IPagamentoService : registarPagamentoCheckOut(valor extras)
+  IPagamentoService --> IEstadiaService : pagamento registado
+else sem extras
+  IEstadiaService -> IEstadiaService : prosseguir sem pagamento adicional
+end
+
+IEstadiaService -> EstadiaRepository : encerrarEstadia(estadia)
+IEstadiaService -> AlojamentoRepository : marcarLimpezaPendente(alojamento)
+IEstadiaService --> EstadiaController : check-out concluido
+EstadiaController --> FuncionarioRececao : confirmar saida
+
+@enduml

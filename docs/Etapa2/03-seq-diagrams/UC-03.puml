@@ -1,0 +1,36 @@
+@startuml UC-03
+title UC-03 - Registar Tutor e Animal
+
+autonumber
+actor FuncionarioRececao
+participant TutorAnimalController
+participant ITutorService
+participant IAnimalService
+participant TutorRepository
+participant AnimalRepository
+
+alt tutor nao existe
+  FuncionarioRececao -> TutorAnimalController : registar tutor(dados tutor)
+  TutorAnimalController -> ITutorService : registarTutor(dto)
+  ITutorService -> TutorRepository : save(tutor)
+  TutorRepository --> ITutorService : tutor criado
+  ITutorService --> TutorAnimalController : tutor registado
+else tutor ja existe
+  FuncionarioRececao -> TutorAnimalController : pesquisar tutor(nome ou NIF)
+  TutorAnimalController -> ITutorService : pesquisar(termo)
+  ITutorService -> TutorRepository : findByNomeOuNif(termo)
+  TutorRepository --> ITutorService : tutor encontrado
+  ITutorService --> TutorAnimalController : tutor existente
+end
+
+FuncionarioRececao -> TutorAnimalController : registar animal(dados animal)
+TutorAnimalController -> IAnimalService : registarAnimal(dto)
+IAnimalService -> AnimalRepository : save(animal)
+note over IAnimalService,AnimalRepository
+  cria a ficha clinica inicial por cascata
+end note
+AnimalRepository --> IAnimalService : animal criado
+IAnimalService --> TutorAnimalController : animal registado
+TutorAnimalController --> FuncionarioRececao : confirmar registo
+
+@enduml

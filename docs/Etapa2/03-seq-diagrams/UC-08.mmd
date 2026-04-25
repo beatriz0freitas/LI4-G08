@@ -1,0 +1,19 @@
+sequenceDiagram
+    autonumber
+    actor FuncionarioRececao
+    participant PagamentoController
+    participant IPagamentoService
+    participant PagamentoRepository
+    participant Fatura
+
+    FuncionarioRececao->>PagamentoController: registar pagamento(valor, metodo)
+    PagamentoController->>IPagamentoService: registarPagamento(dto)
+    IPagamentoService->>PagamentoRepository: save(pagamento)
+    IPagamentoService->>Fatura: emitir(numero, total)
+    alt pagamento liquidado
+        IPagamentoService-->>PagamentoController: pagamento liquidado e fatura emitida
+        PagamentoController-->>FuncionarioRececao: apresentar comprovativo
+    else pagamento pendente
+        IPagamentoService-->>PagamentoController: pagamento pendente
+        PagamentoController-->>FuncionarioRececao: informar divida pendente
+    end

@@ -1,0 +1,34 @@
+sequenceDiagram
+    autonumber
+    actor Cuidador
+    participant EstadiaController
+    participant IEstadiaService
+    participant RegistoCuidadoRepository
+    participant NotaRepository
+
+    Cuidador->>EstadiaController: consultar animais em estadia
+    EstadiaController->>IEstadiaService: listarAnimaisEmEstadia()
+    IEstadiaService-->>EstadiaController: lista de animais e planos
+    EstadiaController-->>Cuidador: mostrar lista
+
+    Cuidador->>EstadiaController: registar cuidado(animal, tipo)
+    EstadiaController->>IEstadiaService: registarCuidadoDiario(dto)
+    IEstadiaService->>RegistoCuidadoRepository: save(registo)
+    RegistoCuidadoRepository-->>IEstadiaService: registo criado
+    IEstadiaService-->>EstadiaController: cuidado registado
+
+    opt adicionar nota a reserva
+        Cuidador->>EstadiaController: adicionar nota(texto)
+        EstadiaController->>IEstadiaService: adicionarNotaReserva(dto)
+        IEstadiaService->>NotaRepository: save(nota)
+        NotaRepository-->>IEstadiaService: nota criada
+        IEstadiaService-->>EstadiaController: nota guardada
+    end
+
+    opt registar alteracao ao estado de saude
+        Cuidador->>EstadiaController: registar alteracao saude(descricao)
+        EstadiaController->>IEstadiaService: registarAlteracaoSaude(dto)
+        IEstadiaService-->>EstadiaController: registo disponivel para veterinario
+    end
+
+    EstadiaController-->>Cuidador: confirmar registos

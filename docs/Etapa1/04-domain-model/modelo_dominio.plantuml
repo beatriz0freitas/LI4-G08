@@ -110,7 +110,7 @@ class Cuidado {
   - dataHora : DateTime
 }
 
-class NotaTurno {
+class Nota {
   - descricao : String
   - dataHora : DateTime
 }
@@ -195,8 +195,8 @@ Estadia "1" --> "1" Reserva : resulta de
 Estadia "1" *-- "0..*" Cuidado
 Cuidado "0..*" -left-> "1" Utilizador : registado por
 
-Reserva "1" *-- "0..*" NotaTurno
-NotaTurno "0..*" -left-> "1" Utilizador : criada por
+Reserva "1" *-- "0..*" Nota
+Nota "0..*" -left-> "1" Utilizador : criada por
 
 Estadia "1" *-- "0..*" RegistoEstadoSaude
 RegistoEstadoSaude "0..*" -left-> "1" Utilizador : registado por

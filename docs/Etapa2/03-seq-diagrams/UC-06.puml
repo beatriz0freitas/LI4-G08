@@ -1,0 +1,24 @@
+@startuml UC-06
+title UC-06 - Registar Check-in
+
+autonumber
+actor FuncionarioRececao
+participant EstadiaController
+participant IEstadiaService
+participant IPagamentoService
+participant ReservaRepository
+participant EstadiaRepository
+participant AlojamentoRepository
+
+FuncionarioRececao -> EstadiaController : localizar reserva e confirmar check-in
+EstadiaController -> IEstadiaService : registarCheckIn(reservaId)
+IEstadiaService -> ReservaRepository : findById(reservaId)
+ReservaRepository --> IEstadiaService : reserva confirmada
+IEstadiaService -> IPagamentoService : registarPagamentoCheckIn(valor total)
+IPagamentoService --> IEstadiaService : pagamento liquidado
+IEstadiaService -> EstadiaRepository : save(estadia)
+IEstadiaService -> AlojamentoRepository : marcarOcupado(alojamento)
+IEstadiaService --> EstadiaController : estadia iniciada
+EstadiaController --> FuncionarioRececao : mostrar confirmacao e plano de cuidados
+
+@enduml

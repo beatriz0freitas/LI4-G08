@@ -1,0 +1,21 @@
+@startuml UC-05
+title UC-05 - Cancelar Reserva
+
+autonumber
+actor FuncionarioRececao
+participant ReservaController
+participant IReservaService
+participant ReservaRepository
+participant AlojamentoRepository
+
+FuncionarioRececao -> ReservaController : cancelar reserva(id)
+ReservaController -> IReservaService : cancelarReserva(reservaId)
+IReservaService -> ReservaRepository : findById(reservaId)
+ReservaRepository --> IReservaService : reserva confirmada
+IReservaService -> ReservaRepository : updateEstado(CANCELADA)
+IReservaService -> AlojamentoRepository : libertarPeriodo(alojamento)
+ReservaRepository --> IReservaService : reserva atualizada
+IReservaService --> ReservaController : cancelamento concluido
+ReservaController --> FuncionarioRececao : confirmar cancelamento
+
+@enduml
