@@ -1,0 +1,113 @@
+%% Template inicial para o modelo de dominio da Etapa 1.
+%% Ajustar entidades, atributos e relacoes apenas com base nos artefactos existentes.
+
+classDiagram
+direction LR
+
+class Tutor {
+  +id: string
+  +nome: string
+  +contacto: string
+}
+
+class Animal {
+  +id: string
+  +nome: string
+  +especie: string
+  +estadoSaude: EstadoSaude
+}
+
+class Alojamento {
+  +id: string
+  +tipo: TipoAlojamento
+  +estadoLimpeza: EstadoLimpeza
+}
+
+class Reserva {
+  +id: string
+  +dataInicio: date
+  +dataFim: date
+  +estado: EstadoReserva
+}
+
+class Estadia {
+  +id: string
+  +checkIn: datetime
+  +checkOut: datetime
+  +estado: EstadoEstadia
+}
+
+class Pagamento {
+  +id: string
+  +valor: decimal
+  +metodo: MetodoPagamento
+  +estado: EstadoPagamento
+}
+
+class ServicoExtra {
+  +id: string
+  +tipo: TipoServicoExtra
+  +custo: decimal
+}
+
+class IntervencaoClinica {
+  +id: string
+  +descricao: string
+  +custo: decimal
+}
+
+class EstadoLimpeza {
+  <<enumeration>>
+  CONCLUIDO
+  PENDENTE
+}
+
+class EstadoReserva {
+  <<enumeration>>
+  ATIVA
+  CANCELADA
+  CONCLUIDA
+}
+
+class EstadoEstadia {
+  <<enumeration>>
+  AGENDADA
+  EM_CURSO
+  TERMINADA
+}
+
+class EstadoPagamento {
+  <<enumeration>>
+  LIQUIDADO
+  PENDENTE
+}
+
+class MetodoPagamento {
+  <<enumeration>>
+  NUMERARIO
+  CARTAO_DEBITO
+  CARTAO_CREDITO
+}
+
+class TipoServicoExtra {
+  <<enumeration>>
+  BANHO
+  PASSEIO
+  OUTRO
+}
+
+class TipoAlojamento {
+  <<enumeration>>
+}
+
+class EstadoSaude {
+  <<enumeration>>
+}
+
+Tutor "1" --> "0..*" Animal : possui
+Animal "1" --> "0..*" Reserva : origina
+Reserva "1" --> "1" Alojamento : reserva
+Reserva "0..1" --> "1" Estadia : converte-se em
+Estadia "1" --> "0..*" Pagamento : gera
+Estadia "0..*" --> "0..*" ServicoExtra : inclui
+Estadia "0..*" --> "0..*" IntervencaoClinica : regista
