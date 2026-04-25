@@ -30,3 +30,6 @@ Etapa 2 do trabalho pratico de LI4 (LEI, Universidade do Minho), edicao 2026. Fo
 - Cada diagrama de sequencia deve estar centrado num cenario observavel ligado a um caso de uso ou fluxo relevante.
 - Contratos de API devem explicitar operacoes, dados, validacoes, autenticacao e erros observaveis coerentes com os requisitos.
 - ADRs sao obrigatorios quando a escolha afetar implementacao, operacao ou qualidade de forma relevante.
+
+## Template de ADR
+Usa o template [adr-template.md](./references/adr-template.md) quando a decisao arquitetural precisar de ser registada.

@@ -278,7 +278,7 @@ MySQL (via Hibernate/HikariCP)
 
 ## 9. Decisões de Arquitetura
 
-As decisões detalhadas encontram-se em `Etapa2/05-architecture-decisions/`.
+As decisoes detalhadas encontram-se em `docs/Etapa2/04-architecture-decisions/`.
 
 | ID | Decisão | Alternativa rejeitada | Justificação |
 |---|---|---|---|
