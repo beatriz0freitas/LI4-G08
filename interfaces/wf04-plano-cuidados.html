@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Patas&Bigodes — Plano de Cuidados</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+  <style>
+    .brand-link .brand-text { font-weight: 700; font-size: 1rem; }
+    .turno-bar { background: #343a40; color: #fff; padding: 8px 16px;
+                 border-radius: 4px; margin-bottom: 16px; font-size: 0.88rem; }
+    .turno-bar span { margin-right: 20px; }
+    .cuidado-check label { font-size: 0.9rem; }
+    .nota-turno { font-size: 0.85rem; }
+    .card-header.bg-warning { color: #212529 !important; }
+  </style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light border-bottom">
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" data-widget="pushmenu" href="#" role="button">
+          <i class="fas fa-bars"></i>
+        </a>
+      </li>
+    </ul>
+    <span class="navbar-text mx-auto font-weight-bold text-dark">
+      <i class="fas fa-paw text-primary mr-1"></i> Patas&amp;Bigodes &nbsp;|&nbsp; Sistema de Gestão
+    </span>
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <span class="nav-link text-muted">
+          <i class="fas fa-user-circle mr-1"></i> Miguel Rocha
+        </span>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-danger" href="wf01-login.html">
+          <i class="fas fa-sign-out-alt"></i> Sair
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Sidebar -->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <a href="#" class="brand-link px-3">
+      <i class="fas fa-paw text-primary mr-2"></i>
+      <span class="brand-text">Patas&amp;Bigodes</span>
+    </a>
+    <div class="sidebar">
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center">
+        <div class="image">
+          <i class="fas fa-user-circle fa-2x text-white ml-1"></i>
+        </div>
+        <div class="info ml-2">
+          <span class="d-block text-white" style="font-size:0.85rem;">Miguel Rocha</span>
+          <span class="text-muted" style="font-size:0.75rem;">Cuidador</span>
+        </div>
+      </div>
+      <nav class="mt-1">
+        <ul class="nav nav-pills nav-sidebar flex-column nav-compact" data-widget="treeview" role="menu">
+          <li class="nav-header">MENU</li>
+          <li class="nav-item">
+            <a href="wf04-plano-cuidados.html" class="nav-link active">
+              <i class="nav-icon fas fa-clipboard-list"></i>
+              <p>Plano de Cuidados</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-concierge-bell"></i>
+              <p>Serviços Extra</p>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Content Wrapper -->
+  <div class="content-wrapper">
+    <div class="content-header">
+      <div class="container-fluid">
+        <h1 class="m-0">Plano de Cuidados</h1>
+      </div>
+    </div>
+
+    <section class="content">
+      <div class="container-fluid">
+
+        <!-- Barra de turno -->
+        <div class="turno-bar">
+          <span><i class="fas fa-sun mr-1 text-warning"></i> Turno da manhã</span>
+          <span><i class="fas fa-calendar mr-1"></i> 24 Abr 2026</span>
+          <span><i class="fas fa-clock mr-1"></i> 22 animais</span>
+          <span class="text-warning"><i class="fas fa-exclamation-circle mr-1"></i> 5 cuidados pendentes</span>
+        </div>
+
+        <!-- Laranja: atenção / medicação pendente -->
+        <div class="card card-warning card-outline">
+          <div class="card-header bg-warning">
+            <h3 class="card-title">
+              <i class="fas fa-exclamation-triangle mr-1"></i>
+              Bolinhas (Gato) &mdash; Box F-07 &mdash; Tutor: João Silva
+            </h3>
+            <div class="card-tools">
+              <button class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="row">
+                  <div class="col-auto cuidado-check">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="ali1" onchange="atualizarProgresso()">
+                      <label class="form-check-label" for="ali1">
+                        <i class="fas fa-utensils text-muted mr-1"></i> Alimentação
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-auto cuidado-check">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="med1" onchange="atualizarProgresso()">
+                      <label class="form-check-label" for="med1">
+                        <i class="fas fa-pills text-warning mr-1"></i> Medicação
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-auto cuidado-check">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="pan1" onchange="atualizarProgresso()">
+                      <label class="form-check-label" for="pan1">
+                        <i class="fas fa-bowl-food text-muted mr-1" style="font-size:0.9rem;"></i> Panela (100g)
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-2">
+                  <input type="text" class="form-control form-control-sm nota-turno"
+                         placeholder="Adicionar nota de turno...">
+                </div>
+              </div>
+              <div class="col-md-4 text-right">
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" id="hig1" onchange="atualizarProgresso()">
+                  <label class="form-check-label" for="hig1">
+                    <i class="fas fa-shower text-info mr-1"></i> Higiene
+                  </label>
+                </div>
+                <button class="btn btn-primary btn-sm mt-2" onclick="registarCuidado(this)">
+                  <i class="fas fa-save mr-1"></i> Registar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Verde: concluído -->
+        <div class="card card-success card-outline">
+          <div class="card-header bg-success">
+            <h3 class="card-title text-white">
+              <i class="fas fa-check-circle mr-1"></i>
+              Bolinhas (Gato) &mdash; Box F-07 &mdash; Tutor: Maria Lima
+            </h3>
+            <div class="card-tools">
+              <span class="badge badge-light">Todos concluídos</span>
+              <button class="btn btn-tool text-white" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body py-2">
+            <span class="text-success mr-3"><i class="fas fa-check mr-1"></i>Alimentação</span>
+            <span class="text-success mr-3"><i class="fas fa-check mr-1"></i>Medicação</span>
+            <span class="text-success"><i class="fas fa-check mr-1"></i>Higiene</span>
+          </div>
+        </div>
+
+        <!-- Vermelho: alteração de saúde -->
+        <div class="card card-danger card-outline">
+          <div class="card-header bg-danger">
+            <h3 class="card-title text-white">
+              <i class="fas fa-heartbeat mr-1"></i>
+              Simba (Cão, Labrador) &mdash; Box C-12 &mdash; Tutor: Pedro Costa
+            </h3>
+            <div class="card-tools">
+              <span class="badge badge-light text-danger">Alteração de saúde</span>
+              <button class="btn btn-tool text-white" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+              </button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="callout callout-danger py-2">
+              <i class="fas fa-exclamation-circle mr-1 text-danger"></i>
+              Animal apresenta sintomas — encaminhado para veterinário.
+            </div>
+            <a href="wf05-historico-clinico.html" class="btn btn-danger btn-sm">
+              <i class="fas fa-stethoscope mr-1"></i> Ver Historial Clínico
+            </a>
+          </div>
+        </div>
+
+        <!-- Barra de progresso -->
+        <div class="card card-outline">
+          <div class="card-body py-2">
+            <div class="d-flex justify-content-between mb-1">
+              <small class="text-muted">Progresso do turno</small>
+              <small id="progressoTexto" class="text-muted">17 de 22 cuidados concluídos (77%)</small>
+            </div>
+            <div class="progress" style="height: 10px;">
+              <div class="progress-bar bg-success" id="barraProgresso"
+                   role="progressbar" style="width: 77%"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <footer class="main-footer text-muted text-center" style="font-size:0.8rem;">
+    UC-09 &nbsp;|&nbsp; ICuidadoService.consultarPlano(), .registarCuidado(), .adicionarNota()
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+<script>
+  const totalBase = 22;
+  let concluidosBase = 17;
+  let extras = 0;
+
+  function atualizarProgresso() {
+    const checks = document.querySelectorAll('input[type=checkbox]:checked');
+    extras = checks.length;
+    const total = concluidosBase + extras;
+    const pct = Math.min(Math.round((total / totalBase) * 100), 100);
+    document.getElementById('barraProgresso').style.width = pct + '%';
+    document.getElementById('progressoTexto').textContent =
+      total + ' de ' + totalBase + ' cuidados concluídos (' + pct + '%)';
+  }
+
+  function registarCuidado(btn) {
+    const card = btn.closest('.card');
+    btn.innerHTML = '<i class="fas fa-check mr-1"></i> Registado';
+    btn.classList.replace('btn-primary', 'btn-success');
+    btn.disabled = true;
+    concluidosBase = Math.min(concluidosBase + 1, totalBase);
+    atualizarProgresso();
+  }
+</script>
+</body>
+</html>
