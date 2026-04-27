@@ -1,0 +1,15 @@
+sequenceDiagram
+    autonumber
+    actor CuidadorOuVeterinario
+    participant ServicoExtraController
+    participant IServicoExtraService
+    participant ServicoExtraRepository
+    participant Fatura
+
+    CuidadorOuVeterinario->>ServicoExtraController: registar servico extra(animal, tipo, custo)
+    ServicoExtraController->>IServicoExtraService: registarServicoExtra(dto)
+    IServicoExtraService->>ServicoExtraRepository: save(servico)
+    ServicoExtraRepository-->>IServicoExtraService: servico criado
+    IServicoExtraService->>Fatura: atualizarTotal(custo)
+    IServicoExtraService-->>ServicoExtraController: servico registado
+    ServicoExtraController-->>CuidadorOuVeterinario: confirmar registo
