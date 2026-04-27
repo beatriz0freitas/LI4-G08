@@ -1,0 +1,131 @@
+@startuml Hotel de Animais — Diagrama de Componentes
+
+skinparam componentStyle uml2
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+interface "HTTP" as HTTP
+
+package "Spring Security 6" {
+  [SecurityFilterChain\n(BCrypt · Sessão · CSRF)] as SEC
+}
+
+package "Spring MVC — Infraestrutura" {
+  [DispatcherServlet] as DS
+  [HandlerMapping] as HM
+  [ViewResolver\n(Thymeleaf)] as VR
+}
+
+package "Camada de Apresentação" <<Rectangle>> {
+  [AuthController] as AC
+  [AlojamentoController] as ALC
+  [TutorAnimalController] as TAC
+  [ReservaController] as RC
+  [EstadiaController] as EC
+  [PagamentoController] as PC
+  [ServicoExtraController] as SERC
+  [ClinicaController] as CC
+  [LimpezaController] as LC
+  [RelatorioController] as RLC
+  [ColaboradorController] as COC
+}
+
+package "Camada de Aplicação" <<Rectangle>> {
+  [ColaboradorService] as CS
+  [AlojamentoService] as ALS
+  [TutorService] as TS
+  [AnimalService] as ANS
+  [ReservaService] as RS
+  [EstadiaService] as ES
+  [ServicoExtraService] as SES
+  [ClinicaService] as CLS
+  [PagamentoService] as PS
+  [LimpezaService] as LS
+  [RelatorioService] as RLS
+}
+
+package "Camada de Dados" <<Rectangle>> {
+  [ColaboradorRepository] as CR
+  [AlojamentoRepository] as ALR
+  [TutorRepository] as TR
+  [AnimalRepository] as ANR
+  [ReservaRepository] as RR
+  [EstadiaRepository] as ER
+  [ServicoExtraRepository] as SR
+  [ClinicaRepository] as CLR
+  [PagamentoRepository] as PR
+  [RegistoCuidadoRepository] as RCR
+}
+
+database "MySQL 8\n(prod) / H2 (testes)" as DB
+
+' Entrada
+HTTP --> SEC
+
+' Security → DispatcherServlet
+SEC --> DS : autorizado
+
+' DispatcherServlet usa HandlerMapping e ViewResolver
+DS ..> HM : <<usa>>
+DS ..> VR : <<usa>>
+
+' HandlerMapping → Controllers (dependência)
+HM ..> AC
+HM ..> ALC
+HM ..> TAC
+HM ..> RC
+HM ..> EC
+HM ..> PC
+HM ..> SERC
+HM ..> CC
+HM ..> LC
+HM ..> RLC
+HM ..> COC
+
+' Controllers → Services
+AC   --> CS
+ALC  --> ALS
+TAC  --> TS
+TAC  --> ANS
+RC   --> RS
+EC   --> ES
+PC   --> PS
+SERC --> SES
+CC   --> CLS
+CC   --> ANS
+LC   --> LS
+RLC  --> RLS
+COC  --> CS
+
+' Services → Repositories
+CS  --> CR
+ALS --> ALR
+TS  --> TR
+ANS --> ANR
+RS  --> RR
+RS  --> ALR
+ES  --> ER
+ES  --> RR
+SES --> SR
+CLS --> CLR
+PS  --> PR
+LS  --> ALR
+RLS --> RR
+RLS --> ER
+RLS --> PR
+
+' Repositories → BD
+CR  --> DB
+ALR --> DB
+TR  --> DB
+ANR --> DB
+RR  --> DB
+ER  --> DB
+SR  --> DB
+CLR --> DB
+PR  --> DB
+RCR --> DB
+
+@enduml
