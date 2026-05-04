@@ -1,0 +1,37 @@
+<th:block xmlns:th="http://www.thymeleaf.org" th:fragment="head">
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title th:text="${pageTitle != null ? pageTitle : 'Hotel Animais'}">Hotel Animais</title>
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css">
+
+	<style>
+		body {
+			font-family: 'Inter', sans-serif;
+		}
+
+		.brand-link {
+			display: flex;
+			align-items: center;
+			gap: .75rem;
+		}
+
+		.content-wrapper {
+			background: #f4f6f9;
+		}
+
+		.card, .small-box {
+			border-radius: .9rem;
+		}
+
+		.metric-value {
+			font-size: 2rem;
+			font-weight: 700;
+		}
+	</style>
+</th:block>
