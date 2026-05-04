@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Patas&Bigodes — Login</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+  <style>
+    body.login-page {
+      background: #e9ecef;
+    }
+    .login-box {
+      width: 380px;
+    }
+    .login-logo a {
+      color: #343a40;
+    }
+    .login-logo .brand-icon {
+      font-size: 2.5rem;
+      color: #007bff;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .login-logo .brand-name {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .login-logo .brand-sub {
+      font-size: 0.8rem;
+      color: #6c757d;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .card {
+      border-top: 3px solid #007bff;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .btn-entrar {
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+    .tentativas-badge {
+      font-size: 0.75rem;
+      color: #dc3545;
+      text-align: right;
+      margin-top: -8px;
+      margin-bottom: 8px;
+    }
+    .footer-note {
+      font-size: 0.78rem;
+      color: #adb5bd;
+      border-top: 1px solid #f0f0f0;
+      padding-top: 12px;
+      margin-top: 12px;
+      text-align: center;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body class="hold-transition login-page">
+
+<!-- Barra de topo — como no wireframe -->
+<nav class="navbar navbar-light" style="background:#343a40; padding: 6px 20px;">
+  <span class="navbar-brand text-white mb-0" style="font-size:0.95rem; margin:auto;">
+    <i class="fas fa-paw mr-2"></i>Patas&amp;Bigodes &nbsp;|&nbsp; Sistema de Gestão
+  </span>
+</nav>
+
+<div class="login-box" style="margin-top: 60px;">
+  <div class="login-logo">
+    <a href="#">
+      <i class="fas fa-paw brand-icon"></i>
+      <span class="brand-name">Patas<span class="text-primary">&amp;</span>Bigodes</span><br>
+      <span class="brand-sub">Sistema de Gestão</span>
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="card-body login-card-body">
+      <p class="login-box-msg text-muted">Iniciar Sessão na Aplicação</p>
+
+      <div class="alert alert-danger alert-dismissible" id="loginError" style="display:none;">
+        <i class="fas fa-exclamation-triangle mr-1"></i>
+        Credenciais inválidas. Tente novamente.
+      </div>
+
+      <div class="alert alert-warning" id="loginBlocked" style="display:none;">
+        <i class="fas fa-ban mr-1"></i>
+        Conta bloqueada após 5 tentativas. Contacte o Diretor.
+      </div>
+
+      <form id="loginForm" autocomplete="off">
+        <div class="input-group mb-3">
+          <input type="text" id="utilizador" class="form-control" placeholder="Utilizador" autofocus>
+          <div class="input-group-append">
+            <div class="input-group-text"><i class="fas fa-user text-muted"></i></div>
+          </div>
+        </div>
+
+        <div class="input-group mb-1">
+          <input type="password" id="palavraPasse" class="form-control" placeholder="Palavra-passe">
+          <div class="input-group-append">
+            <div class="input-group-text"><i class="fas fa-lock text-muted"></i></div>
+          </div>
+        </div>
+
+        <div class="tentativas-badge" id="tentativasBadge" style="display:none;">
+          <i class="fas fa-exclamation-circle"></i> <span id="tentativasTexto"></span>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-12">
+            <button type="submit" id="btnEntrar" class="btn btn-primary btn-block btn-entrar">
+              <i class="fas fa-sign-in-alt mr-1"></i> ENTRAR
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div class="footer-note">
+        Acesso restrito a colaboradores autorizados<br>
+        Em caso de bloqueio contactar o Diretor
+      </div>
+    </div>
+  </div>
+
+  <!-- Hint para demo -->
+  <div class="text-center mt-2">
+    <small class="text-muted">
+      Demo: <code>diretor</code> / <code>recepcao</code> / <code>vet</code> / <code>cuidador</code> / <code>limpeza</code> &mdash; pass: <code>1234</code>
+    </small>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+<script>
+  const utilizadores = {
+    'diretor':  { pass: '1234', destino: 'wf02-dashboard-diretor.html' },
+    'recepcao': { pass: '1234', destino: 'wf03-reservas.html' },
+    'cuidador': { pass: '1234', destino: 'wf04-plano-cuidados.html' },
+    'vet':      { pass: '1234', destino: 'wf05-historico-clinico.html' },
+    'limpeza':  { pass: '1234', destino: 'wf06-limpeza.html' },
+  };
+
+  const MAX_TENTATIVAS = 5;
+  let tentativas = 0;
+
+  $('#loginForm').on('submit', function (e) {
+    e.preventDefault();
+
+    if (tentativas >= MAX_TENTATIVAS) return;
+
+    const u = $('#utilizador').val().trim().toLowerCase();
+    const p = $('#palavraPasse').val();
+
+    if (utilizadores[u] && utilizadores[u].pass === p) {
+      $('#btnEntrar').html('<i class="fas fa-spinner fa-spin mr-1"></i> A entrar...').prop('disabled', true);
+      setTimeout(() => { window.location.href = utilizadores[u].destino; }, 600);
+    } else {
+      tentativas++;
+      $('#loginError').show();
+      $('#palavraPasse').val('').focus();
+
+      const restantes = MAX_TENTATIVAS - tentativas;
+      if (restantes > 0) {
+        $('#tentativasBadge').show();
+        $('#tentativasTexto').text(restantes + ' tentativa' + (restantes === 1 ? '' : 's') + ' restante' + (restantes === 1 ? '' : 's'));
+      } else {
+        $('#loginError').hide();
+        $('#loginBlocked').show();
+        $('#tentativasBadge').hide();
+        $('#btnEntrar').prop('disabled', true).html('<i class="fas fa-ban mr-1"></i> Bloqueado');
+      }
+    }
+  });
+</script>
+</body>
+</html>
