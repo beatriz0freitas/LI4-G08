@@ -67,4 +67,55 @@ Arquivos para acompanhar: `PatasBigodesApp/src/main/java/pt/hotel/animais/contro
 - Prioridade curta: adicionar testes de integração para `AlojamentoRepository` (T034) e criar um pequeno teste de arranque da aplicação para detectar mapeamentos ambíguos.
 - Prioridade média: fazer varredura automatizada dos templates `src/main/resources/templates/**` para detectar inclusões de CDN conflitantes (`bootstrap`, `jquery`) e corrigir para a versão definida (Bootstrap 4.6 + jQuery 3.6). Recomenda-se criar script ou grep simples para encontrar ocorrências.
 
+## 2026-05-06 — Wizard de reservas e uniformização de UI
+
+Contexto: o assistente de criação de reservas permitia avançar visualmente sem enviar o estado ao servidor. Isso fazia com que o tutor escolhido não fosse reconhecido no passo seguinte e dava a sensação de haver dois pontos de selecção no mesmo passo quando o Select2 não estava suportado visualmente.
+
+Correção aplicada:
+
+- O wizard passou a navegar entre passos através de query string (`/reservas/novo?step=passoN&...`), preservando `tutorId`, `animalId`, `alojamentoId`, `dataInicio` e `dataFim`.
+- O `ReservaController` passou a aceitar o parâmetro `step` e a devolver `activeStep` ao template para reactivar o passo correcto após o reload.
+- O Select2 passou a carregar o seu CSS globalmente, evitando que o select original ficasse visível ao lado do componente enriquecido.
+- A navegação lateral do wizard deixou de depender apenas de `data-toggle="tab"` e passou a usar a mesma função de navegação com validação por passo.
+- Uniformizou-se o carregamento de scripts para Bootstrap 4.6 + jQuery 3.6 + AdminLTE 3 nas páginas que ainda misturavam Bootstrap 5.
+
+Arquivos afectados nesta ronda:
+
+- `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`
+- `PatasBigodesApp/src/main/resources/templates/reservas/form.html`
+- `PatasBigodesApp/src/main/resources/templates/fragments/head.html`
+- `PatasBigodesApp/src/main/resources/templates/layout.html`
+- `PatasBigodesApp/src/main/resources/templates/animais/form.html`
+- `PatasBigodesApp/src/main/resources/templates/animais/detail.html`
+- `PatasBigodesApp/src/main/resources/templates/reservas/disponibilidade.html`
+- `PatasBigodesApp/src/main/resources/templates/reservas/confirmacao.html`
+- `PatasBigodesApp/src/main/resources/templates/tutores/form.html`
+- `PatasBigodesApp/src/main/resources/templates/tutores/detail.html`
+- `PatasBigodesApp/src/main/resources/templates/tutores/list.html`
+
+Verificação:
+
+- Build Maven executado com sucesso após as alterações.
+- Pesquisa nas templates já não devolve referências a Bootstrap 5.
+
+## 2026-05-06 — Lazy loading em animais e sidebar resiliente
+
+Contexto: ao abrir a listagem de animais ou o detalhe de um animal recém-criado, o Thymeleaf tentava ler `animal.tutor.nome` fora de uma sessão Hibernate activa, provocando `LazyInitializationException`. Em paralelo, a secção "Receção" da sidebar nem sempre abria quando algumas páginas não definiam `activePage`.
+
+Correção aplicada:
+
+- O `AnimalRepository` passou a carregar o `Tutor` com `@EntityGraph(attributePaths = "tutor")` nas queries usadas pelas vistas.
+- `findAll`, `findById`, `findByTutorId`, `findByNomeContainingIgnoreCase`, `findByTutorIdAndNomeContainingIgnoreCase` e `findByEspecie` passaram a devolver `Animal` com tutor inicializado.
+- A sidebar passou a abrir a secção "Receção" com base em `activePage` ou no `requestURI`, cobrindo páginas que não injectam explicitamente esse atributo.
+
+Arquivos afectados:
+
+- `PatasBigodesApp/src/main/java/pt/hotel/animais/repository/AnimalRepository.java`
+- `PatasBigodesApp/src/main/resources/templates/fragments/sidebar.html`
+
+Verificação:
+
+- Build Maven executado com sucesso após a alteração do repository.
+- A expansão da sidebar deixou de depender exclusivamente do `activePage` nos ecrãs que pertencem à área de receção.
+
 

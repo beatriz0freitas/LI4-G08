@@ -50,31 +50,31 @@
 								<div class="card-body p-0">
 									<ul class="nav flex-column">
 										<li class="nav-item">
-											<a href="#" class="nav-link active" data-toggle="tab" data-target="#passo1">
+											<a href="#" class="nav-link active" onclick="goToStep('passo1'); return false;">
 												<i class="fas fa-user mr-2"></i>Tutor
 												<span th:if="${reservaForm.tutorId != null}" class="badge badge-success float-right"><i class="fas fa-check"></i></span>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="#" class="nav-link" data-toggle="tab" data-target="#passo2">
+											<a href="#" class="nav-link" onclick="goToStep('passo2'); return false;">
 												<i class="fas fa-paw mr-2"></i>Animal
 												<span th:if="${reservaForm.animalId != null}" class="badge badge-success float-right"><i class="fas fa-check"></i></span>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="#" class="nav-link" data-toggle="tab" data-target="#passo3">
+											<a href="#" class="nav-link" onclick="goToStep('passo3'); return false;">
 												<i class="fas fa-calendar mr-2"></i>Período
 												<span th:if="${reservaForm.dataInicio != null && reservaForm.dataFim != null}" class="badge badge-success float-right"><i class="fas fa-check"></i></span>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="#" class="nav-link" data-toggle="tab" data-target="#passo4">
+											<a href="#" class="nav-link" onclick="goToStep('passo4'); return false;">
 												<i class="fas fa-cube mr-2"></i>Alojamento
 												<span th:if="${reservaForm.alojamentoId != null}" class="badge badge-success float-right"><i class="fas fa-check"></i></span>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="#" class="nav-link" data-toggle="tab" data-target="#passo5">
+											<a href="#" class="nav-link" onclick="goToStep('passo5'); return false;">
 												<i class="fas fa-check-circle mr-2"></i>Confirmação
 											</a>
 										</li>
@@ -88,7 +88,7 @@
 							<form th:action="@{/reservas}" th:object="${reservaForm}" method="post">
 								<div class="tab-content">
 									<!-- Passo 1: Tutor -->
-									<div class="tab-pane fade show active" id="passo1">
+									<div class="tab-pane fade" id="passo1" th:classappend="${activeStep == null or activeStep == 'passo1'} ? ' show active' : ''">
 										<div class="card card-primary">
 											<div class="card-header">
 												<h3 class="card-title">Passo 1: Selecione o Tutor</h3>
@@ -131,7 +131,7 @@
 									</div>
 
 									<!-- Passo 2: Animal -->
-									<div class="tab-pane fade" id="passo2">
+									<div class="tab-pane fade" id="passo2" th:classappend="${activeStep == 'passo2'} ? ' show active' : ''">
 										<div class="card card-primary">
 											<div class="card-header">
 												<h3 class="card-title">Passo 2: Selecione o Animal</h3>
@@ -169,9 +169,7 @@
 															<p class="mb-1"><strong>Espécie:</strong> <span th:text="${animal.especie.label}"></span></p>
 															<p class="mb-1"><strong>Raça:</strong> <span th:text="${animal.raca}"></span></p>
 															<p class="mb-0"><strong>Estado Saúde:</strong> 
-																<span th:classappend="${animal.estadoSaude.toString() == 'NORMAL'} ? 'badge badge-success' :
-																		${animal.estadoSaude.toString() == 'ALTERADO'} ? 'badge badge-warning' :
-																		'badge badge-danger'"
+																<span th:classappend="${animal.estadoSaude.toString() == 'NORMAL'} ? 'badge badge-success' : (${animal.estadoSaude.toString() == 'ALTERADO'} ? 'badge badge-warning' : 'badge badge-danger')"
 																	th:text="${animal.estadoSaude.label}"></span>
 															</p>
 														</div>
@@ -190,7 +188,7 @@
 									</div>
 
 									<!-- Passo 3: Período -->
-									<div class="tab-pane fade" id="passo3">
+									<div class="tab-pane fade" id="passo3" th:classappend="${activeStep == 'passo3'} ? ' show active' : ''">
 										<div class="card card-primary">
 											<div class="card-header">
 												<h3 class="card-title">Passo 3: Defina o Período</h3>
@@ -246,7 +244,7 @@
 									</div>
 
 									<!-- Passo 4: Alojamento -->
-									<div class="tab-pane fade" id="passo4">
+									<div class="tab-pane fade" id="passo4" th:classappend="${activeStep == 'passo4'} ? ' show active' : ''">
 										<div class="card card-primary">
 											<div class="card-header">
 												<h3 class="card-title">Passo 4: Selecione o Alojamento</h3>
@@ -297,7 +295,7 @@
 									</div>
 
 									<!-- Passo 5: Confirmação -->
-									<div class="tab-pane fade" id="passo5">
+									<div class="tab-pane fade" id="passo5" th:classappend="${activeStep == 'passo5'} ? ' show active' : ''">
 										<div class="card card-success">
 											<div class="card-header">
 												<h3 class="card-title">Passo 5: Revise e Confirme</h3>
@@ -373,13 +371,16 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-	<script>
+	<script th:inline="javascript">
+		const initialStep = /*[[${activeStep != null ? activeStep : 'passo1'}]]*/ 'passo1';
+
 		$(function () {
 			// Inicializa Select2 para melhor UX
 			$('.select2').select2({
-				theme: 'bootstrap',
 				width: '100%'
 			});
+
+			activateStep(initialStep);
 
 			// Ao selecionar tutor, carrega seus animais via AJAX
 			$('#tutorId').on('change', function() {
@@ -401,15 +402,61 @@
 			});
 		});
 
-		// Função utilitária para navegar entre passos usando a API de Tabs do Bootstrap
-		function goToStep(stepId) {
-			var selector = "a[data-target='#" + stepId + "']";
+		function activateStep(stepId) {
+			var selector = "a[onclick=\"goToStep('" + stepId + "')\"]";
 			if (window.jQuery) {
-				$(selector).tab('show');
-			} else {
-				// fallback: simula clique
-				document.querySelector(selector)?.click();
+				var tabSelector = "a[onclick=\"goToStep('" + stepId + "')\"]";
+				var tab = $(tabSelector).first();
+				if (tab.length) {
+					tab.closest('.nav').find('.nav-link').removeClass('active');
+					tab.addClass('active');
+				}
+				var pane = $('#' + stepId);
+				if (pane.length) {
+					$('.tab-pane').removeClass('show active');
+					pane.addClass('show active');
+				}
 			}
+		}
+
+		function buildWizardUrl(stepId) {
+			var params = new URLSearchParams();
+			var tutorId = $('#tutorId').val();
+			var animalId = $('#animalId').val();
+			var alojamentoId = $('#alojamentoId').val();
+			var dataInicio = $('#dataInicio').val();
+			var dataFim = $('#dataFim').val();
+
+			if (tutorId) { params.set('tutorId', tutorId); }
+			if (animalId) { params.set('animalId', animalId); }
+			if (alojamentoId) { params.set('alojamentoId', alojamentoId); }
+			if (dataInicio) { params.set('dataInicio', dataInicio); }
+			if (dataFim) { params.set('dataFim', dataFim); }
+			params.set('step', stepId);
+
+			return '/reservas/novo?' + params.toString();
+		}
+
+		// Navega entre passos mantendo o estado no servidor via query string
+		function goToStep(stepId) {
+			if (stepId === 'passo2' && !$('#tutorId').val()) {
+				alert('Selecione primeiro um tutor.');
+				return;
+			}
+			if (stepId === 'passo3' && (!$('#tutorId').val() || !$('#animalId').val())) {
+				alert('Selecione primeiro um tutor e um animal.');
+				return;
+			}
+			if (stepId === 'passo4' && (!$('#tutorId').val() || !$('#animalId').val() || !$('#dataInicio').val() || !$('#dataFim').val())) {
+				alert('Preencha o tutor, animal e período antes de avançar.');
+				return;
+			}
+			if (stepId === 'passo5' && (!$('#tutorId').val() || !$('#animalId').val() || !$('#dataInicio').val() || !$('#dataFim').val() || !$('#alojamentoId').val())) {
+				alert('Selecione o alojamento antes de avançar.');
+				return;
+			}
+
+			window.location.href = buildWizardUrl(stepId);
 		}
 	</script>
 </body>

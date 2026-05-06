@@ -121,6 +121,7 @@ public class ReservaController {
         @RequestParam(name = "alojamentoId", required = false) Long alojamentoId,
         @RequestParam(name = "dataInicio", required = false) String dataInicio,
         @RequestParam(name = "dataFim", required = false) String dataFim,
+        @RequestParam(name = "step", required = false, defaultValue = "passo1") String step,
         Model model
     ) {
         ReservaFormDto reservaForm = new ReservaFormDto();
@@ -154,6 +155,7 @@ public class ReservaController {
         model.addAttribute("tutores", tutores);
         model.addAttribute("alojamentos", alojamentos);
         model.addAttribute("animaisTutor", animaisTutor);
+        model.addAttribute("activeStep", step);
         model.addAttribute("pageTitle", "Nova Reserva");
         model.addAttribute("breadcrumb", "Criar Reserva");
         model.addAttribute("activePage", "reservas");
@@ -184,6 +186,7 @@ public class ReservaController {
             model.addAttribute("tutores", tutores);
             model.addAttribute("alojamentos", alojamentos);
             model.addAttribute("animaisTutor", animaisTutor);
+            model.addAttribute("activeStep", "passo1");
             model.addAttribute("pageTitle", "Nova Reserva");
             model.addAttribute("breadcrumb", "Criar Reserva");
             model.addAttribute("activePage", "reservas");
@@ -209,6 +212,7 @@ public class ReservaController {
             model.addAttribute("alojamentos", alojamentos);
             model.addAttribute("animaisTutor", animaisTutor);
             model.addAttribute("errorMessage", e.getMessage());
+            model.addAttribute("activeStep", "passo1");
             model.addAttribute("pageTitle", "Nova Reserva");
             model.addAttribute("breadcrumb", "Criar Reserva");
             model.addAttribute("activePage", "reservas");
