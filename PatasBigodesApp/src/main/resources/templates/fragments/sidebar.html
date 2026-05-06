@@ -14,6 +14,32 @@
 							<p>Dashboard</p>
 						</a>
 					</li>
+					<li class="nav-item has-treeview" th:classappend="${activePage == 'tutores' or activePage == 'animais' or activePage == 'reservas'} ? ' menu-open' : ''">
+						<a href="#" class="nav-link" th:classappend="${activePage == 'tutores' or activePage == 'animais' or activePage == 'reservas'} ? ' active' : ''">
+							<i class="nav-icon fas fa-users"></i>
+							<p>Receção<i class="right fas fa-angle-left"></i></p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item">
+								<a th:href="@{/tutores}" class="nav-link" th:classappend="${activePage == 'tutores'} ? ' active' : ''">
+									<i class="far fa-circle nav-icon"></i>
+									<p>Tutores</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a th:href="@{/animais}" class="nav-link" th:classappend="${activePage == 'animais'} ? ' active' : ''">
+									<i class="far fa-circle nav-icon"></i>
+									<p>Animais</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a th:href="@{/reservas}" class="nav-link" th:classappend="${activePage == 'reservas'} ? ' active' : ''">
+									<i class="far fa-circle nav-icon"></i>
+									<p>Reservas</p>
+								</a>
+							</li>
+						</ul>
+					</li>
 					<li class="nav-item">
 						<a th:href="@{/alojamentos}" class="nav-link" th:classappend="${activePage == 'alojamentos'} ? ' active' : ''">
 							<i class="nav-icon fas fa-house"></i>

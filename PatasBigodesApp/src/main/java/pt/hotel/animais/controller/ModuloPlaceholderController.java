@@ -11,9 +11,7 @@ import java.util.Map;
 public class ModuloPlaceholderController {
 
     private static final Map<String, String> TITULOS = Map.of(
-        "reservas", "Reservas",
         "estadias", "Check-in / Check-out",
-        "tutores", "Tutores e Animais",
         "cuidados", "Cuidados Diários",
         "clinica", "Clínica Veterinária",
         "pagamentos", "Pagamentos",
@@ -22,9 +20,7 @@ public class ModuloPlaceholderController {
     );
 
     @GetMapping({
-        "/reservas",
         "/estadias",
-        "/tutores",
         "/cuidados",
         "/clinica",
         "/pagamentos",

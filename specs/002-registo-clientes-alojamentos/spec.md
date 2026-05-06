@@ -107,6 +107,8 @@ Como funcionário de receção, quero consultar rapidamente os dados completos d
 2. **Given** um tutor foi encontrado, **When** o funcionário abre a ficha do tutor, **Then** vê todos os dados: nome, NIF, contacto, email, e lista de animais associados.
 3. **Given** um animal está listado, **When** o funcionário clica no animal, **Then** acede ao histórico completo: data de nascimento, raça, estado de saúde, necessidades alimentares, medicação, e histórico de reservas.
 
+**Nota (actualização 2026-05-06)**: A navegação foi clarificada para consistência das URLs. A listagem geral de animais está disponível em `/animais` e o detalhe de um animal é servido em `/animais/{id}`. Links a partir da ficha de tutor continuam a listar os animais do tutor, mas os detalhes do animal usam o endpoint raiz para manter rastreabilidade e permitir acesso directo.
+
 ---
 
 ## Requirements *(mandatory)*
@@ -188,6 +190,16 @@ Como funcionário de receção, quero consultar rapidamente os dados completos d
 - **Registar Animal**: `POST /api/animais` — Request: `{tutorId, nome, especie, raca, ...}` → Response: `{id, tutorId, nome, ...}`
 - **Consultar Disponibilidade**: `GET /api/alojamentos/disponibilidade?dataInicio=...&dataFim=...` → Response: Array de boxes disponíveis.
 - **Criar Reserva**: `POST /api/reservas` — Request: `{animalId, tutorId, alojamentoId, dataInicio, dataFim}` → Response: `{id, estado, ...}`
+
+**UI Routes (server-side)**
+
+- `GET /tutores` — Lista e pesquisa de tutores.
+- `GET /tutores/{id}` — Detalhe de tutor com lista de animais associados.
+- `GET /animais` — Lista geral de animais (rota adicionada).
+- `GET /animais/{id}` — Detalhe de animal (rota adicionada).
+- `GET /reservas` — Lista de reservas.
+- `GET /reservas/novo` — Assistente de criação de reservas (wizard).
+- `POST /reservas` — Submissão do formulário de criação de reserva.
 
 ---
 

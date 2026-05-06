@@ -180,3 +180,10 @@ Expected task breakdown:
 - implementar controllers e templates Thymeleaf;
 - adicionar testes de integração e regressão;
 - validar a rastreabilidade entre spec, plano e implementação.
+
+## Corrections / Implementation Updates (2026-05-06)
+
+Durante a execução foram aplicadas correções técnicas e de navegação que afectam parte do plano e das tasks. O registo completo dessas alterações encontra-se em `refinements.md`.
+
+
+

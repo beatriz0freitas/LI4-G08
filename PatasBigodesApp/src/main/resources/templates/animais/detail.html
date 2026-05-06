@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt">
+<head th:insert="fragments/head :: head"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<th:block th:insert="fragments/navbar :: navbar"></th:block>
+		<th:block th:insert="fragments/sidebar :: sidebar"></th:block>
+
+		<div class="content-wrapper">
+			<div class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1 class="m-0" th:text="${animal.nome}">Nome do Animal</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a th:href="@{/}">Início</a></li>
+								<li class="breadcrumb-item"><a th:href="@{/tutores}">Tutores</a></li>
+								<li class="breadcrumb-item active" th:text="${animal.nome}">Animal</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<!-- Informações do Animal -->
+						<div class="col-md-6">
+							<div class="card">
+								<div class="card-header bg-primary">
+									<h3 class="card-title">Informações do Animal</h3>
+								</div>
+								<div class="card-body">
+									<div class="mb-3">
+										<strong>Espécie:</strong>
+										<span class="badge" 
+											  th:classappend="${animal.especie.toString() == 'CAO'} ? 'badge-primary' : 'badge-info'"
+											  th:text="${animal.especie.label}">Espécie</span>
+									</div>
+									<div class="mb-3">
+										<strong>Raça:</strong>
+										<span th:text="${animal.raca}">Raça</span>
+									</div>
+									<div class="mb-3">
+										<strong>Data de Nascimento:</strong>
+										<span th:text="${#temporals.format(animal.dataNascimento, 'dd/MM/yyyy')}">Data</span>
+									</div>
+									<div class="mb-3">
+										<strong>Peso:</strong>
+										<span th:text="${animal.peso + ' kg'}">Peso</span>
+									</div>
+									<div class="mb-3">
+										<strong>Estado de Saúde:</strong>
+										<span class="badge"
+											  th:classappend="${animal.estadoSaude.toString() == 'NORMAL'} ? 'badge-success' : 
+														   ${animal.estadoSaude.toString() == 'ALTERADO'} ? 'badge-warning' : 'badge-danger'"
+											  th:text="${animal.estadoSaude.label}">Estado</span>
+									</div>
+									<div class="mb-3">
+										<strong>Tutor:</strong>
+										<a th:href="@{/tutores/{id}(id=${animal.tutor.id})}" 
+										   th:text="${animal.tutor.nome}"
+										   class="btn-link"></a>
+									</div>
+									<div class="mb-3">
+										<strong>Data de Registo:</strong>
+										<span th:text="${#temporals.format(animal.dataRegisto, 'dd/MM/yyyy HH:mm')}">Data</span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Detalhes de Saúde -->
+						<div class="col-md-6">
+							<div class="card">
+								<div class="card-header bg-warning">
+									<h3 class="card-title">Detalhes de Saúde</h3>
+								</div>
+								<div class="card-body">
+									<div class="mb-3">
+										<strong>Necessidades Alimentares:</strong>
+										<p th:if="${animal.necessidadesAlimentares}" 
+										   th:text="${animal.necessidadesAlimentares}"
+										   class="mb-0">Necessidades</p>
+										<p th:unless="${animal.necessidadesAlimentares}" 
+										   class="text-muted">Sem restrições especiais</p>
+									</div>
+									<div class="mb-3">
+										<strong>Medicação em Curso:</strong>
+										<p th:if="${animal.medicacaoCurso}" 
+										   th:text="${animal.medicacaoCurso}"
+										   class="mb-0">Medicação</p>
+										<p th:unless="${animal.medicacaoCurso}" 
+										   class="text-muted">Sem medicação</p>
+									</div>
+								</div>
+							</div>
+
+							<!-- Ações Rápidas -->
+							<div class="card mt-3">
+								<div class="card-header bg-success">
+									<h3 class="card-title">Ações</h3>
+								</div>
+								<div class="card-body">
+									<a th:href="@{/reservas/novo(tutorId=${animal.tutor.id}, animalId=${animal.id})}" 
+									   class="btn btn-info btn-block">
+										<i class="fas fa-calendar mr-2"></i> Criar Reserva
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<th:block th:insert="fragments/footer :: footer"></th:block>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+</html>

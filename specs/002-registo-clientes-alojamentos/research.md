@@ -55,3 +55,7 @@
 **Rationale**: Estes testes cobrem a lógica crítica da fase 2 com o mínimo de infra-estrutura adicional e alinham-se com a configuração já visível no repositório.
 
 **Alternatives considered**: TestContainers neste momento; apenas testes unitários. TestContainers foi adiado por não fazer parte da configuração atual do projeto, e testes unitários isolados seriam insuficientes para validar fluxos de reserva e segurança.
+
+
+
+**Implementation note**: As alterações de implementação e o histórico de correcções devem ser registados em `refinements.md`. Não use este ficheiro como changelog; `research.md` mantém decisões, alternativas e rationale.

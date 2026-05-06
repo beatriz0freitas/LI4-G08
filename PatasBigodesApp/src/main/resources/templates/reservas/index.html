@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt">
+<head th:insert="fragments/head :: head"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<th:block th:insert="fragments/navbar :: navbar"></th:block>
+		<th:block th:insert="fragments/sidebar :: sidebar"></th:block>
+
+		<div class="content-wrapper">
+			<div class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1 class="m-0" th:if="${disponibilidades == null}">Reservas</h1>
+							<h1 class="m-0" th:if="${disponibilidades != null}">Alojamentos Disponíveis</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a th:href="@{/}">Início</a></li>
+								<li class="breadcrumb-item" th:if="${disponibilidades == null}">
+									<a th:href="@{/reservas}">Reservas</a>
+								</li>
+								<li class="breadcrumb-item" th:if="${disponibilidades != null}">
+									<a th:href="@{/reservas/disponibilidade}">Consultar Disponibilidade</a>
+								</li>
+								<li class="breadcrumb-item active" th:if="${disponibilidades == null}">Lista</li>
+								<li class="breadcrumb-item active" th:if="${disponibilidades != null}">Resultados</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<section class="content">
+				<div class="container-fluid">
+					<!-- Mensagens de feedback -->
+					<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+						<i class="fas fa-exclamation-circle mr-2"></i>
+						<span th:text="${errorMessage}">Erro</span>
+						<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+					</div>
+
+					<div th:if="${warningMessage}" class="alert alert-warning alert-dismissible fade show" role="alert">
+						<i class="fas fa-exclamation-triangle mr-2"></i>
+						<span th:text="${warningMessage}">Aviso</span>
+						<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+					</div>
+
+					<div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+						<i class="fas fa-check-circle mr-2"></i>
+						<span th:text="${successMessage}">Sucesso</span>
+						<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+					</div>
+
+					<!-- Vista: Lista de Reservas -->
+					<th:block th:if="${disponibilidades == null}">
+						<!-- Botões de ação -->
+						<div class="mb-3">
+							<a th:href="@{/reservas/novo}" class="btn btn-primary">
+								<i class="fas fa-plus mr-2"></i>Nova Reserva
+							</a>
+							<a th:href="@{/reservas/disponibilidade}" class="btn btn-info">
+								<i class="fas fa-search mr-2"></i>Consultar Disponibilidade
+							</a>
+						</div>
+
+						<!-- Tabela de Reservas -->
+						<div class="card">
+							<div class="card-header">
+								<h3 class="card-title">Lista de Reservas</h3>
+								<div class="card-tools">
+									<span class="badge badge-primary" th:text="${#lists.size(reservas)} + ' registos'"></span>
+								</div>
+							</div>
+							<div class="card-body">
+								<div th:if="${#lists.isEmpty(reservas)}" class="alert alert-info text-center">
+									<i class="fas fa-info-circle mr-2"></i>
+									Não existem reservas registadas. 
+									<a th:href="@{/reservas/novo}">Criar nova reserva</a>
+								</div>
+
+								<div th:if="${not #lists.isEmpty(reservas)}" class="table-responsive">
+									<table class="table table-hover table-striped">
+										<thead class="table-light">
+											<tr>
+												<th>#</th>
+												<th>Tutor</th>
+												<th>Animal</th>
+												<th>Alojamento</th>
+												<th>Período</th>
+												<th>Estado</th>
+												<th>Ações</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="reserva : ${reservas}">
+												<td>
+													<a th:href="@{/reservas/{id}(id=${reserva.id})}" th:text="${reserva.id}">ID</a>
+												</td>
+												<td th:text="${reserva.tutor.nome}">Tutor</td>
+												<td th:text="${reserva.animal.nome}">Animal</td>
+												<td th:text="${reserva.alojamento.identificacao}">Alojamento</td>
+												<td>
+													<span th:text="${#temporals.format(reserva.dataInicio, 'dd/MM/yyyy')} + ' a ' + ${#temporals.format(reserva.dataFim, 'dd/MM/yyyy')}">Período</span>
+												</td>
+												<td>
+													<span class="badge"
+														  th:classappend="${reserva.estado.toString() == 'ATIVA'} ? 'badge-success' :
+																   ${reserva.estado.toString() == 'CANCELADA'} ? 'badge-danger' :
+																   'badge-secondary'"
+														  th:text="${reserva.estado.label}">Estado</span>
+												</td>
+												<td>
+													<a th:href="@{/reservas/{id}(id=${reserva.id})}" class="btn btn-sm btn-info" title="Ver detalhes">
+														<i class="fas fa-eye"></i>
+													</a>
+													<form th:if="${reserva.isAtiva()}" th:action="@{/reservas/{id}/cancelar(id=${reserva.id})}" method="post" class="d-inline" onsubmit="return confirm('Tem a certeza que deseja cancelar?')">
+														<button type="submit" class="btn btn-sm btn-danger" title="Cancelar reserva">
+															<i class="fas fa-times"></i>
+														</button>
+													</form>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</th:block>
+
+					<!-- Vista: Resultados de Disponibilidade -->
+					<th:block th:if="${disponibilidades != null}">
+						<!-- Header com período -->
+						<div class="card mb-3 bg-light">
+							<div class="card-body">
+								<p class="m-0">
+									<strong>Alojamentos disponíveis de</strong> 
+									<span th:text="${#temporals.format(dataInicio, 'dd/MM/yyyy')}" class="text-primary"></span>
+									<strong>a</strong>
+									<span th:text="${#temporals.format(dataFim, 'dd/MM/yyyy')}" class="text-primary"></span>
+								</p>
+								<small class="text-muted">Total encontrado: <span th:text="${#lists.size(disponibilidades)}"></span> alojamento(s)</small>
+							</div>
+						</div>
+
+						<!-- Botões de navegação -->
+						<div class="mb-3">
+							<a th:href="@{/reservas/disponibilidade}" class="btn btn-secondary">
+								<i class="fas fa-search mr-2"></i>Nova Busca
+							</a>
+							<a th:href="@{/reservas}" class="btn btn-secondary">
+								<i class="fas fa-list mr-2"></i>Ver Todas as Reservas
+							</a>
+						</div>
+
+						<!-- Tabela de Alojamentos Disponíveis -->
+						<div class="card">
+							<div class="card-header">
+								<h3 class="card-title">Alojamentos Disponíveis</h3>
+								<div class="card-tools">
+									<span class="badge badge-success" th:text="${#lists.size(disponibilidades)} + ' alojamento(s)'"></span>
+								</div>
+							</div>
+							<div class="card-body">
+								<div th:if="${#lists.isEmpty(disponibilidades)}" class="alert alert-warning text-center">
+									<i class="fas fa-exclamation-triangle mr-2"></i>
+									Nenhum alojamento disponível para o período selecionado.
+									<a th:href="@{/reservas/disponibilidade}">Tentar outro período</a>
+								</div>
+
+								<div th:if="${not #lists.isEmpty(disponibilidades)}" class="table-responsive">
+									<table class="table table-hover table-striped">
+										<thead class="table-light">
+											<tr>
+												<th>Identificação</th>
+												<th>Tipo</th>
+												<th>Capacidade</th>
+												<th>Estado Limpeza</th>
+												<th>Ação</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr th:each="disponibilidade : ${disponibilidades}">
+												<td>
+													<strong th:text="${disponibilidade.identificacao}">ID</strong>
+												</td>
+												<td th:text="${disponibilidade.tipo}">Tipo</td>
+												<td>
+													<span th:text="${disponibilidade.capacidade} + ' lugar(es)'"></span>
+												</td>
+												<td>
+													<span class="badge badge-success">
+														<i class="fas fa-check mr-1"></i>Limpo
+													</span>
+												</td>
+												<td>
+													<a th:href="@{/reservas/novo(alojamentoId=${disponibilidade.id},dataInicio=${#dates.format(dataInicio,'yyyy-MM-dd')},dataFim=${#dates.format(dataFim,'yyyy-MM-dd')})}" 
+													   class="btn btn-sm btn-success">
+														<i class="fas fa-arrow-right mr-1"></i>Reservar
+													</a>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</div>
+
+								<!-- Card informativo -->
+								<div class="alert alert-info mt-3">
+									<i class="fas fa-lightbulb mr-2"></i>
+									<strong>Próximo passo:</strong> Clique em "Reservar" para criar uma reserva com este alojamento no período selecionado.
+								</div>
+							</div>
+						</div>
+					</th:block>
+				</div>
+			</section>
+		</div>
+	</div>
+
+	<!-- Scripts -->
+	<script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+	<script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

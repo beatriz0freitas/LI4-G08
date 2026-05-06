@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt">
+<head th:insert="fragments/head :: head"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<th:block th:insert="fragments/navbar :: navbar"></th:block>
+		<th:block th:insert="fragments/sidebar :: sidebar"></th:block>
+
+		<div class="content-wrapper">
+			<div class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2">
+						<div class="col-sm-6">
+							<h1 class="m-0" th:text="${pageTitle}">Formulário</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a th:href="@{/}">Início</a></li>
+								<li class="breadcrumb-item"><a th:href="@{/tutores}">Tutores</a></li>
+								<li class="breadcrumb-item active" th:text="${pageTitle}">Formulário</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<section class="content">
+				<div class="container-fluid">
+					<!-- Mensagens de erro globais -->
+					<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+						<i class="fas fa-exclamation-circle mr-2"></i>
+						<span th:text="${errorMessage}">Mensagem de erro</span>
+						<button type="button" class="close" data-dismiss="alert">
+							<span>&times;</span>
+						</button>
+					</div>
+
+					<!-- Card do formulário -->
+					<div class="card card-primary">
+						<div class="card-header">
+							<h3 class="card-title">Dados do Tutor</h3>
+						</div>
+
+						<form th:action="${tutorId} ? @{/tutores/{id}(id=${tutorId})} : @{/tutores}" 
+							  th:object="${tutorForm}" method="post" class="form-horizontal">
+							<div class="card-body">
+								<!-- Nome -->
+								<div class="form-group row">
+									<label for="nome" class="col-sm-2 col-form-label">Nome <span class="text-danger">*</span></label>
+									<div class="col-sm-10">
+										<input type="text" th:field="*{nome}" id="nome" 
+											   class="form-control" 
+											   th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid' : ''"
+											   placeholder="Nome completo do tutor">
+										<div class="invalid-feedback" th:if="${#fields.hasErrors('nome')}">
+											<ul class="mb-0 pl-3">
+												<li th:each="err : ${#fields.errors('nome')}" th:text="${err}">Erro</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+
+								<!-- NIF -->
+								<div class="form-group row">
+									<label for="nif" class="col-sm-2 col-form-label">NIF <span class="text-danger">*</span></label>
+									<div class="col-sm-10">
+										<input type="text" th:field="*{nif}" id="nif" 
+											   class="form-control" 
+											   th:classappend="${#fields.hasErrors('nif')} ? 'is-invalid' : ''"
+											   placeholder="123456789" maxlength="20">
+										<small class="form-text text-muted">9 dígitos, sem espaços</small>
+										<div class="invalid-feedback" th:if="${#fields.hasErrors('nif')}">
+											<ul class="mb-0 pl-3">
+												<li th:each="err : ${#fields.errors('nif')}" th:text="${err}">Erro</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+
+								<!-- Contacto -->
+								<div class="form-group row">
+									<label for="contacto" class="col-sm-2 col-form-label">Contacto <span class="text-danger">*</span></label>
+									<div class="col-sm-10">
+										<input type="tel" th:field="*{contacto}" id="contacto" 
+											   class="form-control" 
+											   th:classappend="${#fields.hasErrors('contacto')} ? 'is-invalid' : ''"
+											   placeholder="912345678" maxlength="30">
+										<small class="form-text text-muted">Número de telemóvel</small>
+										<div class="invalid-feedback" th:if="${#fields.hasErrors('contacto')}">
+											<ul class="mb-0 pl-3">
+												<li th:each="err : ${#fields.errors('contacto')}" th:text="${err}">Erro</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+
+								<!-- Email -->
+								<div class="form-group row">
+									<label for="email" class="col-sm-2 col-form-label">Email <span class="text-danger">*</span></label>
+									<div class="col-sm-10">
+										<input type="email" th:field="*{email}" id="email" 
+											   class="form-control" 
+											   th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
+											   placeholder="tutor@exemplo.com">
+										<div class="invalid-feedback" th:if="${#fields.hasErrors('email')}">
+											<ul class="mb-0 pl-3">
+												<li th:each="err : ${#fields.errors('email')}" th:text="${err}">Erro</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Botões de ação -->
+							<div class="card-footer">
+								<button type="submit" class="btn btn-success">
+									<i class="fas fa-save mr-2"></i>Guardar
+								</button>
+								<a th:href="@{/tutores}" class="btn btn-secondary">
+									<i class="fas fa-times mr-2"></i>Cancelar
+								</a>
+							</div>
+						</form>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<th:block th:insert="fragments/footer :: footer"></th:block>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+</html>
