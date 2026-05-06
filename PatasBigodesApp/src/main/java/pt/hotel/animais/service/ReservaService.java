@@ -104,7 +104,7 @@ public class ReservaService {
      */
     @Transactional(readOnly = true)
     public Reserva obter(Long id) {
-        return reservaRepository.findById(id)
+        return reservaRepository.findWithDetalhesById(id)
             .orElseThrow(() -> new IllegalArgumentException("Reserva com ID " + id + " não encontrada"));
     }
     
@@ -178,6 +178,6 @@ public class ReservaService {
      */
     @Transactional(readOnly = true)
     public List<Reserva> listarTodas() {
-        return reservaRepository.findAll();
+        return reservaRepository.findAllWithDetalhes();
     }
 }

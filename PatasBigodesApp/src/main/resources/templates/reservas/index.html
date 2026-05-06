@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt">
-<head th:insert="fragments/head :: head"></head>
+<head th:insert="~{fragments/head :: head}"></head>
 <body class="hold-transition sidebar-mini layout-fixed">
 	<div class="wrapper">
-		<th:block th:insert="fragments/navbar :: navbar"></th:block>
-		<th:block th:insert="fragments/sidebar :: sidebar"></th:block>
+		<th:block th:insert="~{fragments/navbar :: navbar}"></th:block>
+		<th:block th:insert="~{fragments/sidebar :: sidebar}"></th:block>
 
 		<div class="content-wrapper">
 			<div class="content-header">
@@ -101,13 +101,11 @@
 												<td th:text="${reserva.animal.nome}">Animal</td>
 												<td th:text="${reserva.alojamento.identificacao}">Alojamento</td>
 												<td>
-													<span th:text="${#temporals.format(reserva.dataInicio, 'dd/MM/yyyy')} + ' a ' + ${#temporals.format(reserva.dataFim, 'dd/MM/yyyy')}">Período</span>
+													<span th:text="${#temporals.format(reserva.dataInicio, 'dd/MM/yyyy') + ' a ' + #temporals.format(reserva.dataFim, 'dd/MM/yyyy')}">Período</span>
 												</td>
 												<td>
 													<span class="badge"
-														  th:classappend="${reserva.estado.toString() == 'ATIVA'} ? 'badge-success' :
-																   ${reserva.estado.toString() == 'CANCELADA'} ? 'badge-danger' :
-																   'badge-secondary'"
+														  th:classappend="${reserva.estado.toString() == 'ATIVA' ? 'badge-success' : (reserva.estado.toString() == 'CANCELADA' ? 'badge-danger' : 'badge-secondary')}"
 														  th:text="${reserva.estado.label}">Estado</span>
 												</td>
 												<td>
@@ -194,7 +192,7 @@
 													</span>
 												</td>
 												<td>
-													<a th:href="@{/reservas/novo(alojamentoId=${disponibilidade.id},dataInicio=${#dates.format(dataInicio,'yyyy-MM-dd')},dataFim=${#dates.format(dataFim,'yyyy-MM-dd')})}" 
+													<a th:href="@{/reservas/novo(alojamentoId=${disponibilidade.alojamentoId},dataInicio=${#temporals.format(dataInicio,'yyyy-MM-dd')},dataFim=${#temporals.format(dataFim,'yyyy-MM-dd')})} + '#passo1'" 
 													   class="btn btn-sm btn-success">
 														<i class="fas fa-arrow-right mr-1"></i>Reservar
 													</a>

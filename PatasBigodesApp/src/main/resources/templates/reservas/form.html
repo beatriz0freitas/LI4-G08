@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt">
 <head th:insert="~{fragments/head :: head}"></head>
-<body class="hold-transition sidebar-mini layout-fixed" th:attr="data-active-step=${activeStep}">
+<body class="hold-transition sidebar-mini layout-fixed">
 	<div class="wrapper">
 		<th:block th:insert="~{fragments/navbar :: navbar}"></th:block>
 		<th:block th:insert="~{fragments/sidebar :: sidebar}"></th:block>
@@ -29,355 +29,311 @@
 					<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
 						<i class="fas fa-exclamation-circle mr-2"></i>
 						<span th:text="${errorMessage}">Erro</span>
-						<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+						<button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
+							<span aria-hidden="true">&times;</span>
+						</button>
 					</div>
 
-					<!-- Wizard de passos -->
+					<div th:if="${warningMessage}" class="alert alert-warning alert-dismissible fade show" role="alert">
+						<i class="fas fa-exclamation-triangle mr-2"></i>
+						<span th:text="${warningMessage}">Aviso</span>
+						<button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+
 					<div class="card card-primary card-outline">
 						<div class="card-header">
 							<h3 class="card-title">Assistente de Criação de Reserva</h3>
 						</div>
-					</div>
-
-					<!-- Formulário em passos -->
-					<div class="row">
-						<div class="col-md-3">
-							<!-- Passos laterais -->
-							<div class="card card-primary card-outline">
-								<div class="card-header">
-									<h3 class="card-title">Passos</h3>
-								</div>
-								<div class="card-body p-0">
-									<ul class="nav flex-column">
+						<div class="card-body">
+							<div class="row">
+								<div class="col-md-3">
+									<ul class="nav nav-pills flex-column wizard-steps">
 										<li class="nav-item">
-											<a href="#" class="nav-link active" onclick="goToStep('passo1'); return false;">
+											<a href="#" class="nav-link" data-step-link="passo1" onclick="goToStep('passo1'); return false;">
 												<i class="fas fa-user mr-2"></i>Tutor
 												<span th:if="${reservaForm.tutorId != null}" class="badge badge-success float-right"><i class="fas fa-check"></i></span>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="#" class="nav-link" onclick="goToStep('passo2'); return false;">
+											<a href="#" class="nav-link" data-step-link="passo2" onclick="goToStep('passo2'); return false;">
 												<i class="fas fa-paw mr-2"></i>Animal
 												<span th:if="${reservaForm.animalId != null}" class="badge badge-success float-right"><i class="fas fa-check"></i></span>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="#" class="nav-link" onclick="goToStep('passo3'); return false;">
+											<a href="#" class="nav-link" data-step-link="passo3" onclick="goToStep('passo3'); return false;">
 												<i class="fas fa-calendar mr-2"></i>Período
 												<span th:if="${reservaForm.dataInicio != null && reservaForm.dataFim != null}" class="badge badge-success float-right"><i class="fas fa-check"></i></span>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="#" class="nav-link" onclick="goToStep('passo4'); return false;">
+											<a href="#" class="nav-link" data-step-link="passo4" onclick="goToStep('passo4'); return false;">
 												<i class="fas fa-cube mr-2"></i>Alojamento
 												<span th:if="${reservaForm.alojamentoId != null}" class="badge badge-success float-right"><i class="fas fa-check"></i></span>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="#" class="nav-link" onclick="goToStep('passo5'); return false;">
+											<a href="#" class="nav-link" data-step-link="passo5" onclick="goToStep('passo5'); return false;">
 												<i class="fas fa-check-circle mr-2"></i>Confirmação
 											</a>
 										</li>
 									</ul>
 								</div>
-							</div>
-						</div>
 
-						<div class="col-md-9">
-							<!-- Conteúdo dos passos -->
-							<form th:action="@{/reservas}" th:object="${reservaForm}" method="post">
-								<div class="tab-content">
-									<!-- Passo 1: Tutor -->
-									<div class="tab-pane fade" id="passo1" th:classappend="${activeStep == null or activeStep == 'passo1'} ? ' show active' : ''">
-										<div class="card card-primary">
-											<div class="card-header">
-												<h3 class="card-title">Passo 1: Selecione o Tutor</h3>
-											</div>
-											<div class="card-body">
-												<div class="form-group">
-													<label for="tutorId">Tutor <span class="text-danger">*</span></label>
-													<select th:field="*{tutorId}" id="tutorId" class="form-control select2" 
-														th:classappend="${#fields.hasErrors('tutorId')} ? 'is-invalid' : ''" required>
-														<option value="">-- Selecione um tutor --</option>
-														<option th:each="tutor : ${tutores}" th:value="${tutor.id}" 
-															th:text="${tutor.nome} + ' (NIF: ' + ${tutor.nif} + ')'">Tutor</option>
-													</select>
-													<small class="form-text text-muted mt-2">
-														<i class="fas fa-info-circle mr-1"></i>
-														Se não encontra o tutor, 
-														<a th:href="@{/tutores/novo}">crie um novo tutor</a>
-													</small>
-													<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('tutorId')}">
-														<li th:each="err : ${#fields.errors('tutorId')}" th:text="${err}">Erro</li>
+								<div class="col-md-9">
+									<form th:action="@{/reservas}" th:object="${reservaForm}" method="post" novalidate>
+										<div class="tab-content">
+											<div class="tab-pane fade show active" id="passo1">
+												<div class="card card-primary mb-0">
+													<div class="card-header">
+														<h3 class="card-title">Passo 1: Selecione o Tutor</h3>
 													</div>
-												</div>
-
-												<!-- Informações do tutor selecionado -->
-												<div th:if="${reservaForm.tutorId != null}" class="alert alert-info">
-													<strong>Tutor Selecionado:</strong>
-													<div th:each="tutor : ${tutores}" th:if="${tutor.id == reservaForm.tutorId}">
-														<p class="mb-1"><strong>Nome:</strong> <span th:text="${tutor.nome}"></span></p>
-														<p class="mb-1"><strong>NIF:</strong> <span th:text="${tutor.nif}"></span></p>
-														<p class="mb-0"><strong>Contacto:</strong> <span th:text="${tutor.contacto}"></span></p>
-													</div>
-															</div>
-														</div>
-													</div>
-															</div>
-														</div>
-														</div>
-													</div>
-												<div class="card-footer">
-												<button type="button" class="btn btn-primary float-right" onclick="goToStep('passo2')">
-													Próximo <i class="fas fa-arrow-right ml-2"></i>
-												</button>
-											</div>
-										</div>
-									</div>
-
-									<!-- Passo 2: Animal -->
-									<div class="tab-pane fade" id="passo2" th:classappend="${activeStep == 'passo2'} ? ' show active' : ''">
-										<div class="card card-primary">
-											<div class="card-header">
-												<h3 class="card-title">Passo 2: Selecione o Animal</h3>
-											</div>
-											<div class="card-body">
-												<div th:if="${reservaForm.tutorId == null}" class="alert alert-warning">
-													<i class="fas fa-exclamation-triangle mr-2"></i>
-													Selecione primeiro um tutor no passo anterior.
-												</div>
-
-												<div th:if="${reservaForm.tutorId != null}">
-													<div class="form-group">
-														<label for="animalId">Animal <span class="text-danger">*</span></label>
-														<select th:field="*{animalId}" id="animalId" class="form-control select2"
-															th:classappend="${#fields.hasErrors('animalId')} ? 'is-invalid' : ''" required>
-															<option value="">-- Selecione um animal --</option>
-															<option th:each="animal : ${animaisTutor}" th:value="${animal.id}"
-																th:text="${animal.nome} + ' (' + ${animal.especie.label} + ')'">Animal</option>
-														</select>
-														<small class="form-text text-muted mt-2">
-															<i class="fas fa-info-circle mr-1"></i>
-															Se precisa adicionar um novo animal ao tutor,
-															<a th:href="@{/animais/novo}">crie um novo animal</a>
-														</small>
-														<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('animalId')}">
-															<li th:each="err : ${#fields.errors('animalId')}" th:text="${err}">Erro</li>
-														</div>
-													</div>
-
-													<!-- Informações do animal selecionado -->
-													<div th:if="${reservaForm.animalId != null}" class="alert alert-info">
-														<strong>Animal Selecionado:</strong>
-														<div th:each="animal : ${animaisTutor}" th:if="${animal.id == reservaForm.animalId}">
-															<p class="mb-1"><strong>Nome:</strong> <span th:text="${animal.nome}"></span></p>
-															<p class="mb-1"><strong>Espécie:</strong> <span th:text="${animal.especie.label}"></span></p>
-															<p class="mb-1"><strong>Raça:</strong> <span th:text="${animal.raca}"></span></p>
-															<p class="mb-0"><strong>Estado Saúde:</strong> 
-																<span th:classappend="${animal.estadoSaude.toString() == 'NORMAL'} ? 'badge badge-success' : (${animal.estadoSaude.toString() == 'ALTERADO'} ? 'badge badge-warning' : 'badge badge-danger')"
-																	th:text="${animal.estadoSaude.label}"></span>
-															</p>
-														</div>
-													</div>
-												</div>
-											</div>
-											<div class="card-footer">
-												<button type="button" class="btn btn-secondary" onclick="goToStep('passo1')">
-													<i class="fas fa-arrow-left mr-2"></i>Anterior
-												</button>
-												<button type="button" class="btn btn-primary float-right" onclick="goToStep('passo3')">
-													Próximo <i class="fas fa-arrow-right ml-2"></i>
-												</button>
-											</div>
-										</div>
-									</div>
-
-									<!-- Passo 3: Período -->
-									<div class="tab-pane fade" id="passo3" th:classappend="${activeStep == 'passo3'} ? ' show active' : ''">
-										<div class="card card-primary">
-											<div class="card-header">
-												<h3 class="card-title">Passo 3: Defina o Período</h3>
-											</div>
-											<div class="card-body">
-												<div class="row">
-													<div class="col-md-6">
+													<div class="card-body">
 														<div class="form-group">
-															<label for="dataInicio">Data de Início <span class="text-danger">*</span></label>
-															<input type="date" th:field="*{dataInicio}" id="dataInicio" 
-																class="form-control" 
-																th:classappend="${#fields.hasErrors('dataInicio')} ? 'is-invalid' : ''"
-																required>
-															<small class="form-text text-muted">A partir de quando pretende o alojamento</small>
-															<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('dataInicio')}">
-																<li th:each="err : ${#fields.errors('dataInicio')}" th:text="${err}">Erro</li>
+															<label for="tutorId">Tutor <span class="text-danger">*</span></label>
+															<select th:field="*{tutorId}" id="tutorId" class="form-control" th:classappend="${#fields.hasErrors('tutorId')} ? ' is-invalid' : ''">
+																<option value="">-- Selecione um tutor --</option>
+																<option th:each="tutor : ${tutores}" th:value="${tutor.id}" th:text="${tutor.nome + ' (NIF: ' + tutor.nif + ')'}">Tutor</option>
+															</select>
+															<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('tutorId')}">
+																<div th:each="err : ${#fields.errors('tutorId')}" th:text="${err}">Erro</div>
+															</div>
+															<small class="form-text text-muted mt-2">
+																Se não encontra o tutor, <a th:href="@{/tutores/novo}">registe um novo tutor</a>.
+															</small>
+														</div>
+
+														<div th:if="${reservaForm.tutorId != null}" class="alert alert-info mb-0">
+															<strong>Tutor selecionado</strong>
+															<div th:each="tutor : ${tutores}" th:if="${tutor.id == reservaForm.tutorId}">
+																<div><strong>Nome:</strong> <span th:text="${tutor.nome}">Nome</span></div>
+																<div><strong>NIF:</strong> <span th:text="${tutor.nif}">NIF</span></div>
+																<div><strong>Contacto:</strong> <span th:text="${tutor.contacto}">Contacto</span></div>
 															</div>
 														</div>
 													</div>
-													<div class="col-md-6">
+													<div class="card-footer clearfix">
+														<button type="button" class="btn btn-primary float-right" onclick="goToStep('passo2')">
+															Próximo <i class="fas fa-arrow-right ml-2"></i>
+														</button>
+													</div>
+												</div>
+											</div>
+
+											<div class="tab-pane fade" id="passo2">
+												<div class="card card-primary mb-0">
+													<div class="card-header">
+														<h3 class="card-title">Passo 2: Selecione o Animal</h3>
+													</div>
+													<div class="card-body">
+														<div th:if="${reservaForm.tutorId == null}" class="alert alert-warning mb-0">
+															<i class="fas fa-exclamation-triangle mr-2"></i>Selecione primeiro um tutor.
+														</div>
+
+														<div th:if="${reservaForm.tutorId != null}">
+															<div th:if="${#lists.isEmpty(animaisTutor)}" class="alert alert-warning">
+																<i class="fas fa-exclamation-triangle mr-2"></i>Este tutor ainda não tem animais registados.
+															</div>
+
+															<div class="form-group">
+																<label for="animalId">Animal <span class="text-danger">*</span></label>
+																<select th:field="*{animalId}" id="animalId" class="form-control" th:classappend="${#fields.hasErrors('animalId')} ? ' is-invalid' : ''">
+																	<option value="">-- Selecione um animal --</option>
+																	<option th:each="animal : ${animaisTutor}" th:value="${animal.id}" th:text="${animal.nome + ' (' + animal.especie.label + ')'}">Animal</option>
+																</select>
+																<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('animalId')}">
+																	<div th:each="err : ${#fields.errors('animalId')}" th:text="${err}">Erro</div>
+																</div>
+																<small class="form-text text-muted mt-2" th:if="${reservaForm.tutorId != null}">
+																	Se precisa adicionar um animal, <a th:href="@{/tutores/{id}/animais/novo(id=${reservaForm.tutorId})}">registe-o neste tutor</a>.
+																</small>
+															</div>
+
+															<div th:if="${reservaForm.animalId != null}" class="alert alert-info mb-0">
+																<strong>Animal selecionado</strong>
+																<div th:each="animal : ${animaisTutor}" th:if="${animal.id == reservaForm.animalId}">
+																	<div><strong>Nome:</strong> <span th:text="${animal.nome}">Nome</span></div>
+																	<div><strong>Espécie:</strong> <span th:text="${animal.especie.label}">Espécie</span></div>
+																	<div><strong>Raça:</strong> <span th:text="${animal.raca}">Raça</span></div>
+																	<div>
+																		<strong>Estado de saúde:</strong>
+																		<span class="badge" th:classappend="${animal.estadoSaude.toString() == 'NORMAL' ? ' badge-success' : (animal.estadoSaude.toString() == 'ALTERADO' ? ' badge-warning' : ' badge-danger')}" th:text="${animal.estadoSaude.label}">Estado</span>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+													<div class="card-footer clearfix">
+														<button type="button" class="btn btn-secondary" onclick="goToStep('passo1')">
+															<i class="fas fa-arrow-left mr-2"></i>Anterior
+														</button>
+														<button type="button" class="btn btn-primary float-right" onclick="goToStep('passo3')">
+															Próximo <i class="fas fa-arrow-right ml-2"></i>
+														</button>
+													</div>
+												</div>
+											</div>
+
+											<div class="tab-pane fade" id="passo3">
+												<div class="card card-primary mb-0">
+													<div class="card-header">
+														<h3 class="card-title">Passo 3: Defina o Período</h3>
+													</div>
+													<div class="card-body">
+														<div class="row">
+															<div class="col-md-6">
+																<div class="form-group">
+																	<label for="dataInicio">Data de início <span class="text-danger">*</span></label>
+																	<input type="date" name="dataInicio" id="dataInicio" class="form-control" th:value="${reservaForm.dataInicio}" th:classappend="${#fields.hasErrors('dataInicio')} ? ' is-invalid' : ''">
+																	<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('dataInicio')}">
+																		<div th:each="err : ${#fields.errors('dataInicio')}" th:text="${err}">Erro</div>
+																	</div>
+																</div>
+															</div>
+															<div class="col-md-6">
+																<div class="form-group">
+																	<label for="dataFim">Data de fim <span class="text-danger">*</span></label>
+																	<input type="date" name="dataFim" id="dataFim" class="form-control" th:value="${reservaForm.dataFim}" th:classappend="${#fields.hasErrors('dataFim')} ? ' is-invalid' : ''">
+																	<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('dataFim')}">
+																		<div th:each="err : ${#fields.errors('dataFim')}" th:text="${err}">Erro</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+
+														<div th:if="${reservaForm.dataInicio != null && reservaForm.dataFim != null}" class="alert alert-info mb-0">
+															<strong>Período selecionado:</strong>
+															<span th:text="${#temporals.format(reservaForm.dataInicio, 'dd/MM/yyyy') + ' a ' + #temporals.format(reservaForm.dataFim, 'dd/MM/yyyy')}">Período</span>
+														</div>
+													</div>
+													<div class="card-footer clearfix">
+														<button type="button" class="btn btn-secondary" onclick="goToStep('passo2')">
+															<i class="fas fa-arrow-left mr-2"></i>Anterior
+														</button>
+														<button type="button" class="btn btn-primary float-right" onclick="goToStep('passo4')">
+															Próximo <i class="fas fa-arrow-right ml-2"></i>
+														</button>
+													</div>
+												</div>
+											</div>
+
+											<div class="tab-pane fade" id="passo4">
+												<div class="card card-primary mb-0">
+													<div class="card-header">
+														<h3 class="card-title">Passo 4: Selecione o Alojamento</h3>
+													</div>
+													<div class="card-body">
+														<div th:if="${tipoAlojamentoEsperado == null}" class="alert alert-warning">
+															<i class="fas fa-exclamation-triangle mr-2"></i>Selecione primeiro o animal e o período.
+														</div>
+														<div th:if="${tipoAlojamentoEsperado != null}" class="alert alert-secondary">
+															<i class="fas fa-filter mr-1"></i>
+															A mostrar apenas alojamentos <strong th:text="${tipoAlojamentoEsperado.label}">adequados</strong> limpos e livres no período selecionado.
+														</div>
+
+														<div th:if="${tipoAlojamentoEsperado != null && #lists.isEmpty(disponibilidades)}" class="alert alert-warning">
+															<i class="fas fa-exclamation-triangle mr-2"></i>Não existem alojamentos disponíveis para estes dados.
+														</div>
+
 														<div class="form-group">
-															<label for="dataFim">Data de Fim <span class="text-danger">*</span></label>
-															<input type="date" th:field="*{dataFim}" id="dataFim" 
-																class="form-control" 
-																th:classappend="${#fields.hasErrors('dataFim')} ? 'is-invalid' : ''"
-																required>
-															<small class="form-text text-muted">Até quando é necessário o alojamento</small>
-															<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('dataFim')}">
-																<li th:each="err : ${#fields.errors('dataFim')}" th:text="${err}">Erro</li>
+															<label for="alojamentoId">Alojamento <span class="text-danger">*</span></label>
+															<select th:field="*{alojamentoId}" id="alojamentoId" class="form-control" th:classappend="${#fields.hasErrors('alojamentoId')} ? ' is-invalid' : ''">
+																<option value="">-- Selecione um alojamento --</option>
+																<option th:each="d : ${disponibilidades}" th:value="${d.alojamentoId}" th:text="${d.identificacao + ' (' + d.tipoLabel + ', capacidade ' + d.capacidade + ')'}">Alojamento</option>
+															</select>
+															<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('alojamentoId')}">
+																<div th:each="err : ${#fields.errors('alojamentoId')}" th:text="${err}">Erro</div>
+															</div>
+															<small class="form-text text-muted mt-2">Só são listados alojamentos compatíveis com a espécie do animal, limpos e sem reservas ativas sobrepostas.</small>
+														</div>
+
+														<div th:if="${reservaForm.alojamentoId != null}" class="alert alert-info mb-0">
+															<strong>Alojamento selecionado</strong>
+															<div th:each="d : ${disponibilidades}" th:if="${d.alojamentoId == reservaForm.alojamentoId}">
+																<div><strong>Identificação:</strong> <span th:text="${d.identificacao}">Alojamento</span></div>
+																<div><strong>Tipo:</strong> <span th:text="${d.tipoLabel}">Tipo</span></div>
+																<div><strong>Capacidade:</strong> <span th:text="${d.capacidade + ' lugar(es)'}">Capacidade</span></div>
 															</div>
 														</div>
 													</div>
-												</div>
-
-												<!-- Resumo do período -->
-												<div th:if="${reservaForm.dataInicio != null && reservaForm.dataFim != null}" class="alert alert-info">
-													<strong>Período Selecionado:</strong>
-													<p class="mb-0">
-														De <span th:text="${#temporals.format(reservaForm.dataInicio, 'dd/MM/yyyy')}" class="text-primary"></span>
-														a <span th:text="${#temporals.format(reservaForm.dataFim, 'dd/MM/yyyy')}" class="text-primary"></span>
-															</p>
-														</div>
+													<div class="card-footer clearfix">
+														<button type="button" class="btn btn-secondary" onclick="goToStep('passo3')">
+															<i class="fas fa-arrow-left mr-2"></i>Anterior
+														</button>
+														<button type="button" class="btn btn-primary float-right" onclick="goToStep('passo5')">
+															Próximo <i class="fas fa-arrow-right ml-2"></i>
+														</button>
 													</div>
 												</div>
-												<div class="card-footer">
-												<button type="button" class="btn btn-secondary" onclick="goToStep('passo2')">
-													<i class="fas fa-arrow-left mr-2"></i>Anterior
-												</button>
-												<button type="button" class="btn btn-primary float-right" onclick="goToStep('passo4')">
-													Próximo <i class="fas fa-arrow-right ml-2"></i>
-												</button>
+											</div>
+
+											<div class="tab-pane fade" id="passo5">
+												<div class="card card-success mb-0">
+													<div class="card-header">
+														<h3 class="card-title">Passo 5: Revise e Confirme</h3>
+													</div>
+													<div class="card-body">
+														<div class="row">
+															<div class="col-md-6">
+																<div class="info-box bg-light">
+																	<span class="info-box-icon bg-primary"><i class="fas fa-user"></i></span>
+																	<div class="info-box-content">
+																		<span class="info-box-text">Tutor</span>
+																		<span class="info-box-number small" th:each="tutor : ${tutores}" th:if="${tutor.id == reservaForm.tutorId}" th:text="${tutor.nome}">Tutor</span>
+																	</div>
+																</div>
+															</div>
+															<div class="col-md-6">
+																<div class="info-box bg-light">
+																	<span class="info-box-icon bg-success"><i class="fas fa-paw"></i></span>
+																	<div class="info-box-content">
+																		<span class="info-box-text">Animal</span>
+																		<span class="info-box-number small" th:each="animal : ${animaisTutor}" th:if="${animal.id == reservaForm.animalId}" th:text="${animal.nome}">Animal</span>
+																	</div>
+																</div>
+															</div>
+															<div class="col-md-6">
+																<div class="info-box bg-light">
+																	<span class="info-box-icon bg-warning"><i class="fas fa-calendar"></i></span>
+																	<div class="info-box-content">
+																		<span class="info-box-text">Período</span>
+																		<span class="info-box-number small" th:if="${reservaForm.dataInicio != null && reservaForm.dataFim != null}" th:text="${#temporals.format(reservaForm.dataInicio, 'dd/MM') + ' a ' + #temporals.format(reservaForm.dataFim, 'dd/MM')}">Período</span>
+																	</div>
+																</div>
+															</div>
+															<div class="col-md-6">
+																<div class="info-box bg-light">
+																	<span class="info-box-icon bg-info"><i class="fas fa-cube"></i></span>
+																	<div class="info-box-content">
+																		<span class="info-box-text">Alojamento</span>
+																		<th:block th:each="d : ${disponibilidades}">
+																			<span class="info-box-number small" th:if="${d.alojamentoId == reservaForm.alojamentoId}" th:text="${d.identificacao}">Alojamento</span>
+																		</th:block>
+																	</div>
+																</div>
+															</div>
+														</div>
+
+														<div class="alert alert-info mb-0">
+															<i class="fas fa-check-circle mr-2"></i>Confirme os dados antes de criar a reserva.
+														</div>
+													</div>
+													<div class="card-footer clearfix">
+														<button type="button" class="btn btn-secondary" onclick="goToStep('passo4')">
+															<i class="fas fa-arrow-left mr-2"></i>Anterior
+														</button>
+														<button type="submit" class="btn btn-success float-right">
+															<i class="fas fa-save mr-2"></i>Criar Reserva
+														</button>
+													</div>
+												</div>
 											</div>
 										</div>
-									</div>
-
-									<!-- Passo 4: Alojamento -->
-									<div class="tab-pane fade" id="passo4" th:classappend="${activeStep == 'passo4'} ? ' show active' : ''">
-										<div class="card card-primary">
-												<div class="card-header">
-													<h3 class="card-title">Passo 4: Selecione o Alojamento</h3>
-												</div>
-												<div class="card-body">
-													<div th:if="${tipoAlojamentoEsperado != null}" class="alert alert-secondary">
-														<i class="fas fa-filter mr-1"></i>
-														A mostrar apenas alojamentos <strong th:text="${tipoAlojamentoEsperado.label}">adequados</strong> limpos e livres no período selecionado.
-													</div>
-													<div th:if="${tipoAlojamentoEsperado == null}" class="alert alert-warning">
-														<i class="fas fa-exclamation-triangle mr-1"></i>
-														Selecione primeiro o animal e o período para listar alojamentos adequados e disponíveis.
-													</div>
-													<div class="form-group">
-														<label for="alojamentoId">Alojamento <span class="text-danger">*</span></label>
-														<select th:field="*{alojamentoId}" id="alojamentoId" class="form-control select2"
-															th:classappend="${#fields.hasErrors('alojamentoId')} ? 'is-invalid' : ''" required>
-															<option value="">-- Selecione um alojamento --</option>
-															<option th:each="d : ${disponibilidades}" th:value="${d.alojamentoId}"
-																th:text="${d.identificacao} + ' (Tipo: ' + ${d.tipoLabel} + ', Capacidade: ' + ${d.capacidade} + ' lugar)'">Alojamento</option>
-														</select>
-														<div th:if="${tipoAlojamentoEsperado != null && #lists.isEmpty(disponibilidades)}" class="alert alert-warning mt-3 mb-0">
-															<i class="fas fa-exclamation-triangle mr-1"></i>
-															Não existem alojamentos adequados e disponíveis para este animal no período selecionado.
-														</div>
-														<small class="form-text text-muted mt-2">
-															<i class="fas fa-info-circle mr-1"></i>
-															Apenas alojamentos com limpeza concluída, sem reservas sobrepostas e compatíveis com a espécie do animal podem ser selecionados.
-														</small>
-														<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('alojamentoId')}">
-															<li th:each="err : ${#fields.errors('alojamentoId')}" th:text="${err}">Erro</li>
-														</div>
-												</div>
-
-												<!-- Informações do alojamento selecionado -->
-													<div th:if="${reservaForm.alojamentoId != null}" class="alert alert-info">
-														<strong>Alojamento Selecionado:</strong>
-
-														<div th:each="d : ${disponibilidades}" th:if="${d.alojamentoId == reservaForm.alojamentoId}">
-															<p class="mb-1"><strong>Identificação:</strong> <span th:text="${d.identificacao}"></span></p>
-															<p class="mb-1"><strong>Tipo:</strong> <span th:text="${d.tipoLabel}"></span></p>
-															<p class="mb-1"><strong>Capacidade:</strong> <span th:text="${d.capacidade} + ' lugar(es)'"></span></p>
-															<p class="mb-0"><strong>Estado:</strong>
-																<span th:if="${d.disponivel}" class="badge badge-success">
-																	<i class="fas fa-check-circle mr-1"></i>Disponível
-																</span>
-															</p>
-															</div>
-														</div>
-													</div>
-												<div class="card-footer">
-												<button type="button" class="btn btn-secondary" onclick="goToStep('passo3')">
-													<i class="fas fa-arrow-left mr-2"></i>Anterior
-												</button>
-												<button type="button" class="btn btn-primary float-right" onclick="goToStep('passo5')">
-													Próximo <i class="fas fa-arrow-right ml-2"></i>
-												</button>
-											</div>
-										</div>
-									</div>
-
-									<!-- Passo 5: Confirmação -->
-									<div class="tab-pane fade" id="passo5" th:classappend="${activeStep == 'passo5'} ? ' show active' : ''">
-										<div class="card card-success">
-											<div class="card-header">
-												<h3 class="card-title">Passo 5: Revise e Confirme</h3>
-											</div>
-											<div class="card-body">
-												<div class="row">
-													<div class="col-md-6">
-														<div class="info-box bg-light">
-															<span class="info-box-icon bg-primary"><i class="fas fa-user"></i></span>
-															<div class="info-box-content">
-																<span class="info-box-text">Tutor</span>
-																<span class="info-box-number small" th:each="tutor : ${tutores}" th:if="${tutor.id == reservaForm.tutorId}" th:text="${tutor.nome}">Tutor</span>
-															</div>
-														</div>
-													</div>
-													<div class="col-md-6">
-														<div class="info-box bg-light">
-															<span class="info-box-icon bg-success"><i class="fas fa-paw"></i></span>
-															<div class="info-box-content">
-																<span class="info-box-text">Animal</span>
-																<span class="info-box-number small" th:each="animal : ${animaisTutor}" th:if="${animal.id == reservaForm.animalId}" th:text="${animal.nome}">Animal</span>
-															</div>
-														</div>
-													</div>
-													<div class="col-md-6">
-														<div class="info-box bg-light">
-															<span class="info-box-icon bg-warning"><i class="fas fa-calendar"></i></span>
-															<div class="info-box-content">
-																<span class="info-box-text">Período</span>
-																<span class="info-box-number small" th:if="${reservaForm.dataInicio != null && reservaForm.dataFim != null}" 
-																	th:text="${#temporals.format(reservaForm.dataInicio, 'dd/MM')} + ' a ' + ${#temporals.format(reservaForm.dataFim, 'dd/MM')}">Período</span>
-															</div>
-														</div>
-													</div>
-													<div class="col-md-6">
-														<div class="info-box bg-light">
-															<span class="info-box-icon bg-info"><i class="fas fa-cube"></i></span>
-															<div class="info-box-content">
-																<span class="info-box-text">Alojamento</span>
-																<th:block th:each="d : ${disponibilidades}">
-																	<span class="info-box-number small" th:if="${d.alojamentoId == reservaForm.alojamentoId}" th:text="${d.identificacao}">Alojamento</span>
-																</th:block>
-															</div>
-														</div>
-													</div>
-												</div>
-
-												<div class="alert alert-info mt-3">
-													<i class="fas fa-check-circle mr-2"></i>
-													<strong>Tudo correto?</strong> Clique em "Criar Reserva" para confirmar.
-												</div>
-											</div>
-											<div class="card-footer">
-												<button type="button" class="btn btn-secondary" onclick="goToStep('passo4')">
-													<i class="fas fa-arrow-left mr-2"></i>Anterior
-												</button>
-												<button type="submit" class="btn btn-success float-right">
-													<i class="fas fa-save mr-2"></i>Criar Reserva
-												</button>
-											</div>
-										</div>
-									</div>
+									</form>
 								</div>
-							</form>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -390,99 +346,88 @@
 	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-	<script th:inline="javascript">
-		const initialStep = (function(){
-			try {
-				var s = document.body.getAttribute('data-active-step');
-				return (s && s.length>0) ? s : 'passo1';
-			} catch(e){ return 'passo1'; }
-		})();
-
-		$(function () {
-			// Inicializa Select2 para melhor UX
-			$('.select2').select2({
-				width: '100%'
-			});
-
-			activateStep(initialStep);
-
-			// Ao selecionar tutor, carrega seus animais via AJAX
-			$('#tutorId').on('change', function() {
-				let tutorId = $(this).val();
-				if (tutorId) {
-					// Seria ideal fazer AJAX aqui para carregar animais dinamicamente
-					// Por agora, o servidor já carrega os animais no novoForm
-				}
-			});
-
-			// Valida que data de fim é posterior a data de início
-			$('#dataFim').on('change', function() {
-				let dataInicio = $('#dataInicio').val();
-				let dataFim = $(this).val();
-				if (dataInicio && dataFim && dataFim <= dataInicio) {
-					alert('A data de fim deve ser posterior à data de início');
-					$(this).val('');
-				}
-			});
-		});
-
-		function activateStep(stepId) {
-			var selector = "a[onclick=\"goToStep('" + stepId + "')\"]";
-			if (window.jQuery) {
-				var tabSelector = "a[onclick=\"goToStep('" + stepId + "')\"]";
-				var tab = $(tabSelector).first();
-				if (tab.length) {
-					tab.closest('.nav').find('.nav-link').removeClass('active');
-					tab.addClass('active');
-				}
-				var pane = $('#' + stepId);
-				if (pane.length) {
-					$('.tab-pane').removeClass('show active');
-					pane.addClass('show active');
-				}
-			}
+	<script>
+		function valueOf(id) {
+			var element = document.getElementById(id);
+			return element ? element.value : '';
 		}
 
 		function buildWizardUrl(stepId) {
 			var params = new URLSearchParams();
-			var tutorId = $('#tutorId').val();
-			var animalId = $('#animalId').val();
-			var alojamentoId = $('#alojamentoId').val();
-			var dataInicio = $('#dataInicio').val();
-			var dataFim = $('#dataFim').val();
+			var tutorId = valueOf('tutorId');
+			var animalId = valueOf('animalId');
+			var alojamentoId = valueOf('alojamentoId');
+			var dataInicio = valueOf('dataInicio');
+			var dataFim = valueOf('dataFim');
 
-			if (tutorId) { params.set('tutorId', tutorId); }
-			if (animalId) { params.set('animalId', animalId); }
-			if (alojamentoId) { params.set('alojamentoId', alojamentoId); }
-			if (dataInicio) { params.set('dataInicio', dataInicio); }
-			if (dataFim) { params.set('dataFim', dataFim); }
-			params.set('step', stepId);
-
-			return '/reservas/novo?' + params.toString();
+			if (tutorId) params.set('tutorId', tutorId);
+			if (animalId) params.set('animalId', animalId);
+			if (alojamentoId) params.set('alojamentoId', alojamentoId);
+			if (dataInicio) params.set('dataInicio', dataInicio);
+			if (dataFim) params.set('dataFim', dataFim);
+			var query = params.toString();
+			return '/reservas/novo' + (query ? '?' + query : '') + '#' + stepId;
 		}
 
-		// Navega entre passos mantendo o estado no servidor via query string
 		function goToStep(stepId) {
-			if (stepId === 'passo2' && !$('#tutorId').val()) {
+			var tutorId = valueOf('tutorId');
+			var animalId = valueOf('animalId');
+			var dataInicio = valueOf('dataInicio');
+			var dataFim = valueOf('dataFim');
+			var alojamentoId = valueOf('alojamentoId');
+
+			if (stepId !== 'passo1' && !tutorId) {
 				alert('Selecione primeiro um tutor.');
 				return;
 			}
-			if (stepId === 'passo3' && (!$('#tutorId').val() || !$('#animalId').val())) {
-				alert('Selecione primeiro um tutor e um animal.');
+			if ((stepId === 'passo3' || stepId === 'passo4' || stepId === 'passo5') && !animalId) {
+				alert('Selecione primeiro um animal.');
 				return;
 			}
-			if (stepId === 'passo4' && (!$('#tutorId').val() || !$('#animalId').val() || !$('#dataInicio').val() || !$('#dataFim').val())) {
-				alert('Preencha o tutor, animal e período antes de avançar.');
+			if ((stepId === 'passo4' || stepId === 'passo5') && (!dataInicio || !dataFim)) {
+				alert('Preencha o período antes de avançar.');
 				return;
 			}
-			if (stepId === 'passo5' && (!$('#tutorId').val() || !$('#animalId').val() || !$('#dataInicio').val() || !$('#dataFim').val() || !$('#alojamentoId').val())) {
-				alert('Selecione o alojamento antes de avançar.');
+			if ((stepId === 'passo4' || stepId === 'passo5') && dataInicio && dataFim && dataInicio >= dataFim) {
+				alert('A data de início deve ser anterior à data de fim.');
+				return;
+			}
+			if (stepId === 'passo5' && !alojamentoId) {
+				alert('Selecione um alojamento antes de avançar.');
 				return;
 			}
 
 			window.location.href = buildWizardUrl(stepId);
 		}
+
+		function inferStepFromForm() {
+			if (document.querySelector('.is-invalid')) {
+				var paneWithError = document.querySelector('.is-invalid').closest('.tab-pane');
+				if (paneWithError) return paneWithError.id;
+			}
+			if (!valueOf('tutorId')) return 'passo1';
+			if (!valueOf('animalId')) return 'passo2';
+			if (!valueOf('dataInicio') || !valueOf('dataFim') || valueOf('dataInicio') >= valueOf('dataFim')) return 'passo3';
+			if (!valueOf('alojamentoId')) return 'passo4';
+			return 'passo5';
+		}
+
+		function activateStep(activeStep) {
+			document.querySelectorAll('[data-step-link]').forEach(function(link) {
+				link.classList.toggle('active', link.getAttribute('data-step-link') === activeStep);
+			});
+			document.querySelectorAll('.tab-pane').forEach(function(pane) {
+				var isActive = pane.id === activeStep;
+				pane.classList.toggle('show', isActive);
+				pane.classList.toggle('active', isActive);
+			});
+		}
+
+		(function activateCurrentStep() {
+			var hashStep = window.location.hash ? window.location.hash.substring(1) : '';
+			var activeStep = document.querySelector('[data-step-link="' + hashStep + '"]') ? hashStep : inferStepFromForm();
+			activateStep(activeStep);
+		})();
 	</script>
 </body>
 </html>
