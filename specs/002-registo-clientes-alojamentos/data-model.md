@@ -56,8 +56,10 @@ O modelo de dados desta fase cobre o registo base de tutores e animais, a dispon
 
 **Validation rules**:
 - `identificacao` é obrigatória.
+- `tipo` é obrigatório e usa `CANINO` ou `FELINO`.
+- `capacidade` é obrigatória e deve ser maior ou igual a 1.
 - `estadoLimpeza` usa os valores `PENDENTE` e `CONCLUIDO`.
-- Um alojamento só é elegível para nova reserva quando a limpeza está concluída e não existem conflitos temporais.
+- Um alojamento só é elegível para nova reserva quando a limpeza está concluída, não existem conflitos temporais e o `tipo` é compatível com a espécie do animal.
 
 ### Reserva
 
@@ -103,6 +105,11 @@ O modelo de dados desta fase cobre o registo base de tutores e animais, a dispon
 - `PENDENTE`
 - `CONCLUIDO`
 
+### TipoAlojamento
+
+- `CANINO`
+- `FELINO`
+
 ### EstadoReserva
 
 - `ATIVA`
@@ -117,4 +124,4 @@ O modelo de dados desta fase cobre o registo base de tutores e animais, a dispon
 ## Notes
 
 - O modelo mantém compatibilidade com a Etapa 2, mas a implementação desta fase deve concentrar-se apenas nos atributos necessários para o registo e a reserva.
-- Os campos `tipo` e `capacidade` de `Alojamento` mantêm-se para compatibilidade com o modelo de domínio aprovado na Etapa 2.
+- Os campos `tipo` e `capacidade` de `Alojamento` são usados no fluxo de reserva: `tipo` filtra alojamentos adequados à espécie e `capacidade` evita unidades incompletas/indefinidas na UI.

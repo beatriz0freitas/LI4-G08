@@ -75,10 +75,15 @@ public class ReservaService {
             );
         }
         
-        // Verifica se o alojamento está limpo
-        if (!alojamentoService.estaDisponivel(formDto.getAlojamentoId(), formDto.getDataInicio(), formDto.getDataFim())) {
+        // Verifica se o alojamento está limpo, livre e adequado à espécie do animal
+        if (!alojamentoService.estaDisponivel(
+            formDto.getAlojamentoId(),
+            formDto.getDataInicio(),
+            formDto.getDataFim(),
+            animal.getEspecie()
+        )) {
             throw new IllegalArgumentException(
-                "O alojamento não está disponível para o período especificado (limpeza não concluída ou há conflitos)"
+                "O alojamento não está disponível ou não é adequado à espécie do animal"
             );
         }
         

@@ -3,6 +3,7 @@ package pt.hotel.animais.model;
 import jakarta.persistence.*;
 import lombok.*;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
+import pt.hotel.animais.model.enums.TipoAlojamento;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +17,9 @@ public class Alojamento {
     @Column(nullable = false, unique = true)
     private String identificacao;
     
-    @Column(length = 50)
-    private String tipo;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private TipoAlojamento tipo;
     
     @Column
     private Integer capacidade;

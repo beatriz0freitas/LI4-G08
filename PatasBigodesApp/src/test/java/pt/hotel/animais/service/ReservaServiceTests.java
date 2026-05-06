@@ -10,6 +10,7 @@ import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Tutor;
 import pt.hotel.animais.model.enums.Especie;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
+import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.repository.AlojamentoRepository;
 import pt.hotel.animais.repository.AnimalRepository;
 import pt.hotel.animais.repository.ReservaRepository;
@@ -67,7 +68,7 @@ public class ReservaServiceTests {
     private Alojamento createAlojamento(String id) {
         Alojamento a = new Alojamento();
         a.setIdentificacao(id);
-        a.setTipo("Box");
+        a.setTipo(TipoAlojamento.CANINO);
         a.setCapacidade(1);
         a.setEstadoLimpeza(EstadoLimpeza.CONCLUIDO);
         return alojamentoRepository.save(a);

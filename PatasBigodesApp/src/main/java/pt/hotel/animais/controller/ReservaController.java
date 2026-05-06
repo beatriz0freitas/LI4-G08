@@ -10,15 +10,16 @@ import jakarta.validation.Valid;
 import pt.hotel.animais.dto.DisponibilidadeAlojamentoDto;
 import pt.hotel.animais.dto.ReservaFormDto;
 import pt.hotel.animais.model.Animal;
-import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.Tutor;
+import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.service.AlojamentoService;
 import pt.hotel.animais.service.AnimalService;
 import pt.hotel.animais.service.ReservaService;
 import pt.hotel.animais.service.TutorService;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -142,23 +143,7 @@ public class ReservaController {
             reservaForm.setDataFim(java.time.LocalDate.parse(dataFim));
         }
         
-        // Carrega listas para dropdowns
-        List<Tutor> tutores = tutorService.listarTodos();
-        List<Alojamento> alojamentos = alojamentoService.listarTodos();
-        
-        List<Animal> animaisTutor = new java.util.ArrayList<>();
-        if (tutorId != null) {
-            animaisTutor = animalService.procurarPorTutor(tutorId);
-        }
-        
-        model.addAttribute("reservaForm", reservaForm);
-        model.addAttribute("tutores", tutores);
-        model.addAttribute("alojamentos", alojamentos);
-        model.addAttribute("animaisTutor", animaisTutor);
-        model.addAttribute("activeStep", step);
-        model.addAttribute("pageTitle", "Nova Reserva");
-        model.addAttribute("breadcrumb", "Criar Reserva");
-        model.addAttribute("activePage", "reservas");
+        prepararFormularioReserva(reservaForm, model, step);
         
         return "reservas/form";
     }
@@ -174,22 +159,7 @@ public class ReservaController {
         Model model
     ) {
         if (bindingResult.hasErrors()) {
-            // Recarrega listas em caso de erro
-            List<Tutor> tutores = tutorService.listarTodos();
-            List<Alojamento> alojamentos = alojamentoService.listarTodos();
-            List<Animal> animaisTutor = new java.util.ArrayList<>();
-            
-            if (formDto.getTutorId() != null) {
-                animaisTutor = animalService.procurarPorTutor(formDto.getTutorId());
-            }
-            
-            model.addAttribute("tutores", tutores);
-            model.addAttribute("alojamentos", alojamentos);
-            model.addAttribute("animaisTutor", animaisTutor);
-            model.addAttribute("activeStep", "passo1");
-            model.addAttribute("pageTitle", "Nova Reserva");
-            model.addAttribute("breadcrumb", "Criar Reserva");
-            model.addAttribute("activePage", "reservas");
+            prepararFormularioReserva(formDto, model, "passo4");
             return "reservas/form";
         }
         
@@ -199,23 +169,8 @@ public class ReservaController {
                 "Reserva criada com sucesso! ID: " + reserva.getId());
             return "redirect:/reservas/" + reserva.getId();
         } catch (IllegalArgumentException e) {
-            // Recarrega listas em caso de erro de negócio
-            List<Tutor> tutores = tutorService.listarTodos();
-            List<Alojamento> alojamentos = alojamentoService.listarTodos();
-            List<Animal> animaisTutor = new java.util.ArrayList<>();
-            
-            if (formDto.getTutorId() != null) {
-                animaisTutor = animalService.procurarPorTutor(formDto.getTutorId());
-            }
-            
-            model.addAttribute("tutores", tutores);
-            model.addAttribute("alojamentos", alojamentos);
-            model.addAttribute("animaisTutor", animaisTutor);
             model.addAttribute("errorMessage", e.getMessage());
-            model.addAttribute("activeStep", "passo1");
-            model.addAttribute("pageTitle", "Nova Reserva");
-            model.addAttribute("breadcrumb", "Criar Reserva");
-            model.addAttribute("activePage", "reservas");
+            prepararFormularioReserva(formDto, model, "passo4");
             return "reservas/form";
         }
     }
@@ -279,5 +234,43 @@ public class ReservaController {
             model.addAttribute("errorMessage", e.getMessage());
             return "redirect:/reservas/" + id;
         }
+    }
+
+    private void prepararFormularioReserva(ReservaFormDto reservaForm, Model model, String activeStep) {
+        List<Tutor> tutores = tutorService.listarTodos();
+        List<Animal> animaisTutor = new ArrayList<>();
+        List<DisponibilidadeAlojamentoDto> disponibilidades = new ArrayList<>();
+        TipoAlojamento tipoAlojamentoEsperado = null;
+
+        if (reservaForm.getTutorId() != null) {
+            animaisTutor = animalService.procurarPorTutor(reservaForm.getTutorId());
+        }
+
+        if (reservaForm.getAnimalId() != null) {
+            Animal animalSelecionado = animalService.obter(reservaForm.getAnimalId());
+            tipoAlojamentoEsperado = TipoAlojamento.fromEspecie(animalSelecionado.getEspecie());
+
+            if (reservaForm.getDataInicio() != null && reservaForm.getDataFim() != null) {
+                try {
+                    disponibilidades = alojamentoService.consultarDisponibilidade(
+                        reservaForm.getDataInicio(),
+                        reservaForm.getDataFim(),
+                        animalSelecionado.getEspecie()
+                    );
+                } catch (IllegalArgumentException e) {
+                    model.addAttribute("warningMessage", e.getMessage());
+                }
+            }
+        }
+
+        model.addAttribute("reservaForm", reservaForm);
+        model.addAttribute("tutores", tutores);
+        model.addAttribute("disponibilidades", disponibilidades);
+        model.addAttribute("animaisTutor", animaisTutor);
+        model.addAttribute("tipoAlojamentoEsperado", tipoAlojamentoEsperado);
+        model.addAttribute("activeStep", activeStep);
+        model.addAttribute("pageTitle", "Nova Reserva");
+        model.addAttribute("breadcrumb", "Criar Reserva");
+        model.addAttribute("activePage", "reservas");
     }
 }

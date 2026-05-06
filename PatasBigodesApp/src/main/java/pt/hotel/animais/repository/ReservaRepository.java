@@ -35,7 +35,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
      * Utilizado para verificar disponibilidade.
      */
     @Query("SELECT r FROM Reserva r WHERE r.alojamento.id = :alojamentoId " +
-           "AND r.estado = 'ATIVA' " +
+           "AND r.estado = pt.hotel.animais.model.enums.EstadoReserva.ATIVA " +
            "AND NOT (r.dataFim < :dataInicio OR r.dataInicio > :dataFim)")
     List<Reserva> findActiveReservasInPeriod(
         @Param("alojamentoId") Long alojamentoId,
@@ -62,7 +62,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
      * Conta as reservas ativas num determinado período para um alojamento.
      */
     @Query("SELECT COUNT(r) FROM Reserva r WHERE r.alojamento.id = :alojamentoId " +
-           "AND r.estado = 'ATIVA' " +
+           "AND r.estado = pt.hotel.animais.model.enums.EstadoReserva.ATIVA " +
            "AND NOT (r.dataFim < :dataInicio OR r.dataInicio > :dataFim)")
     long countActiveInPeriod(
         @Param("alojamentoId") Long alojamentoId,

@@ -274,9 +274,8 @@ enum EstadoSaude {
 }
 
 enum TipoAlojamento {
-  BOX_INDIVIDUAL
-  BOX_PARTILHADA
-  SUITE
+  CANINO
+  FELINO
 }
 
 enum EstadoLimpeza {

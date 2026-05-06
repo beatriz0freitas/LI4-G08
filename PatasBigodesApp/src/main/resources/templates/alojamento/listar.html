@@ -123,7 +123,7 @@
 											<td>
 												<strong th:text="${alojamento.identificacao}">ID Alojamento</strong>
 											</td>
-											<td th:text="${alojamento.tipo}">Tipo</td>
+											<td th:text="${alojamento.tipo != null ? alojamento.tipo.label : 'Por definir'}">Tipo</td>
 											<td>
 												<span class="badge badge-info" th:text="${alojamento.capacidade} + ' lugar(es)'"></span>
 											</td>
@@ -199,7 +199,7 @@
 							<dd class="col-sm-8" th:text="${alojamento.identificacao}">Identificação</dd>
 
 							<dt class="col-sm-4">Tipo:</dt>
-							<dd class="col-sm-8" th:text="${alojamento.tipo}">Tipo</dd>
+							<dd class="col-sm-8" th:text="${alojamento.tipo != null ? alojamento.tipo.label : 'Por definir'}">Tipo</dd>
 
 							<dt class="col-sm-4">Capacidade:</dt>
 							<dd class="col-sm-8" th:text="${alojamento.capacidade} + ' lugar(es)'">Capacidade</dd>

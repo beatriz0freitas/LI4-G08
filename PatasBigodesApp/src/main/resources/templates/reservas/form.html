@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt">
-<head th:insert="fragments/head :: head"></head>
-<body class="hold-transition sidebar-mini layout-fixed">
+<head th:insert="~{fragments/head :: head}"></head>
+<body class="hold-transition sidebar-mini layout-fixed" th:attr="data-active-step=${activeStep}">
 	<div class="wrapper">
-		<th:block th:insert="fragments/navbar :: navbar"></th:block>
-		<th:block th:insert="fragments/sidebar :: sidebar"></th:block>
+		<th:block th:insert="~{fragments/navbar :: navbar}"></th:block>
+		<th:block th:insert="~{fragments/sidebar :: sidebar}"></th:block>
 
 		<div class="content-wrapper">
 			<div class="content-header">
@@ -120,9 +120,14 @@
 														<p class="mb-1"><strong>NIF:</strong> <span th:text="${tutor.nif}"></span></p>
 														<p class="mb-0"><strong>Contacto:</strong> <span th:text="${tutor.contacto}"></span></p>
 													</div>
-												</div>
-											</div>
-											<div class="card-footer">
+															</div>
+														</div>
+													</div>
+															</div>
+														</div>
+														</div>
+													</div>
+												<div class="card-footer">
 												<button type="button" class="btn btn-primary float-right" onclick="goToStep('passo2')">
 													Próximo <i class="fas fa-arrow-right ml-2"></i>
 												</button>
@@ -229,10 +234,11 @@
 													<p class="mb-0">
 														De <span th:text="${#temporals.format(reservaForm.dataInicio, 'dd/MM/yyyy')}" class="text-primary"></span>
 														a <span th:text="${#temporals.format(reservaForm.dataFim, 'dd/MM/yyyy')}" class="text-primary"></span>
-													</p>
+															</p>
+														</div>
+													</div>
 												</div>
-											</div>
-											<div class="card-footer">
+												<div class="card-footer">
 												<button type="button" class="btn btn-secondary" onclick="goToStep('passo2')">
 													<i class="fas fa-arrow-left mr-2"></i>Anterior
 												</button>
@@ -246,44 +252,56 @@
 									<!-- Passo 4: Alojamento -->
 									<div class="tab-pane fade" id="passo4" th:classappend="${activeStep == 'passo4'} ? ' show active' : ''">
 										<div class="card card-primary">
-											<div class="card-header">
-												<h3 class="card-title">Passo 4: Selecione o Alojamento</h3>
-											</div>
-											<div class="card-body">
-												<div class="form-group">
-													<label for="alojamentoId">Alojamento <span class="text-danger">*</span></label>
-													<select th:field="*{alojamentoId}" id="alojamentoId" class="form-control select2"
-														th:classappend="${#fields.hasErrors('alojamentoId')} ? 'is-invalid' : ''" required>
-														<option value="">-- Selecione um alojamento --</option>
-														<option th:each="alojamento : ${alojamentos}" th:value="${alojamento.id}"
-															th:text="${alojamento.identificacao} + ' (Tipo: ' + ${alojamento.tipo} + ', Capacidade: ' + ${alojamento.capacidade} + ' lugar)'"
-															th:attr="data-estado-limpeza=${alojamento.estadoLimpeza.toString()}">Alojamento</option>
-													</select>
-													<small class="form-text text-muted mt-2">
-														<i class="fas fa-info-circle mr-1"></i>
-														Apenas alojamentos com limpeza completada podem ser selecionados.
-													</small>
-													<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('alojamentoId')}">
-														<li th:each="err : ${#fields.errors('alojamentoId')}" th:text="${err}">Erro</li>
+												<div class="card-header">
+													<h3 class="card-title">Passo 4: Selecione o Alojamento</h3>
+												</div>
+												<div class="card-body">
+													<div th:if="${tipoAlojamentoEsperado != null}" class="alert alert-secondary">
+														<i class="fas fa-filter mr-1"></i>
+														A mostrar apenas alojamentos <strong th:text="${tipoAlojamentoEsperado.label}">adequados</strong> limpos e livres no período selecionado.
 													</div>
+													<div th:if="${tipoAlojamentoEsperado == null}" class="alert alert-warning">
+														<i class="fas fa-exclamation-triangle mr-1"></i>
+														Selecione primeiro o animal e o período para listar alojamentos adequados e disponíveis.
+													</div>
+													<div class="form-group">
+														<label for="alojamentoId">Alojamento <span class="text-danger">*</span></label>
+														<select th:field="*{alojamentoId}" id="alojamentoId" class="form-control select2"
+															th:classappend="${#fields.hasErrors('alojamentoId')} ? 'is-invalid' : ''" required>
+															<option value="">-- Selecione um alojamento --</option>
+															<option th:each="d : ${disponibilidades}" th:value="${d.alojamentoId}"
+																th:text="${d.identificacao} + ' (Tipo: ' + ${d.tipoLabel} + ', Capacidade: ' + ${d.capacidade} + ' lugar)'">Alojamento</option>
+														</select>
+														<div th:if="${tipoAlojamentoEsperado != null && #lists.isEmpty(disponibilidades)}" class="alert alert-warning mt-3 mb-0">
+															<i class="fas fa-exclamation-triangle mr-1"></i>
+															Não existem alojamentos adequados e disponíveis para este animal no período selecionado.
+														</div>
+														<small class="form-text text-muted mt-2">
+															<i class="fas fa-info-circle mr-1"></i>
+															Apenas alojamentos com limpeza concluída, sem reservas sobrepostas e compatíveis com a espécie do animal podem ser selecionados.
+														</small>
+														<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('alojamentoId')}">
+															<li th:each="err : ${#fields.errors('alojamentoId')}" th:text="${err}">Erro</li>
+														</div>
 												</div>
 
 												<!-- Informações do alojamento selecionado -->
-												<div th:if="${reservaForm.alojamentoId != null}" class="alert alert-info">
-													<strong>Alojamento Selecionado:</strong>
-													<div th:each="alojamento : ${alojamentos}" th:if="${alojamento.id == reservaForm.alojamentoId}">
-														<p class="mb-1"><strong>Identificação:</strong> <span th:text="${alojamento.identificacao}"></span></p>
-														<p class="mb-1"><strong>Tipo:</strong> <span th:text="${alojamento.tipo}"></span></p>
-														<p class="mb-1"><strong>Capacidade:</strong> <span th:text="${alojamento.capacidade} + ' lugar(es)'"></span></p>
-														<p class="mb-0"><strong>Estado:</strong> 
-															<span class="badge badge-success">
-																<i class="fas fa-check-circle mr-1"></i>Limpo
-															</span>
-														</p>
+													<div th:if="${reservaForm.alojamentoId != null}" class="alert alert-info">
+														<strong>Alojamento Selecionado:</strong>
+
+														<div th:each="d : ${disponibilidades}" th:if="${d.alojamentoId == reservaForm.alojamentoId}">
+															<p class="mb-1"><strong>Identificação:</strong> <span th:text="${d.identificacao}"></span></p>
+															<p class="mb-1"><strong>Tipo:</strong> <span th:text="${d.tipoLabel}"></span></p>
+															<p class="mb-1"><strong>Capacidade:</strong> <span th:text="${d.capacidade} + ' lugar(es)'"></span></p>
+															<p class="mb-0"><strong>Estado:</strong>
+																<span th:if="${d.disponivel}" class="badge badge-success">
+																	<i class="fas fa-check-circle mr-1"></i>Disponível
+																</span>
+															</p>
+															</div>
+														</div>
 													</div>
-												</div>
-											</div>
-											<div class="card-footer">
+												<div class="card-footer">
 												<button type="button" class="btn btn-secondary" onclick="goToStep('passo3')">
 													<i class="fas fa-arrow-left mr-2"></i>Anterior
 												</button>
@@ -335,7 +353,9 @@
 															<span class="info-box-icon bg-info"><i class="fas fa-cube"></i></span>
 															<div class="info-box-content">
 																<span class="info-box-text">Alojamento</span>
-																<span class="info-box-number small" th:each="alojamento : ${alojamentos}" th:if="${alojamento.id == reservaForm.alojamentoId}" th:text="${alojamento.identificacao}">Alojamento</span>
+																<th:block th:each="d : ${disponibilidades}">
+																	<span class="info-box-number small" th:if="${d.alojamentoId == reservaForm.alojamentoId}" th:text="${d.identificacao}">Alojamento</span>
+																</th:block>
 															</div>
 														</div>
 													</div>
@@ -364,7 +384,7 @@
 			</section>
 		</div>
 
-		<th:block th:insert="fragments/footer :: footer"></th:block>
+		<th:block th:insert="~{fragments/footer :: footer}"></th:block>
 	</div>
 
 	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -372,7 +392,12 @@
 	<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 	<script th:inline="javascript">
-		const initialStep = /*[[${activeStep != null ? activeStep : 'passo1'}]]*/ 'passo1';
+		const initialStep = (function(){
+			try {
+				var s = document.body.getAttribute('data-active-step');
+				return (s && s.length>0) ? s : 'passo1';
+			} catch(e){ return 'passo1'; }
+		})();
 
 		$(function () {
 			// Inicializa Select2 para melhor UX
@@ -461,4 +486,3 @@
 	</script>
 </body>
 </html>
-

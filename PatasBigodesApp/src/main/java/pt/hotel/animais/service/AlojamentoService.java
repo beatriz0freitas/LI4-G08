@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pt.hotel.animais.dto.DisponibilidadeAlojamentoDto;
 import pt.hotel.animais.model.Alojamento;
+import pt.hotel.animais.model.enums.Especie;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
+import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.repository.AlojamentoRepository;
 
 import java.time.LocalDate;
@@ -42,18 +44,23 @@ public class AlojamentoService {
         
         // Converte para DTOs
         return alojamentosDisponiveis.stream()
-            .map(a -> {
-                DisponibilidadeAlojamentoDto dto = new DisponibilidadeAlojamentoDto(
-                    a.getId(),
-                    a.getIdentificacao(),
-                    a.getTipo(),
-                    a.getCapacidade()
-                );
-                dto.setDataInicio(dataInicio);
-                dto.setDataFim(dataFim);
-                dto.setDisponivel(true);
-                return dto;
-            })
+            .map(a -> toDisponibilidadeDto(a, dataInicio, dataFim))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Procura alojamentos disponíveis para um período e adequados à espécie do animal.
+     */
+    public List<DisponibilidadeAlojamentoDto> consultarDisponibilidade(LocalDate dataInicio, LocalDate dataFim, Especie especie) {
+        if (dataInicio == null || dataFim == null || dataInicio.isAfter(dataFim)) {
+            throw new IllegalArgumentException("Datas de entrada inválidas: dataInicio deve ser anterior a dataFim");
+        }
+
+        TipoAlojamento tipo = TipoAlojamento.fromEspecie(especie);
+        List<Alojamento> alojamentosDisponiveis = alojamentoRepository.findAvailableForPeriodAndTipo(dataInicio, dataFim, tipo);
+
+        return alojamentosDisponiveis.stream()
+            .map(a -> toDisponibilidadeDto(a, dataInicio, dataFim))
             .collect(Collectors.toList());
     }
     
@@ -74,6 +81,21 @@ public class AlojamentoService {
         long conflitos = alojamentoRepository.countConflictingReservas(alojamentoId, dataInicio, dataFim);
         return conflitos == 0;
     }
+
+    /**
+     * Verifica disponibilidade e compatibilidade com a espécie do animal.
+     */
+    public boolean estaDisponivel(Long alojamentoId, LocalDate dataInicio, LocalDate dataFim, Especie especie) {
+        Alojamento alojamento = alojamentoRepository.findById(alojamentoId)
+            .orElseThrow(() -> new IllegalArgumentException("Alojamento não encontrado"));
+
+        TipoAlojamento tipoEsperado = TipoAlojamento.fromEspecie(especie);
+        if (alojamento.getTipo() != tipoEsperado) {
+            return false;
+        }
+
+        return estaDisponivel(alojamentoId, dataInicio, dataFim);
+    }
     
     /**
      * Obtém um alojamento por ID.
@@ -81,5 +103,18 @@ public class AlojamentoService {
     public Alojamento obter(Long id) {
         return alojamentoRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Alojamento com ID " + id + " não encontrado"));
+    }
+
+    private DisponibilidadeAlojamentoDto toDisponibilidadeDto(Alojamento alojamento, LocalDate dataInicio, LocalDate dataFim) {
+        DisponibilidadeAlojamentoDto dto = new DisponibilidadeAlojamentoDto(
+            alojamento.getId(),
+            alojamento.getIdentificacao(),
+            alojamento.getTipo(),
+            alojamento.getCapacidade()
+        );
+        dto.setDataInicio(dataInicio);
+        dto.setDataFim(dataFim);
+        dto.setDisponivel(true);
+        return dto;
     }
 }

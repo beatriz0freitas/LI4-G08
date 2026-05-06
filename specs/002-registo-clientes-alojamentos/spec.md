@@ -131,7 +131,7 @@ Como funcionário de receção, quero consultar rapidamente os dados completos d
 - **Tutor**: Representa o proprietário/responsável do animal. Atributos: `id`, `nome`, `nif`, `contacto`, `email`, `dataRegisto`.
 - **Animal**: Representa um animal sob cuidado do hotel. Atributos: `id`, `nome`, `especie` (enum: CAO, GATO), `raca`, `dataNascimento`, `peso`, `estadoSaude` (enum: NORMAL, ALTERADO, CRITICO), `necessidadesAlimentares`, `medicacaoCurso`, `dataRegisto`.
 - **Reserva**: Representa uma alocação de box para um período. Atributos: `id`, `dataInicio`, `dataFim`, `alojamento` (box), `animal`, `tutor`, `estado` (enum: ATIVA, CANCELADA, CONCLUIDA), `dataCriacao`.
-- **Alojamento** (Box): Representa uma box/quarto do hotel. Atributos: `id`, `identificacao`, `tipo`, `capacidade`, `estadoLimpeza` (enum: PENDENTE, CONCLUIDO).
+- **Alojamento** (Box): Representa uma box/quarto do hotel. Atributos: `id`, `identificacao`, `tipo` (enum: CANINO, FELINO), `capacidade`, `estadoLimpeza` (enum: PENDENTE, CONCLUIDO).
 - Relações:
   - `Tutor 1:* Animal` (um tutor pode ter múltiplos animais)
   - `Animal 1:* Reserva` (um animal pode ter múltiplas reservas)

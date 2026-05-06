@@ -117,5 +117,3 @@ Verificação:
 
 - Build Maven executado com sucesso após a alteração do repository.
 - A expansão da sidebar deixou de depender exclusivamente do `activePage` nos ecrãs que pertencem à área de receção.
-
-

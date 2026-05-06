@@ -40,7 +40,7 @@ Diagrama: [domain-model.mmd](domain-model.mmd)
 |---|---|---|
 | `Especie` | `CAO`, `GATO` | RD-08 |
 | `EstadoSaude` | `NORMAL`, `ALTERADO`, `CRITICO` | US-16, US-24 |
-| `TipoAlojamento` | `BOX_INDIVIDUAL`, `BOX_PARTILHADA`, `SUITE` | US-12 — *pressuposto* (ver abaixo) |
+| `TipoAlojamento` | `CANINO`, `FELINO` | US-12 — refinado por compatibilidade com `Especie` |
 | `EstadoLimpeza` | `PENDENTE`, `CONCLUIDO` | RD-01, US-21 |
 | `EstadoReserva` | `ATIVA`, `CANCELADA`, `CONCLUIDA` | US-06, RD-06 |
 | `EstadoEstadia` | `EM_CURSO`, `TERMINADA` | US-07, RD-03 |
@@ -52,7 +52,7 @@ Diagrama: [domain-model.mmd](domain-model.mmd)
 
 ## Pressupostos
 
-1. **`TipoAlojamento`**: os documentos de requisitos mencionam "boxes" (US-12) e "espaços de acolhimento" mas não enumeram tipos. Adotaram-se `BOX_INDIVIDUAL`, `BOX_PARTILHADA` e `SUITE` como valores representativos. A lista deverá ser confirmada com os stakeholders.
+1. **`TipoAlojamento`**: os alojamentos são classificados como `CANINO` ou `FELINO` para garantir que a reserva só apresenta unidades compatíveis com a espécie do animal (`CAO` ou `GATO`). Esta decisão substitui a enumeração provisória baseada em formato de box.
 2. **`MetodoPagamento`**: os requisitos registam a necessidade de processar pagamentos (US-10, US-11) mas não enumeram métodos. Adotaram-se `NUMERARIO`, `CARTAO_DEBITO` e `CARTAO_CREDITO` como valores típicos num hotel de animais. A lista deverá ser confirmada com os stakeholders.
 3. **`EstadoSaude`**: US-16 menciona "alterações ao estado de saúde" e US-24 refere "alterações recentes". Os valores `NORMAL`, `ALTERADO` e `CRITICO` são considerados suficientes para cobrir a variação descrita.
 4. **`RegistoCuidado` e `ServicoExtra` separados**: cuidados diários (alimentação, medicação — US-15) são distinguidos dos serviços extra faturáveis (banho, passeio — US-18) por terem natureza e impacto financeiro diferentes.
