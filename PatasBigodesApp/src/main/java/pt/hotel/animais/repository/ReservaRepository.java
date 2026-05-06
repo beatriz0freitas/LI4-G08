@@ -8,12 +8,27 @@ import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.enums.EstadoReserva;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository para a entidade Reserva.
  */
 @Repository
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
+
+    @Query("SELECT r FROM Reserva r " +
+           "JOIN FETCH r.tutor " +
+           "JOIN FETCH r.animal " +
+           "JOIN FETCH r.alojamento " +
+           "ORDER BY r.dataCriacao DESC")
+    List<Reserva> findAllWithDetalhes();
+
+    @Query("SELECT r FROM Reserva r " +
+           "JOIN FETCH r.tutor " +
+           "JOIN FETCH r.animal " +
+           "JOIN FETCH r.alojamento " +
+           "WHERE r.id = :id")
+    Optional<Reserva> findWithDetalhesById(@Param("id") Long id);
     
     /**
      * Procura reservas de um tutor.

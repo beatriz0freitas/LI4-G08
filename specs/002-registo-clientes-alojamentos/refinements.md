@@ -117,3 +117,26 @@ Verificação:
 
 - Build Maven executado com sucesso após a alteração do repository.
 - A expansão da sidebar deixou de depender exclusivamente do `activePage` nos ecrãs que pertencem à área de receção.
+
+## 2026-05-06 — Correção da consulta de disponibilidade de reservas
+
+Contexto: a página "Buscar Disponibilidade" calculava correctamente os alojamentos disponíveis, mas falhava ao apresentar os resultados e ao gerar a acção "Reservar". O template tentava aceder a `disponibilidade.id`, propriedade inexistente no `DisponibilidadeAlojamentoDto`, e formatava `LocalDate` com `#dates`, incompatível com os tipos `java.time` usados no controller.
+
+Correção aplicada:
+
+- O link "Reservar" dos resultados passou a usar `disponibilidade.alojamentoId`, mantendo a referência correcta à box disponível.
+- A formatação de `dataInicio` e `dataFim` passou de `#dates` para `#temporals`, adequada a `LocalDate`.
+- O formulário de consulta preserva as datas submetidas quando há erro de validação.
+- As expressões de fragments em `reservas/disponibilidade.html` foram actualizadas para a sintaxe recomendada por Thymeleaf.
+- Foi acrescentado teste de integração para validar que `POST /reservas/buscar-disponibilidade` renderiza resultados e gera link para nova reserva com `alojamentoId`, `dataInicio` e `dataFim`.
+
+Arquivos afectados:
+
+- `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`
+- `PatasBigodesApp/src/main/resources/templates/reservas/disponibilidade.html`
+- `PatasBigodesApp/src/main/resources/templates/reservas/index.html`
+- `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ReservaRenderingControllerTest.java`
+
+Rastreabilidade:
+
+- Suporta US-12 e RF-06, garantindo que a consulta de disponibilidade em tempo real apresenta resultados utilizáveis para avançar para a criação de reserva sem quebrar o fluxo.

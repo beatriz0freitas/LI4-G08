@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt">
-<head th:insert="fragments/head :: head"></head>
+<head th:insert="~{fragments/head :: head}"></head>
 <body class="hold-transition sidebar-mini layout-fixed">
 	<div class="wrapper">
-		<th:block th:insert="fragments/navbar :: navbar"></th:block>
-		<th:block th:insert="fragments/sidebar :: sidebar"></th:block>
+		<th:block th:insert="~{fragments/navbar :: navbar}"></th:block>
+		<th:block th:insert="~{fragments/sidebar :: sidebar}"></th:block>
 
 		<div class="content-wrapper">
 			<div class="content-header">
@@ -126,8 +126,7 @@
 										<td th:text="${animal.peso}">Peso</td>
 										<td>
 											<span class="badge"
-												  th:classappend="${animal.estadoSaude.toString() == 'NORMAL'} ? 'badge-success' : 
-														   ${animal.estadoSaude.toString() == 'ALTERADO'} ? 'badge-warning' : 'badge-danger'"
+												  th:classappend="${animal.estadoSaude.toString() == 'NORMAL' ? 'badge-success' : (animal.estadoSaude.toString() == 'ALTERADO' ? 'badge-warning' : 'badge-danger')}"
 												  th:text="${animal.estadoSaude.label}">Estado</span>
 										</td>
 										<td th:text="${#temporals.format(animal.dataRegisto, 'dd/MM/yyyy')}">Data</td>
@@ -146,7 +145,7 @@
 			</section>
 		</div>
 
-		<th:block th:insert="fragments/footer :: footer"></th:block>
+		<th:block th:insert="~{fragments/footer :: footer}"></th:block>
 	</div>
 
 	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
