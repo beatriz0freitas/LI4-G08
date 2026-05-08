@@ -166,6 +166,13 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 - **RNF-04 - Autenticação e permissões**: Acesso exige autenticação prévia e controlo de permissões por perfil.
 - **RNF-05 - Confidencialidade dos dados**: Garantir confidencialidade de dados pessoais e clínicos em conformidade com RGPD.
 
+### Validation & Test Requirements
+
+- A conclusão desta feature exige testes automatizados sobre todas as funcionalidades P1 deste documento (US-06, US-12, US-07, US-10, US-11).
+- Cada fluxo funcional deve ter, no mínimo, um teste de caminho feliz e um teste de regra de negócio/erro (ex.: indisponibilidade de box, check-out sem check-in, pagamento sem método).
+- As regras de domínio críticas (RD-01, RD-02, RD-03, RD-04, RD-06, RD-07, RD-09) devem ter testes dedicados na camada de serviço.
+- Deve existir pelo menos um teste de integração por caso de uso principal (UC-04, UC-05, UC-06, UC-07, UC-08), cobrindo persistência e transições de estado.
+
 ### Key Entities
 
 - **Reserva**: Ligação entre Tutor, Animal, Alojamento e período (dataInicio, dataFim). Estados: ATIVA, CANCELADA, CONCLUIDA. Uma reserva pode desencadear no máximo uma Estadia (RD-06).
@@ -186,6 +193,9 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 - **SC-005**: 100% dos pagamentos registam valor, método e estado conforme RF-10.
 - **SC-006**: Diretor consegue consultar indicadores e pendentes por período com atualização máxima de 60 segundos (RF-01).
 - **SC-007**: Histórico completo de estadias e pagamentos por animal está disponível para receção/direção (RF-05).
+- **SC-008**: Existe pelo menos 1 teste automatizado por funcionalidade P1 desta feature (US-06, US-12, US-07, US-10, US-11).
+- **SC-009**: Existe pelo menos 1 teste de integração por caso de uso principal (UC-04, UC-05, UC-06, UC-07, UC-08).
+- **SC-010**: 100% das regras de domínio críticas listadas nesta spec têm testes automatizados com resultado verde no pipeline local.
 
 ---
 
