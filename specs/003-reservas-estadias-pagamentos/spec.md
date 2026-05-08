@@ -5,6 +5,11 @@
 **Status**: Draft  
 **Input**: Fase 3 do plano de implementação gradual — ciclo operacional principal do hotel de animais
 
+**Mapped User Stories**: US-06, US-07, US-10, US-11, US-12, US-05, US-02  
+**Mapped Functional Requirements**: RF-01, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10  
+**Mapped Domain Requirements**: RD-01, RD-02, RD-03, RD-04, RD-06, RD-07, RD-09  
+**Mapped Non-Functional Requirements**: RNF-01, RNF-03, RNF-04, RNF-05
+
 **Origem documentária**:
 - [Plano de Implementação Gradual — Fase 3](../../docs/Etapa3/plano-implementacao-gradual.md#fase-3--reservas-estadias-e-pagamentos)
 - [UC-04: Criar Reserva](../../docs/Etapa1/03-use-cases/UC-04.md)
@@ -15,97 +20,120 @@
 
 ---
 
+## Clarifications
+
+### Session 2026-05-08
+
+- Q: Qual a fonte de verdade para User Stories e Requisitos nesta feature? → A: User Stories em `docs/Etapa1/01-user-stories/user-stories.md` e requisitos em `docs/Etapa1/02-requirements/`.
+- Q: Que nível de detalhe de referências arquiteturais deve constar na spec? → A: Referenciar explicitamente diagramas de sequência, mockups de UI e ADRs relevantes da Etapa 2.
+
+---
+
 ## User Scenarios & Testing
 
-### User Story 1 - Criar reserva com disponibilidade confirmada (Priority: P1)
+### US-06 - Criar e gerir reservas com controlo automático de disponibilidade (Priority: P1)
 
-Um funcionário de receção precisa de criar uma reserva para um cliente quando este contacta para alojar o seu animal. O sistema deve verificar a disponibilidade do alojamento no período pretendido, apresentar opções e permitir a confirmação imediata.
+Como funcionário de receção, quero criar e gerir reservas com controlo automático de disponibilidade, para evitar situações de overbooking.
 
-**Why this priority**: Criação de reserva é o ponto de entrada crítico do ciclo operacional. Sem isto, não há estadias nem pagamentos. Alinha-se com UC-04 e RD-01 (gestão de disponibilidade).
+**Why this priority**: É o fluxo base que habilita estadias e faturação posterior. Sem gestão de reservas não existe operação diária da receção.
 
-**Independent Test**: Funcionário consegue criar uma reserva completa (tutor + animal + período + alojamento), e o alojamento fica marcado como indisponível no período. Teste é independente de check-in e pagamento.
+**Independent Test**: Criar reserva válida para um animal/tutor e, em seguida, cancelar a reserva. O sistema deve refletir indisponibilidade e libertação do alojamento no mesmo período.
 
 **Acceptance Scenarios**:
 
-1. **Given** um tutor e animal registados no sistema e alojamento disponível no período, **When** o funcionário preenche data inicial, data final e seleciona alojamento, **Then** a reserva é criada, confirmada e o alojamento fica indisponível.
-
-2. **Given** um período em que não há alojamentos livres, **When** o funcionário tenta criar reserva, **Then** o sistema apresenta alternativas de datas ou comunica indisponibilidade total.
-
-3. **Given** uma reserva já criada, **When** outro funcionário tenta usar o mesmo alojamento no mesmo período, **Then** o sistema impede a sobreposição e marca como ocupado.
+1. **Given** tutor e animal já registados e uma box disponível no período, **When** o funcionário cria a reserva, **Then** a reserva fica ativa e a box fica indisponível para reservas sobrepostas.
+2. **Given** uma reserva ativa, **When** o funcionário executa cancelamento, **Then** a reserva muda para CANCELADA e não pode ser reativada (deve ser criada nova reserva).
 
 ---
 
-### User Story 2 - Cancelar reserva e liberar alojamento (Priority: P1)
+### US-12 - Consultar disponibilidade das boxes em tempo real (Priority: P1)
 
-Um funcionário de receção precisa cancelar uma reserva quando um cliente avisa que não vai utilizar o alojamento. O sistema deve liberar o alojamento imediatamente para que outras reservas possam ser feitas.
+Como funcionário de receção, quero consultar a disponibilidade das boxes em tempo real, para responder de imediato a pedidos de reserva.
 
-**Why this priority**: Operação crítica de gestão de disponibilidade em tempo real. Sem isto, alojamentos ficam presos em reservas canceladas. Alinha-se com UC-05 e RD-06.
+**Why this priority**: Reduz erros operacionais e garante resposta imediata no balcão de atendimento.
 
-**Independent Test**: Funcionário consegue localizar uma reserva confirmada, cancela-a, e o alojamento volta a estar disponível para o período original.
+**Independent Test**: Consultar disponibilidade para um intervalo de datas e validar que o sistema exclui boxes com reserva confirmada, estadia ativa ou limpeza não concluída.
 
 **Acceptance Scenarios**:
 
-1. **Given** uma reserva confirmada, **When** o funcionário acessa a reserva e seleciona "Cancelar", **Then** o sistema altera o estado para CANCELADA e liberta o alojamento.
-
-2. **Given** uma reserva cancelada, **When** outro funcionário consulta o período, **Then** o alojamento aparece disponível novamente.
-
-3. **Given** uma reserva em estado ATIVA, **When** o funcionário cancela, **Then** o sistema mantém auditoria (registo histórico da cancelação).
+1. **Given** período pretendido definido, **When** o funcionário consulta disponibilidade, **Then** o sistema devolve apenas boxes que cumprem as 3 condições de disponibilidade (RF-06, RD-01).
+2. **Given** inexistência de boxes elegíveis, **When** a consulta é submetida, **Then** o sistema indica indisponibilidade e sugere alternativas de datas.
 
 ---
 
-### User Story 3 - Registar check-in e processar pagamento base (Priority: P1)
+### US-07 - Registar check-in e check-out de cada animal (Priority: P1)
 
-Um funcionário de receção precisa registar a entrada de um animal no hotel quando o cliente chega na data combinada. O sistema deve confirmar dados do animal, calcular o custo total da estadia e processar o pagamento.
+Como funcionário de receção, quero registar o check-in e check-out de cada animal, para garantir o controlo das estadias em curso.
 
-**Why this priority**: Check-in marca o início operacional da estadia e viabiliza o fluxo de cuidados. Sem isto, não há estadia registada nem cuidados podem ser rastreados. Alinha-se com UC-06 e RD-02, RD-04.
+**Why this priority**: Define o ciclo de vida da estadia e alimenta estados operacionais de box e faturação.
 
-**Independent Test**: Funcionário consegue localizar reserva confirmada, processa pagamento (qualquer método) e o animal fica registado como hospedado no alojamento.
+**Independent Test**: Para uma reserva confirmada, registar check-in e posteriormente check-out, validando sequência obrigatória e transições de estado.
 
 **Acceptance Scenarios**:
 
-1. **Given** uma reserva confirmada para a data atual, **When** o funcionário pesquisa a reserva por nome de tutor/animal e confirma dados, **Then** o sistema calcula o custo total da estadia (dias × tarifa base do alojamento) e apresenta para pagamento.
-
-2. **Given** o pagamento apresentado, **When** o funcionário seleciona método (NUMERARIO, CARTAO_DEBITO, CARTAO_CREDITO) e confirma, **Then** o sistema regista o pagamento com estado LIQUIDADO e marca a estadia como EM_CURSO.
-
-3. **Given** um cliente sem capacidade de pagamento imediato, **When** o funcionário regista pagamento com estado PENDENTE, **Then** o sistema permite check-in e marca dívida consultável pelo diretor.
-
-4. **Given** check-in bem-sucedido, **When** o sistema atualiza o estado do alojamento, **Then** marca-o como OCUPADO (afeta RD-01 — disponibilidade em tempo real).
+1. **Given** reserva confirmada, **When** o check-in é registado, **Then** a estadia entra em EM_CURSO e a box passa a OCUPADO.
+2. **Given** estadia EM_CURSO, **When** o check-out é registado, **Then** a estadia termina e a box passa a PENDENTE_LIMPEZA.
+3. **Given** ausência de check-in anterior, **When** é tentado check-out, **Then** a operação é recusada (RD-03).
 
 ---
 
-### User Story 4 - Registar check-out e pagamento de extras (Priority: P1)
+### US-10 - Pagamento da estadia no check-in (Priority: P1)
 
-Um funcionário de receção precisa registar a saída do animal quando o cliente vem levantá-lo. Se houver serviços adicionais (banho, passeio, medicação), o sistema deve apresentar o valor incremental e processar pagamento.
+Como funcionário de receção, quero registar o pagamento da estadia no momento do check-in, com base na duração reservada e no tipo de alojamento, para que o valor base fique liquidado à entrada.
 
-**Why this priority**: Check-out é o ponto de encerramento da estadia e garante que alojamento volta a estar disponível para limpeza e nova reserva. Alinha-se com UC-07 e RD-03, RD-04.
+**Why this priority**: Garante liquidação do valor base no momento operacional de entrada e reduz risco financeiro.
 
-**Independent Test**: Funcionário consegue localizar estadia em curso, confirmar dados, registar check-out. Se houver extras, sistema calcula incremento e permite pagamento. Alojamento muda estado para PENDENTE_LIMPEZA.
+**Independent Test**: No check-in, o sistema calcula valor da estadia e regista pagamento com método e estado obrigatórios.
 
 **Acceptance Scenarios**:
 
-1. **Given** uma estadia com check-in registado, **When** o funcionário localiza a estadia e seleciona "Registar Check-out", **Then** o sistema apresenta resumo (datas, animal, custo base) sem serviços extras.
-
-2. **Given** estadia com serviços adicionais registados, **When** o sistema exibe resumo, **Then** lista cada serviço com custo individual e total de extras.
-
-3. **Given** o resumo apresentado, **When** o funcionário confirma check-out com pagamento adicional, **Then** o sistema regista pagamento e encerra estadia com estado TERMINADA.
-
-4. **Given** check-out concluído com sucesso, **When** o sistema atualiza alojamento, **Then** marca-o com estado PENDENTE_LIMPEZA e torna-o indisponível para novas reservas até limpeza.
+1. **Given** check-in em execução, **When** o sistema calcula valor base (dias x tarifa de alojamento), **Then** apresenta montante a liquidar.
+2. **Given** escolha de método de pagamento, **When** a operação é confirmada, **Then** é criado registo de pagamento com valor, método e estado.
 
 ---
 
-### User Story 5 - Consultar histórico de pagamentos por estadia (Priority: P2)
+### US-11 - Cobrança de extras no check-out (Priority: P1)
 
-Um funcionário ou diretor precisa consultar o histórico de pagamentos associados a uma estadia para auditar e reconciliar com contabilidade.
+Como funcionário de receção, quero registar o check-out de um animal e cobrar nesse momento apenas os serviços extra e intervenções veterinárias acumulados durante a estadia, para que a faturação complementar fique liquidada à saída.
 
-**Why this priority**: Suporte operacional e de conformidade. Sem isto, não há rastreabilidade de fluxos de caixa. Alinha-se com RD-04 e requisitos de faturação.
+**Why this priority**: Separa claramente faturação base e complementar, conforme regras de domínio.
 
-**Independent Test**: Funcionário consegue localizar uma estadia, visualizar todos os pagamentos associados (check-in + check-out + extras se houver) com valores, métodos e estados.
+**Independent Test**: No check-out, o sistema agrega extras e intervenções, mostra total complementar e regista pagamento final.
 
 **Acceptance Scenarios**:
 
-1. **Given** uma estadia com um ou mais pagamentos, **When** o funcionário acessa detalhes da estadia, **Then** o sistema lista cronologicamente todos os pagamentos com data, valor, método, momento (CHECK_IN ou CHECK_OUT) e estado.
+1. **Given** estadia com extras/intervenções, **When** o check-out é iniciado, **Then** o sistema apresenta discriminação de custos complementares.
+2. **Given** confirmação de pagamento no check-out, **When** a operação termina, **Then** o sistema regista pagamento complementar e encerra a estadia.
 
-2. **Given** pagamentos com estado misto (alguns LIQUIDADO, alguns PENDENTE), **When** o sistema apresenta, **Then** diferencia visualmente e permite ação sobre pendentes.
+---
+
+### US-05 - Histórico completo de estadias e pagamentos (Priority: P2)
+
+Como diretor, quero consultar o histórico completo de estadias e pagamentos, para ter uma visão financeira e operacional do hotel.
+
+**Why this priority**: Suporta auditoria e análise operacional, mas não bloqueia o fluxo transacional base.
+
+**Independent Test**: Diretor consulta histórico por animal ou período e visualiza estadias e pagamentos associados.
+
+**Acceptance Scenarios**:
+
+1. **Given** histórico existente, **When** o diretor filtra por período, **Then** obtém lista de estadias e respetivos pagamentos.
+2. **Given** transações com estados diferentes, **When** o histórico é apresentado, **Then** o estado de cada pagamento fica identificado (LIQUIDADO/PENDENTE).
+
+---
+
+### US-02 - Indicadores de faturação e pagamentos pendentes (Priority: P2)
+
+Como diretor, quero consultar indicadores de faturação e pagamentos pendentes filtráveis por período, para acompanhar o desempenho financeiro do hotel.
+
+**Why this priority**: Necessário para controlo financeiro diário/mensal e reconciliação de pendências.
+
+**Independent Test**: Diretor abre dashboard, aplica filtro temporal e visualiza faturação agregada e lista de pagamentos pendentes.
+
+**Acceptance Scenarios**:
+
+1. **Given** pagamentos registados no sistema, **When** o diretor aplica filtro por período, **Then** a faturação agregada é atualizada.
+2. **Given** existência de dívidas pendentes, **When** o diretor consulta painel financeiro, **Then** o sistema apresenta lista de pendentes para reconciliação.
 
 ---
 
@@ -113,13 +141,30 @@ Um funcionário ou diretor precisa consultar o histórico de pagamentos associad
 
 ### Functional Requirements
 
-- **FR-06**: Sistema DEVE permitir criar reserva associando tutor, animal, alojamento e período, com validação de disponibilidade em tempo real (UC-04, RD-01).
-- **FR-07**: Sistema DEVE permitir cancelar reserva confirmada e liberar o alojamento para o período (UC-05, RD-06).
-- **FR-08**: Sistema DEVE registar check-in de estadia ligando reserva confirmada a alojamento, com transição obrigatória de estados (Reserva: ATIVA → associada a Estadia; Alojamento: DISPONIVEL → OCUPADO) (UC-06, RD-02).
-- **FR-09**: Sistema DEVE registar check-out de estadia com transição de estado (Estadia: EM_CURSO → TERMINADA; Alojamento: OCUPADO → PENDENTE_LIMPEZA) (UC-07, RD-03).
-- **FR-10**: Sistema DEVE registar pagamentos em dois momentos distintos: CHECK_IN (custo integral da estadia) e CHECK_OUT (serviços adicionais, se existam), com suporte a três métodos (NUMERARIO, CARTAO_DEBITO, CARTAO_CREDITO) e dois estados (LIQUIDADO, PENDENTE) (UC-08, RD-04).
-- **FR-01-estadia**: Sistema DEVE manter dashboa com ocupação em tempo real, incluindo número de estadias em curso e receita acumulada (RD-02).
-- **FR-06-pagamento-pendente**: Sistema DEVE manter lista de pagamentos pendentes consultável apenas pelo diretor para reconciliação com contabilidade (RD-04).
+- **RF-01 - Dashboard operacional**: O sistema deve disponibilizar um dashboard acessível ao perfil de diretor contendo, no mínimo, taxa de ocupação atual, número de estadias ativas, número de reservas futuras e valor total de faturação diária/mensal, com atualização automática (evento relevante ou máximo de 60 segundos).
+- **RF-05 - Histórico de estadias e pagamentos**: O sistema deve manter um histórico completo das estadias e pagamentos de cada animal, consultável pela receção e pela direção.
+- **RF-06 - Controlo de disponibilidade de boxes**: O sistema deve determinar disponibilidade em tempo real por três condições cumulativas: sem reserva confirmada no período, sem estadia ativa no período e limpeza concluída; deve impedir reservas inválidas e sugerir alternativas.
+- **RF-07 - Gestão de reservas**: O sistema deve permitir criação, confirmação e cancelamento de reservas, com registo de período, box e animal associados.
+- **RF-08 - Check-in e pagamento de estadia**: O sistema deve suportar check-in, registar data de entrada e box atribuída, e processar pagamento da estadia no mesmo momento.
+- **RF-09 - Check-out e faturação complementar**: O sistema deve suportar check-out, registar data de saída e calcular/processar pagamento de serviços extra e intervenções veterinárias acumulados.
+- **RF-10 - Registo de pagamentos**: O sistema deve registar pagamentos de check-in e check-out com valor, método (numerário, cartão de débito, cartão de crédito) e estado (liquidado ou pendente), garantindo rastreabilidade.
+
+### Domain Requirements
+
+- **RD-01 - Disponibilidade de alojamento**: Um alojamento só é considerado disponível se não existir reserva ou estadia ativa no período e se a limpeza estiver marcada como concluída.
+- **RD-02 - Check-in condicionado a reserva**: Um animal só pode realizar check-in com reserva confirmada associada.
+- **RD-03 - Sequência de check-in/check-out**: O check-out só pode ocorrer após check-in registado para a mesma estadia.
+- **RD-04 - Pagamento no check-in e check-out**: O check-in cobre exclusivamente a estadia base; extras e intervenções veterinárias são cobrados no check-out.
+- **RD-06 - Cancelamento de reservas**: Uma reserva cancelada não pode ser reativada; deve ser criada nova reserva.
+- **RD-07 - Exclusividade de estadia**: Um animal não pode ter duas estadias em curso em simultâneo.
+- **RD-09 - Registo e imutabilidade de custos extra**: O custo de extra/intervenção deve ser registado na ocorrência e não pode ser alterado após check-out.
+
+### Non-Functional Requirements
+
+- **RNF-01 - Tempo de resposta**: Leituras abaixo de 2 segundos e escritas abaixo de 3 segundos, em condições normais (até 10 utilizadores simultâneos).
+- **RNF-03 - Disponibilidade**: Sistema disponível durante todo o horário de funcionamento do hotel.
+- **RNF-04 - Autenticação e permissões**: Acesso exige autenticação prévia e controlo de permissões por perfil.
+- **RNF-05 - Confidencialidade dos dados**: Garantir confidencialidade de dados pessoais e clínicos em conformidade com RGPD.
 
 ### Key Entities
 
@@ -134,14 +179,13 @@ Um funcionário ou diretor precisa consultar o histórico de pagamentos associad
 
 ### Measurable Outcomes
 
-- **SC-001**: Funcionário consegue criar reserva em menos de 2 minutos (fluxo normal: pesquisa tutor/animal → verifica datas → seleciona alojamento → confirma).
-- **SC-002**: Cancelamento de reserva torna alojamento disponível em tempo real (max 5 segundos) sem erros de sobreposição em consultas simultâneas.
-- **SC-003**: Check-in e pagamento completam em menos de 3 minutos por cliente.
-- **SC-004**: Check-out com extras listados em menos de 2 minutos.
-- **SC-005**: 100% das transações de pagamento registam estado (LIQUIDADO ou PENDENTE) sem perda de dados.
-- **SC-006**: Histórico de pagamentos recuperável em tempo real (< 1 segundo) por qualquer estadia.
-- **SC-007**: Transições de estado de Alojamento (DISPONIVEL ↔ OCUPADO ↔ PENDENTE_LIMPEZA) ocorrem automaticamente e sem inconsistências.
-- **SC-008**: Dashboard do diretor atualiza ocupação e receita em tempo real com erro máximo de 5 segundos.
+- **SC-001**: Consulta de disponibilidade e pesquisa de histórico respondem em menos de 2 segundos em condições normais de utilização (RNF-01).
+- **SC-002**: Operações de escrita (criar/cancelar reserva, check-in, check-out, registo de pagamento) concluem em menos de 3 segundos de processamento do sistema (RNF-01).
+- **SC-003**: 100% das reservas respeitam as regras de não-overbooking definidas por RF-06 e RD-01.
+- **SC-004**: 100% dos check-outs respeitam sequência obrigatória (RD-03), sem encerramentos sem check-in prévio.
+- **SC-005**: 100% dos pagamentos registam valor, método e estado conforme RF-10.
+- **SC-006**: Diretor consegue consultar indicadores e pendentes por período com atualização máxima de 60 segundos (RF-01).
+- **SC-007**: Histórico completo de estadias e pagamentos por animal está disponível para receção/direção (RF-05).
 
 ---
 
@@ -179,11 +223,17 @@ Um funcionário ou diretor precisa consultar o histórico de pagamentos associad
 
 ### Sequence Diagrams
 
-- [UC-04: Criar Reserva](../../docs/Etapa2/03-seq-diagrams/UC-04.mmd): Fluxo de sistema (pesquisa → validação → criação)
-- [UC-05: Cancelar Reserva](../../docs/Etapa2/03-seq-diagrams/UC-05.mmd): Fluxo de cancelamento
-- [UC-06: Registar Check-in](../../docs/Etapa2/03-seq-diagrams/UC-06.mmd): Fluxo de check-in com pagamento
-- [UC-07: Registar Check-out](../../docs/Etapa2/03-seq-diagrams/UC-07.mmd): Fluxo de check-out
-- [UC-08: Processar Faturacao e Pagamento](../../docs/Etapa2/03-seq-diagrams/UC-08.mmd): Subcase incluído em UC-06 e UC-07
+- [UC-04: Criar Reserva](../../docs/Etapa2/03-seq-diagrams/UC-04.mmd): fluxo principal de disponibilidade, seleção e confirmação de reserva
+- [UC-05: Cancelar Reserva](../../docs/Etapa2/03-seq-diagrams/UC-05.mmd): fluxo de cancelamento e libertação de box
+- [UC-06: Registar Check-in](../../docs/Etapa2/03-seq-diagrams/UC-06.mmd): fluxo de check-in, criação/ativação da estadia e pagamento base
+- [UC-07: Registar Check-out](../../docs/Etapa2/03-seq-diagrams/UC-07.mmd): fluxo de check-out, atualização de estado e transição para limpeza
+- [UC-08: Processar Faturacao e Pagamento](../../docs/Etapa2/03-seq-diagrams/UC-08.mmd): composição dos pagamentos em check-in/check-out
+
+### UI Mockups
+
+- [WF02: Dashboard do Diretor](../../docs/Etapa2/05-ui-interface-mockup/wf02-dashboard-diretor.html): referência para indicadores de faturação e pagamentos pendentes (US-02)
+- [WF03: Reservas](../../docs/Etapa2/05-ui-interface-mockup/wf03-reservas.html): referência para consulta de disponibilidade, criação/cancelamento de reservas e ações de check-in/check-out na receção
+- [WF04: Plano de Cuidados](../../docs/Etapa2/05-ui-interface-mockup/wf04-plano-cuidados.html): contexto funcional para origem de serviços extra e integração no fecho de estadia
 
 ### Architecture Decisions
 
@@ -193,27 +243,19 @@ Um funcionário ou diretor precisa consultar o histórico de pagamentos associad
 - [ADR-04: Spring Security com Sessão HTTP](../../docs/Etapa2/04-architecture-decisions/ADR-04-spring-security-sessao-http.md): Autenticação por sessão
 - [ADR-05: DTO entre Controller e Service](../../docs/Etapa2/04-architecture-decisions/ADR-05-dto-entre-controller-service.md): Padrão de transferência de dados
 
-### UI Mockups
-
-- [WF03: Reservas](../../docs/Etapa2/05-ui-interface-mockup/wf03-reservas.html): Interface para criar, listar e cancelar reservas
-- [WF04: Plano de Cuidados (contexto)](../../docs/Etapa2/05-ui-interface-mockup/wf04-plano-cuidados.html): Visualização de estadia e cuidados (não foco aqui, mas relacionado)
-
 ---
 
 ## Validação de Rastreabilidade
 
 | Origem | Mapeamento | Status |
 |--------|-----------|--------|
-| UC-04 | US-1 (Criar Reserva) | ✓ Coberto |
-| UC-05 | US-2 (Cancelar Reserva) | ✓ Coberto |
-| UC-06 | US-3 (Check-in + Pagamento base) | ✓ Coberto |
-| UC-07 | US-4 (Check-out + Pagamento extras) | ✓ Coberto |
-| UC-08 | US-3, US-4 (Processar Faturação) | ✓ Coberto (subcase) |
-| RD-01 | FR-06, FR-08 (Disponibilidade) | ✓ Coberto |
-| RD-02 | FR-08 (Check-in, estadias EM_CURSO) | ✓ Coberto |
-| RD-03 | FR-09 (Check-out, PENDENTE_LIMPEZA) | ✓ Coberto |
-| RD-04 | FR-10 (Pagamentos CHECK_IN/CHECK_OUT) | ✓ Coberto |
-| RD-06 | FR-07 (Cancelar reserva, liberar alojamento) | ✓ Coberto |
+| US-06 | UC-04, UC-05, RF-06, RF-07, RD-01, RD-06 | ✓ Coberto |
+| US-12 | UC-04, RF-06, RD-01 | ✓ Coberto |
+| US-07 | UC-06, UC-07, RF-08, RF-09, RD-02, RD-03, RD-07 | ✓ Coberto |
+| US-10 | UC-06, UC-08, RF-08, RF-10, RD-04 | ✓ Coberto |
+| US-11 | UC-07, UC-08, RF-09, RF-10, RD-03, RD-04, RD-09 | ✓ Coberto |
+| US-05 | RF-05 | ✓ Coberto |
+| US-02 | RF-01 | ✓ Coberto |
 
 ---
 
@@ -221,4 +263,4 @@ Um funcionário ou diretor precisa consultar o histórico de pagamentos associad
 
 - Esta spec assume que a Fase 1 (Fundação com autenticação) e Fase 2 (Registo de Tutores, Animais, Disponibilidade) estão completas e estáveis.
 - Serviços adicionais (banho, passeio, medicação) são registados em Fase 4, mas o pagamento dos mesmos é processado nesta fase (no check-out).
-- Auditoria de cancelamentos e mudanças de estado de reservas é um requisito implícito (RD-06, RD-07) mas será documentado em detalhe no plano de implementação.
+- A rastreabilidade normativa usa os identificadores oficiais de Etapa 1 (`US-xx`, `RF-xx`, `RD-xx`, `RNF-xx`) sem alias locais (`FR-xx`).
