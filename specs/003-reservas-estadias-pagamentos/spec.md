@@ -26,23 +26,25 @@
 
 - Q: Qual a fonte de verdade para User Stories e Requisitos nesta feature? → A: User Stories em `docs/Etapa1/01-user-stories/user-stories.md` e requisitos em `docs/Etapa1/02-requirements/`.
 - Q: Que nível de detalhe de referências arquiteturais deve constar na spec? → A: Referenciar explicitamente diagramas de sequência, mockups de UI e ADRs relevantes da Etapa 2.
+- Q: Como tratar a prioridade de RD-06 nesta fase? → A: Embora RD-06 esteja definido como Should Have na Etapa 1, nesta feature é tratado como obrigatório operacional para garantir integridade do ciclo de reservas (sem reativação de reservas canceladas).
 
 ---
 
 ## User Scenarios & Testing
 
-### US-06 - Criar e gerir reservas com controlo automático de disponibilidade (Priority: P1)
+### US-06 - Criar, confirmar e gerir reservas com controlo automático de disponibilidade (Priority: P1)
 
-Como funcionário de receção, quero criar e gerir reservas com controlo automático de disponibilidade, para evitar situações de overbooking.
+Como funcionário de receção, quero criar, confirmar e gerir reservas com controlo automático de disponibilidade, para evitar situações de overbooking.
 
 **Why this priority**: É o fluxo base que habilita estadias e faturação posterior. Sem gestão de reservas não existe operação diária da receção.
 
-**Independent Test**: Criar reserva válida para um animal/tutor e, em seguida, cancelar a reserva. O sistema deve refletir indisponibilidade e libertação do alojamento no mesmo período.
+**Independent Test**: Criar reserva válida para um animal/tutor, confirmar a reserva e, em seguida, cancelar a reserva. O sistema deve refletir indisponibilidade e libertação do alojamento no mesmo período.
 
 **Acceptance Scenarios**:
 
 1. **Given** tutor e animal já registados e uma box disponível no período, **When** o funcionário cria a reserva, **Then** a reserva fica ativa e a box fica indisponível para reservas sobrepostas.
-2. **Given** uma reserva ativa, **When** o funcionário executa cancelamento, **Then** a reserva muda para CANCELADA e não pode ser reativada (deve ser criada nova reserva).
+2. **Given** uma reserva recém-criada, **When** o funcionário confirma a reserva, **Then** o sistema regista o evento de confirmação e mantém o alojamento indisponível no período reservado.
+3. **Given** uma reserva ativa/confirmada, **When** o funcionário executa cancelamento, **Then** a reserva muda para CANCELADA e não pode ser reativada (deve ser criada nova reserva).
 
 ---
 
@@ -172,6 +174,10 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 - Cada fluxo funcional deve ter, no mínimo, um teste de caminho feliz e um teste de regra de negócio/erro (ex.: indisponibilidade de box, check-out sem check-in, pagamento sem método).
 - As regras de domínio críticas (RD-01, RD-02, RD-03, RD-04, RD-06, RD-07, RD-09) devem ter testes dedicados na camada de serviço.
 - Deve existir pelo menos um teste de integração por caso de uso principal (UC-04, UC-05, UC-06, UC-07, UC-08), cobrindo persistência e transições de estado.
+- Devem existir testes explícitos de autorização por perfil para operações críticas (reserva, check-in/out, pagamentos, dashboard e histórico), incluindo cenários de acesso negado.
+- Devem existir testes de confidencialidade para garantir que dados pessoais e clínicos sensíveis não são expostos em respostas indevidas ou ecrãs sem permissão.
+- Devem existir testes de desempenho para validar SC-001, SC-002 e SC-006 em condições normais de utilização.
+- Todas as ações críticas (criação, confirmação e cancelamento de reserva; check-in; check-out; registo de pagamento) devem gerar registos de auditoria verificáveis por testes automatizados.
 
 ### Key Entities
 
@@ -196,6 +202,8 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 - **SC-008**: Existe pelo menos 1 teste automatizado por funcionalidade P1 desta feature (US-06, US-12, US-07, US-10, US-11).
 - **SC-009**: Existe pelo menos 1 teste de integração por caso de uso principal (UC-04, UC-05, UC-06, UC-07, UC-08).
 - **SC-010**: 100% das regras de domínio críticas listadas nesta spec têm testes automatizados com resultado verde no pipeline local.
+- **SC-011**: 100% das operações críticas do ciclo de reservas/estadias/pagamentos produzem eventos de auditoria rastreáveis.
+- **SC-012**: Testes de desempenho automatizados comprovam cumprimento de SC-001, SC-002 e SC-006 em ambiente de validação da feature.
 
 ---
 

@@ -1,5 +1,5 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read:
-specs/002-registo-clientes-alojamentos/plan.md
+specs/003-reservas-estadias-pagamentos/plan.md
 <!-- SPECKIT END -->
