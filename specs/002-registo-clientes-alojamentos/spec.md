@@ -5,7 +5,7 @@
 **Status**: Draft  
 **Phase**: Fase 2 do Plano de Implementação Gradual  
 **Mapped Use Cases**: UC-03 (Registar Tutor e Animal), UC-04 (Criar Reserva)  
-**Mapped User Stories**: US-05, US-06, US-09, US-12  
+**Mapped User Stories**: US-06, US-08, US-09, US-12  
 **Mapped Domain Requirements**: RD-03, RD-05, RD-06  
 
 ---
@@ -24,90 +24,66 @@ Esta feature deve ser interpretada e implementada em coerência com os artefacto
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - Registo de Tutor (Priority: P1)
+### US-09 - Registar e consultar dados de tutores e animais (Priority: P1)
 
-Como funcionário de receção, quero registar um novo tutor no sistema com os seus dados de contacto, para que fique disponível para futuras reservas.
+Como funcionário de receção, quero registar e consultar os dados dos tutores e dos seus animais, para ter toda a informação disponível no momento do atendimento.
 
-**Why this priority**: P1 — Fundação essencial para o módulo de reservas. Sem tutores registados, não é possível criar animais nem reservas. Bloqueia todas as funcionalidades subsequentes.
+**Why this priority**: P1 — Sem dados de tutor/animal não é possível criar reservas nem garantir atendimento informado.
 
-**Independent Test**: Um funcionário pode registar um tutor completo (nome, NIF, contacto, email) e recuperá-lo posteriormente pelo NIF ou nome. A funcionalidade é testável isoladamente e permite ao utilizador criar um registo base.
+**Independent Test**: Registar tutor e animal com dados obrigatórios, e depois consultar ficha completa por NIF/nome.
 
 **Acceptance Scenarios**:
 
-1. **Given** funcionário autenticado na aplicação, **When** acessa a secção "Registar Tutor", **Then** vê um formulário com campos obrigatórios: nome completo, NIF, contacto telefónico e email.
-2. **Given** um funcionário preenche corretamente todos os campos do tutor, **When** submete o formulário, **Then** o sistema guarda o registo e apresenta uma mensagem de confirmação.
-3. **Given** um funcionário tenta registar um tutor com NIF já existente, **When** submete o formulário, **Then** o sistema apresenta um erro e impede a duplicação.
-4. **Given** um tutor foi registado, **When** o funcionário pesquisa pelo NIF ou nome, **Then** o sistema apresenta os dados completos do tutor.
+1. **Given** funcionário autenticado, **When** regista tutor com nome, contacto, email e NIF, **Then** o sistema guarda o registo e impede duplicação de NIF.
+2. **Given** tutor existente, **When** regista animal com espécie, raça, data de nascimento, peso, estado de saúde, necessidades alimentares e medicação, **Then** o sistema associa o animal ao tutor.
+3. **Given** tutor registado, **When** é consultada a ficha do tutor, **Then** o sistema apresenta dados do tutor e lista de animais associados.
 
 ---
 
-### User Story 2 - Registo de Animal (Priority: P1)
+### US-12 - Consultar disponibilidade das boxes em tempo real (Priority: P1)
 
-Como funcionário de receção, quero registar um novo animal associado a um tutor já existente, fornecendo espécie, raça, data de nascimento e estado de saúde, para que o sistema tenha o historial completo do animal.
+Como funcionário de receção, quero consultar a disponibilidade das boxes em tempo real, para responder de imediato a pedidos de reserva.
 
-**Why this priority**: P1 — Essencial para criar reservas. Um animal é a entidade central do negócio; sem poder registar animais associados aos tutores, não é possível prosseguir para reservas ou estadias.
+**Why this priority**: P1 — A disponibilidade é condição obrigatória para criação de reservas sem overbooking.
 
-**Independent Test**: Um funcionário pode registar um animal (nome, espécie, raça, data de nascimento, peso, estado de saúde, necessidades alimentares, medicação) associado a um tutor existente. O animal fica consultável e pronto para reservas.
+**Independent Test**: Selecionar período e obter apenas boxes elegíveis (sem conflito de reserva/estadia e com limpeza concluída).
 
 **Acceptance Scenarios**:
 
-1. **Given** um tutor existe no sistema, **When** o funcionário seleciona "Adicionar Animal" para esse tutor, **Then** vê um formulário com campos obrigatórios: nome, espécie (Cão ou Gato), raça, data de nascimento, peso, estado de saúde, necessidades alimentares e medicação em curso.
-2. **Given** o funcionário preenche todos os campos do animal, **When** submete, **Then** o sistema cria a ficha clínica do animal e a associa ao tutor.
-3. **Given** um animal foi registado, **When** o funcionário consulta os animais do tutor, **Then** o sistema lista todos os animais associados.
-4. **Given** um tutor tem múltiplos animais, **When** o funcionário consulta o tutor, **Then** o sistema apresenta todos os animais com respetivos estados de saúde.
+1. **Given** período definido, **When** o funcionário consulta disponibilidade, **Then** o sistema devolve apenas boxes válidas para esse intervalo.
+2. **Given** inexistência de boxes disponíveis, **When** a consulta é executada, **Then** o sistema informa indisponibilidade e sugere alternativas.
 
 ---
 
-### User Story 3 - Consulta de Disponibilidade de Alojamentos (Priority: P1)
+### US-06 - Criar e gerir reservas com controlo automático de disponibilidade (Priority: P1)
 
-Como funcionário de receção, quero consultar a disponibilidade de alojamentos (boxes) em tempo real para um período específico, para responder imediatamente a pedidos de reserva.
+Como funcionário de receção, quero criar e gerir reservas com controlo automático de disponibilidade, para evitar situações de overbooking.
 
-**Why this priority**: P1 — Crítica para o fluxo de reservas. Sem poder visualizar disponibilidade, é impossível criar uma reserva válida. Afeta diretamente a experiência do utilizador na receção.
+**Why this priority**: P1 — Reserva é a transação operacional principal da receção nesta fase.
 
-**Independent Test**: Um funcionário consegue selecionar um período de datas e ver quais as boxes disponíveis (com estado de limpeza concluído, sem reservas confirmadas e sem estadias ativas nesse período).
+**Independent Test**: Criar reserva válida e cancelar reserva ativa, validando atualização imediata da disponibilidade.
 
 **Acceptance Scenarios**:
 
-1. **Given** funcionário autenticado na aplicação, **When** acessa o módulo "Criar Reserva", **Then** vê um campo para selecionar período (data início e data fim).
-2. **Given** o funcionário seleciona um período válido, **When** clica em "Consultar Disponibilidade", **Then** o sistema apresenta apenas as boxes que cumprem as três condições: sem reserva confirmada, sem estadia ativa, com limpeza concluída.
-3. **Given** uma box tem uma reserva confirmada para o período pretendido, **When** o funcionário consulta disponibilidade nesse período, **Then** essa box não aparece como disponível.
-4. **Given** não existem boxes disponíveis no período solicitado, **When** o funcionário submete a consulta, **Then** o sistema apresenta uma mensagem informativa e sugere alternativas de datas.
+1. **Given** tutor/animal existentes e box disponível, **When** o funcionário confirma uma reserva, **Then** a reserva fica ativa e a box fica indisponível no período.
+2. **Given** reserva ativa, **When** o funcionário cancela, **Then** o estado passa a CANCELADA e a reserva não pode ser reativada.
 
 ---
 
-### User Story 4 - Criação de Reserva (Priority: P1)
+### US-08 - Consultar histórico de cada animal (Priority: P2)
 
-Como funcionário de receção, quero criar uma reserva para um animal, selecionando um período e uma box disponível, para garantir a alocação e evitar overbooking.
+Como funcionário de receção, quero consultar o histórico de cada animal, para prestar um serviço mais personalizado e informado.
 
-**Why this priority**: P1 — Transação operacional central do sistema. Toda a cadeia de valor (check-in, pagamentos, cuidados) depende de uma reserva criada corretamente.
+**Why this priority**: P2 — Melhora qualidade de atendimento e contexto operacional, sem bloquear criação de reservas.
 
-**Independent Test**: Um funcionário consegue criar uma reserva selecionando um tutor, um animal desse tutor, um período e uma box disponível. A reserva fica confirmada e a box fica marcada como indisponível no período.
-
-**Acceptance Scenarios**:
-
-1. **Given** um tutor e animal existem no sistema, **When** o funcionário acessa "Criar Reserva" e seleciona o tutor, **Then** o sistema lista todos os animais do tutor.
-2. **Given** um animal é selecionado, **When** o funcionário indica o período pretendido, **Then** o sistema apresenta as boxes disponíveis apenas para esse período.
-3. **Given** o funcionário seleciona uma box disponível, **When** confirma a reserva, **Then** o sistema cria a reserva com estado "ATIVA" e marca a box como indisponível no período.
-4. **Given** uma reserva foi criada, **When** o funcionário consulta a disponibilidade novamente para o mesmo período, **Then** a box agora aparece como indisponível.
-5. **Given** um funcionário tenta criar uma reserva com período ou box inconsistente, **When** submete, **Then** o sistema valida e impede a criação, apresentando motivo do erro.
-
----
-
-### User Story 5 - Consulta de Dados de Tutor e Animal (Priority: P2)
-
-Como funcionário de receção, quero consultar rapidamente os dados completos de um tutor e dos seus animais no momento do atendimento, para prestar um serviço personalizado e informado.
-
-**Why this priority**: P2 — Suporte operacional importante mas não bloqueia reservas básicas. Melhora a qualidade do atendimento ao disponibilizar histórico completo.
-
-**Independent Test**: Um funcionário consegue pesquisar um tutor pelo nome ou NIF e aceder a um painel com todos os dados do tutor, lista de animais associados, e histórico de reservas/estadias passadas.
+**Independent Test**: Pesquisar tutor/animal e aceder ao histórico do animal com reservas/estadias anteriores.
 
 **Acceptance Scenarios**:
 
-1. **Given** funcionário na receção, **When** pesquisa um tutor pelo nome ou NIF, **Then** o sistema apresenta o tutor encontrado.
-2. **Given** um tutor foi encontrado, **When** o funcionário abre a ficha do tutor, **Then** vê todos os dados: nome, NIF, contacto, email, e lista de animais associados.
-3. **Given** um animal está listado, **When** o funcionário clica no animal, **Then** acede ao histórico completo: data de nascimento, raça, estado de saúde, necessidades alimentares, medicação, e histórico de reservas.
+1. **Given** animal com histórico, **When** o funcionário abre o detalhe do animal, **Then** visualiza histórico de reservas e estadias.
+2. **Given** pesquisa por nome/NIF do tutor, **When** o tutor é selecionado, **Then** o sistema permite navegar para os detalhes de cada animal associado.
 
-**Nota (actualização 2026-05-06)**: A navegação foi clarificada para consistência das URLs. A listagem geral de animais está disponível em `/animais` e o detalhe de um animal é servido em `/animais/{id}`. Links a partir da ficha de tutor continuam a listar os animais do tutor, mas os detalhes do animal usam o endpoint raiz para manter rastreabilidade e permitir acesso directo.
+**Nota (actualização 2026-05-06)**: A navegação foi clarificada para consistência das URLs. A listagem geral de animais está disponível em `/animais` e o detalhe de um animal é servido em `/animais/{id}`. Links a partir da ficha de tutor continuam a listar os animais do tutor, mas os detalhes do animal usam o endpoint raiz para manter rastreabilidade e permitir acesso direto.
 
 ---
 
@@ -125,6 +101,13 @@ Como funcionário de receção, quero consultar rapidamente os dados completos d
 - **RF-07**: O sistema DEVE permitir a criação de reservas, registando: período (data início e data fim), box, animal, tutor e estado inicial "ATIVA".
 - **RF-07**: O sistema DEVE permitir o cancelamento de reservas; uma reserva cancelada não pode ser reativada (deverá criar-se uma nova).
 - **RF-05**: O sistema DEVE manter um histórico completo das reservas e estadias de cada animal, consultável pela receção e direção.
+
+### Validation & Test Requirements
+
+- A conclusão desta feature exige testes automatizados sobre as funcionalidades P1 (US-09, US-12, US-06).
+- Cada funcionalidade P1 deve ter pelo menos um teste de caminho feliz e um teste de validação/erro (ex.: NIF duplicado, box indisponível, conflito de período).
+- As regras de disponibilidade e integridade (RF-06, RF-07, RD-05, RD-06) devem ter testes dedicados na camada de serviço.
+- Deve existir pelo menos um teste de integração para UC-03 e UC-04.
 
 ### Key Entities
 
@@ -152,6 +135,9 @@ Como funcionário de receção, quero consultar rapidamente os dados completos d
 - **SC-006**: Consulta de tutor/animal por NIF ou nome retorna resultados em menos de 500ms.
 - **SC-007**: Sistema previne com sucesso 100% das tentativas de criar reservas em boxes indisponíveis.
 - **SC-008**: Histórico completo de reservas de um animal é consultável em menos de 1 segundo.
+- **SC-009**: Existe pelo menos 1 teste automatizado por funcionalidade P1 desta feature (US-09, US-12, US-06).
+- **SC-010**: Existe pelo menos 1 teste de integração por caso de uso coberto nesta fase (UC-03 e UC-04).
+- **SC-011**: As regras críticas de disponibilidade e associação tutor-animal têm testes automatizados com resultado verde no pipeline local.
 
 ---
 

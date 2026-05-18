@@ -22,10 +22,10 @@ class AlojamentoServiceTest {
     private AlojamentoService alojamentoService;
 
     @Test
-    void contarAlojamentosDisponiveisDemoDeveContarConcluidos() {
+    void contarAlojamentosDisponiveisDeveContarConcluidos() {
         when(alojamentoRepository.countByEstadoLimpeza(EstadoLimpeza.CONCLUIDO)).thenReturn(2L);
 
-        long resultado = alojamentoService.contarAlojamentosDisponiveisDemo();
+        long resultado = alojamentoService.contarAlojamentosDisponiveis();
 
         assertThat(resultado).isEqualTo(2L);
     }

@@ -40,6 +40,26 @@
 							</li>
 						</ul>
 					</li>
+					<li class="nav-item has-treeview" th:classappend="${activePage == 'estadias' or activePage == 'historico'} ? ' menu-open' : ''">
+						<a href="#" class="nav-link" th:classappend="${activePage == 'estadias' or activePage == 'historico'} ? ' active' : ''">
+							<i class="nav-icon fas fa-bed"></i>
+							<p>Estadias<i class="right fas fa-angle-left"></i></p>
+						</a>
+						<ul class="nav nav-treeview">
+							<li class="nav-item">
+								<a th:href="@{/estadias}" class="nav-link" th:classappend="${activePage == 'estadias'} ? ' active' : ''">
+									<i class="far fa-circle nav-icon"></i>
+									<p>Check-in / Check-out</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a th:href="@{/historico}" class="nav-link" th:classappend="${activePage == 'historico'} ? ' active' : ''">
+									<i class="far fa-circle nav-icon"></i>
+									<p>Histórico</p>
+								</a>
+							</li>
+						</ul>
+					</li>
 					<li class="nav-item">
 						<a th:href="@{/alojamentos}" class="nav-link" th:classappend="${activePage == 'alojamentos'} ? ' active' : ''">
 							<i class="nav-icon fas fa-house"></i>

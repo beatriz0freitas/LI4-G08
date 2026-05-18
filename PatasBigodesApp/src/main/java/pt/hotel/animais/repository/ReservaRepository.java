@@ -72,6 +72,19 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
      * Procura reservas de um tutor ordenadas por data de criação decrescente (mais recentes primeiro).
      */
     List<Reserva> findByTutorIdOrderByDataCriacaoDesc(Long tutorId);
+
+    /**
+     * Conta as reservas num determinado estado.
+     */
+    @Query("SELECT COUNT(r) FROM Reserva r WHERE r.estado = :estado")
+    long countByEstado(@Param("estado") EstadoReserva estado);
+
+    /**
+     * Conta reservas ativas com data de início futura.
+     */
+    @Query("SELECT COUNT(r) FROM Reserva r WHERE r.estado = pt.hotel.animais.model.enums.EstadoReserva.ATIVA " +
+           "AND r.dataInicio > :hoje")
+    long countFuturas(@Param("hoje") LocalDate hoje);
     
     /**
      * Conta as reservas ativas num determinado período para um alojamento.
