@@ -112,6 +112,13 @@
 													<a th:href="@{/reservas/{id}(id=${reserva.id})}" class="btn btn-sm btn-info" title="Ver detalhes">
 														<i class="fas fa-eye"></i>
 													</a>
+													<form th:if="${reserva.isAtiva()}" th:action="@{/estadias/check-in}" method="post" class="d-inline" onsubmit="return confirm('Registar check-in para esta reserva?')">
+														<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+														<input type="hidden" name="reservaId" th:value="${reserva.id}" />
+														<button type="submit" class="btn btn-sm btn-success" title="Check-in">
+															<i class="fas fa-right-to-bracket"></i>
+														</button>
+													</form>
 													<form th:if="${reserva.isAtiva()}" th:action="@{/reservas/{id}/cancelar(id=${reserva.id})}" method="post" class="d-inline" onsubmit="return confirm('Tem a certeza que deseja cancelar?')">
 														<button type="submit" class="btn btn-sm btn-danger" title="Cancelar reserva">
 															<i class="fas fa-times"></i>

@@ -242,6 +242,25 @@ public class ReservaController {
         }
     }
 
+    /**
+     * POST /reservas/{id}/confirmar - Alias para concluir/confirmar reserva
+     */
+    @PostMapping("/{id}/confirmar")
+    public String confirmar(
+        @PathVariable Long id,
+        RedirectAttributes redirectAttributes,
+        Model model
+    ) {
+        try {
+            reservaService.concluir(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Reserva confirmada com sucesso");
+            return "redirect:/reservas";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "redirect:/reservas/" + id;
+        }
+    }
+
     private void prepararFormularioReserva(ReservaFormDto reservaForm, Model model) {
         List<Tutor> tutores = tutorService.listarTodos();
         List<Animal> animaisTutor = new ArrayList<>();

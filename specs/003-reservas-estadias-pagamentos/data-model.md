@@ -74,9 +74,10 @@ Este modelo cobre o ciclo operacional de Fase 3: criação/cancelamento de reser
 - `estadoOcupacao` (derivado por regras de domínio)
 
 **State behavior**:
-- `DISPONIVEL -> OCUPADO` no check-in.
-- `OCUPADO -> PENDENTE_LIMPEZA` no check-out.
-- `PENDENTE_LIMPEZA -> DISPONIVEL` após confirmação de limpeza (fluxo da fase anterior).
+- `Estadia`: `EM_CURSO -> TERMINADA` no check-out.
+- `Alojamento`: `DISPONIVEL -> OCUPADO` no check-in.
+- `Alojamento`: `OCUPADO -> PENDENTE_LIMPEZA` no check-out.
+- `Alojamento`: `PENDENTE_LIMPEZA -> DISPONIVEL` após confirmação de limpeza (fluxo da fase anterior).
 
 ## Relationships
 

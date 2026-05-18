@@ -115,12 +115,13 @@ Como diretor, quero consultar o histórico completo de estadias e pagamentos, pa
 
 **Why this priority**: Suporta auditoria e análise operacional, mas não bloqueia o fluxo transacional base.
 
-**Independent Test**: Diretor consulta histórico por animal ou período e visualiza estadias e pagamentos associados.
+**Independent Test**: Diretor consulta histórico por cliente, animal, estado ou período e visualiza estadias e pagamentos associados de forma paginada.
 
 **Acceptance Scenarios**:
 
 1. **Given** histórico existente, **When** o diretor filtra por período, **Then** obtém lista de estadias e respetivos pagamentos.
 2. **Given** transações com estados diferentes, **When** o histórico é apresentado, **Then** o estado de cada pagamento fica identificado (LIQUIDADO/PENDENTE).
+3. **Given** muitos registos no histórico, **When** o diretor navega entre páginas, **Then** o sistema mantém os filtros ativos e apresenta apenas o subconjunto correspondente.
 
 ---
 
@@ -143,8 +144,8 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 
 ### Functional Requirements
 
-- **RF-01 - Dashboard operacional**: O sistema deve disponibilizar um dashboard acessível ao perfil de diretor contendo, no mínimo, taxa de ocupação atual, número de estadias ativas, número de reservas futuras e valor total de faturação diária/mensal, com atualização automática (evento relevante ou máximo de 60 segundos).
-- **RF-05 - Histórico de estadias e pagamentos**: O sistema deve manter um histórico completo das estadias e pagamentos de cada animal, consultável pela receção e pela direção.
+- **RF-01 - Dashboard operacional**: O sistema deve disponibilizar um dashboard acessível ao perfil de diretor contendo, no mínimo, taxa de ocupação atual, número de estadias ativas, número de reservas futuras e valor total de faturação diária/mensal, com atualização automática (evento relevante ou máximo de 60 segundos). A implementação deve manter um `DashboardService` próprio, mas esse serviço deve apenas orquestrar métricas expostas pelos serviços de domínio, sem aceder diretamente aos repositórios.
+- **RF-05 - Histórico de estadias e pagamentos**: O sistema deve manter um histórico completo das estadias e pagamentos de cada animal, consultável pela receção e pela direção, com paginação e filtragem por cliente, animal, estado e intervalo temporal.
 - **RF-06 - Controlo de disponibilidade de boxes**: O sistema deve determinar disponibilidade em tempo real por três condições cumulativas: sem reserva confirmada no período, sem estadia ativa no período e limpeza concluída; deve impedir reservas inválidas e sugerir alternativas.
 - **RF-07 - Gestão de reservas**: O sistema deve permitir criação, confirmação e cancelamento de reservas, com registo de período, box e animal associados.
 - **RF-08 - Check-in e pagamento de estadia**: O sistema deve suportar check-in, registar data de entrada e box atribuída, e processar pagamento da estadia no mesmo momento.
@@ -177,13 +178,13 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 - Devem existir testes explícitos de autorização por perfil para operações críticas (reserva, check-in/out, pagamentos, dashboard e histórico), incluindo cenários de acesso negado.
 - Devem existir testes de confidencialidade para garantir que dados pessoais e clínicos sensíveis não são expostos em respostas indevidas ou ecrãs sem permissão.
 - Devem existir testes de desempenho para validar SC-001, SC-002 e SC-006 em condições normais de utilização.
+- Devem existir testes de paginação e filtragem no histórico para garantir preservação dos filtros entre páginas e consistência dos resultados.
 - Todas as ações críticas (criação, confirmação e cancelamento de reserva; check-in; check-out; registo de pagamento) devem gerar registos de auditoria verificáveis por testes automatizados.
 
 ### Key Entities
 
 - **Reserva**: Ligação entre Tutor, Animal, Alojamento e período (dataInicio, dataFim). Estados: ATIVA, CANCELADA, CONCLUIDA. Uma reserva pode desencadear no máximo uma Estadia (RD-06).
-- **Estadia**: Documento de hospedagem com referência a uma Reserva. Estados: EM_CURSO, TERMINADA. Inclui checkIn (data/hora) e checkOut (data/hora). Máximo uma Estadia por Animal em qualquer período (RD-07).
-- **Pagamento**: Registo de transação com valor, método, momento (CHECK_IN ou CHECK_OUT), estado (LIQUIDADO ou PENDENTE) e referência a Estadia. Máximo dois pagamentos por Estadia (um CHECK_IN obrigatório, um CHECK_OUT opcional).
+- **Estadia**: Documento de hospedagem com referência a uma Reserva. Estados: EM_CURSO, TERMINADA. Inclui checkIn (data/hora) e checkOut (data/hora). Máximo uma Estadia por Animal em qualquer período (RD-07).- **Pagamento**: Registo de transação com valor, método, momento (CHECK_IN ou CHECK_OUT), estado (LIQUIDADO ou PENDENTE) e referência a Estadia. Máximo dois pagamentos por Estadia (um CHECK_IN obrigatório, um CHECK_OUT opcional).
 - **Alojamento**: Entidade existente (Fase 1), mas agora com ciclo de estado expandido: DISPONIVEL → OCUPADO → PENDENTE_LIMPEZA → CONCLUIDO → DISPONIVEL.
 
 ---
@@ -198,7 +199,7 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 - **SC-004**: 100% dos check-outs respeitam sequência obrigatória (RD-03), sem encerramentos sem check-in prévio.
 - **SC-005**: 100% dos pagamentos registam valor, método e estado conforme RF-10.
 - **SC-006**: Diretor consegue consultar indicadores e pendentes por período com atualização máxima de 60 segundos (RF-01).
-- **SC-007**: Histórico completo de estadias e pagamentos por animal está disponível para receção/direção (RF-05).
+- **SC-007**: Histórico completo de estadias e pagamentos por animal, cliente ou período está disponível para receção/direção com paginação consistente (RF-05).
 - **SC-008**: Existe pelo menos 1 teste automatizado por funcionalidade P1 desta feature (US-06, US-12, US-07, US-10, US-11).
 - **SC-009**: Existe pelo menos 1 teste de integração por caso de uso principal (UC-04, UC-05, UC-06, UC-07, UC-08).
 - **SC-010**: 100% das regras de domínio críticas listadas nesta spec têm testes automatizados com resultado verde no pipeline local.
@@ -222,6 +223,10 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 ---
 
 ## Technical References — Etapa 2
+
+### Refinements
+
+- [Refinements da implementação](./refinements.md): decisões de ajuste tomadas durante a implementação.
 
 ### Architecture & Components
 

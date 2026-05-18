@@ -172,6 +172,22 @@ public class ReservaService {
         reserva.setEstado(EstadoReserva.CONCLUIDA);
         return reservaRepository.save(reserva);
     }
+
+    /**
+     * Conta as reservas ativas.
+     */
+    @Transactional(readOnly = true)
+    public long contarReservasAtivas() {
+        return reservaRepository.countByEstado(EstadoReserva.ATIVA);
+    }
+
+    /**
+     * Conta reservas ativas com início futuro.
+     */
+    @Transactional(readOnly = true)
+    public long contarReservasFuturas() {
+        return reservaRepository.countFuturas(LocalDate.now());
+    }
     
     /**
      * Lista todas as reservas.

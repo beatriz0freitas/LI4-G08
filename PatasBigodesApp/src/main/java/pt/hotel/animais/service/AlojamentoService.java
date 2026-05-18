@@ -23,8 +23,18 @@ public class AlojamentoService {
         return alojamentoRepository.findAllByOrderByIdentificacaoAsc();
     }
 
-    public long contarAlojamentosDisponiveisDemo() {
+    /**
+     * Conta os alojamentos disponíveis para receção.
+     */
+    public long contarAlojamentosDisponiveis() {
         return alojamentoRepository.countByEstadoLimpeza(EstadoLimpeza.CONCLUIDO);
+    }
+
+    /**
+     * Conta os alojamentos pendentes de limpeza.
+     */
+    public long contarAlojamentosPendentesLimpeza() {
+        return alojamentoRepository.countByEstadoLimpeza(EstadoLimpeza.PENDENTE);
     }
     
     /**
@@ -103,6 +113,26 @@ public class AlojamentoService {
     public Alojamento obter(Long id) {
         return alojamentoRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Alojamento com ID " + id + " não encontrado"));
+    }
+
+    /**
+     * Marca um alojamento como pendente de limpeza após check-out.
+     */
+    public void marcarPendenteLimpeza(Long alojamentoId) {
+        Alojamento alojamento = alojamentoRepository.findById(alojamentoId)
+            .orElseThrow(() -> new IllegalArgumentException("Alojamento não encontrado"));
+        alojamento.setEstadoLimpeza(EstadoLimpeza.PENDENTE);
+        alojamentoRepository.save(alojamento);
+    }
+
+    /**
+     * Marca um alojamento como concluído (limpeza feita).
+     */
+    public void marcarLimpezaConcluida(Long alojamentoId) {
+        Alojamento alojamento = alojamentoRepository.findById(alojamentoId)
+            .orElseThrow(() -> new IllegalArgumentException("Alojamento não encontrado"));
+        alojamento.setEstadoLimpeza(EstadoLimpeza.CONCLUIDO);
+        alojamentoRepository.save(alojamento);
     }
 
     private DisponibilidadeAlojamentoDto toDisponibilidadeDto(Alojamento alojamento, LocalDate dataInicio, LocalDate dataFim) {

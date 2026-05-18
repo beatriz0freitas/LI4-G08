@@ -20,7 +20,6 @@ public class ModuloPlaceholderController {
     );
 
     @GetMapping({
-        "/estadias",
         "/cuidados",
         "/clinica",
         "/pagamentos",
