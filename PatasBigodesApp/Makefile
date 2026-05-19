@@ -1,8 +1,5 @@
 .DEFAULT_GOAL := help
 
-MVN := mvn
-COMPOSE := docker compose
-
 DB_HOST ?= localhost
 HOST_DB_PORT ?= 3307
 DB_PORT ?= $(HOST_DB_PORT)
@@ -35,62 +32,58 @@ help:
 	@echo "  make logs-app    - Mostrar logs da app"
 	@echo "  make logs-db     - Mostrar logs da base de dados"
 	@echo "  make clean       - Limpar artefactos Maven"
-	@echo ""
-	@echo "Variáveis:"
-	@echo "  HOST_DB_PORT     - Porta MySQL publicada no host (default: 3307)"
-	@echo "  DB_PORT          - Porta usada pela app local (default: HOST_DB_PORT)"
 
 test:
-	$(MVN) test
+	mvn test
 
 package:
-	$(MVN) clean package
+	mvn clean package
 
 run:
-	DB_HOST=$(DB_HOST) DB_PORT=$(DB_PORT) DB_NAME=$(DB_NAME) DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) $(MVN) spring-boot:run
+	DB_HOST=$(DB_HOST) DB_PORT=$(DB_PORT) DB_NAME=$(DB_NAME) DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) mvn spring-boot:run
 
 run-mysql: run
 
 verify:
-	$(MVN) test
-	$(COMPOSE) config
+	mvn test
+	docker compose config
 
 config:
-	$(COMPOSE) config
+	docker compose config
 
 db-up:
-	$(COMPOSE) up -d db
+	docker compose up -d db
 
 db-stop:
-	$(COMPOSE) stop db
+	docker compose stop db
 
 db-shell:
-	$(COMPOSE) exec db mysql -u$(DB_USERNAME) -p$(DB_PASSWORD) $(DB_NAME)
+	docker compose exec db mysql -u$(DB_USERNAME) -p$(DB_PASSWORD) $(DB_NAME)
 
 up:
-	$(COMPOSE) up -d --build
+	docker compose up -d --build
 
 down:
-	$(COMPOSE) down
+	docker compose down
 
 restart:
-	$(COMPOSE) down
-	$(COMPOSE) up -d --build
+	docker compose down
+	docker compose up -d --build
 
 destroy:
-	$(COMPOSE) down -v --remove-orphans
+	docker compose down -v --remove-orphans
 
 ps:
-	$(COMPOSE) ps
+	docker compose ps
 
 logs:
-	$(COMPOSE) logs -f
+	docker compose logs -f
 
 logs-app:
-	$(COMPOSE) logs -f app
+	docker compose logs -f app
 
 logs-db:
-	$(COMPOSE) logs -f db
+	docker compose logs -f db
 
 clean:
-	$(MVN) clean
+	mvn clean
