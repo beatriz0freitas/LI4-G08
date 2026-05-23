@@ -59,7 +59,7 @@ package "Camada de Dados" <<Rectangle>> {
   [RegistoCuidadoRepository] as RCR
 }
 
-database "MySQL 8\n(prod) / H2 (testes)" as DB
+database "MySQL 8\n(dev/prod/testes integração)" as DB
 
 ' Entrada
 HTTP --> SEC

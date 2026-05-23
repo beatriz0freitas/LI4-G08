@@ -181,10 +181,17 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 - Devem existir testes de paginação e filtragem no histórico para garantir preservação dos filtros entre páginas e consistência dos resultados.
 - Todas as ações críticas (criação, confirmação e cancelamento de reserva; check-in; check-out; registo de pagamento) devem gerar registos de auditoria verificáveis por testes automatizados.
 
+### Enums de Pagamento
+
+- `EstadoPagamento`: `LIQUIDADO`, `PENDENTE`
+- `MetodoPagamento`: `NAO_DEFINIDO`, `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO`
+- `MomentoPagamento`: `CHECK_IN`, `CHECK_OUT`
+
 ### Key Entities
 
 - **Reserva**: Ligação entre Tutor, Animal, Alojamento e período (dataInicio, dataFim). Estados: ATIVA, CANCELADA, CONCLUIDA. Uma reserva pode desencadear no máximo uma Estadia (RD-06).
-- **Estadia**: Documento de hospedagem com referência a uma Reserva. Estados: EM_CURSO, TERMINADA. Inclui checkIn (data/hora) e checkOut (data/hora). Máximo uma Estadia por Animal em qualquer período (RD-07).- **Pagamento**: Registo de transação com valor, método, momento (CHECK_IN ou CHECK_OUT), estado (LIQUIDADO ou PENDENTE) e referência a Estadia. Máximo dois pagamentos por Estadia (um CHECK_IN obrigatório, um CHECK_OUT opcional).
+- **Estadia**: Documento de hospedagem com referência a uma Reserva. Estados: EM_CURSO, TERMINADA. Inclui checkIn (data/hora) e checkOut (data/hora). Máximo uma Estadia por Animal em qualquer período (RD-07).
+- **Pagamento**: Registo de transação com valor, `metodoPagamento` (`MetodoPagamento`), `momentoPagamento` (`MomentoPagamento`), `estadoPagamento` (`EstadoPagamento`) e referência a Estadia. Máximo dois pagamentos por Estadia (um CHECK_IN obrigatório, um CHECK_OUT opcional).
 - **Alojamento**: Entidade existente (Fase 1), mas agora com ciclo de estado expandido: DISPONIVEL → OCUPADO → PENDENTE_LIMPEZA → CONCLUIDO → DISPONIVEL.
 
 ---
@@ -262,9 +269,10 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 
 - [ADR-01: Monolito em Camadas](../../docs/Etapa2/04-architecture-decisions/ADR-01-monolito-camadas.md): Justificação de design monolítico
 - [ADR-02: Spring MVC + Thymeleaf para SSR](../../docs/Etapa2/04-architecture-decisions/ADR-02-spring-mvc-thymeleaf-ssr.md): Templates renderizadas no servidor
-- [ADR-03: MySQL como BD Principal](../../docs/Etapa2/04-architecture-decisions/ADR-03-mysql-base-dados-principal.md): Persistência relacional
-- [ADR-04: Spring Security com Sessão HTTP](../../docs/Etapa2/04-architecture-decisions/ADR-04-spring-security-sessao-http.md): Autenticação por sessão
-- [ADR-05: DTO entre Controller e Service](../../docs/Etapa2/04-architecture-decisions/ADR-05-dto-entre-controller-service.md): Padrão de transferência de dados
+- [ADR-03: Persistência em SGBD relacional](../../docs/Etapa2/04-architecture-decisions/ADR-03-persistencia-sgbd-relacional.md): Persistência relacional
+- [ADR-04: MySQL e padrão repositório](../../docs/Etapa2/04-architecture-decisions/ADR-04-mysql-base-dados.md): Base de dados e acesso a dados
+- [ADR-05: Controlo de acesso por perfil](../../docs/Etapa2/04-architecture-decisions/ADR-05-controlo-acesso-perfil.md): Autenticação e autorização
+- [ADR-06: Isolamento da apresentação através de DTOs](../../docs/Etapa2/04-architecture-decisions/ADR-06-isolamento-apresentacao-dtos.md): Padrão de transferência de dados
 
 ---
 

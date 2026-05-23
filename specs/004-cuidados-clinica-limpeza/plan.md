@@ -11,7 +11,7 @@ Implementar a operação diária e o acompanhamento clínico durante estadias, c
 
 **Language/Version**: Java 21
 **Primary Dependencies**: Spring Boot 3.3.5, Spring MVC, Thymeleaf, Spring Security, Spring Data JPA, Flyway, Hibernate, Lombok
-**Storage**: Base de dados relacional via JPA/Flyway; H2 em teste e MySQL em desenvolvimento/produção
+**Storage**: Base de dados relacional via JPA/Flyway; MySQL em desenvolvimento, produção e testes de integração
 **Testing**: Maven Surefire/Failsafe com `spring-boot-starter-test` e `spring-security-test`
 **Target Platform**: Aplicação web server-rendered para Linux/macOS em ambiente local e servidor JVM
 **Project Type**: web-service / web application monolítica com SSR

@@ -3,7 +3,7 @@
 ## Pré-requisitos
 - Java 21
 - Maven
-- Base de dados H2 para testes locais
+- Base de dados MySQL para testes com persistência
 
 ## Executar a aplicação
 1. Entrar no projeto:

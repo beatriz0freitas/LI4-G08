@@ -1,91 +1,115 @@
 %% Modelo de Domínio — Hotel de Animais
-%% Gerado com base em: US-01..US-24, RD-01..RD-09, UC-01..UC-13
 
 classDiagram
-direction TB
+direction LR
 
-%% ── Entidades principais ──────────────────────────────────────────
-
+%% Clientes e Alojamentos
 class Tutor {
-  +id: string
-  +nome: string
-  +nif: string
-  +contacto: string
-  +email: string
+  id
+  nome
+  nif
+  contacto
+  email
 }
 
 class Animal {
-  +id: string
-  +nome: string
-  +especie: Especie
-  +raca: string
-  +estadoSaude: EstadoSaude
+  id
+  nome
+  especie
+  raca
+  dataNascimento
+  peso
+  estadoSaude
+  necessidadesAlimentares
+  medicacaoCurso
 }
 
 class Alojamento {
-  +id: string
-  +identificacao: string
-  +tipo: TipoAlojamento
-  +estadoLimpeza: EstadoLimpeza
+  id
+  identificacao
+  tipo
+  capacidade
+  estadoLimpeza
 }
 
 class Reserva {
-  +id: string
-  +dataInicio: date
-  +dataFim: date
-  +estado: EstadoReserva
-}
-
-class Estadia {
-  +id: string
-  +checkIn: datetime
-  +checkOut: datetime
-  +estado: EstadoEstadia
-}
-
-class Pagamento {
-  +id: string
-  +valor: decimal
-  +metodo: MetodoPagamento
-  +estado: EstadoPagamento
-  +momento: MomentoPagamento
-}
-
-class ServicoExtra {
-  +id: string
-  +tipo: TipoServicoExtra
-  +custo: decimal
-  +dataHora: datetime
-}
-
-class IntervencaoClinica {
-  +id: string
-  +descricao: string
-  +custo: decimal
-  +dataHora: datetime
-}
-
-class RegistoCuidado {
-  +id: string
-  +descricao: string
-  +dataHora: datetime
+  id
+  dataInicio
+  dataFim
+  estado
+  dataCriacao
 }
 
 class Nota {
-  +id: string
-  +conteudo: string
-  +dataHora: datetime
+  id
+  descricao
+  dataHora
 }
 
+%% Estadias e Faturação
+class Estadia {
+  id
+  dataInicio
+  dataFim
+  estado
+  dataCriacao
+}
+
+class Fatura {
+  numero
+  dataEmissao
+  total
+}
+
+class Pagamento {
+  id
+  valor
+  metodoPagamento
+  momentoPagamento
+  estadoPagamento
+  dataCriacao
+}
+
+class ServicoExtra {
+  id
+  tipo
+  custo
+  dataHora
+}
+
+%% Cuidados e Clínica
+class RegistoCuidado {
+  id
+  descricao
+  dataHora
+}
+
+class HistoricoClinico {
+}
+
+class IntervencaoClinica {
+  id
+  descricao
+  custo
+  dataHora
+}
+
+class AlteracaoEstadoSaude {
+  id
+  descricao
+  severidade
+  dataHora
+}
+
+%% Operação e Perfis
 class Colaborador {
-  +id: string
-  +nome: string
-  +email: string
-  +tipoColaborador: TipoColaborador
+  id
+  nome
+  email
+  tipoColaborador
 }
 
-%% ── Enumerações ───────────────────────────────────────────────────
-
+%% Enumerações
 class Especie {
   <<enumeration>>
   CAO
@@ -126,12 +150,13 @@ class EstadoEstadia {
 
 class EstadoPagamento {
   <<enumeration>>
-  PENDENTE
   LIQUIDADO
+  PENDENTE
 }
 
 class MetodoPagamento {
   <<enumeration>>
+  NAO_DEFINIDO
   NUMERARIO
   CARTAO_DEBITO
   CARTAO_CREDITO
@@ -159,16 +184,46 @@ class TipoColaborador {
   RESPONSAVEL_LIMPEZA
 }
 
-%% ── Relações ──────────────────────────────────────────────────────
+%% Fluxo principal do domínio
+Tutor "1" -- "1..*" Animal : possui
+Tutor "1" -- "1..*" Reserva : cria
+Animal "1" -- "1..*" Reserva : origina
+Alojamento "1" -- "1..*" Reserva : aloja
 
-Tutor        "1..*" -- "*"    Animal             : possui
-Animal       "1"    -- "*"    Reserva            : origina
-Alojamento   "1"    -- "*"    Reserva            : aloja
-Reserva      "1"    -- "0..1" Estadia            : gera
-Reserva      "1"    -- "*"    Nota               : contém
-Estadia      "1"    -- "*"    RegistoCuidado     : regista
-Estadia      "1"    -- "*"    ServicoExtra       : inclui
-Estadia      "1"    -- "*"    IntervencaoClinica : inclui
-Estadia      "1"    -- "0..2" Pagamento          : gera
-Colaborador  "1"    -- "*"    Nota               : escreve
-Colaborador  "1"    -- "*"    RegistoCuidado     : regista
+Reserva "1" -- "0..1" Estadia : gera
+Reserva "1" -- "0..*" Nota : contém
+
+%% Entidades dependentes da estadia
+Estadia "1" -- "0..*" RegistoCuidado : regista
+Estadia "1" -- "0..*" ServicoExtra : inclui
+Estadia "1" -- "0..*" IntervencaoClinica : inclui
+Estadia "1" -- "0..*" AlteracaoEstadoSaude : inclui
+
+Estadia "1" -- "1" Fatura : origina
+Estadia "1" -- "0..2" Pagamento : gera
+Fatura "1" -- "0..2" Pagamento : agrega
+
+%% Componente clínica
+Animal "1" -- "1" HistoricoClinico : possui
+HistoricoClinico "1" -- "0..*" IntervencaoClinica : agrega
+HistoricoClinico "1" -- "0..*" AlteracaoEstadoSaude : agrega
+
+%% Autoria operacional
+Colaborador "1" -- "0..*" Nota : escreve
+Colaborador "1" -- "0..*" RegistoCuidado : regista
+Colaborador "1" -- "0..*" ServicoExtra : regista
+Colaborador "1" -- "0..*" IntervencaoClinica : regista
+Colaborador "1" -- "0..*" AlteracaoEstadoSaude : regista
+
+%% Ligações às enumerações
+Animal ..> Especie : usa
+Animal ..> EstadoSaude : usa
+Alojamento ..> TipoAlojamento : usa
+Alojamento ..> EstadoLimpeza : usa
+Reserva ..> EstadoReserva : usa
+Estadia ..> EstadoEstadia : usa
+Pagamento ..> MetodoPagamento : usa
+Pagamento ..> MomentoPagamento : usa
+Pagamento ..> EstadoPagamento : usa
+ServicoExtra ..> TipoServicoExtra : usa
+Colaborador ..> TipoColaborador : usa

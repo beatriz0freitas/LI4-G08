@@ -2,7 +2,9 @@ package pt.hotel.animais.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import pt.hotel.animais.model.enums.TipoPagamento;
+import pt.hotel.animais.model.enums.EstadoPagamento;
+import pt.hotel.animais.model.enums.MetodoPagamento;
+import pt.hotel.animais.model.enums.MomentoPagamento;
 
 import java.time.LocalDateTime;
 
@@ -21,15 +23,17 @@ public class Pagamento {
     @Column(name = "valor", nullable = false)
     private BigDecimal valor;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "metodo", nullable = false, length = 50)
-    private String metodo;
+    private MetodoPagamento metodoPagamento;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false, length = 30)
-    private TipoPagamento tipo;
+    private MomentoPagamento momentoPagamento;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false, length = 30)
-    private String estado = "REGISTADO";
+    private EstadoPagamento estadoPagamento = EstadoPagamento.LIQUIDADO;
 
     @Column(name = "data_criacao", nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
@@ -45,12 +49,12 @@ public class Pagamento {
     public void setEstadia(Estadia estadia) { this.estadia = estadia; }
     public BigDecimal getValor() { return valor; }
     public void setValor(BigDecimal valor) { this.valor = valor; }
-    public String getMetodo() { return metodo; }
-    public void setMetodo(String metodo) { this.metodo = metodo; }
-    public TipoPagamento getTipo() { return tipo; }
-    public void setTipo(TipoPagamento tipo) { this.tipo = tipo; }
-    public String getEstado() { return estado; }
-    public void setEstado(String estado) { this.estado = estado; }
+    public MetodoPagamento getMetodoPagamento() { return metodoPagamento; }
+    public void setMetodoPagamento(MetodoPagamento metodoPagamento) { this.metodoPagamento = metodoPagamento; }
+    public MomentoPagamento getMomentoPagamento() { return momentoPagamento; }
+    public void setMomentoPagamento(MomentoPagamento momentoPagamento) { this.momentoPagamento = momentoPagamento; }
+    public EstadoPagamento getEstadoPagamento() { return estadoPagamento; }
+    public void setEstadoPagamento(EstadoPagamento estadoPagamento) { this.estadoPagamento = estadoPagamento; }
     public LocalDateTime getDataCriacao() { return dataCriacao; }
     public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }
 }

@@ -18,7 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = Replace.ANY)
+@AutoConfigureTestDatabase(replace = Replace.NONE)
 public class AlojamentoRepositoryIntegrationTest {
 
     @Autowired

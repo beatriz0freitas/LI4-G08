@@ -18,8 +18,8 @@ Implementar a base operacional da receção para registar tutores e animais, con
 -->
 
 **Language/Version**: Java 21  
-**Primary Dependencies**: Spring Boot 3.3.5, Spring MVC, Thymeleaf, Spring Security 6, Spring Data JPA, Flyway, MySQL driver, H2 for testes  
-**Storage**: MySQL 8 em desenvolvimento e produção; H2 para testes de integração e slices  
+**Primary Dependencies**: Spring Boot 3.3.5, Spring MVC, Thymeleaf, Spring Security 6, Spring Data JPA, Flyway, MySQL driver
+**Storage**: MySQL 8 em desenvolvimento, produção e testes de integração
 **Testing**: JUnit 5, Spring Boot Test, Mockito, Spring Security Test  
 **Target Platform**: Aplicação web server-side em Linux/Docker, executada via Maven ou Docker Compose  
 **Project Type**: Web application MVC monolítica  
@@ -119,7 +119,7 @@ O ficheiro `research.md` vai consolidar as decisões seguintes:
 - persistência com integridade relacional para tutor, animal, alojamento e reserva;
 - validação de disponibilidade no service layer para impedir overbooking;
 - suporte explícito por migrations Flyway para criar e versionar o esquema necessário à fase 2;
-- abordagem de testes com `Spring Boot Test`, `Mockito`, `Spring Security Test` e base H2 para isolamento;
+- abordagem de testes com `Spring Boot Test`, `Mockito`, `Spring Security Test` e MySQL nos testes com persistência;
 - contratos de interação orientados aos fluxos de receção, não a uma API pública separada.
 
 ### Clarifications Resolved
@@ -184,6 +184,4 @@ Expected task breakdown:
 ## Corrections / Implementation Updates (2026-05-06)
 
 Durante a execução foram aplicadas correções técnicas e de navegação que afectam parte do plano e das tasks. O registo completo dessas alterações encontra-se em `refinements.md`.
-
-
 

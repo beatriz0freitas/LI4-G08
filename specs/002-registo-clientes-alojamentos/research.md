@@ -50,11 +50,11 @@
 
 ## 7. Estratégia de testes
 
-**Decision**: Usar `Spring Boot Test`, `MockMvc`, `Mockito` e `Spring Security Test` para cobrir fluxos de controller e serviço; manter H2 para testes isolados enquanto o projeto não adiciona uma dependência de contentorização de testes.
+**Decision**: Usar `Spring Boot Test`, `MockMvc`, `Mockito` e `Spring Security Test` para cobrir fluxos de controller e serviço; usar Mockito quando não há persistência e MySQL nos testes que validam repositories, queries, transações ou migrations.
 
-**Rationale**: Estes testes cobrem a lógica crítica da fase 2 com o mínimo de infra-estrutura adicional e alinham-se com a configuração já visível no repositório.
+**Rationale**: Estes testes cobrem a lógica crítica da fase 2 sem simular um SGBD diferente do usado pela aplicação.
 
-**Alternatives considered**: TestContainers neste momento; apenas testes unitários. TestContainers foi adiado por não fazer parte da configuração atual do projeto, e testes unitários isolados seriam insuficientes para validar fluxos de reserva e segurança.
+**Alternatives considered**: Base de dados em memória; apenas testes unitários. A base em memória foi rejeitada por poder divergir do MySQL, e testes unitários isolados seriam insuficientes para validar fluxos de reserva e segurança.
 
 
 

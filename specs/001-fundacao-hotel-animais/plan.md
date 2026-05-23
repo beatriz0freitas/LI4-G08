@@ -11,7 +11,7 @@ Implementar a fundação do sistema com autenticação por sessão HTTP, dashboa
 
 **Language/Version**: Java 21 + Spring Boot 3.3.5  
 **Primary Dependencies**: Spring Web (MVC), Spring Security 6 (sessão HTTP + BCrypt), Thymeleaf (view), Spring Data JPA, Hibernate  
-**Storage**: MySQL 8 (production), H2 (testing), Flyway (migrations)  
+**Storage**: MySQL 8 (desenvolvimento/produção/testes de integração), Flyway (migrations)
 **Testing**: JUnit 5, Mockito 5, TestContainers (MySQL)  
 **Target Platform**: Linux/Docker (Dockerfile + docker-compose.yml)  
 **Project Type**: Web application (MVC monolith, layered architecture)  

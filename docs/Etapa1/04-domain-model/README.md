@@ -1,11 +1,12 @@
 # Modelo de Domínio
 
-Este diretório deve concentrar os artefactos conceptuais da Etapa 1 que descrevem o domínio do sistema.
+Este diretório concentra os artefactos conceptuais da Etapa 1 que descrevem o domínio do sistema.
 
-## Ficheiros recomendados
+## Ficheiros 
 - `domain-model.mmd`: diagrama principal em Mermaid.
+- `domain-model.plantuml`: diagrama em PlauntUml
 - `domain-model.md`: explicação curta das entidades, relações, multiplicidades e pressupostos.
-- `traceability.md` (opcional): mapeamento entre entidades do modelo e `US`, `RF`, `RD`, `RNF` ou `UC` quando o diagrama crescer.
+  
 
 ## Critérios
 - Modelar conceitos de negócio do hotel de animais, não classes técnicas de implementação.

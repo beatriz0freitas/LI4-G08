@@ -12,8 +12,8 @@ Implementar o ciclo operacional de receção para reservas, check-in/check-out e
 ## Technical Context
 
 **Language/Version**: Java 21  
-**Primary Dependencies**: Spring Boot 3.3.5, Spring MVC, Thymeleaf, Spring Security 6, Spring Data JPA, Flyway, MySQL driver, H2 (testes)  
-**Storage**: MySQL 8 para desenvolvimento/produção; H2 para testes locais e integração  
+**Primary Dependencies**: Spring Boot 3.3.5, Spring MVC, Thymeleaf, Spring Security 6, Spring Data JPA, Flyway, MySQL driver
+**Storage**: MySQL 8 para desenvolvimento, produção e testes de integração
 **Testing**: JUnit 5, Spring Boot Test, MockMvc, Mockito, Spring Security Test  
 **Target Platform**: Aplicação web server-side (Linux/Docker), execução via Maven/Makefile  
 **Project Type**: Web application MVC monolítica  

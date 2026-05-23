@@ -32,13 +32,14 @@ Esta fase de pesquisa confirma as escolhas técnicas e resolve qualquer ambiguid
 ## 2. Armazenamento de Dados — MySQL 8
 
 ### Decisão
-**Escolhido**: MySQL 8.0 (produção) + H2 (testes)
+**Escolhido**: MySQL 8.0 para desenvolvimento, produção e testes de integração
 
 ### Rationale
 - **MySQL 8.0**: ACID garantido; suporta transações; amplamente utilizado em Portugal
-- **H2 em testes**: Setup rápido; não requer container; isolamento completo entre testes
+- **Testes sem persistência**: Mockito para isolar services/controllers quando a base de dados não é relevante
+- **Testes com persistência**: MySQL para validar queries, transações e migrations no mesmo SGBD usado pela aplicação, usando o serviço separado `db-tests` com a base `hotelanimais_test`
 - **Flyway para migrations**: Versionamento de schema; rastreabilidade; suporta múltiplos ambientes
-- **ADR-03** ([MySQL como base de dados principal](../../../docs/Etapa2/04-architecture-decisions/ADR-03-mysql-base-dados-principal.md)) confirma esta escolha
+- **ADR-03** ([Persistência em SGBD relacional](../../../docs/Etapa2/04-architecture-decisions/ADR-03-persistencia-sgbd-relacional.md)) e **ADR-04** ([MySQL e padrão repositório](../../../docs/Etapa2/04-architecture-decisions/ADR-04-mysql-base-dados.md)) confirmam esta escolha
 
 ### Alternativas Consideradas e Rejeitadas
 | Alternativa | Razão Rejeitada |
@@ -58,7 +59,7 @@ Esta fase de pesquisa confirma as escolhas técnicas e resolve qualquer ambiguid
 - **HTTP Session**: Suportado nativamente por Spring Security; mantém estado no servidor (aceitável para fase 1)
 - **BCrypt**: Hash seguro; implementação nativa em Spring Security 6; força configurável (12 rounds padrão)
 - **Role-Based Access Control (RBAC)**: 5 tipos de colaborador (DIRETOR, FUNCIONARIO_RECEPCAO, CUIDADOR, MEDICO_VETERINARIO, RESPONSAVEL_LIMPEZA); permissões via @PreAuthorize
-- **ADR-04** ([Spring Security + sessão HTTP](../../../docs/Etapa2/04-architecture-decisions/ADR-04-spring-security-sessao-http.md)) confirma esta escolha
+- **ADR-05** ([controlo de acesso por perfil](../../../docs/Etapa2/04-architecture-decisions/ADR-05-controlo-acesso-perfil.md)) confirma esta escolha
 
 ### Alternativas Consideradas e Rejeitadas
 | Alternativa | Razão Rejeitada |
@@ -78,7 +79,7 @@ Esta fase de pesquisa confirma as escolhas técnicas e resolve qualquer ambiguid
 - **Separação de Responsabilidades**: Validação de input (DTO) separada de lógica de negócio (Entity)
 - **Segurança**: Evita exposição de campos internos; controlo granular de serialização
 - **Testabilidade**: Controllers testáveis com DTOs mockados
-- **ADR-05** ([DTOs entre Controller e Service](../../../docs/Etapa2/04-architecture-decisions/ADR-05-dto-entre-controller-service.md)) confirma esta escolha
+- **ADR-06** ([isolamento da apresentação através de DTOs](../../../docs/Etapa2/04-architecture-decisions/ADR-06-isolamento-apresentacao-dtos.md)) confirma esta escolha
 
 ### Exemplo
 ```java
@@ -221,8 +222,8 @@ services:
 
 ### Decisão
 **Perfis**:
-- `application-mysql.properties` (produção: MySQL)
-- `application-h2.properties` (testes: H2 in-memory)
+- `application-mysql.properties` (MySQL)
+- `src/test/resources/application.properties` (testes com MySQL)
 - Padrão: MySQL
 
 ### Rationale
@@ -237,10 +238,9 @@ spring.datasource.password=root
 spring.jpa.hibernate.ddl-auto=validate
 spring.flyway.enabled=true
 
-# application-h2.properties (testes)
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.driverClassName=org.h2.Driver
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+# src/test/resources/application.properties (testes com MySQL)
+spring.datasource.url=jdbc:mysql://localhost:3308/hotelanimais_test
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.flyway.enabled=true
 ```
 

@@ -277,7 +277,7 @@ class AuthIntegrationTest {
 
 - **Use Case**: [UC-01 — Autenticar no Sistema](../../../../docs/Etapa1/03-use-cases/UC-01.md)
 - **Data Model**: [data-model.md](../data-model.md) (TipoColaborador enum)
-- **Architecture**: [ADR-04 — Spring Security + Sessão HTTP](../../../../docs/Etapa2/04-architecture-decisions/ADR-04-spring-security-sessao-http.md)
+- **Architecture**: [ADR-05 — Controlo de acesso por perfil](../../../../docs/Etapa2/04-architecture-decisions/ADR-05-controlo-acesso-perfil.md)
 - **Template**: `templates/auth/login.html`
 
 ---
