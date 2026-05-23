@@ -6,7 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import pt.hotel.animais.dto.PagamentoDto;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.Reserva;
-import pt.hotel.animais.model.enums.TipoPagamento;
+import pt.hotel.animais.model.enums.EstadoPagamento;
+import pt.hotel.animais.model.enums.MetodoPagamento;
+import pt.hotel.animais.model.enums.MomentoPagamento;
 import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.service.PagamentoService;
 
@@ -45,8 +47,9 @@ public class EstadiaService {
         PagamentoDto pagamentoDto = new PagamentoDto();
         pagamentoDto.setEstadiaId(saved.getId());
         pagamentoDto.setValor(valorBase);
-        pagamentoDto.setMetodo("NAO_DEFINIDO");
-        pagamentoDto.setTipo(TipoPagamento.CHECK_IN);
+        pagamentoDto.setMetodoPagamento(MetodoPagamento.NAO_DEFINIDO);
+        pagamentoDto.setMomentoPagamento(MomentoPagamento.CHECK_IN);
+        pagamentoDto.setEstadoPagamento(EstadoPagamento.LIQUIDADO);
 
         pagamentoService.registrarPagamento(pagamentoDto);
 
@@ -70,7 +73,7 @@ public class EstadiaService {
         try {
             java.math.BigDecimal extras = pagamentoService.calcularExtras(saved);
             if (extras != null && extras.compareTo(java.math.BigDecimal.ZERO) > 0) {
-                pagamentoService.registrarPagamentoCheckOut(saved.getId(), extras, "NAO_DEFINIDO");
+                pagamentoService.registrarPagamentoCheckOut(saved.getId(), extras, MetodoPagamento.NAO_DEFINIDO);
             }
         } catch (Exception ignored) {
             // Não falhar o check-out se o registo de pagamento falhar

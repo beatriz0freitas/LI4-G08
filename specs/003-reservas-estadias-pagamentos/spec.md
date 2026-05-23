@@ -181,10 +181,17 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 - Devem existir testes de paginação e filtragem no histórico para garantir preservação dos filtros entre páginas e consistência dos resultados.
 - Todas as ações críticas (criação, confirmação e cancelamento de reserva; check-in; check-out; registo de pagamento) devem gerar registos de auditoria verificáveis por testes automatizados.
 
+### Enums de Pagamento
+
+- `EstadoPagamento`: `LIQUIDADO`, `PENDENTE`
+- `MetodoPagamento`: `NAO_DEFINIDO`, `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO`
+- `MomentoPagamento`: `CHECK_IN`, `CHECK_OUT`
+
 ### Key Entities
 
 - **Reserva**: Ligação entre Tutor, Animal, Alojamento e período (dataInicio, dataFim). Estados: ATIVA, CANCELADA, CONCLUIDA. Uma reserva pode desencadear no máximo uma Estadia (RD-06).
-- **Estadia**: Documento de hospedagem com referência a uma Reserva. Estados: EM_CURSO, TERMINADA. Inclui checkIn (data/hora) e checkOut (data/hora). Máximo uma Estadia por Animal em qualquer período (RD-07).- **Pagamento**: Registo de transação com valor, método, momento (CHECK_IN ou CHECK_OUT), estado (LIQUIDADO ou PENDENTE) e referência a Estadia. Máximo dois pagamentos por Estadia (um CHECK_IN obrigatório, um CHECK_OUT opcional).
+- **Estadia**: Documento de hospedagem com referência a uma Reserva. Estados: EM_CURSO, TERMINADA. Inclui checkIn (data/hora) e checkOut (data/hora). Máximo uma Estadia por Animal em qualquer período (RD-07).
+- **Pagamento**: Registo de transação com valor, `metodoPagamento` (`MetodoPagamento`), `momentoPagamento` (`MomentoPagamento`), `estadoPagamento` (`EstadoPagamento`) e referência a Estadia. Máximo dois pagamentos por Estadia (um CHECK_IN obrigatório, um CHECK_OUT opcional).
 - **Alojamento**: Entidade existente (Fase 1), mas agora com ciclo de estado expandido: DISPONIVEL → OCUPADO → PENDENTE_LIMPEZA → CONCLUIDO → DISPONIVEL.
 
 ---

@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import pt.hotel.animais.dto.PagamentoDto;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.Pagamento;
+import pt.hotel.animais.model.enums.EstadoPagamento;
+import pt.hotel.animais.model.enums.MetodoPagamento;
 import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.repository.PagamentoRepository;
 
@@ -35,23 +37,23 @@ public class PagamentoService {
         Pagamento pagamento = new Pagamento();
         pagamento.setEstadia(estadia);
         pagamento.setValor(dto.getValor());
-        pagamento.setMetodo(dto.getMetodo());
-        pagamento.setTipo(dto.getTipo());
-        pagamento.setEstado("REGISTADO");
+        pagamento.setMetodoPagamento(dto.getMetodoPagamento());
+        pagamento.setMomentoPagamento(dto.getMomentoPagamento());
+        pagamento.setEstadoPagamento(dto.getEstadoPagamento() == null ? EstadoPagamento.LIQUIDADO : dto.getEstadoPagamento());
 
         return pagamentoRepository.save(pagamento);
     }
 
-    public Pagamento registrarPagamentoCheckOut(Long estadiaId, java.math.BigDecimal valor, String metodo) {
+    public Pagamento registrarPagamentoCheckOut(Long estadiaId, java.math.BigDecimal valor, MetodoPagamento metodoPagamento) {
         Estadia estadia = estadiaRepository.findById(estadiaId)
                 .orElseThrow(() -> new IllegalArgumentException("Estadia não encontrada"));
 
         Pagamento pagamento = new Pagamento();
         pagamento.setEstadia(estadia);
         pagamento.setValor(valor);
-        pagamento.setMetodo(metodo == null ? "NAO_DEFINIDO" : metodo);
-        pagamento.setTipo(pt.hotel.animais.model.enums.TipoPagamento.CHECK_OUT);
-        pagamento.setEstado("REGISTADO");
+        pagamento.setMetodoPagamento(metodoPagamento == null ? MetodoPagamento.NAO_DEFINIDO : metodoPagamento);
+        pagamento.setMomentoPagamento(pt.hotel.animais.model.enums.MomentoPagamento.CHECK_OUT);
+        pagamento.setEstadoPagamento(EstadoPagamento.LIQUIDADO);
 
         return pagamentoRepository.save(pagamento);
     }
