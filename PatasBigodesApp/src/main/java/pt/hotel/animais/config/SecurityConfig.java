@@ -21,7 +21,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/h2-console/**").permitAll()
+                .requestMatchers("/login").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -37,13 +37,6 @@ public class SecurityConfig {
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
                 .permitAll()
-            )
-            // Permite iframe para consola H2 (apenas desenvolvimento)
-            .headers(headers -> headers
-                .frameOptions(frame -> frame.sameOrigin())
-            )
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/h2-console/**")
             );
 
         return http.build();

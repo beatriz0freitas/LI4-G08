@@ -19,7 +19,7 @@ public interface PagamentoRepository extends JpaRepository<Pagamento, Long> {
 	/**
 	 * Conta os pagamentos ainda não liquidados.
 	 */
-	@Query("SELECT COUNT(p) FROM Pagamento p WHERE p.estado IS NULL OR UPPER(p.estado) <> 'PAGO'")
+	@Query("SELECT COUNT(p) FROM Pagamento p WHERE p.estadoPagamento = pt.hotel.animais.model.enums.EstadoPagamento.PENDENTE")
 	long countPendentes();
 
 }

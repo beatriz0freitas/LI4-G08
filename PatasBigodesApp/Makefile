@@ -4,12 +4,16 @@ DB_HOST ?= localhost
 HOST_DB_PORT ?= 3307
 DB_PORT ?= $(HOST_DB_PORT)
 DB_NAME ?= hotelanimais
+TEST_HOST_DB_PORT ?= 3308
+TEST_DB_PORT ?= $(TEST_HOST_DB_PORT)
+TEST_DB_NAME ?= hotelanimais_test
 DB_USERNAME ?= hoteluser
 DB_PASSWORD ?= hotelpass
 
 export HOST_DB_PORT
+export TEST_HOST_DB_PORT
 
-.PHONY: help test package run run-mysql verify config db-up db-stop db-shell up down restart destroy ps logs logs-app logs-db clean
+.PHONY: help test package run run-mysql verify config db-up db-reset-test db-stop db-shell up down restart destroy ps logs logs-app logs-db clean
 
 help:
 	@echo "Alvos disponíveis:"
@@ -21,6 +25,7 @@ help:
 	@echo "  make verify      - Validar testes e docker compose config"
 	@echo "  make config      - Mostrar a configuração final do docker compose"
 	@echo "  make db-up       - Subir apenas a base de dados MySQL em Docker"
+	@echo "  make db-reset-test - Recriar a base de dados MySQL de testes"
 	@echo "  make db-stop     - Parar apenas a base de dados MySQL"
 	@echo "  make db-shell    - Abrir cliente MySQL dentro do contentor db"
 	@echo "  make up          - Subir a stack completa (db + app)"
@@ -34,7 +39,8 @@ help:
 	@echo "  make clean       - Limpar artefactos Maven"
 
 test:
-	mvn test
+	make db-reset-test
+	DB_HOST=$(DB_HOST) DB_PORT=$(TEST_DB_PORT) DB_NAME=$(TEST_DB_NAME) DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) mvn test
 
 package:
 	mvn clean package
@@ -45,7 +51,8 @@ run:
 run-mysql: run
 
 verify:
-	mvn test
+	make db-reset-test
+	DB_HOST=$(DB_HOST) DB_PORT=$(TEST_DB_PORT) DB_NAME=$(TEST_DB_NAME) DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) mvn test
 	docker compose config
 
 config:
@@ -53,6 +60,10 @@ config:
 
 db-up:
 	docker compose up -d db
+
+db-reset-test:
+	docker compose rm -sf db-tests
+	docker compose up -d --wait db-tests
 
 db-stop:
 	docker compose stop db

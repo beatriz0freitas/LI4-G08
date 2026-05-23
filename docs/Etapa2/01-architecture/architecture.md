@@ -219,18 +219,19 @@ Templates Thymeleaf residem em `src/main/resources/templates/`, organizados por 
 
 ## 6. Tecnologias e Dependências
 
-| Componente | Tecnologia | Versão |
-|---|---|---|
-| Linguagem | Java | 21 (LTS) |
-| Framework web | Spring Boot (Spring MVC) | 3.3.x |
-| Segurança | Spring Security | 6.x |
-| Persistência | Spring Data JPA + Hibernate | 3.x |
-| Base de dados (prod) | MySQL | 8.x |
-| Base de dados (testes) | H2 (in-memory) | 2.x |
-| Template engine | Thymeleaf + Thymeleaf Security Extras | 3.x |
-| Build | Maven | 3.9.x |
-| Testes | JUnit 5 + Mockito + Spring Boot Test | — |
-| CSS/UI | Bootstrap | 5.x |
+| Componente | Tecnologia |
+|---|---|
+| Linguagem | Java |
+| Framework web | Spring Boot (Spring MVC) |
+| Segurança | Spring Security |
+| Persistência | Spring Data JPA |
+| Base de dados | MySQL |
+| Template engine | Thymeleaf |
+| CSS / UI | AdminLTE |
+| Gestão de dependências e construção | Maven |
+| Testes | JUnit + Mockito + Spring Boot Test |
+| Ambiente de execução | Docker |
+
 
 ---
 
@@ -295,4 +296,4 @@ As decisoes detalhadas encontram-se em `docs/Etapa2/04-architecture-decisions/`.
 1. O sistema opera em rede local; não é considerado acesso remoto externo nesta fase.
 2. Um único servidor Java (Spring Boot embarcado) serve toda a aplicação.
 3. As cópias de segurança são geridas pelo sistema operativo/script agendado, não pela aplicação.
-4. O ambiente de desenvolvimento usa H2; o ambiente de produção usa MySQL com o mesmo schema Hibernate.
+4. Os ambientes de desenvolvimento, produção e testes de integração usam MySQL; testes sem persistência usam Mockito.

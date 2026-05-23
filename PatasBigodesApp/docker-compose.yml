@@ -18,6 +18,23 @@ services:
       retries: 20
       start_period: 120s
 
+  db-tests:
+    image: mysql:8.0
+    container_name: hotelanimais-db-tests
+    environment:
+      MYSQL_DATABASE: hotelanimais_test
+      MYSQL_USER: hoteluser
+      MYSQL_PASSWORD: hotelpass
+      MYSQL_ROOT_PASSWORD: rootpass
+    ports:
+      - "127.0.0.1:${TEST_HOST_DB_PORT:-3308}:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-prootpass"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 120s
+
   app:
     build:
       context: .

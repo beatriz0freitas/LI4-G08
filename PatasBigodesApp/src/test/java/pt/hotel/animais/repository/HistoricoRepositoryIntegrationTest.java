@@ -24,7 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class HistoricoRepositoryIntegrationTest {
 
     @Autowired
