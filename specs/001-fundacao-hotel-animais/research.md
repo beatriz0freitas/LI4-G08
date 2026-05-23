@@ -32,11 +32,12 @@ Esta fase de pesquisa confirma as escolhas técnicas e resolve qualquer ambiguid
 ## 2. Armazenamento de Dados — MySQL 8
 
 ### Decisão
-**Escolhido**: MySQL 8.0 (produção) + H2 (testes)
+**Escolhido**: MySQL 8.0 para desenvolvimento, produção e testes de integração
 
 ### Rationale
 - **MySQL 8.0**: ACID garantido; suporta transações; amplamente utilizado em Portugal
-- **H2 em testes**: Setup rápido; não requer container; isolamento completo entre testes
+- **Testes sem persistência**: Mockito para isolar services/controllers quando a base de dados não é relevante
+- **Testes com persistência**: MySQL para validar queries, transações e migrations no mesmo SGBD usado pela aplicação
 - **Flyway para migrations**: Versionamento de schema; rastreabilidade; suporta múltiplos ambientes
 - **ADR-03** ([Persistência em SGBD relacional](../../../docs/Etapa2/04-architecture-decisions/ADR-03-persistencia-sgbd-relacional.md)) e **ADR-04** ([MySQL e padrão repositório](../../../docs/Etapa2/04-architecture-decisions/ADR-04-mysql-base-dados.md)) confirmam esta escolha
 
@@ -221,8 +222,8 @@ services:
 
 ### Decisão
 **Perfis**:
-- `application-mysql.properties` (produção: MySQL)
-- `application-h2.properties` (testes: H2 in-memory)
+- `application-mysql.properties` (MySQL)
+- `src/test/resources/application.properties` (testes com MySQL)
 - Padrão: MySQL
 
 ### Rationale
@@ -237,10 +238,9 @@ spring.datasource.password=root
 spring.jpa.hibernate.ddl-auto=validate
 spring.flyway.enabled=true
 
-# application-h2.properties (testes)
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.driverClassName=org.h2.Driver
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+# src/test/resources/application.properties (testes com MySQL)
+spring.datasource.url=jdbc:mysql://localhost:3307/hotelanimais
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.flyway.enabled=true
 ```
 

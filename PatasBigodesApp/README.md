@@ -68,13 +68,15 @@ Isto sobe os serviços definidos em `docker-compose.yml`.
 
 ## 4. Execução dos testes
 
-Para correr a suite de testes, usa um dos seguintes comandos:
+Para correr a suite de testes, usa:
 
 ```bash
 make test
 ```
 
-ou, em alternativa:
+Este comando sobe primeiro o serviço MySQL definido em `docker-compose.yml` e só depois executa os testes Maven.
+
+Em alternativa, se a base de dados já estiver ativa, podes executar diretamente:
 
 ```bash
 mvn test
@@ -93,11 +95,11 @@ O `Makefile` funciona como camada de atalho para tarefas comuns do projeto.
 | Comando | Descrição |
 | --- | --- |
 | `make help` | Mostra a lista de alvos disponíveis e a respetiva função. |
-| `make test` | Executa os testes Maven da aplicação. |
+| `make test` | Sobe o MySQL e executa os testes Maven da aplicação. |
 | `make package` | Gera o ficheiro JAR com `mvn clean package`. |
 | `make run` | Arranca a aplicação localmente com o perfil e credenciais da base de dados configurados via variáveis de ambiente. |
 | `make run-mysql` | Alias de `make run`. |
-| `make verify` | Corre os testes e valida a configuração do Docker Compose. |
+| `make verify` | Sobe o MySQL, corre os testes e valida a configuração do Docker Compose. |
 | `make config` | Mostra a configuração final resolvida do Docker Compose. |
 | `make db-up` | Sobe apenas o serviço de base de dados MySQL. |
 | `make db-stop` | Pára apenas o serviço de base de dados MySQL. |

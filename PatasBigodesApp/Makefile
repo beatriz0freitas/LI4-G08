@@ -34,7 +34,8 @@ help:
 	@echo "  make clean       - Limpar artefactos Maven"
 
 test:
-	mvn test
+	docker compose up -d --wait db
+	DB_HOST=$(DB_HOST) DB_PORT=$(DB_PORT) DB_NAME=$(DB_NAME) DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) mvn test
 
 package:
 	mvn clean package
@@ -45,7 +46,8 @@ run:
 run-mysql: run
 
 verify:
-	mvn test
+	docker compose up -d --wait db
+	DB_HOST=$(DB_HOST) DB_PORT=$(DB_PORT) DB_NAME=$(DB_NAME) DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) mvn test
 	docker compose config
 
 config:

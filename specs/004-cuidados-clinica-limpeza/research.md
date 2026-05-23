@@ -7,7 +7,7 @@
 
 ## 2. Persistência e migrações
 - Decision: As novas capacidades serão modeladas com entidades JPA e suportadas por migrações Flyway.
-- Rationale: O projeto já usa JPA/Flyway, o que facilita integridade, versionamento do esquema e validação em testes com H2.
+- Rationale: O projeto já usa JPA/Flyway, o que facilita integridade, versionamento do esquema e validação em testes de integração com MySQL.
 - Alternatives considered: SQL manual ou criação de tabelas ad hoc. Rejeitado por reduzir rastreabilidade e aumentar o risco de divergência entre ambientes.
 
 ## 3. Modelo de domínio para saúde e operação diária
