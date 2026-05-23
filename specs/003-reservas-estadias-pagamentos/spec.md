@@ -269,9 +269,10 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 
 - [ADR-01: Monolito em Camadas](../../docs/Etapa2/04-architecture-decisions/ADR-01-monolito-camadas.md): Justificação de design monolítico
 - [ADR-02: Spring MVC + Thymeleaf para SSR](../../docs/Etapa2/04-architecture-decisions/ADR-02-spring-mvc-thymeleaf-ssr.md): Templates renderizadas no servidor
-- [ADR-03: MySQL como BD Principal](../../docs/Etapa2/04-architecture-decisions/ADR-03-mysql-base-dados-principal.md): Persistência relacional
-- [ADR-04: Spring Security com Sessão HTTP](../../docs/Etapa2/04-architecture-decisions/ADR-04-spring-security-sessao-http.md): Autenticação por sessão
-- [ADR-05: DTO entre Controller e Service](../../docs/Etapa2/04-architecture-decisions/ADR-05-dto-entre-controller-service.md): Padrão de transferência de dados
+- [ADR-03: Persistência em SGBD relacional](../../docs/Etapa2/04-architecture-decisions/ADR-03-persistencia-sgbd-relacional.md): Persistência relacional
+- [ADR-04: MySQL e padrão repositório](../../docs/Etapa2/04-architecture-decisions/ADR-04-mysql-base-dados.md): Base de dados e acesso a dados
+- [ADR-05: Controlo de acesso por perfil](../../docs/Etapa2/04-architecture-decisions/ADR-05-controlo-acesso-perfil.md): Autenticação e autorização
+- [ADR-06: Isolamento da apresentação através de DTOs](../../docs/Etapa2/04-architecture-decisions/ADR-06-isolamento-apresentacao-dtos.md): Padrão de transferência de dados
 
 ---
 

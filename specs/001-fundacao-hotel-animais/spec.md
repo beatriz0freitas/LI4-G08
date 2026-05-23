@@ -9,6 +9,7 @@
 - Requisitos Funcionais: [docs/Etapa1/02-requirements/functional/](../../../docs/Etapa1/02-requirements/functional/)
 - Requisitos de Domínio: [docs/Etapa1/02-requirements/domain/](../../../docs/Etapa1/02-requirements/domain/)
 - Arquitetura: [docs/Etapa2/01-architecture/architecture.md](../../../docs/Etapa2/01-architecture/architecture.md)
+- Decisões Arquiteturais: [ADR-01](../../../docs/Etapa2/04-architecture-decisions/ADR-01-monolito-camadas.md), [ADR-02](../../../docs/Etapa2/04-architecture-decisions/ADR-02-spring-mvc-thymeleaf-ssr.md), [ADR-03](../../../docs/Etapa2/04-architecture-decisions/ADR-03-persistencia-sgbd-relacional.md), [ADR-04](../../../docs/Etapa2/04-architecture-decisions/ADR-04-mysql-base-dados.md), [ADR-05](../../../docs/Etapa2/04-architecture-decisions/ADR-05-controlo-acesso-perfil.md), [ADR-06](../../../docs/Etapa2/04-architecture-decisions/ADR-06-isolamento-apresentacao-dtos.md), [ADR-07](../../../docs/Etapa2/04-architecture-decisions/ADR-07-docker-desenvolvimento-testes.md)
 - Diagrama de Classes: [docs/Etapa2/02-class-diagram/class-diagram.md](../../../docs/Etapa2/02-class-diagram/class-diagram.md)
 - Mockups UI: [docs/Etapa2/05-ui-interface-mockup/](../../../docs/Etapa2/05-ui-interface-mockup/)
 

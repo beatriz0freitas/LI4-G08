@@ -12,7 +12,7 @@ Completar a rastreabilidade da operação diária e do acompanhamento clínico d
 - Use Cases: [UC-09 - Registar Cuidados Diarios](docs/Etapa1/03-use-cases/UC-09.md#L1), [UC-10 - Registar Servico Extra](docs/Etapa1/03-use-cases/UC-10.md#L1), [UC-11 - Gerir Historial Clinico](docs/Etapa1/03-use-cases/UC-11.md#L1)
 - User Stories: US-14, US-15, US-16, US-17, US-18, US-22, US-23 (ver rastreabilidade em [docs/Etapa1/01-user-stories/user-stories.md](docs/Etapa1/01-user-stories/user-stories.md#L1))
 - Requisitos não-funcionais relevantes: [RNF-02](docs/Etapa1/02-requirements/non-functional/RNF-02.md#L1), [RNF-09](docs/Etapa1/02-requirements/non-functional/RNF-09.md#L1)
-- Arquitetura / decisões: [ADR-01 Monolito Camadas](docs/Etapa2/04-architecture-decisions/ADR-01-monolito-camadas.md#L1), [ADR-02 Spring MVC + Thymeleaf SSR](docs/Etapa2/04-architecture-decisions/ADR-02-spring-mvc-thymeleaf-ssr.md#L1), [ADR-05 DTO entre Controller/Service](docs/Etapa2/04-architecture-decisions/ADR-05-dto-entre-controller-service.md#L1)
+- Arquitetura / decisões: [ADR-01 Monolito Camadas](../../docs/Etapa2/04-architecture-decisions/ADR-01-monolito-camadas.md#L1), [ADR-02 Spring MVC + Thymeleaf SSR](../../docs/Etapa2/04-architecture-decisions/ADR-02-spring-mvc-thymeleaf-ssr.md#L1), [ADR-06 DTOs na apresentação](../../docs/Etapa2/04-architecture-decisions/ADR-06-isolamento-apresentacao-dtos.md#L1)
 - Componentes e diagramas: [components.mmd](docs/Etapa2/01-architecture/components.mmd#L1), fluxos de sequência relevantes em [docs/Etapa2/03-seq-diagrams/UC-09.mmd](docs/Etapa2/03-seq-diagrams/UC-09.mmd#L1), [UC-10.mmd](docs/Etapa2/03-seq-diagrams/UC-10.mmd#L1), [UC-11.mmd](docs/Etapa2/03-seq-diagrams/UC-11.mmd#L1)
 
 
@@ -112,14 +112,14 @@ Relações: `Estadia` 1..* `RegistoCuidado` ; `Estadia` 1..* `ServicoExtra` ; `E
 - **SC-005**: Controlo de acesso: apenas perfis designados conseguem criar intervenções clínicas (teste de autorização automatizado).
 
 ## Assunções
-- A base de utilizadores, perfis e autenticação reusa a infraestrutura existente (ver [ADR-04](docs/Etapa2/04-architecture-decisions/ADR-04-spring-security-sessao-http.md#L1)).
+- A base de utilizadores, perfis e autenticação reusa a infraestrutura existente (ver [ADR-05](../../docs/Etapa2/04-architecture-decisions/ADR-05-controlo-acesso-perfil.md#L1)).
 - A entidade `Estadia` já existe e tem um identificador estável usado pelas novas entidades.
 - A faturação final no check-out é extensível para somar `ServicoExtra` e `IntervencaoClinica` sem refatoração profunda.
 - Formatos de data/hora seguem a convenção da aplicação (ISO local) e fusos não são foco nesta fase.
 
 ## Dependências
 - Depende de `EstadiaService`/`ReservaService` existentes para validações de estado (ver [docs/Etapa2/01-architecture/architecture.md](docs/Etapa2/01-architecture/architecture.md#L1)).
-- Requer decisões de implementação sobre DTOs e mapeamento (seguindo [ADR-05](docs/Etapa2/04-architecture-decisions/ADR-05-dto-entre-controller-service.md#L1)).
+- Requer decisões de implementação sobre DTOs e mapeamento (seguindo [ADR-06](../../docs/Etapa2/04-architecture-decisions/ADR-06-isolamento-apresentacao-dtos.md#L1)).
 
 ## Testes de Aceitação Propostos
 - Teste de integração: `RegistoCuidadoIntegrationTest` que cria reserva→check-in→registo de cuidado→valida visualização no historial.
@@ -135,7 +135,7 @@ Relações: `Estadia` 1..* `RegistoCuidado` ; `Estadia` 1..* `ServicoExtra` ; `E
 
 ## Referências
 - Etapa 1 — Use cases e requisitos: [UC-09](docs/Etapa1/03-use-cases/UC-09.md#L1), [UC-10](docs/Etapa1/03-use-cases/UC-10.md#L1), [UC-11](docs/Etapa1/03-use-cases/UC-11.md#L1), [User Stories](docs/Etapa1/01-user-stories/user-stories.md#L1), [Domain Model](docs/Etapa1/04-domain-model/domain-model.md#L1)
-- Etapa 2 — Arquitetura e decisões: [components](docs/Etapa2/01-architecture/components.mmd#L1), [architecture.md](docs/Etapa2/01-architecture/architecture.md#L1), [ADR-02](docs/Etapa2/04-architecture-decisions/ADR-02-spring-mvc-thymeleaf-ssr.md#L1), [ADR-05 DTO pattern](docs/Etapa2/04-architecture-decisions/ADR-05-dto-entre-controller-service.md#L1)
+- Etapa 2 — Arquitetura e decisões: [components](docs/Etapa2/01-architecture/components.mmd#L1), [architecture.md](docs/Etapa2/01-architecture/architecture.md#L1), [ADR-02](../../docs/Etapa2/04-architecture-decisions/ADR-02-spring-mvc-thymeleaf-ssr.md#L1), [ADR-06 DTOs na apresentação](../../docs/Etapa2/04-architecture-decisions/ADR-06-isolamento-apresentacao-dtos.md#L1)
 
 ---
 
