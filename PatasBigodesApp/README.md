@@ -74,12 +74,18 @@ Para correr a suite de testes, usa:
 make test
 ```
 
-Este comando sobe primeiro o serviço MySQL definido em `docker-compose.yml` e só depois executa os testes Maven.
+Este comando recria o serviço MySQL `db-tests`, definido em `docker-compose.yml`, e só depois executa os testes Maven contra a base `hotelanimais_test`.
 
 Em alternativa, se a base de dados já estiver ativa, podes executar diretamente:
 
 ```bash
 mvn test
+```
+
+Neste caso, garante primeiro que o serviço `db-tests` está ativo e limpo, por exemplo com:
+
+```bash
+make db-reset-test
 ```
 
 Se quiseres validar simultaneamente os testes e a configuração do Docker Compose, usa:
@@ -95,13 +101,14 @@ O `Makefile` funciona como camada de atalho para tarefas comuns do projeto.
 | Comando | Descrição |
 | --- | --- |
 | `make help` | Mostra a lista de alvos disponíveis e a respetiva função. |
-| `make test` | Sobe o MySQL e executa os testes Maven da aplicação. |
+| `make test` | Recria o serviço `db-tests` e executa os testes Maven da aplicação. |
 | `make package` | Gera o ficheiro JAR com `mvn clean package`. |
 | `make run` | Arranca a aplicação localmente com o perfil e credenciais da base de dados configurados via variáveis de ambiente. |
 | `make run-mysql` | Alias de `make run`. |
-| `make verify` | Sobe o MySQL, corre os testes e valida a configuração do Docker Compose. |
+| `make verify` | Recria o serviço `db-tests`, corre os testes e valida a configuração do Docker Compose. |
 | `make config` | Mostra a configuração final resolvida do Docker Compose. |
 | `make db-up` | Sobe apenas o serviço de base de dados MySQL. |
+| `make db-reset-test` | Recria o serviço MySQL de testes `db-tests`. |
 | `make db-stop` | Pára apenas o serviço de base de dados MySQL. |
 | `make db-shell` | Abre um cliente MySQL dentro do contentor da base de dados. |
 | `make up` | Sobe a stack completa com rebuild das imagens. |
@@ -122,13 +129,16 @@ O `Makefile` usa estas variáveis por omissão:
 - `HOST_DB_PORT=3307`
 - `DB_PORT=3307`
 - `DB_NAME=hotelanimais`
+- `TEST_HOST_DB_PORT=3308`
+- `TEST_DB_PORT=3308`
+- `TEST_DB_NAME=hotelanimais_test`
 - `DB_USERNAME=hoteluser`
 - `DB_PASSWORD=hotelpass`
 
 Se precisares de alterar a porta local da base de dados, podes fazê-lo assim:
 
 ```bash
-HOST_DB_PORT=3308 make up
+HOST_DB_PORT=3309 make up
 ```
 
 ## 7. Estrutura do Docker Compose
@@ -136,9 +146,11 @@ HOST_DB_PORT=3308 make up
 O ficheiro `docker-compose.yml` define dois serviços:
 
 - `db`: contentor MySQL 8.0 com volume persistente `mysql_data`.
+- `db-tests`: contentor MySQL 8.0 exclusivo para testes, sem volume persistente.
 - `app`: aplicação Spring Boot construída a partir do `Dockerfile` do projeto.
 
 O serviço da aplicação aguarda que a base de dados esteja saudável antes de arrancar.
+O serviço `db` disponibiliza a base principal `hotelanimais`; o serviço `db-tests` disponibiliza `hotelanimais_test` e é recriado pelo `Makefile` antes da suite.
 
 ## 8. Notas operacionais
 

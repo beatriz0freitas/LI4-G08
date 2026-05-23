@@ -37,7 +37,7 @@ Esta fase de pesquisa confirma as escolhas técnicas e resolve qualquer ambiguid
 ### Rationale
 - **MySQL 8.0**: ACID garantido; suporta transações; amplamente utilizado em Portugal
 - **Testes sem persistência**: Mockito para isolar services/controllers quando a base de dados não é relevante
-- **Testes com persistência**: MySQL para validar queries, transações e migrations no mesmo SGBD usado pela aplicação
+- **Testes com persistência**: MySQL para validar queries, transações e migrations no mesmo SGBD usado pela aplicação, usando o serviço separado `db-tests` com a base `hotelanimais_test`
 - **Flyway para migrations**: Versionamento de schema; rastreabilidade; suporta múltiplos ambientes
 - **ADR-03** ([Persistência em SGBD relacional](../../../docs/Etapa2/04-architecture-decisions/ADR-03-persistencia-sgbd-relacional.md)) e **ADR-04** ([MySQL e padrão repositório](../../../docs/Etapa2/04-architecture-decisions/ADR-04-mysql-base-dados.md)) confirmam esta escolha
 
@@ -239,7 +239,7 @@ spring.jpa.hibernate.ddl-auto=validate
 spring.flyway.enabled=true
 
 # src/test/resources/application.properties (testes com MySQL)
-spring.datasource.url=jdbc:mysql://localhost:3307/hotelanimais
+spring.datasource.url=jdbc:mysql://localhost:3308/hotelanimais_test
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 spring.flyway.enabled=true
 ```

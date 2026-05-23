@@ -73,6 +73,12 @@ Como responsável pela limpeza, quero consultar a lista de alojamentos que neces
 
 ## Requirements *(mandatory)*
 
+### Test Database
+
+- Os testes com persistência usam o serviço MySQL `db-tests`, com a base `hotelanimais_test`, separado do serviço principal `db` e da base `hotelanimais`.
+- O alvo `make test` deve recriar o serviço `db-tests` antes de executar a suite, garantindo isolamento entre execuções.
+- Testes sem persistência devem usar Mockito, sem ligação à base de dados.
+
 ### Functional Requirements
 
 Mapeamento direto com a documentação de Etapa 1:
