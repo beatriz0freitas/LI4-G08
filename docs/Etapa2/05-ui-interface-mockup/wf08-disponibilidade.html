@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mapa de Disponibilidade · Patas&amp;Bigodes</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/all.min.css">
+<style>
+  .callout { padding:.75rem 1rem; border-left:4px solid #ccc; background:#f9f9f9; border-radius:3px; margin-bottom:1rem; }
+  .callout-info { border-left-color:#00c0ef; background:#e1f5fe; color:#0277bd; }
+  .callout-success { border-left-color:#00a65a; background:#e8f5e9; color:#1b5e20; }
+  .callout-warning { border-left-color:#f39c12; background:#fff3e0; color:#e65100; }
+  .callout-danger  { border-left-color:#dd4b39; background:#fdecea; color:#b71c1c; }
+  .box-state { border:2px solid; border-radius:3px; padding:.5rem; text-align:left; cursor:pointer; color:#fff; }
+  .box-state .id { font-weight:700; font-size:.95rem; }
+  .box-state .lbl { font-size:.65rem; font-weight:700; text-transform:uppercase; }
+  .box-state .occ { font-size:.7rem; font-weight:600; opacity:.95; }
+  .st-livre { background:#00a65a; border-color:#008d4c; }
+  .st-ocupado { background:#dd4b39; border-color:#c33b29; }
+  .st-reservado { background:#00c0ef; border-color:#00a7d0; }
+  .st-limpeza { background:#f39c12; border-color:#d68910; }
+  .legend-dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; vertical-align:middle; }
+  .timeline-mini { position:relative; padding-left:25px; border-left:2px solid #d2d6de; margin-left:10px; }
+  .timeline-mini .ev { position:relative; margin-bottom:1rem; }
+  .timeline-mini .ev .dot { position:absolute; left:-32px; top:3px; width:14px; height:14px; border-radius:50%; box-shadow:0 0 0 4px #ecf0f5; }
+  .small-box .icon { top:10px; }
+  .footer-note { text-align:center; font-style:italic; color:#777; font-size:.75rem; margin-top:1rem; }
+</style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+<nav class="main-header navbar navbar-expand navbar-dark" style="background:#343a40;">
+  <ul class="navbar-nav">
+    <li class="nav-item"><a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a></li>
+    <li class="nav-item d-none d-sm-inline-block"><span class="nav-link">Alojamento de Animais</span></li>
+  </ul>
+  <ul class="navbar-nav ml-auto">
+    <li class="nav-item"><span class="nav-link">Dra. Céu Faria</span></li>
+    <li class="nav-item"><a href="login.html" class="nav-link"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+  </ul>
+</nav>
+
+<aside class="main-sidebar sidebar-dark-primary elevation-4" style="background:#212529;">
+  <a href="dashboard.html" class="brand-link" style="background:#1a1d20;">
+    <span class="brand-text font-weight-bold">Patas&amp;Bigodes</span>
+  </a>
+  <div class="sidebar">
+    <nav class="mt-2">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+        <li class="nav-item"><a href="dashboard.html" class="nav-link "><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a></li>
+<li class="nav-item"><a href="reservas.html" class="nav-link "><i class="nav-icon fas fa-calendar-check"></i><p>Reservas</p></a></li>
+<li class="nav-item"><a href="cuidados.html" class="nav-link "><i class="nav-icon fas fa-clipboard-list"></i><p>Plano de Cuidados</p></a></li>
+<li class="nav-item"><a href="historial.html" class="nav-link "><i class="nav-icon fas fa-heartbeat"></i><p>Historial Clínico</p></a></li>
+<li class="nav-item"><a href="limpeza.html" class="nav-link "><i class="nav-icon fas fa-broom"></i><p>Limpeza</p></a></li>
+<li class="nav-item"><a href="colaboradores.html" class="nav-link "><i class="nav-icon fas fa-users"></i><p>Colaboradores</p></a></li>
+<li class="nav-item"><a href="disponibilidade.html" class="nav-link active"><i class="nav-icon fas fa-th"></i><p>Disponibilidade</p></a></li>
+
+      </ul>
+    </nav>
+  </div>
+</aside>
+
+<div class="content-wrapper" style="background:#ecf0f5;">
+  <section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6"><h1 class="m-0">Mapa de Disponibilidade</h1></div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Início</a></li><li class="breadcrumb-item active">Disponibilidade</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="content"><div class="container-fluid">
+
+<div class="row">
+  <div class="col-md-3 col-6"><div class="small-box bg-success"><div class="inner"><h3>7</h3><p>Livres</p></div><div class="icon"><i class="fas fa-door-open"></i></div></div></div>
+  <div class="col-md-3 col-6"><div class="small-box bg-danger"><div class="inner"><h3>6</h3><p>Ocupados</p></div><div class="icon"><i class="fas fa-paw"></i></div></div></div>
+  <div class="col-md-3 col-6"><div class="small-box bg-info"><div class="inner"><h3>3</h3><p>Reservados</p></div><div class="icon"><i class="fas fa-bookmark"></i></div></div></div>
+  <div class="col-md-3 col-6"><div class="small-box bg-warning"><div class="inner"><h3>2</h3><p>Em Limpeza</p></div><div class="icon"><i class="fas fa-broom"></i></div></div></div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header bg-primary"><h3 class="card-title">Mapa de Boxes</h3><div class="card-tools text-white"><small>Ocupação: 50%</small></div></div>
+      <div class="card-body">
+        <div class="form-inline mb-2">
+          <i class="fas fa-calendar mr-2 text-muted"></i><input type="date" class="form-control form-control-sm" value="2026-04-27">
+          <div class="ml-auto">
+            <button class="btn btn-sm btn-primary">Todos</button>
+            <button class="btn btn-sm btn-outline-primary">Canino — Padrão</button>
+            <button class="btn btn-sm btn-outline-primary">Canino — Premium</button>
+            <button class="btn btn-sm btn-outline-primary">Felino — Standard</button>
+          </div>
+        </div>
+        <div class="border-top border-bottom py-2 mb-3" style="font-size:.8rem;">
+          <span class="mr-3"><span class="legend-dot st-livre"></span>Livre</span>
+          <span class="mr-3"><span class="legend-dot st-ocupado"></span>Ocupado</span>
+          <span class="mr-3"><span class="legend-dot st-limpeza"></span>Limpeza</span>
+          <span class="mr-3"><span class="legend-dot st-reservado"></span>Reservado</span>
+        </div>
+        <div class="row"><div class="col-md-2 col-4 mb-2"><div class="box-state st-ocupado"><div class="id">C-01</div><div class="lbl">Ocupado</div><div class="occ">Rex</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-livre"><div class="id">C-02</div><div class="lbl">Livre</div><div class="occ">&nbsp;</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-limpeza"><div class="id">C-03</div><div class="lbl">Limpeza</div><div class="occ">&nbsp;</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-ocupado"><div class="id">C-04</div><div class="lbl">Ocupado</div><div class="occ">Luna</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-reservado"><div class="id">C-05</div><div class="lbl">Reservado</div><div class="occ">Bobi</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-livre"><div class="id">C-06</div><div class="lbl">Livre</div><div class="occ">&nbsp;</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-ocupado"><div class="id">C-07</div><div class="lbl">Ocupado</div><div class="occ">Mel</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-livre"><div class="id">C-08</div><div class="lbl">Livre</div><div class="occ">&nbsp;</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-ocupado"><div class="id">C-09</div><div class="lbl">Ocupado</div><div class="occ">Thor</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-livre"><div class="id">C-10</div><div class="lbl">Livre</div><div class="occ">&nbsp;</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-reservado"><div class="id">C-11</div><div class="lbl">Reservado</div><div class="occ">Nina</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-livre"><div class="id">C-12</div><div class="lbl">Livre</div><div class="occ">&nbsp;</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-ocupado"><div class="id">F-01</div><div class="lbl">Ocupado</div><div class="occ">Tobias</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-livre"><div class="id">F-02</div><div class="lbl">Livre</div><div class="occ">&nbsp;</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-ocupado"><div class="id">F-03</div><div class="lbl">Ocupado</div><div class="occ">Mimi</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-limpeza"><div class="id">F-04</div><div class="lbl">Limpeza</div><div class="occ">&nbsp;</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-livre"><div class="id">F-05</div><div class="lbl">Livre</div><div class="occ">&nbsp;</div></div></div><div class="col-md-2 col-4 mb-2"><div class="box-state st-reservado"><div class="id">F-06</div><div class="lbl">Reservado</div><div class="occ">Bolinhas</div></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header bg-dark"><h3 class="card-title">Detalhe do Alojamento</h3></div>
+      <div class="card-body">
+        <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+          <h4 class="mb-0">C-01</h4><span class="badge badge-danger">Ocupado</span>
+        </div>
+        <small class="text-muted">Tipo</small><div class="font-weight-bold">Canino — Padrão</div>
+        <small class="text-muted mt-2 d-block">Animal alojado</small><div class="font-weight-bold">Rex</div>
+        <small class="text-muted mt-2 d-block">Desde</small><div class="font-weight-bold">22 Abr</div>
+        <hr><button class="btn btn-primary btn-block btn-sm">Ver Estadia</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="callout callout-info mt-3"><i class="fas fa-info-circle"></i> O mapa reflete o estado em tempo real (RD-01). Boxes em limpeza só ficam disponíveis após validação pelo Resp. Limpeza.</div>
+<p class="footer-note">UC-02 · IReservaService.consultarDisponibilidade() · Perfil: Receção / Diretor</p>
+  </div></section>
+</div>
+
+<footer class="main-footer">
+  <strong>© 2026 Patas&amp;Bigodes</strong>
+  <div class="float-right d-none d-sm-inline-block">Versão 1.0.0</div>
+</footer>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+</html>
