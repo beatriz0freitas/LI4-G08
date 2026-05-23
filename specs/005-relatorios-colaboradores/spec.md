@@ -72,6 +72,66 @@ Os requisitos funcionais e de domínio para este spec derivam dos ficheiros em [
 - **SC-005**: Acesso a relatórios financeiros detalhados é permitido apenas a perfis com privilégio `DIRETOR` (verificação via testes de autorização automatizados e logs de acesso).
 - **SC-006**: Cada pagamento incluído nos relatórios tem rastreabilidade: `idPagamento`, `valor`, `metodoPagamento`, `estado`, `momento`, `reservaId`.
 
+### Performance targets — reconciliação
+
+Há uma sobreposição aparente entre metas não-funcionais documentadas noutros artefactos (p.ex. `RNF-01`) e os critérios medíveis listados acima. Para claridade e testabilidade adoptamos a regra reconciliada abaixo:
+
+- **PT-1 (interactivos, períodos ≤ 3 meses)**: 95% das consultas de relatórios padrão executam em ≤ 1s em infra normal de produção (baseline de dados até 3 meses).
+- **PT-2 (agregados amplos, até 12 meses)**: 95% das consultas de relatórios executam em ≤ 5s; quando ultrapassado, o sistema oferece execução em background com token de consulta e notificações ao `geradoPor`.
+
+Os testes de aceitação devem incluir cenários de carga sintética para validar ambos os limiares; ver tasks sugeridas em `tasks.md`.
+
+### RBAC — Matriz de Autorização (normativa)
+
+Esta feature exige uma matriz RBAC explícita que mapa operações (ConsultarRelatorio, ExportarCSV, ExportarPDF, GerirColaborador, VerCampoFinanceiro) para perfis. A matriz mínima obrigatória:
+
+- `DIRETOR`: ConsultarRelatorio, ExportarCSV, ExportarPDF, VerCampoFinanceiro, GerirColaborador
+- `FUNCIONARIO_RECEPCAO`: ConsultarRelatorio (sem VerCampoFinanceiro pormenorizado), ExportarCSV (agregado sem campos financeiros detalhados), GerirColaborador (criar/editar limitado)
+- `CUIDADOR`: ConsultarRelatorio (somente dados operacionais), sem permissões de export financeiro
+- `MEDICO_VETERINARIO`: ConsultarRelatorio (dados clínicos), sem acesso a campos financeiros sensíveis por defeito
+- `RESPONSAVEL_LIMPEZA`: ConsultarRelatorio (dados operacionais mínimos), sem export
+
+Implementação exigida: controllers e endpoints deverão declarar `@PreAuthorize` com expressões claras e ter testes de integração (`RelatoriosAuthIT`, `ClinicaAuthTest`) que validem cada combinação de permissão/endpoint.
+
+### Integridade de dados e imutabilidade (referência a RD-09)
+
+Relatórios financeiros dependem de registos de pagamento e serviços extra que devem ser imutáveis para efeitos de fatura e auditoria após o `check-out`. Requisitos obrigatórios:
+
+- Todas as alterações que afectem `Pagamento`/`ServicoExtra` após `Estadia` estar `CHECKED_OUT` devem ser rejeitadas pela aplicação (400/403) e auditadas.
+- Preferir defesa em profundidade: restrição a nível de serviço + migração DB (audit trail / append-only pattern) quando possível.
+- Testes de regressão obrigatórios: cenários que tentem alterar valores após check-out e que verifiquem resposta 400/403 e que não alterem o ficheiro de faturação já gerado.
+
+### HTTP error codes and validation behaviour
+
+Padronizar códigos HTTP para facilitar a escrita de testes e comportamento UI:
+
+- `400 Bad Request` — validação de input inválido (ex.: intervalo de datas errado, custo negativo)
+- `401 Unauthorized` — sem autenticação
+- `403 Forbidden` — autenticado mas sem permissão para a operação (ex.: tentativa de ver campos financeiros sem privilégio)
+- `404 Not Found` — recurso inexistente
+- `409 Conflict` — tentativa de alteração em conflito com estado imutável (alternativa a 400/403 quando aplicável)
+- `500 Internal Server Error` — falhas não previstas (registar e investigar)
+
+Os testes de integração e os critérios de aceitação devem verificar explicitamente estes códigos nos cenários relevantes.
+
+### UI signalling for sensitive and critical items
+
+Para consistência visual e testabilidade, definir elementos de UI para sinalizar dados sensíveis ou críticos nos relatórios:
+
+- **Badge sensível**: `badge--sensitive` para colunas que contenham campos financeiros detalhados — visível apenas a perfis com `VerCampoFinanceiro`.
+- **Acessibilidade**: incluir `role="status"` e `aria-live="polite"` sempre que um badge for dinamicamente inserido.
+- **Teste de aceitação visual**: criar um cenário que autentique como `DIRETOR`, abra um relatório com campos financeiros e verifique a presença do `badge--sensitive`.
+
+### Test coverage mapping (transformar testes implícitos em tasks)
+
+O spec menciona nomes de testes e verificações; para rastreabilidade cada teste referido deve existir em `tasks.md` como tarefa concreta. Exemplos a garantir:
+
+- `RelatoriosAuthIT` / `ClinicaAuthTest` — validações RBAC para endpoints de relatórios e gestão de colaboradores
+- `RelatoriosPerfIT` — benchmarks sintéticos para `PT-1` e `PT-2`
+- `ImmutableAfterCheckoutIT` — tentativa de alteração de `Pagamento`/`ServicoExtra` após check-out
+
+Adicionar estas tarefas permitirá cobertura de testes automatizados e integração com CI.
+
 ## Assumptions
 
 - A base de dados existente contém as entidades `Reserva`, `Estadia`, `Pagamento` já normalizadas conforme Etapa 2/Etapa 3.

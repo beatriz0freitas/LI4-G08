@@ -5,7 +5,7 @@
 ## Phase 1: Setup (Shared Infrastructure)
 
 - [ ] T001 Create feature branch `005-relatorios-colaboradores` and push remote
-- [ ] T002 Create contracts folder and OpenAPI skeleton in specs/005-relatorios-colaboradores/contracts/openapi.yaml
+- [ ] T002 Create contracts folder and API contract in specs/005-relatorios-colaboradores/contracts/contract.md
 - [ ] T003 [P] Add Flyway migration placeholder: PatasBigodesApp/src/main/resources/db/migration/V005__relatorios_colaboradores.sql
 - [ ] T004 [P] Add initial DTOs: PatasBigodesApp/src/main/java/.../dto/RelatorioRequest.java and ColaboradorDTO.java
 
@@ -101,6 +101,15 @@
 - [ ] T040 Update `spec.md` with final implementation decisions: specs/005-relatorios-colaboradores/spec.md
 - [ ] T041 Create `quickstart.md` with example requests and export steps: specs/005-relatorios-colaboradores/quickstart.md
 - [ ] T042 [P] Run manual QA scenario: follow Acceptance Tests in spec and record results in specs/005-relatorios-colaboradores/checklists/qa-results.md
+
+## Auth migration tasks (In-memory -> DB)
+
+- [ ] T043 [P] Create Flyway migration to add `colaborador` table: `PatasBigodesApp/src/main/resources/db/migration/V005__create_colaborador.sql`
+- [ ] T044 [P] Implement `Colaborador` JPA entity and `ColaboradorRepository` if not present: `PatasBigodesApp/src/main/java/pt/hotel/animais/entity/Colaborador.java` and `.../repository/ColaboradorRepository.java`
+- [ ] T045 [P] Implement `JpaUserDetailsService` (UserDetailsService) that loads users from `ColaboradorRepository`: `PatasBigodesApp/src/main/java/pt/hotel/animais/security/JpaUserDetailsService.java`
+- [ ] T046 [P] Replace in-memory seeding in `SecurityConfig` with injected `UserDetailsService` bean and ensure `PasswordEncoder` bean present: `PatasBigodesApp/src/main/java/pt/hotel/animais/config/SecurityConfig.java`
+- [ ] T047 [P] Add `ColaboradorSeeder` ApplicationRunner to seed default users at startup using `PasswordEncoder` when DB empty: `PatasBigodesApp/src/main/java/pt/hotel/animais/config/ColaboradorSeeder.java`
+- [ ] T048 [P] Add integration tests for authentication: `PatasBigodesApp/src/test/java/pt/hotel/animais/auth/ColaboradorAuthIT.java` and `RelatoriosAuthIT` to validate RBAC and login flows
 
 ---
 
