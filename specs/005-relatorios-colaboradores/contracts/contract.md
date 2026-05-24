@@ -1,67 +1,104 @@
-# API Contract — Relatórios e Colaboradores (Spec 005)
+# Contrato de Interface MVC — Relatórios e Colaboradores (Spec 005)
 
-Este ficheiro descreve, em formato Markdown legível, os endpoints e payloads principais usados pela feature.
+Este ficheiro descreve as rotas MVC, templates Thymeleaf e formulários da feature. A arquitetura adotada é Spring MVC server-side.
 
-## Endpoints
+## Relatórios
 
-- POST `/api/relatorios/generate`
-  - Descrição: Gera um relatório agregados com filtros e devolve um ID de relatório ou resultado imediato.
-  - Request JSON: `RelatorioRequest` (ver esquema abaixo)
-  - Responses:
-    - `200 OK`: `{ "id": 123 }` — relatório gerado.
+### `GET /relatorios`
 
-- GET `/api/relatorios/{id}/export/csv`
-  - Descrição: Exporta o relatório em CSV.
-  - Path param: `id` (integer)
-  - Responses:
-    - `200 OK`: CSV stream (`text/csv`)
+- Descrição: apresenta página de filtros e resultados de relatórios.
+- Template: `relatorios/list.html`.
+- Acesso: `DIRETOR`.
+- Parâmetros opcionais: `dataInicio`, `dataFim`, `tipoAlojamento`, `incluirServicosExtra`, `agruparPor`.
+- Resposta: página Thymeleaf com formulário de filtros, métricas agregadas e ações de exportação.
 
-- GET `/api/colaboradores`
-  - Descrição: Lista colaboradores (paginação opcional).
-  - Responses: `200 OK` list of `ColaboradorDTO`.
+### `POST /relatorios/gerar`
 
-- POST `/api/colaboradores`
-  - Descrição: Cria um novo colaborador.
-  - Request JSON: `ColaboradorDTO`
-  - Responses: `201 Created`.
+- Descrição: submete filtros para geração de relatório.
+- Form DTO: `RelatorioFiltroFormDto`.
+- Acesso: `DIRETOR`.
+- Sucesso: `redirect:/relatorios?...` ou renderização do template com resultados.
+- Erro de validação: renderiza `relatorios/list.html` com mensagens.
 
-- PUT `/api/colaboradores/{id}`
-  - Descrição: Atualiza colaborador (soft-edit).
-  - Responses: `200 OK`.
+### `GET /relatorios/exportar/csv`
 
-- DELETE `/api/colaboradores/{id}`
-  - Descrição: Desactiva colaborador (soft delete).
-  - Responses: `204 No Content`.
+- Descrição: exporta o relatório filtrado em CSV.
+- Acesso: `DIRETOR`.
+- Parâmetros: mesmos filtros do relatório.
+- Resposta: ficheiro `text/csv`.
 
-- GET `/api/indicadores/faturacao?start={date}&end={date}`
-  - Descrição: Agrega faturação por período e por método de pagamento.
-  - Responses: `200 OK` com estrutura de agregação.
+### `GET /relatorios/exportar/pdf`
 
-- GET `/api/historico?reservaId={id}`
-  - Descrição: Lista eventos relacionados a uma reserva/estadia (paginação, filtros).
+- Descrição: exporta o relatório filtrado em PDF.
+- Acesso: `DIRETOR`.
+- Parâmetros: mesmos filtros do relatório.
+- Resposta: ficheiro `application/pdf`.
 
-## Schemas
+## Colaboradores
 
-- `RelatorioRequest` (request body)
-  - `dataInicio` (string date, required)
-  - `dataFim` (string date, required)
-  - `tipoAlojamento` (string, optional)
-  - `incluirServicosExtra` (boolean, default false)
-  - `agruparPor` (enum: DIA, SEMANA, MES)
+### `GET /colaboradores`
 
-- `ColaboradorDTO`
-  - `username` (string, required)
-  - `nome` (string, required)
-  - `email` (string)
-  - `tipoColaborador` (enum: DIRETOR, FUNCIONARIO_RECEPCAO, CUIDADOR, MEDICO_VETERINARIO, RESPONSAVEL_LIMPEZA)
+- Descrição: lista colaboradores.
+- Template: `colaboradores/list.html`.
+- Acesso: `DIRETOR`.
 
-## Errors & HTTP codes
+### `GET /colaboradores/novo`
 
-- `400 Bad Request` — validação de input
-- `401 Unauthorized` — sem autenticação
-- `403 Forbidden` — sem permissão
-- `404 Not Found` — recurso inexistente
-- `409 Conflict` — conflito de estado (imutabilidade pós-checkout)
+- Descrição: apresenta formulário de registo de colaborador.
+- Template: `colaboradores/form.html`.
+- Acesso: `DIRETOR`.
+- Requisito: campo `tipoColaborador` deve ser uma seleção gerada a partir de `TipoColaborador.values()`.
 
-## Notes
-- Este contrato é um esqueleto para a implementação; quando as rotas estiverem implementadas, gerar um `openapi.yaml` com detalhes dos schemas e usar ferramentas para gerar clients ou documentação interativa.
+### `POST /colaboradores`
+
+- Descrição: cria colaborador.
+- Form DTO: `ColaboradorFormDto`.
+- Acesso: `DIRETOR`.
+- Sucesso: `redirect:/colaboradores`.
+- Erro de validação: renderiza `colaboradores/form.html`.
+
+### `GET /colaboradores/{id}/editar`
+
+- Descrição: apresenta formulário de edição.
+- Template: `colaboradores/form.html`.
+- Acesso: `DIRETOR`.
+
+### `POST /colaboradores/{id}`
+
+- Descrição: atualiza colaborador.
+- Form DTO: `ColaboradorFormDto`.
+- Acesso: `DIRETOR`.
+- Sucesso: `redirect:/colaboradores`.
+- Erro de validação: renderiza `colaboradores/form.html`.
+
+### `POST /colaboradores/{id}/desativar`
+
+- Descrição: desativa colaborador sem apagar histórico.
+- Acesso: `DIRETOR`.
+- Sucesso: `redirect:/colaboradores`.
+
+## Form DTOs
+
+### `RelatorioFiltroFormDto`
+
+- `dataInicio: LocalDate`
+- `dataFim: LocalDate`
+- `tipoAlojamento: TipoAlojamento?`
+- `incluirServicosExtra: boolean`
+- `agruparPor: GrupoRelatorio` (`DIA`, `SEMANA`, `MES`)
+
+### `ColaboradorFormDto`
+
+- `username: String`
+- `nome: String`
+- `email: String`
+- `password: String`
+- `tipoColaborador: TipoColaborador`
+- `ativo: boolean`
+
+## Validação
+
+- Intervalo de datas inválido regressa à página de relatório com mensagem.
+- `username` e `email` duplicados regressam ao formulário de colaborador com mensagem.
+- `tipoColaborador` inválido ou ausente regressa ao formulário; valores aceites são apenas os da enum `TipoColaborador`.
+- Todas as submissões usam `POST` e token CSRF.

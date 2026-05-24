@@ -17,9 +17,10 @@ Documentar decisões técnicas, alternativas e observações relevantes para a i
 - Verificado: não existe `data-model.md` específico para o spec 005 na pasta; modelos relevantes estão em `specs/001-fundacao-hotel-animais/data-model.md` e outros specs.
 - Recomendação: adicionar `specs/005-relatorios-colaboradores/data-model.md` contendo as entidades `Colaborador`, `Relatorio` (projeção/DTO), campos de `Pagamento` e `ServicoExtra` usados nos relatórios, índices recomendados para consultas por período e campos de data.
 
-## API contracts (presença)
-- Verificado: não existe `contracts/openapi.yaml` em `specs/005-relatorios-colaboradores`.
-- Recomendação: criar `specs/005-relatorios-colaboradores/contracts/openapi.yaml` com as rotas principais: `/api/relatorios/generate`, `/api/relatorios/{id}/export/csv`, `/api/colaboradores` CRUD, `/api/indicadores/faturacao`, `/api/historico`.
+## Contrato de interface MVC
+- Verificado: a arquitetura da Etapa 2 define Spring MVC + Thymeleaf server-side.
+- Recomendação: manter `specs/005-relatorios-colaboradores/contracts/contract.md` como contrato de páginas, formulários e downloads. As rotas principais são `/relatorios`, `/relatorios/gerar`, `/relatorios/exportar/csv`, `/relatorios/exportar/pdf`, `/colaboradores` e `/colaboradores/novo`.
+- Decisão: documentar apenas rotas MVC, templates, formulários e downloads desta feature.
 
 ## Performance & testes
 - Metas reconciliadas: PT-1 (≤1s para 3 meses), PT-2 (≤5s para 12 meses) — adicionar testes de carga sintética (Gatling/JMeter skeleton) e integrar com CI ou job manual em `specs/.../tests/perf/`.
@@ -29,7 +30,7 @@ Documentar decisões técnicas, alternativas e observações relevantes para a i
 
 ## Próximos passos recomendados (prioridade)
 1. Criar `data-model.md` com entidades e índices (prioridade alta).
-2. Criar `contracts/openapi.yaml` (esqueleto) e anotar endpoints principais (prioridade alta).
+2. Rever `contracts/contract.md` com as rotas MVC e templates principais (prioridade alta).
 3. Implementar `Colaborador` entity e `ColaboradorRepository`, completar `JpaUserDetailsService` (já esqueleto criado) e `ColaboradorSeeder` (feito).
 4. Adicionar testes de integração de autenticação e RBAC; adicionar migration seed se desejado.
 5. Criar perf tests skeleton e tasks para CI (ver `tasks.md` atualizadas).
