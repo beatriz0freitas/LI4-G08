@@ -1,12 +1,12 @@
 package pt.hotel.animais.service;
 
 import org.springframework.stereotype.Service;
-import pt.hotel.animais.dto.PlanoCuidadosView;
+import pt.hotel.animais.dto.PlanoCuidadosDto;
 
 @Service
 public class PlanoCuidadosService {
 
-    public PlanoCuidadosView getPlanoByEstadia(Long estadiaId) {
+    public PlanoCuidadosDto getPlanoByEstadia(Long estadiaId) {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 

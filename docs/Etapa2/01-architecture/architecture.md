@@ -55,8 +55,10 @@ Implementada com **Spring MVC** (`@Controller`) e templates **Thymeleaf** (`.htm
 | `ReservaController` | Criação, listagem e cancelamento de reservas | UC-04, UC-05 |
 | `EstadiaController` | Check-in, check-out, cuidados diários | UC-06, UC-07, UC-09 |
 | `PagamentoController` | Registo e consulta de pagamentos | UC-08 |
-| `ServicoExtraController` | Registo de serviços extra durante estadia | UC-10 |
-| `ClinicaController` | Registo e consulta de intervenções clínicas | UC-11 |
+| `ServicoExtraController` | Registo de serviços extra durante estadia (separado) | UC-10 |
+| `RegistoCuidadoController` | Registo e listagem de cuidados diários (separado) | UC-09 |
+| `NotaController` | Adição e consulta de notas operacionais em reservas (separado) | RF-05 |
+| `ClinicaController` | Registo e consulta de intervenções clínicas e alterações de estado de saúde (agrega `IntervencaoClinica` e `AlteracaoEstadoSaude`) | UC-11 |
 | `LimpezaController` | Marcação de alojamento como limpo | UC-12 |
 | `RelatorioController` | Dashboard e geração de relatórios | UC-13 |
 | `ColaboradorController` | Gestão de perfis de acesso (apenas Diretor) | US-03 |
@@ -152,6 +154,8 @@ pt.hotel.animais/
 │   ├── EstadiaController.java
 │   ├── PagamentoController.java
 │   ├── ServicoExtraController.java
+│   ├── RegistoCuidadoController.java
+│   ├── NotaController.java
 │   ├── ClinicaController.java
 │   ├── LimpezaController.java
 │   ├── RelatorioController.java

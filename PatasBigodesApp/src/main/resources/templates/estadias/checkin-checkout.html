@@ -71,6 +71,9 @@
                             <div class="card-header"><h3 class="card-title">Dicas</h3></div>
                             <div class="card-body">
                                 <p>Use o ID da reserva (visível na listagem de reservas) para registar o check-in. Após check-out o responsável é notificado e o alojamento é marcado para limpeza.</p>
+                                <div th:if="${estadiaId}">
+                                    <p>Extras total para a estadia <strong th:text="${estadiaId}"></strong>: <span th:text="${extrasTotal}">0.00</span> EUR</p>
+                                </div>
                             </div>
                         </div>
                     </div>

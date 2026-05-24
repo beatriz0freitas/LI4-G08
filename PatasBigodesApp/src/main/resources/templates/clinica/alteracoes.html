@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Alterações Estado de Saúde</title></head>
+<body>
+<h1>Alterações do Estado de Saúde (Estadia [[${estadiaId}]])</h1>
+<form th:action="@{/clinica/alteracoes/create}" method="post">
+    <input type="hidden" name="estadiaId" th:value="${estadiaId}" />
+    <label>Descrição: <input type="text" name="descricao" /></label>
+    <label>Severidade: <input type="text" name="severidade" /></label>
+    <label>DataHora: <input type="datetime-local" name="dataHora" /></label>
+    <button type="submit">Registar Alteração</button>
+</form>
+<hr/>
+<ul>
+    <li th:each="a : ${alteracoes}">
+        <span th:text="${a.dataHora}"></span> - <span th:text="${a.descricao}"></span> - <span th:text="${a.severidade}"></span>
+    </li>
+</ul>
+</body>
+</html>

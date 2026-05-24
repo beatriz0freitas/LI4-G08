@@ -36,6 +36,8 @@ public class ReservaController {
     private final AlojamentoService alojamentoService;
     private final TutorService tutorService;
     private final AnimalService animalService;
+    private final pt.hotel.animais.repository.EstadiaRepository estadiaRepository;
+    private final pt.hotel.animais.service.PagamentoService pagamentoService;
     
     /**
      * GET /reservas - Lista de reservas (geralmente com filtros).
@@ -196,6 +198,15 @@ public class ReservaController {
             model.addAttribute("pageTitle", "Reserva #" + id);
             model.addAttribute("breadcrumb", "Detalhes da Reserva");
             model.addAttribute("activePage", "reservas");
+
+            // mostrar extras se existir estadia associada
+            estadiaRepository.findByReservaId(id).ifPresent(estadia -> {
+                try {
+                    var extras = pagamentoService.calcularExtras(estadia);
+                    model.addAttribute("extrasTotal", extras);
+                    model.addAttribute("estadiaId", estadia.getId());
+                } catch (Exception ignored) {}
+            });
             
             return "reservas/confirmacao";
         } catch (IllegalArgumentException e) {
