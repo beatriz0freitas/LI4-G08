@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="fragments/head :: head"></th:block>
+    <title>Histórico Consolidado</title>
+</head>
+<body>
+<div class="container">
+    <h1>Histórico Consolidado</h1>
+    <table class="table">
+        <thead>
+            <tr><th>Tipo</th><th>DataHora</th><th>Descrição</th></tr>
+        </thead>
+        <tbody>
+            <tr th:each="it : ${itens}">
+                <td th:text="${it.tipo}">TIPO</td>
+                <td th:text="${it.dataHora}">2026-01-01</td>
+                <td th:text="${it.descricao}">Desc</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

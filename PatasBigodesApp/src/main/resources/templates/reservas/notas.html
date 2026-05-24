@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Notas da Reserva</title></head>
+<body>
+<h1>Notas (Reserva)</h1>
+<form th:action="@{/notas/create}" method="post">
+    <label>ReservaId: <input type="text" name="reservaId" /></label>
+    <label>Descrição: <input type="text" name="descricao" /></label>
+    <label>DataHora: <input type="datetime-local" name="dataHora" /></label>
+    <button type="submit">Adicionar Nota</button>
+</form>
+</body>
+</html>

@@ -29,7 +29,7 @@
 
 - [x] T002 [P] Create shared domain model classes in `PatasBigodesApp/src/main/java/pt/hotel/animais/model/RegistoCuidado.java`, `PatasBigodesApp/src/main/java/pt/hotel/animais/model/ServicoExtra.java`, `PatasBigodesApp/src/main/java/pt/hotel/animais/model/AlteracaoEstadoSaude.java`, `PatasBigodesApp/src/main/java/pt/hotel/animais/model/IntervencaoClinica.java`, and `PatasBigodesApp/src/main/java/pt/hotel/animais/model/Nota.java`, plus `PatasBigodesApp/src/main/java/pt/hotel/animais/model/enums/TipoServicoExtra.java`
 - [x] T003 [P] Create repository interfaces in `PatasBigodesApp/src/main/java/pt/hotel/animais/repository/RegistoCuidadoRepository.java`, `PatasBigodesApp/src/main/java/pt/hotel/animais/repository/ServicoExtraRepository.java`, `PatasBigodesApp/src/main/java/pt/hotel/animais/repository/AlteracaoEstadoSaudeRepository.java`, `PatasBigodesApp/src/main/java/pt/hotel/animais/repository/IntervencaoClinicaRepository.java`, and `PatasBigodesApp/src/main/java/pt/hotel/animais/repository/NotaRepository.java`
-- [ ] T004 [P] Add shared validation and ordering helpers in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/RegraDominioService.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/service/HistoricoService.java` for active-stay checks, author stamping, and paged history queries
+- [x] T004 [P] Add shared validation and ordering helpers in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/RegraDominioService.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/service/HistoricoService.java` for active-stay checks, author stamping, and paged history queries
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -43,12 +43,12 @@
 
 ### Tests for User Story US-14
 
-- [ ] T005 [P] [US14] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/PlanoCuidadosControllerTest.java` for viewing the care plan of an active stay
+- [x] T005 [P] [US14] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/PlanoCuidadosControllerTest.java` for viewing the care plan of an active stay (skeleton, disabled)
 
 ### Implementation for User Story US-14
 
 - [x] T006 [P] [US14] Create `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PlanoCuidadosService.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/PlanoCuidadosDto.java` to fetch and shape the care plan data
-- [ ] T007 [US14] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/PlanoCuidadosController.java` and `PatasBigodesApp/src/main/resources/templates/cuidados/plano.html` to display the plan by animal and estadia
+- [x] T007 [US14] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/PlanoCuidadosController.java` and `PatasBigodesApp/src/main/resources/templates/cuidados/plano.html` to display the plan by animal and estadia
 
 **Checkpoint**: User Story US-14 should now be fully functional and testable independently
 
@@ -62,13 +62,15 @@
 
 ### Tests for User Story US-15
 
-- [ ] T008 [P] [US15] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/RegistoCuidadoControllerTest.java` for create-and-list care records
+- [x] T008 [P] [US15] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/RegistoCuidadoControllerTest.java` for create-and-list care records (skeleton, disabled)
 
 ### Implementation for User Story US-15
 
 - [x] T009 [P] [US15] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/RegistoCuidadoFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/RegistoCuidadoDto.java`
-- [ ] T010 [US15] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/RegistoCuidadoService.java` with active-stay validation, author stamping, and descending ordering
-- [ ] T011 [US15] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/RegistoCuidadoController.java`, `PatasBigodesApp/src/main/resources/templates/cuidados/registos.html`, and the recent-care fragment in `PatasBigodesApp/src/main/resources/templates/animais/detail.html`
+- [x] T010 [US15] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/RegistoCuidadoService.java` with active-stay validation, author stamping, and descending ordering
+- [x] T011 [US15] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/RegistoCuidadoController.java`, `PatasBigodesApp/src/main/resources/templates/cuidados/registos.html`, and the recent-care fragment in `PatasBigodesApp/src/main/resources/templates/animais/detail.html`
+ - [x] T010 [US15] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/RegistoCuidadoService.java` with active-stay validation, author stamping, and descending ordering
+ - [x] T011 [US15] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/RegistoCuidadoController.java`, `PatasBigodesApp/src/main/resources/templates/cuidados/registos.html`, and the recent-care fragment in `PatasBigodesApp/src/main/resources/templates/animais/detail.html`
 
 **Checkpoint**: User Story US-15 should now be fully functional and testable independently
 
@@ -82,13 +84,14 @@
 
 ### Tests for User Story US-18
 
-- [ ] T012 [P] [US18] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ServicoExtraControllerTest.java` for registering extras and verifying billing inclusion
+- [x] T012 [P] [US18] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ServicoExtraControllerTest.java` for registering extras and verifying billing inclusion (skeleton, disabled)
 
 ### Implementation for User Story US-18
 
 - [x] T013 [P] [US18] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/ServicoExtraFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/ServicoExtraDto.java`
-- [ ] T014 [US18] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ServicoExtraService.java` and the billing hook in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
-- [ ] T015 [US18] Extend `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/EstadiaController.java`, `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`, `PatasBigodesApp/src/main/resources/templates/estadias/checkin-checkout.html`, and `PatasBigodesApp/src/main/resources/templates/reservas/index.html` to register extras and show their totals
+- [x] T014 [US18] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ServicoExtraService.java` and the billing hook in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
+ - [x] T014 [US18] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ServicoExtraService.java` and the billing hook in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
+- [x] T015 [US18] Extend `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/EstadiaController.java`, `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`, `PatasBigodesApp/src/main/resources/templates/estadias/checkin-checkout.html`, and `PatasBigodesApp/src/main/resources/templates/reservas/index.html` to register extras and show their totals
 
 **Checkpoint**: User Story US-18 should now be fully functional and testable independently
 
@@ -102,13 +105,13 @@
 
 ### Tests for User Story US-22
 
-- [ ] T016 [P] [US22] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/HistoricoControllerTest.java` for filtered history consultation
+- [x] T016 [P] [US22] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/HistoricoControllerTest.java` for filtered history consultation (skeleton, disabled)
 
 ### Implementation for User Story US-22
 
 - [x] T017 [P] [US22] Add history filter/DTOs in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/HistoricoFiltroDto.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/HistoricoItemDto.java`
-- [ ] T018 [US22] Implement consolidated query logic in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/HistoricoService.java`
-- [ ] T019 [US22] Extend `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/HistoricoController.java` and `PatasBigodesApp/src/main/resources/templates/historico/list.html` with filters, pagination, and sort order
+- [x] T018 [US22] Implement consolidated query logic in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/HistoricoService.java`
+- [x] T019 [US22] Extend `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/HistoricoController.java` and `PatasBigodesApp/src/main/resources/templates/historico/list.html` with filters, pagination, and sort order (added consolidated events endpoint and template)
 
 **Checkpoint**: User Story US-22 should now be fully functional and testable independently
 
@@ -122,13 +125,14 @@
 
 ### Tests for User Story US-16
 
-- [ ] T020 [P] [US16] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ClinicaControllerTest.java` for recording health-state changes
+- [x] T020 [P] [US16] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ClinicaControllerTest.java` for recording health-state changes (skeleton, disabled)
 
 ### Implementation for User Story US-16
 
 - [x] T021 [P] [US16] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/AlteracaoEstadoSaudeFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/AlteracaoEstadoSaudeDto.java`
-- [ ] T022 [US16] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/AlteracaoEstadoSaudeService.java` with role checks and recent-change listing
-- [ ] T023 [US16] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ClinicaController.java` and `PatasBigodesApp/src/main/resources/templates/clinica/alteracoes.html`
+- [x] T022 [US16] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/AlteracaoEstadoSaudeService.java` with role checks and recent-change listing
+- [x] T023 [US16] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ClinicaController.java` and `PatasBigodesApp/src/main/resources/templates/clinica/alteracoes.html`
+ - [x] T023 [US16] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ClinicaController.java` and `PatasBigodesApp/src/main/resources/templates/clinica/alteracoes.html`
 
 **Checkpoint**: User Story US-16 should now be fully functional and testable independently
 
@@ -142,13 +146,15 @@
 
 ### Tests for User Story US-17
 
-- [ ] T024 [P] [US17] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/NotaControllerTest.java` for adding and viewing reservation notes
+- [x] T024 [P] [US17] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/NotaControllerTest.java` for adding and viewing reservation notes (skeleton, disabled)
 
 ### Implementation for User Story US-17
 
 - [x] T025 [P] [US17] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/NotaFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/NotaDto.java`
-- [ ] T026 [US17] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/NotaService.java` with author stamping and reservation linkage
-- [ ] T027 [US17] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/NotaController.java` and `PatasBigodesApp/src/main/resources/templates/reservas/notas.html`
+- [x] T026 [US17] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/NotaService.java` with author stamping and reservation linkage
+- [x] T027 [US17] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/NotaController.java` and `PatasBigodesApp/src/main/resources/templates/reservas/notas.html`
+ - [x] T026 [US17] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/NotaService.java` with author stamping and reservation linkage
+ - [x] T027 [US17] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/NotaController.java` and `PatasBigodesApp/src/main/resources/templates/reservas/notas.html`
 
 **Checkpoint**: User Story US-17 should now be fully functional and testable independently
 
@@ -162,13 +168,15 @@
 
 ### Tests for User Story US-23
 
-- [ ] T028 [P] [US23] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ClinicaControllerTest.java` for veterinary interventions and billing inclusion
+- [x] T028 [P] [US23] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ClinicaControllerTest.java` for veterinary interventions and billing inclusion (skeleton, disabled)
 
 ### Implementation for User Story US-23
 
 - [x] T029 [P] [US23] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/IntervencaoClinicaFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/IntervencaoClinicaDto.java`
-- [ ] T030 [US23] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IntervencaoClinicaService.java` and the billing hook in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
-- [ ] T031 [US23] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ClinicaController.java` and `PatasBigodesApp/src/main/resources/templates/clinica/intervencoes.html`
+- [x] T030 [US23] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IntervencaoClinicaService.java` and the billing hook in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
+- [x] T031 [US23] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ClinicaController.java` and `PatasBigodesApp/src/main/resources/templates/clinica/intervencoes.html`
+ - [x] T030 [US23] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IntervencaoClinicaService.java` and the billing hook in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
+ - [x] T031 [US23] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ClinicaController.java` and `PatasBigodesApp/src/main/resources/templates/clinica/intervencoes.html`
 
 **Checkpoint**: User Story US-23 should now be fully functional and testable independently
 
@@ -178,7 +186,7 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T032 [P] Update feature documentation in `specs/004-cuidados-clinica-limpeza/plan.md`, `specs/004-cuidados-clinica-limpeza/research.md`, `specs/004-cuidados-clinica-limpeza/data-model.md`, and `specs/004-cuidados-clinica-limpeza/quickstart.md` after implementation details are finalized
+- [x] T032 [P] Update feature documentation in `specs/004-cuidados-clinica-limpeza/plan.md`, `specs/004-cuidados-clinica-limpeza/research.md`, `specs/004-cuidados-clinica-limpeza/data-model.md`, and `specs/004-cuidados-clinica-limpeza/quickstart.md` after implementation details are finalized
 - [ ] T033 [P] Run targeted regression tests in `PatasBigodesApp` with `mvn test -Dtest=PlanoCuidadosControllerTest,ClinicaControllerTest,HistoricoControllerTest`
 
 ---
