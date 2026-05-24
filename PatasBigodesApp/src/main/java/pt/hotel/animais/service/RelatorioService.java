@@ -1,5 +1,9 @@
 package pt.hotel.animais.service;
 
+import org.springframework.boot.actuate.audit.listener.AuditApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.hotel.animais.dto.RelatorioFiltroFormDto;
@@ -28,17 +32,20 @@ public class RelatorioService implements IRelatorioService {
     private final ReservaRepository reservaRepository;
     private final PagamentoRepository pagamentoRepository;
     private final ServicoExtraRepository servicoExtraRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public RelatorioService(AlojamentoRepository alojamentoRepository,
                             EstadiaRepository estadiaRepository,
                             ReservaRepository reservaRepository,
                             PagamentoRepository pagamentoRepository,
-                            ServicoExtraRepository servicoExtraRepository) {
+                            ServicoExtraRepository servicoExtraRepository,
+                            ApplicationEventPublisher eventPublisher) {
         this.alojamentoRepository = alojamentoRepository;
         this.estadiaRepository = estadiaRepository;
         this.reservaRepository = reservaRepository;
         this.pagamentoRepository = pagamentoRepository;
         this.servicoExtraRepository = servicoExtraRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -64,6 +71,7 @@ public class RelatorioService implements IRelatorioService {
             ? servicoExtraRepository.sumCustoPorPeriodo(inicio, fim)
             : BigDecimal.ZERO);
         resumo.setFaturacaoPorMetodo(faturacaoPorMetodo(inicio, fim));
+        publicarAuditoria(filtro);
         return resumo;
     }
 
@@ -135,5 +143,22 @@ public class RelatorioService implements IRelatorioService {
         filtro.setDataInicio(hoje.withDayOfMonth(1));
         filtro.setDataFim(hoje);
         return filtro;
+    }
+
+    private void publicarAuditoria(RelatorioFiltroFormDto filtro) {
+        eventPublisher.publishEvent(new AuditApplicationEvent(
+            utilizadorAtual(),
+            "RELATORIO_GERADO",
+            Map.of(
+                "dataInicio", filtro.getDataInicio().toString(),
+                "dataFim", filtro.getDataFim().toString(),
+                "incluirServicosExtra", filtro.isIncluirServicosExtra()
+            )
+        ));
+    }
+
+    private String utilizadorAtual() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null ? authentication.getName() : "sistema";
     }
 }

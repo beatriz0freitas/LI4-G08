@@ -1,6 +1,7 @@
 package pt.hotel.animais.service;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import pt.hotel.animais.dto.RelatorioFiltroFormDto;
 import pt.hotel.animais.model.enums.MetodoPagamento;
 import pt.hotel.animais.repository.AlojamentoRepository;
@@ -26,13 +27,15 @@ class RelatorioServiceTest {
     private final ReservaRepository reservaRepository = mock(ReservaRepository.class);
     private final PagamentoRepository pagamentoRepository = mock(PagamentoRepository.class);
     private final ServicoExtraRepository servicoExtraRepository = mock(ServicoExtraRepository.class);
+    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
     private final RelatorioService service = new RelatorioService(
         alojamentoRepository,
         estadiaRepository,
         reservaRepository,
         pagamentoRepository,
-        servicoExtraRepository
+        servicoExtraRepository,
+        eventPublisher
     );
 
     @Test

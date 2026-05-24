@@ -1,5 +1,9 @@
 package pt.hotel.animais.service;
 
+import org.springframework.boot.actuate.audit.listener.AuditApplicationEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,6 +12,8 @@ import pt.hotel.animais.model.Colaborador;
 import pt.hotel.animais.repository.ColaboradorRepository;
 
 import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -15,10 +21,14 @@ public class ColaboradorService implements IColaboradorService {
 
     private final ColaboradorRepository colaboradorRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public ColaboradorService(ColaboradorRepository colaboradorRepository, PasswordEncoder passwordEncoder) {
+    public ColaboradorService(ColaboradorRepository colaboradorRepository,
+                              PasswordEncoder passwordEncoder,
+                              ApplicationEventPublisher eventPublisher) {
         this.colaboradorRepository = colaboradorRepository;
         this.passwordEncoder = passwordEncoder;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -44,7 +54,9 @@ public class ColaboradorService implements IColaboradorService {
         Colaborador colaborador = new Colaborador();
         aplicarCampos(colaborador, formDto);
         colaborador.setPasswordHash(passwordEncoder.encode(formDto.getPassword()));
-        return colaboradorRepository.save(colaborador);
+        Colaborador criado = colaboradorRepository.save(colaborador);
+        publicarAuditoria("COLABORADOR_CRIADO", criado);
+        return criado;
     }
 
     @Override
@@ -55,7 +67,9 @@ public class ColaboradorService implements IColaboradorService {
         if (formDto.getPassword() != null && !formDto.getPassword().isBlank()) {
             colaborador.setPasswordHash(passwordEncoder.encode(formDto.getPassword()));
         }
-        return colaboradorRepository.save(colaborador);
+        Colaborador atualizado = colaboradorRepository.save(colaborador);
+        publicarAuditoria("COLABORADOR_ATUALIZADO", atualizado);
+        return atualizado;
     }
 
     @Override
@@ -63,6 +77,7 @@ public class ColaboradorService implements IColaboradorService {
         Colaborador colaborador = obter(id);
         colaborador.setAtivo(false);
         colaboradorRepository.save(colaborador);
+        publicarAuditoria("COLABORADOR_DESATIVADO", colaborador);
     }
 
     private void aplicarCampos(Colaborador colaborador, ColaboradorFormDto formDto) {
@@ -87,5 +102,23 @@ public class ColaboradorService implements IColaboradorService {
         if (emailExiste) {
             throw new IllegalArgumentException("Já existe um colaborador com esse email");
         }
+    }
+
+    private void publicarAuditoria(String tipoEvento, Colaborador colaborador) {
+        Map<String, Object> dados = new LinkedHashMap<>();
+        dados.put("colaboradorId", colaborador.getId());
+        dados.put("username", colaborador.getUsername());
+        dados.put("tipoColaborador", colaborador.getTipoColaborador() != null ? colaborador.getTipoColaborador().name() : null);
+
+        eventPublisher.publishEvent(new AuditApplicationEvent(
+            utilizadorAtual(),
+            tipoEvento,
+            dados
+        ));
+    }
+
+    private String utilizadorAtual() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null ? authentication.getName() : "sistema";
     }
 }

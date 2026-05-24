@@ -103,7 +103,8 @@ Resumo para esta feature:
 - Palavras-passe devem ser armazenadas apenas como hash BCrypt.
 - Desativar colaborador é operação lógica; não deve apagar histórico associado.
 - Pagamentos e serviços extra já faturados não devem ser alterados depois do check-out, conforme regras de imutabilidade associadas a RD-09.
-- Alterações administrativas devem ser auditáveis pelo menos por data, colaborador autenticado e operação realizada.
+- Alterações administrativas e geração de relatórios devem ser auditáveis através da auditoria do Spring Boot Actuator (`AuditEventRepository`/`AuditApplicationEvent`), pelo menos com data, utilizador autenticado, tipo de operação e detalhe mínimo da entidade afetada.
+- Não deve existir um serviço próprio de auditoria para esta feature; a aplicação deve configurar e usar o mecanismo de auditoria disponibilizado pelo Spring Boot.
 
 ## Test Coverage Mapping
 

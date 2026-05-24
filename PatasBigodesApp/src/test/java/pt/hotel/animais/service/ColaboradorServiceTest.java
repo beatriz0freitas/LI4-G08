@@ -1,6 +1,7 @@
 package pt.hotel.animais.service;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import pt.hotel.animais.dto.ColaboradorFormDto;
 import pt.hotel.animais.model.Colaborador;
@@ -19,7 +20,8 @@ class ColaboradorServiceTest {
 
     private final ColaboradorRepository repository = mock(ColaboradorRepository.class);
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-    private final ColaboradorService service = new ColaboradorService(repository, encoder);
+    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+    private final ColaboradorService service = new ColaboradorService(repository, encoder, eventPublisher);
 
     @Test
     void criarDeveCodificarPasswordEGuardarTipoEnum() {
