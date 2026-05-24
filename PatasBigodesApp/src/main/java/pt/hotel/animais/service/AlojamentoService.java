@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class AlojamentoService {
+public class AlojamentoService implements IAlojamentoService {
 
     private final AlojamentoRepository alojamentoRepository;
 

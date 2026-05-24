@@ -5,17 +5,17 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 
 @Service
-public class DashboardService {
+public class DashboardService implements IDashboardService {
 
-    private final ReservaService reservaService;
-    private final EstadiaService estadiaService;
-    private final PagamentoService pagamentoService;
-    private final AlojamentoService alojamentoService;
+    private final IReservaService reservaService;
+    private final IEstadiaService estadiaService;
+    private final IPagamentoService pagamentoService;
+    private final IAlojamentoService alojamentoService;
 
-    public DashboardService(ReservaService reservaService,
-                            EstadiaService estadiaService,
-                            PagamentoService pagamentoService,
-                            AlojamentoService alojamentoService) {
+    public DashboardService(IReservaService reservaService,
+                            IEstadiaService estadiaService,
+                            IPagamentoService pagamentoService,
+                            IAlojamentoService alojamentoService) {
         this.reservaService = reservaService;
         this.estadiaService = estadiaService;
         this.pagamentoService = pagamentoService;

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pt.hotel.animais.dto.RegistoCuidadoFormDto;
-import pt.hotel.animais.service.RegistoCuidadoService;
+import pt.hotel.animais.service.IRegistoCuidadoService;
 
 import java.security.Principal;
 
@@ -20,7 +20,7 @@ import java.security.Principal;
 @RequestMapping("/cuidados")
 public class RegistoCuidadoController {
 
-    private final RegistoCuidadoService registoCuidadoService;
+    private final IRegistoCuidadoService registoCuidadoService;
 
     @GetMapping
     public String list(@RequestParam Long estadiaId, @PageableDefault(size = 10) org.springframework.data.domain.Pageable pageable, Model model) {

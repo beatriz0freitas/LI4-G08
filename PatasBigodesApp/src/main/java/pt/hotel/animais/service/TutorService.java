@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class TutorService {
+public class TutorService implements ITutorService {
     
     private final TutorRepository tutorRepository;
     

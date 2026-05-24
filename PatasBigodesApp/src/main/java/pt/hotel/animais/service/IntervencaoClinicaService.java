@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class IntervencaoClinicaService {
+public class IntervencaoClinicaService implements IIntervencaoClinicaService {
 
     private final IntervencaoClinicaRepository intervencaoClinicaRepository;
     private final EstadiaRepository estadiaRepository;

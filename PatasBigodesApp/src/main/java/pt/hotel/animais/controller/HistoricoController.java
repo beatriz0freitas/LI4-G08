@@ -12,7 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.data.domain.Sort;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.enums.EstadoEstadia;
-import pt.hotel.animais.service.HistoricoService;
+import pt.hotel.animais.service.IHistoricoService;
 
 import java.time.LocalDate;
 
@@ -20,13 +20,13 @@ import java.time.LocalDate;
 @RequestMapping("/historico")
 public class HistoricoController {
 
-    private final HistoricoService historicoService;
+    private final IHistoricoService historicoService;
     private final pt.hotel.animais.repository.RegistoCuidadoRepository registoCuidadoRepository;
     private final pt.hotel.animais.repository.ServicoExtraRepository servicoExtraRepository;
     private final pt.hotel.animais.repository.IntervencaoClinicaRepository intervencaoClinicaRepository;
     private final pt.hotel.animais.repository.NotaRepository notaRepository;
 
-    public HistoricoController(HistoricoService historicoService,
+    public HistoricoController(IHistoricoService historicoService,
                                pt.hotel.animais.repository.RegistoCuidadoRepository registoCuidadoRepository,
                                pt.hotel.animais.repository.ServicoExtraRepository servicoExtraRepository,
                                pt.hotel.animais.repository.IntervencaoClinicaRepository intervencaoClinicaRepository,

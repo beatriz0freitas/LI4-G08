@@ -5,13 +5,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import pt.hotel.animais.service.AlojamentoService;
+import pt.hotel.animais.service.IAlojamentoService;
 
 @Controller
 @RequiredArgsConstructor
 public class AlojamentoController {
 
-    private final AlojamentoService alojamentoService;
+    private final IAlojamentoService alojamentoService;
 
     @GetMapping("/alojamentos")
     @PreAuthorize("hasAnyRole('DIRETOR', 'FUNCIONARIO_RECEPCAO', 'RESPONSAVEL_LIMPEZA')")

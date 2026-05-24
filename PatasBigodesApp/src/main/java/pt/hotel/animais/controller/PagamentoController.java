@@ -7,15 +7,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pt.hotel.animais.dto.PagamentoDto;
 import pt.hotel.animais.model.Pagamento;
-import pt.hotel.animais.service.PagamentoService;
+import pt.hotel.animais.service.IPagamentoService;
 
 @RestController
 @RequestMapping("/pagamentos")
 public class PagamentoController {
 
-    private final PagamentoService pagamentoService;
+    private final IPagamentoService pagamentoService;
 
-    public PagamentoController(PagamentoService pagamentoService) {
+    public PagamentoController(IPagamentoService pagamentoService) {
         this.pagamentoService = pagamentoService;
     }
 

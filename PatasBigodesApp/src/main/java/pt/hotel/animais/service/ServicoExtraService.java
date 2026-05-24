@@ -19,11 +19,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class ServicoExtraService {
+public class ServicoExtraService implements IServicoExtraService {
 
     private final ServicoExtraRepository servicoExtraRepository;
     private final EstadiaRepository estadiaRepository;
-    private final PagamentoService pagamentoService;
+    private final IPagamentoService pagamentoService;
 
     public ServicoExtraDto register(ServicoExtraFormDto req, Long autorId) {
         Estadia estadia = estadiaRepository.findById(req.getEstadiaId())

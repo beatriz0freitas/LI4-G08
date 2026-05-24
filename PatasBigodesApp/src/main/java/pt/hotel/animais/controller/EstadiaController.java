@@ -10,17 +10,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.repository.EstadiaRepository;
-import pt.hotel.animais.service.EstadiaService;
-import pt.hotel.animais.service.PagamentoService;
+import pt.hotel.animais.service.IEstadiaService;
+import pt.hotel.animais.service.IPagamentoService;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/estadias")
 public class EstadiaController {
 
-    private final EstadiaService estadiaService;
+    private final IEstadiaService estadiaService;
     private final EstadiaRepository estadiaRepository;
-    private final PagamentoService pagamentoService;
+    private final IPagamentoService pagamentoService;
 
     @GetMapping
     public String operacoes(@RequestParam(required = false) Long estadiaId, Model model) {
