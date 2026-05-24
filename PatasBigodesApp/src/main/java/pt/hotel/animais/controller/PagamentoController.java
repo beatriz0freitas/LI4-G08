@@ -1,15 +1,14 @@
 package pt.hotel.animais.controller;
 
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pt.hotel.animais.dto.PagamentoDto;
-import pt.hotel.animais.model.Pagamento;
 import pt.hotel.animais.service.IPagamentoService;
 
-@RestController
+@Controller
 @RequestMapping("/pagamentos")
 public class PagamentoController {
 
@@ -20,8 +19,14 @@ public class PagamentoController {
     }
 
     @PostMapping
-    public ResponseEntity<Pagamento> registrar(@RequestBody PagamentoDto dto) {
-        Pagamento p = pagamentoService.registrarPagamento(dto);
-        return ResponseEntity.ok(p);
+    public String registrar(@ModelAttribute PagamentoDto dto, RedirectAttributes redirectAttributes) {
+        try {
+            pagamentoService.registrarPagamento(dto);
+            redirectAttributes.addFlashAttribute("successMessage", "Pagamento registado com sucesso");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/historico";
     }
 }
