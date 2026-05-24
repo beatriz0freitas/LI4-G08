@@ -6,6 +6,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import pt.hotel.animais.model.enums.TipoColaborador;
 
+/**
+ * DTO de formulário para criação e edição de colaboradores.
+ *
+ * A password é obrigatória apenas na criação; na edição, um valor vazio mantém
+ * a password existente. O tipo de colaborador é uma enum fechada para impedir
+ * perfis arbitrários.
+ */
 public class ColaboradorFormDto {
 
     @NotBlank(message = "Username é obrigatório")

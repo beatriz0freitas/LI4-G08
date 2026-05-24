@@ -110,6 +110,14 @@ Relações: `Estadia` 1..* `RegistoCuidado` ; `Estadia` 1..* `ServicoExtra` ; `E
 - **SC-003**: Historial clínico filtrável por animal/estadia/data com resposta paginada e ordenada; 95% das queries de leitura retornam em <1s num dataset de teste (1000 registos).
 - **SC-004**: Autor e timestamp auditáveis para 100% dos registos criados (logs/DB).
 - **SC-005**: Controlo de acesso: apenas perfis designados conseguem criar intervenções clínicas (teste de autorização automatizado).
+- **SC-006**: Cada funcionalidade P1 tem pelo menos 1 teste unitário na camada de serviço e 1 teste de integração executável no controller correspondente.
+- **SC-007**: Existe pelo menos 1 teste de sistema end-to-end que cubra plano de cuidados, registo de cuidado e consulta do historial sem dependências manuais externas.
+
+## Documentação Técnica
+
+- O código Java deve ser documentado com Javadoc em controllers, services, DTOs e exceptions públicas ou relevantes para fluxos de negócio.
+- O Maven Javadoc Plugin deve gerar a documentação HTML do código.
+- A implementação deve seguir `.specify/memory/constitution.md` e as convenções de estilo em [docs/Etapa3/convencoes.md](../../docs/Etapa3/convencoes.md).
 
 ## Assunções
 - A base de utilizadores, perfis e autenticação reusa a infraestrutura existente (ver [ADR-05](../../docs/Etapa2/04-architecture-decisions/ADR-05-controlo-acesso-perfil.md#L1)).
@@ -131,7 +139,7 @@ Relações: `Estadia` 1..* `RegistoCuidado` ; `Estadia` 1..* `ServicoExtra` ; `E
 2. Repositórios e serviços com operações CRUD e buscas filtradas (paginação).
 3. Controllers e DTOs (segurança via perfis, validações de input).
 4. Templates/Views para recepção/cuidador/veterinario (seguindo mockups em Etapa2/05-ui-interface-mockup).
-5. Testes de integração e unitários; atualizar documentação e rastreabilidade (spec, tasks, research).
+5. Testes unitários, de integração e de sistema; atualizar documentação e rastreabilidade (spec, tasks, research).
 
 ## Referências
 - Etapa 1 — Use cases e requisitos: [UC-09](docs/Etapa1/03-use-cases/UC-09.md#L1), [UC-10](docs/Etapa1/03-use-cases/UC-10.md#L1), [UC-11](docs/Etapa1/03-use-cases/UC-11.md#L1), [User Stories](docs/Etapa1/01-user-stories/user-stories.md#L1), [Domain Model](docs/Etapa1/04-domain-model/domain-model.md#L1)

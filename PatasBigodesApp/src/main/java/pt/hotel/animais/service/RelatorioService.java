@@ -23,6 +23,13 @@ import java.time.LocalTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Serviço de aplicação para geração de relatórios operacionais e financeiros.
+ *
+ * Agrega dados de alojamentos, estadias, reservas, pagamentos e serviços extra.
+ * Cada geração publica evento de auditoria com os filtros gerais utilizados, sem
+ * expor detalhe financeiro linha a linha.
+ */
 @Service
 @Transactional(readOnly = true)
 public class RelatorioService implements IRelatorioService {
@@ -48,6 +55,13 @@ public class RelatorioService implements IRelatorioService {
         this.eventPublisher = eventPublisher;
     }
 
+    /**
+     * Calcula o resumo de métricas para o período e filtros indicados.
+     *
+     * @param filtro filtros de período, alojamento e serviços extra
+     * @return resumo agregado para apresentação na página
+     * @throws IllegalArgumentException quando o período é inválido
+     */
     @Override
     public RelatorioResumoDto gerarRelatorio(RelatorioFiltroFormDto filtro) {
         validarPeriodo(filtro);
@@ -75,6 +89,12 @@ public class RelatorioService implements IRelatorioService {
         return resumo;
     }
 
+    /**
+     * Gera uma representação CSV do relatório filtrado.
+     *
+     * @param filtro filtros aplicados ao relatório
+     * @return conteúdo CSV com cabeçalhos estáveis
+     */
     @Override
     public String gerarCsv(RelatorioFiltroFormDto filtro) {
         RelatorioResumoDto resumo = gerarRelatorio(filtro);
@@ -89,6 +109,12 @@ public class RelatorioService implements IRelatorioService {
             + resumo.getServicosExtraTotal() + "\n";
     }
 
+    /**
+     * Gera uma representação PDF simples do relatório filtrado.
+     *
+     * @param filtro filtros aplicados ao relatório
+     * @return bytes do documento PDF simplificado
+     */
     @Override
     public byte[] gerarPdf(RelatorioFiltroFormDto filtro) {
         RelatorioResumoDto resumo = gerarRelatorio(filtro);
@@ -137,6 +163,11 @@ public class RelatorioService implements IRelatorioService {
         }
     }
 
+    /**
+     * Constrói filtros para o mês corrente.
+     *
+     * @return filtro com início no primeiro dia do mês e fim no dia atual
+     */
     public RelatorioFiltroFormDto filtroMesAtual() {
         LocalDate hoje = LocalDate.now();
         RelatorioFiltroFormDto filtro = new RelatorioFiltroFormDto();

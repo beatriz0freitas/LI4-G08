@@ -9,6 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 import pt.hotel.animais.model.Colaborador;
 import pt.hotel.animais.repository.ColaboradorRepository;
 
+/**
+ * Adaptador entre colaboradores persistidos e o mecanismo de autenticação Spring Security.
+ *
+ * Carrega apenas colaboradores existentes na base de dados e usa o
+ * {@code tipoColaborador} como role de autorização.
+ */
 @Service
 public class ColaboradorUserDetailsService implements UserDetailsService {
 
@@ -18,6 +24,13 @@ public class ColaboradorUserDetailsService implements UserDetailsService {
         this.colaboradorRepository = colaboradorRepository;
     }
 
+    /**
+     * Carrega o utilizador autenticável pelo username informado no formulário de login.
+     *
+     * @param username username submetido
+     * @return detalhes de autenticação esperados pelo Spring Security
+     * @throws UsernameNotFoundException quando não existe colaborador com esse username
+     */
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

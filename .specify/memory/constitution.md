@@ -1,10 +1,10 @@
 <!--
 Sync Impact Report
-Version change: template placeholder version to 1.0.0
-Modified principles: placeholder principles replaced with Domain Scope First; Scenario-Driven Requirements; Modular Separation of Concerns; Verification Before Expansion; Data Integrity, Security, and Operational Reliability
-Added sections: Project Scope and Quality Constraints; Delivery Workflow and Review Gates
+Version change: 1.0.1 to 1.0.2
+Modified principles: none
+Added sections: none
 Removed sections: none
-Templates checked: .specify/templates/plan-template.md checked and aligned; .specify/templates/spec-template.md checked and aligned; .specify/templates/tasks-template.md checked and aligned; .specify/templates/commands/ no files found
+Templates checked: specs 001-005 reference docs/Etapa3/convencoes.md as implementation style convention
 Follow-up TODOs: none
 -->
 
@@ -50,6 +50,7 @@ Business data MUST remain consistent under concurrent use, especially for reserv
 - User-facing operations MUST be simple enough for non-technical staff to perform after minimal training.
 - Key actions SHOULD complete within a few seconds for front-desk use, and availability lookups SHOULD feel near immediate.
 - Documentation, diagrams, prompts, and decisions MUST remain versioned with the repository.
+- Java/Spring Boot implementation MUST follow the style and structure conventions defined in `docs/Etapa3/convencoes.md`.
 - The project MAY use AI assistance, but AI output is always a draft until a human reviews and approves it.
 - All significant technical and architectural decisions MUST be recorded in a decision log (`docs/decisions/`) to ensure a clear audit trail for project evaluation.
 
@@ -88,4 +89,4 @@ Versioning follows semantic rules: a MAJOR bump is required for principle remova
 
 Every significant milestone MUST include a constitution check during review of the spec, the plan, and the task list. If a change conflicts with the constitution, the change is rejected until either the artifact is corrected or the constitution is formally amended.
 
-**Version**: 1.0.1 | **Ratified**: 2026-04-19 | **Last Amended**: 2026-04-19
+**Version**: 1.0.2 | **Ratified**: 2026-04-19 | **Last Amended**: 2026-05-24

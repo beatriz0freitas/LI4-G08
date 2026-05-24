@@ -33,7 +33,7 @@ class AlojamentoServiceTest {
     @Test
     void listarTodosDeveDelegarParaOrdenacaoPorIdentificacao() {
         when(alojamentoRepository.findAllByOrderByIdentificacaoAsc()).thenReturn(java.util.List.of(
-                Alojamento.builder().id(1L).identificacao("Box 1").estadoLimpeza(EstadoLimpeza.PENDENTE).build()
+                    new Alojamento(1L, "Box 1", null, null, EstadoLimpeza.PENDENTE, null)
         ));
 
         var resultado = alojamentoService.listarTodos();

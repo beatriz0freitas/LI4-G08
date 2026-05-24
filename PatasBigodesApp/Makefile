@@ -13,12 +13,13 @@ DB_PASSWORD ?= hotelpass
 export HOST_DB_PORT
 export TEST_HOST_DB_PORT
 
-.PHONY: help test package run run-mysql verify config db-up db-reset-test db-stop db-shell up down restart destroy ps logs logs-app logs-db clean
+.PHONY: help test coverage package run run-mysql verify config db-up db-reset-test db-stop db-shell up down restart destroy ps logs logs-app logs-db docs docs-code docs-clean clean
 
 help:
 	@echo "Alvos disponíveis:"
 	@echo "  make help        - Mostrar esta ajuda"
 	@echo "  make test        - Executar testes"
+	@echo "  make coverage    - Executar testes com relatório JaCoCo"
 	@echo "  make package     - Gerar jar Spring Boot"
 	@echo "  make run         - Arrancar a app localmente contra MySQL (Docker Compose)"
 	@echo "  make run-mysql   - Alias de run"
@@ -36,11 +37,17 @@ help:
 	@echo "  make logs        - Mostrar logs agregados da stack"
 	@echo "  make logs-app    - Mostrar logs da app"
 	@echo "  make logs-db     - Mostrar logs da base de dados"
+	@echo "  make docs        - Gerar documentação Javadoc HTML"
+	@echo "  make docs-clean  - Remover Javadoc HTML gerado"
 	@echo "  make clean       - Limpar artefactos Maven"
 
 test:
 	make db-reset-test
 	DB_HOST=$(DB_HOST) DB_PORT=$(TEST_DB_PORT) DB_NAME=$(TEST_DB_NAME) DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) mvn test
+
+coverage:
+	make db-reset-test
+	DB_HOST=$(DB_HOST) DB_PORT=$(TEST_DB_PORT) DB_NAME=$(TEST_DB_NAME) DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) mvn test jacoco:report
 
 package:
 	mvn clean package
@@ -95,6 +102,14 @@ logs-app:
 
 logs-db:
 	docker compose logs -f db
+
+docs: 
+	mvn javadoc:javadoc -DskipTests
+	@echo "Documentação gerada:"
+	@echo "  Código: target/generated-docs/index.html"
+
+docs-clean:
+	rm -rf target/generated-docs
 
 clean:
 	mvn clean

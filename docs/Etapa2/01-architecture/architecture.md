@@ -244,7 +244,8 @@ Templates Thymeleaf residem em `src/main/resources/templates/`, organizados por 
 | Template engine | Thymeleaf |
 | CSS / UI | AdminLTE |
 | Gestão de dependências e construção | Maven |
-| Testes | JUnit + Mockito + Spring Boot Test |
+| Testes | JUnit + Mockito + Spring Boot Test + JaCoCo |
+| Documentação | Javadoc |
 | Ambiente de execução | Docker |
 
 

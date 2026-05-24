@@ -110,6 +110,14 @@ Preservados conforme [Model de Domínio — Etapa 1](../../../docs/Etapa1/04-dom
 - **SC-002**: O dashboard carrega em < 2 segundos para diretor autenticado (conforme [RNF-01](../../../docs/Etapa1/02-requirements/non-functional/RNF-01.md)).
 - **SC-003**: Responsável de limpeza consegue consultar e marcar alojamentos como limpos sem erros de transação.
 - **SC-004**: Regra [RD-01](../../../docs/Etapa1/02-requirements/domain/RD-01.md) é respeitada: alojamento com limpeza PENDENTE não aparece como disponível.
+- **SC-005**: A fase 1 atinge pelo menos 80% de cobertura de linhas nas classes de `controller`, `service` e `repository` abrangidas por esta feature, medida por relatório JaCoCo gerado no pipeline local.
+
+## Documentação Técnica
+
+- O código Java deve ser documentado com Javadoc em controllers, services, DTOs e exceptions públicas ou relevantes para fluxos de negócio.
+- O relatório JaCoCo deve ser gerado com o Maven e utilizado como critério explícito de cobertura para a fase 1.
+- O Maven Javadoc Plugin deve gerar a documentação HTML do código.
+- A implementação deve seguir `.specify/memory/constitution.md` e as convenções de estilo em [docs/Etapa3/convencoes.md](../../docs/Etapa3/convencoes.md).
 
 ## Assumptions
 

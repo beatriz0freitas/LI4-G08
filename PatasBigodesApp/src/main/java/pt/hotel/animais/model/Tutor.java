@@ -1,6 +1,8 @@
 package pt.hotel.animais.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +12,8 @@ import java.util.List;
  */
 @Entity
 @Table(name = "tutor")
+@Getter
+@Setter
 public class Tutor {
     
     @Id
@@ -40,72 +44,6 @@ public class Tutor {
     @PrePersist
     protected void onCreate() {
         dataRegisto = LocalDateTime.now();
-    }
-    
-    // Getters e Setters
-    
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public String getNome() {
-        return nome;
-    }
-    
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-    
-    public String getNif() {
-        return nif;
-    }
-    
-    public void setNif(String nif) {
-        this.nif = nif;
-    }
-    
-    public String getContacto() {
-        return contacto;
-    }
-    
-    public void setContacto(String contacto) {
-        this.contacto = contacto;
-    }
-    
-    public String getEmail() {
-        return email;
-    }
-    
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    
-    public LocalDateTime getDataRegisto() {
-        return dataRegisto;
-    }
-    
-    public void setDataRegisto(LocalDateTime dataRegisto) {
-        this.dataRegisto = dataRegisto;
-    }
-    
-    public List<Animal> getAnimais() {
-        return animais;
-    }
-    
-    public void setAnimais(List<Animal> animais) {
-        this.animais = animais;
-    }
-    
-    public List<Reserva> getReservas() {
-        return reservas;
-    }
-    
-    public void setReservas(List<Reserva> reservas) {
-        this.reservas = reservas;
     }
     
     @Override

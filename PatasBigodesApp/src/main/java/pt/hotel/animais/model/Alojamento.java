@@ -1,14 +1,16 @@
 package pt.hotel.animais.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
 import pt.hotel.animais.model.enums.TipoAlojamento;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
 public class Alojamento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,4 +32,16 @@ public class Alojamento {
     
     @OneToMany(mappedBy = "alojamento", cascade = CascadeType.ALL)
     private List<Reserva> reservas = new ArrayList<>();
+
+    public Alojamento() {
+    }
+
+    public Alojamento(Long id, String identificacao, TipoAlojamento tipo, Integer capacidade, EstadoLimpeza estadoLimpeza, List<Reserva> reservas) {
+        this.id = id;
+        this.identificacao = identificacao;
+        this.tipo = tipo;
+        this.capacidade = capacidade;
+        this.estadoLimpeza = estadoLimpeza;
+        this.reservas = reservas != null ? reservas : new ArrayList<>();
+    }
 }

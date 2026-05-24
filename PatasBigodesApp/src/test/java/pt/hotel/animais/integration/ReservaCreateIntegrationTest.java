@@ -20,7 +20,7 @@ public class ReservaCreateIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "DIRETOR")
     void getReservas_returns_ok() throws Exception {
         mockMvc.perform(get("/reservas"))
             .andExpect(status().isOk());

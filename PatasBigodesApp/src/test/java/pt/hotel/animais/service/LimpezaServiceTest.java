@@ -1,9 +1,10 @@
 package pt.hotel.animais.service;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
 import pt.hotel.animais.repository.AlojamentoRepository;
@@ -15,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class LimpezaServiceTest {
     @Mock
     private AlojamentoRepository alojamentoRepository;
@@ -22,17 +24,9 @@ class LimpezaServiceTest {
     @InjectMocks
     private LimpezaService limpezaService;
 
-    public LimpezaServiceTest() {
-        MockitoAnnotations.openMocks(this);
-    }
-
     @Test
     void listarAlojamentosPendentes_deveRetornarAlojamentosPendentes() {
-        var alojamento = Alojamento.builder()
-                .id(1L)
-                .identificacao("Box 1")
-                .estadoLimpeza(EstadoLimpeza.PENDENTE)
-                .build();
+        var alojamento = new Alojamento(1L, "Box 1", null, null, EstadoLimpeza.PENDENTE, null);
         when(alojamentoRepository.findByEstadoLimpeza(EstadoLimpeza.PENDENTE))
                 .thenReturn(List.of(alojamento));
         var result = limpezaService.listarAlojamentosPendentes();
@@ -42,11 +36,7 @@ class LimpezaServiceTest {
 
     @Test
     void marcarComoLimpo_deveAtualizarEstadoParaConcluido() {
-        var alojamento = Alojamento.builder()
-                .id(2L)
-                .identificacao("Box 2")
-                .estadoLimpeza(EstadoLimpeza.PENDENTE)
-                .build();
+        var alojamento = new Alojamento(2L, "Box 2", null, null, EstadoLimpeza.PENDENTE, null);
         when(alojamentoRepository.findById(2L)).thenReturn(Optional.of(alojamento));
         when(alojamentoRepository.save(any())).thenReturn(alojamento);
         boolean sucesso = limpezaService.marcarComoLimpo(2L);

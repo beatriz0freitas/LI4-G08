@@ -215,6 +215,14 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 
 ---
 
+## Documentação Técnica
+
+- O código Java deve ser documentado com Javadoc em controllers, services, DTOs e exceptions públicas ou relevantes para fluxos de negócio.
+- O Maven Javadoc Plugin deve gerar a documentação HTML do código.
+- A implementação deve seguir `.specify/memory/constitution.md` e as convenções de estilo em [docs/Etapa3/convencoes.md](../../docs/Etapa3/convencoes.md).
+
+---
+
 ## Assumptions
 
 - Tutor e Animal já estão registados (Fase 2 completa).

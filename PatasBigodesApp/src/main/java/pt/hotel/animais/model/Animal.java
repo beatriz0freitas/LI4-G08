@@ -1,6 +1,8 @@
 package pt.hotel.animais.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import pt.hotel.animais.model.enums.Especie;
 import pt.hotel.animais.model.enums.EstadoSaude;
 import java.time.LocalDate;
@@ -14,6 +16,8 @@ import java.math.BigDecimal;
  */
 @Entity
 @Table(name = "animal")
+@Getter
+@Setter
 public class Animal {
     
     @Id
@@ -59,104 +63,6 @@ public class Animal {
     @PrePersist
     protected void onCreate() {
         dataRegisto = LocalDateTime.now();
-    }
-    
-    // Getters e Setters
-    
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public Tutor getTutor() {
-        return tutor;
-    }
-    
-    public void setTutor(Tutor tutor) {
-        this.tutor = tutor;
-    }
-    
-    public String getNome() {
-        return nome;
-    }
-    
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-    
-    public Especie getEspecie() {
-        return especie;
-    }
-    
-    public void setEspecie(Especie especie) {
-        this.especie = especie;
-    }
-    
-    public String getRaca() {
-        return raca;
-    }
-    
-    public void setRaca(String raca) {
-        this.raca = raca;
-    }
-    
-    public LocalDate getDataNascimento() {
-        return dataNascimento;
-    }
-    
-    public void setDataNascimento(LocalDate dataNascimento) {
-        this.dataNascimento = dataNascimento;
-    }
-    
-    public BigDecimal getPeso() {
-        return peso;
-    }
-    
-    public void setPeso(BigDecimal peso) {
-        this.peso = peso;
-    }
-    
-    public EstadoSaude getEstadoSaude() {
-        return estadoSaude;
-    }
-    
-    public void setEstadoSaude(EstadoSaude estadoSaude) {
-        this.estadoSaude = estadoSaude;
-    }
-    
-    public String getNecessidadesAlimentares() {
-        return necessidadesAlimentares;
-    }
-    
-    public void setNecessidadesAlimentares(String necessidadesAlimentares) {
-        this.necessidadesAlimentares = necessidadesAlimentares;
-    }
-    
-    public String getMedicacaoCurso() {
-        return medicacaoCurso;
-    }
-    
-    public void setMedicacaoCurso(String medicacaoCurso) {
-        this.medicacaoCurso = medicacaoCurso;
-    }
-    
-    public LocalDateTime getDataRegisto() {
-        return dataRegisto;
-    }
-    
-    public void setDataRegisto(LocalDateTime dataRegisto) {
-        this.dataRegisto = dataRegisto;
-    }
-    
-    public List<Reserva> getReservas() {
-        return reservas;
-    }
-    
-    public void setReservas(List<Reserva> reservas) {
-        this.reservas = reservas;
     }
     
     @Override

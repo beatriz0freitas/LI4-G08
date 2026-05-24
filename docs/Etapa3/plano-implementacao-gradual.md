@@ -12,6 +12,7 @@ Este plano organiza a implementação do sistema em fases pequenas e coerentes, 
 - O detalhe funcional deve crescer apenas quando a fase anterior estiver estável.
 - A documentação da Etapa 1 e da Etapa 2 continua a ser a fonte de verdade. 
 - Toda a regra de negócio, classe e relação provém da Etapa 1 ou Etapa 2. Nada é inventado.
+- Documentação com Javadoc para controllers, services, DTOs e exceptions.
 
 ## Fase 1 — Fundação transversal
 

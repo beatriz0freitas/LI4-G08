@@ -20,7 +20,7 @@ public class CheckInIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "DIRETOR")
     void dashboard_endpoint_returns_ok() throws Exception {
         mockMvc.perform(get("/dashboard"))
             .andExpect(status().isOk());

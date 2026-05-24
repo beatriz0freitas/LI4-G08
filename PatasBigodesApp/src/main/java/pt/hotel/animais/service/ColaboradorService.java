@@ -15,6 +15,13 @@ import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Serviço de aplicação para gestão de colaboradores e respetivos perfis de acesso.
+ *
+ * Centraliza validações de unicidade, hashing de passwords e publicação de
+ * eventos de auditoria. A remoção de colaboradores é lógica para preservar
+ * rastreabilidade histórica.
+ */
 @Service
 @Transactional
 public class ColaboradorService implements IColaboradorService {
@@ -31,12 +38,24 @@ public class ColaboradorService implements IColaboradorService {
         this.eventPublisher = eventPublisher;
     }
 
+    /**
+     * Lista todos os colaboradores, ativos e inativos.
+     *
+     * @return lista de colaboradores persistidos
+     */
     @Override
     @Transactional(readOnly = true)
     public List<Colaborador> listarTodos() {
         return colaboradorRepository.findAll();
     }
 
+    /**
+     * Obtém um colaborador pelo identificador.
+     *
+     * @param id identificador do colaborador
+     * @return colaborador encontrado
+     * @throws IllegalArgumentException quando o colaborador não existe
+     */
     @Override
     @Transactional(readOnly = true)
     public Colaborador obter(Long id) {
@@ -44,6 +63,13 @@ public class ColaboradorService implements IColaboradorService {
             .orElseThrow(() -> new IllegalArgumentException("Colaborador não encontrado"));
     }
 
+    /**
+     * Cria um colaborador com password armazenada como BCrypt.
+     *
+     * @param formDto dados validados do formulário
+     * @return colaborador criado
+     * @throws IllegalArgumentException quando a password falta ou username/email já existem
+     */
     @Override
     public Colaborador criar(ColaboradorFormDto formDto) {
         if (formDto.getPassword() == null || formDto.getPassword().isBlank()) {
@@ -59,6 +85,15 @@ public class ColaboradorService implements IColaboradorService {
         return criado;
     }
 
+    /**
+     * Atualiza dados administrativos de um colaborador existente.
+     *
+     * <p>A password só é alterada quando o formulário traz um novo valor não vazio.</p>
+     *
+     * @param id identificador do colaborador
+     * @param formDto dados validados do formulário
+     * @return colaborador atualizado
+     */
     @Override
     public Colaborador atualizar(Long id, ColaboradorFormDto formDto) {
         Colaborador colaborador = obter(id);
@@ -72,6 +107,11 @@ public class ColaboradorService implements IColaboradorService {
         return atualizado;
     }
 
+    /**
+     * Desativa logicamente um colaborador.
+     *
+     * @param id identificador do colaborador
+     */
     @Override
     public void desativar(Long id) {
         Colaborador colaborador = obter(id);

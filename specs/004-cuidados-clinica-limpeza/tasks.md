@@ -187,7 +187,10 @@
 **Purpose**: Improvements that affect multiple user stories
 
 - [x] T032 [P] Update feature documentation in `specs/004-cuidados-clinica-limpeza/plan.md`, `specs/004-cuidados-clinica-limpeza/research.md`, `specs/004-cuidados-clinica-limpeza/data-model.md`, and `specs/004-cuidados-clinica-limpeza/quickstart.md` after implementation details are finalized
-- [ ] T033 [P] Run targeted regression tests in `PatasBigodesApp` with `mvn test -Dtest=PlanoCuidadosControllerTest,ClinicaControllerTest,HistoricoControllerTest`
+- [ ] T033 [P] Run targeted regression tests in `PatasBigodesApp` with `mvn test -Dtest=PlanoCuidadosControllerTest,RegistoCuidadoControllerTest,ServicoExtraControllerTest,HistoricoControllerTest,ClinicaControllerTest`
+- [ ] T034 [P] Replace the disabled skeleton tests with executable integration coverage in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/PlanoCuidadosControllerTest.java`, `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/RegistoCuidadoControllerTest.java`, `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ServicoExtraControllerTest.java`, `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/HistoricoControllerTest.java`, and `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ClinicaControllerTest.java`
+- [ ] T035 [P] Add unit tests for service-layer validation and ordering in `PatasBigodesApp/src/test/java/pt/hotel/animais/service/RegistoCuidadoServiceTest.java`, `PatasBigodesApp/src/test/java/pt/hotel/animais/service/ServicoExtraServiceTest.java`, `PatasBigodesApp/src/test/java/pt/hotel/animais/service/HistoricoServiceTest.java`, and `PatasBigodesApp/src/test/java/pt/hotel/animais/service/ClinicaServiceTest.java`
+- [ ] T036 [P] Add a system smoke test that traverses plan → registo de cuidado → serviço extra → historial in `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/CuidadosClinicaSystemSmokeTest.java`
 
 ---
 

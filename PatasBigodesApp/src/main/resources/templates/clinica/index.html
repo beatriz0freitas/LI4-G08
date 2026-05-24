@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="fragments/head :: head"></th:block>
+    <title>Clínica Veterinária</title>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <th:block th:replace="fragments/navbar :: navbar"></th:block>
+    <th:block th:replace="fragments/sidebar :: sidebar"></th:block>
+
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Clínica Veterinária</h1>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Histórico clínico</h3>
+                            </div>
+                            <div class="card-body">
+                                <p>Consulte estadias em curso ou anteriores para abrir intervenções clínicas e alterações ao estado de saúde.</p>
+                                <a th:href="@{/historico}" class="btn btn-primary">
+                                    <i class="fas fa-notes-medical"></i> Abrir histórico
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Registos clínicos</h3>
+                            </div>
+                            <div class="card-body">
+                                <p>Os registos clínicos são associados a uma estadia específica para manter rastreabilidade operacional.</p>
+                                <a th:href="@{/estadias}" class="btn btn-secondary">
+                                    <i class="fas fa-stethoscope"></i> Ver estadias
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+</html>

@@ -74,6 +74,8 @@
 - [x] T034 [P] Validar CSRF em todos os formulários POST.
 - [x] T035 Atualizar `quickstart.md` com passos de navegação na UI.
 - [x] T036 Registar resultados de QA em `specs/005-relatorios-colaboradores/checklists/qa-results.md`.
+- [x] T037 Configurar Maven Javadoc Plugin para gerar documentação HTML do código.
+- [ ] T038 Rever Javadoc em controllers, services, DTOs e exceptions; completar documentação em classes públicas relevantes.
 
 ## Dependencies & Execution Order
 
@@ -83,4 +85,4 @@
 
 ## Summary
 
-Total tasks: 36 (`T001`..`T036`).
+Total tasks: 38 (`T001`..`T038`).
