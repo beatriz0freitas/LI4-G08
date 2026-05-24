@@ -2,13 +2,15 @@ package pt.hotel.animais.dto;
 
 import java.time.LocalDateTime;
 
-public class RegistoCuidadoView {
+public class HistoricoItemDto {
+    private String tipo;
     private Long id;
     private Long estadiaId;
     private String descricao;
     private LocalDateTime dataHora;
-    private String autorNome;
 
+    public String getTipo() { return tipo; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public Long getEstadiaId() { return estadiaId; }
@@ -17,6 +19,4 @@ public class RegistoCuidadoView {
     public void setDescricao(String descricao) { this.descricao = descricao; }
     public LocalDateTime getDataHora() { return dataHora; }
     public void setDataHora(LocalDateTime dataHora) { this.dataHora = dataHora; }
-    public String getAutorNome() { return autorNome; }
-    public void setAutorNome(String autorNome) { this.autorNome = autorNome; }
 }
