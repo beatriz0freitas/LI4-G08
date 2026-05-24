@@ -117,6 +117,7 @@ Preservados conforme [Model de Domínio — Etapa 1](../../../docs/Etapa1/04-dom
 - O código Java deve ser documentado com Javadoc em controllers, services, DTOs e exceptions públicas ou relevantes para fluxos de negócio.
 - O relatório JaCoCo deve ser gerado com o Maven e utilizado como critério explícito de cobertura para a fase 1.
 - O Maven Javadoc Plugin deve gerar a documentação HTML do código.
+- A implementação deve seguir `.specify/memory/constitution.md` e as convenções de estilo em [docs/Etapa3/convencoes.md](../../docs/Etapa3/convencoes.md).
 
 ## Assumptions
 

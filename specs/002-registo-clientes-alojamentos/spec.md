@@ -148,6 +148,7 @@ Como funcionário de receção, quero consultar o histórico de cada animal, par
 
 - O código Java deve ser documentado com Javadoc em controllers, services, DTOs e exceptions públicas ou relevantes para fluxos de negócio.
 - O Maven Javadoc Plugin deve gerar a documentação HTML do código.
+- A implementação deve seguir `.specify/memory/constitution.md` e as convenções de estilo em [docs/Etapa3/convencoes.md](../../docs/Etapa3/convencoes.md).
 
 ---
 

@@ -117,6 +117,7 @@ Relações: `Estadia` 1..* `RegistoCuidado` ; `Estadia` 1..* `ServicoExtra` ; `E
 
 - O código Java deve ser documentado com Javadoc em controllers, services, DTOs e exceptions públicas ou relevantes para fluxos de negócio.
 - O Maven Javadoc Plugin deve gerar a documentação HTML do código.
+- A implementação deve seguir `.specify/memory/constitution.md` e as convenções de estilo em [docs/Etapa3/convencoes.md](../../docs/Etapa3/convencoes.md).
 
 ## Assunções
 - A base de utilizadores, perfis e autenticação reusa a infraestrutura existente (ver [ADR-05](../../docs/Etapa2/04-architecture-decisions/ADR-05-controlo-acesso-perfil.md#L1)).
