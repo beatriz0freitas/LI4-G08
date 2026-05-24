@@ -13,12 +13,13 @@ DB_PASSWORD ?= hotelpass
 export HOST_DB_PORT
 export TEST_HOST_DB_PORT
 
-.PHONY: help test package run run-mysql verify config db-up db-reset-test db-stop db-shell up down restart destroy ps logs logs-app logs-db docs docs-code docs-clean clean
+.PHONY: help test coverage package run run-mysql verify config db-up db-reset-test db-stop db-shell up down restart destroy ps logs logs-app logs-db docs docs-code docs-clean clean
 
 help:
 	@echo "Alvos disponíveis:"
 	@echo "  make help        - Mostrar esta ajuda"
 	@echo "  make test        - Executar testes"
+	@echo "  make coverage    - Executar testes com relatório JaCoCo"
 	@echo "  make package     - Gerar jar Spring Boot"
 	@echo "  make run         - Arrancar a app localmente contra MySQL (Docker Compose)"
 	@echo "  make run-mysql   - Alias de run"
@@ -43,6 +44,10 @@ help:
 test:
 	make db-reset-test
 	DB_HOST=$(DB_HOST) DB_PORT=$(TEST_DB_PORT) DB_NAME=$(TEST_DB_NAME) DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) mvn test
+
+coverage:
+	make db-reset-test
+	DB_HOST=$(DB_HOST) DB_PORT=$(TEST_DB_PORT) DB_NAME=$(TEST_DB_NAME) DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) mvn test jacoco:report
 
 package:
 	mvn clean package
