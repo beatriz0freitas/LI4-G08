@@ -5,6 +5,9 @@ import pt.hotel.animais.model.enums.TipoAlojamento;
 
 import java.time.LocalDate;
 
+/**
+ * DTO de formulário com os filtros aplicados aos relatórios de direção.
+ */
 public class RelatorioFiltroFormDto {
 
     @NotNull(message = "Data de início é obrigatória")
@@ -17,6 +20,9 @@ public class RelatorioFiltroFormDto {
     private boolean incluirServicosExtra = true;
     private GrupoRelatorio agruparPor = GrupoRelatorio.MES;
 
+    /**
+     * Unidade temporal usada para agrupar dados do relatório.
+     */
     public enum GrupoRelatorio {
         DIA,
         SEMANA,

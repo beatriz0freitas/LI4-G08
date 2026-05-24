@@ -20,6 +20,14 @@ import pt.hotel.animais.service.IRelatorioService;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 
+/**
+ * Controller MVC dos relatórios operacionais e financeiros da direção.
+ *
+ * Renderiza a página Thymeleaf de filtros/resultados e disponibiliza downloads
+ * CSV/PDF quando o utilizador pede exportação. As respostas de ficheiro usam
+ * {@link ResponseEntity} apenas para controlar headers e conteúdo binário, não para
+ * expor endpoints JSON.
+ */
 @Controller
 @RequestMapping("/relatorios")
 @PreAuthorize("hasRole('DIRETOR')")
@@ -31,6 +39,13 @@ public class RelatorioController {
         this.relatorioService = relatorioService;
     }
 
+    /**
+     * Mostra a página de relatórios com filtros por defeito e resumo inicial.
+     *
+     * @param filtro filtros recebidos por query string
+     * @param model modelo da página
+     * @return template de relatórios
+     */
     @GetMapping
     public String index(@ModelAttribute("filtro") RelatorioFiltroFormDto filtro, Model model) {
         aplicarDefaults(filtro);
@@ -39,6 +54,14 @@ public class RelatorioController {
         return "relatorios/list";
     }
 
+    /**
+     * Processa o formulário de filtros e recalcula as métricas apresentadas.
+     *
+     * @param filtro filtros submetidos pelo formulário
+     * @param bindingResult resultado da validação Bean Validation
+     * @param model modelo da página
+     * @return template de relatórios com resultados ou mensagens de erro
+     */
     @PostMapping("/gerar")
     public String gerar(@Valid @ModelAttribute("filtro") RelatorioFiltroFormDto filtro,
                         BindingResult bindingResult,
@@ -56,6 +79,12 @@ public class RelatorioController {
         return "relatorios/list";
     }
 
+    /**
+     * Exporta o relatório filtrado para CSV.
+     *
+     * @param filtro filtros recebidos por query string
+     * @return resposta de download com conteúdo CSV
+     */
     @GetMapping("/exportar/csv")
     public ResponseEntity<byte[]> exportarCsv(@ModelAttribute RelatorioFiltroFormDto filtro) {
         aplicarDefaults(filtro);
@@ -66,6 +95,12 @@ public class RelatorioController {
             .body(conteudo);
     }
 
+    /**
+     * Exporta o relatório filtrado para PDF.
+     *
+     * @param filtro filtros recebidos por query string
+     * @return resposta de download com conteúdo PDF
+     */
     @GetMapping("/exportar/pdf")
     public ResponseEntity<byte[]> exportarPdf(@ModelAttribute RelatorioFiltroFormDto filtro) {
         aplicarDefaults(filtro);

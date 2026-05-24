@@ -111,6 +111,11 @@ Preservados conforme [Model de Domínio — Etapa 1](../../../docs/Etapa1/04-dom
 - **SC-003**: Responsável de limpeza consegue consultar e marcar alojamentos como limpos sem erros de transação.
 - **SC-004**: Regra [RD-01](../../../docs/Etapa1/02-requirements/domain/RD-01.md) é respeitada: alojamento com limpeza PENDENTE não aparece como disponível.
 
+## Documentação Técnica
+
+- O código Java deve ser documentado com Javadoc em controllers, services, DTOs e exceptions públicas ou relevantes para fluxos de negócio.
+- O Maven Javadoc Plugin deve gerar a documentação HTML do código.
+
 ## Assumptions
 
 - Esta Fase 1 implementa apenas [UC-01](../../../docs/Etapa1/03-use-cases/UC-01.md) (autenticação), [RF-01](../../../docs/Etapa1/02-requirements/functional/RF-01.md) (dashboard) e [RD-01](../../../docs/Etapa1/02-requirements/domain/RD-01.md) (limpeza).

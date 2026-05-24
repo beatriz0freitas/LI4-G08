@@ -5,6 +5,9 @@ import pt.hotel.animais.model.enums.MomentoPagamento;
 import pt.hotel.animais.model.enums.EstadoPagamento;
 import pt.hotel.animais.model.enums.MetodoPagamento;
 
+/**
+ * DTO de formulário para registar pagamentos associados a estadias.
+ */
 public class PagamentoDto {
     private Long estadiaId;
     private BigDecimal valor;

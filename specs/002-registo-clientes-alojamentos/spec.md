@@ -141,6 +141,13 @@ Como funcionário de receção, quero consultar o histórico de cada animal, par
 
 ---
 
+## Documentação Técnica
+
+- O código Java deve ser documentado com Javadoc em controllers, services, DTOs e exceptions públicas ou relevantes para fluxos de negócio.
+- O Maven Javadoc Plugin deve gerar a documentação HTML do código.
+
+---
+
 ## Assumptions
 
 - **Utilizadores**: Apenas funcionários de receção autenticados podem aceder a registo de tutores e criação de reservas.

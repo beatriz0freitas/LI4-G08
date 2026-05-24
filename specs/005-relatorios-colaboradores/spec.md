@@ -106,6 +106,11 @@ Resumo para esta feature:
 - Alterações administrativas e geração de relatórios devem ser auditáveis através da auditoria do Spring Boot Actuator (`AuditEventRepository`/`AuditApplicationEvent`), pelo menos com data, utilizador autenticado, tipo de operação e detalhe mínimo da entidade afetada.
 - Não deve existir um serviço próprio de auditoria para esta feature; a aplicação deve configurar e usar o mecanismo de auditoria disponibilizado pelo Spring Boot.
 
+## Documentação Técnica
+
+- O código Java deve ser documentado com Javadoc em controllers, services, DTOs e exceptions públicas ou relevantes para fluxos de negócio.
+- O Maven Javadoc Plugin deve gerar a documentação HTML do código.
+
 ## Test Coverage Mapping
 
 - `RelatorioControllerTest`: renderização das páginas de relatório, validações de filtros e exportação.

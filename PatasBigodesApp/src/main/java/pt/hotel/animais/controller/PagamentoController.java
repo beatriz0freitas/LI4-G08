@@ -8,6 +8,13 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pt.hotel.animais.dto.PagamentoDto;
 import pt.hotel.animais.service.IPagamentoService;
 
+/**
+ * Controller MVC para registo manual de pagamentos a partir de formulários.
+ *
+ * O registo principal de pagamentos também é invocado pelos fluxos de check-in
+ * e check-out. Este controller existe para submissões HTML e devolve sempre um
+ * redirecionamento com mensagens flash.
+ */
 @Controller
 @RequestMapping("/pagamentos")
 public class PagamentoController {
@@ -18,6 +25,13 @@ public class PagamentoController {
         this.pagamentoService = pagamentoService;
     }
 
+    /**
+     * Regista um pagamento associado a uma estadia.
+     *
+     * @param dto dados do pagamento submetidos pelo formulário
+     * @param redirectAttributes mensagens flash para o utilizador
+     * @return redirecionamento para o histórico operacional/financeiro
+     */
     @PostMapping
     public String registrar(@ModelAttribute PagamentoDto dto, RedirectAttributes redirectAttributes) {
         try {

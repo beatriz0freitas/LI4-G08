@@ -4,6 +4,12 @@ import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * DTO de leitura com as métricas agregadas apresentadas no relatório.
+ *
+ * Não representa uma entidade persistida; é uma projeção calculada a partir de
+ * reservas, estadias, pagamentos, alojamentos e serviços extra.
+ */
 public class RelatorioResumoDto {
     private long alojamentosTotal;
     private long alojamentosOcupados;

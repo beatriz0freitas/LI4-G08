@@ -111,6 +111,11 @@ Relações: `Estadia` 1..* `RegistoCuidado` ; `Estadia` 1..* `ServicoExtra` ; `E
 - **SC-004**: Autor e timestamp auditáveis para 100% dos registos criados (logs/DB).
 - **SC-005**: Controlo de acesso: apenas perfis designados conseguem criar intervenções clínicas (teste de autorização automatizado).
 
+## Documentação Técnica
+
+- O código Java deve ser documentado com Javadoc em controllers, services, DTOs e exceptions públicas ou relevantes para fluxos de negócio.
+- O Maven Javadoc Plugin deve gerar a documentação HTML do código.
+
 ## Assunções
 - A base de utilizadores, perfis e autenticação reusa a infraestrutura existente (ver [ADR-05](../../docs/Etapa2/04-architecture-decisions/ADR-05-controlo-acesso-perfil.md#L1)).
 - A entidade `Estadia` já existe e tem um identificador estável usado pelas novas entidades.

@@ -16,6 +16,13 @@ import pt.hotel.animais.model.Colaborador;
 import pt.hotel.animais.model.enums.TipoColaborador;
 import pt.hotel.animais.service.IColaboradorService;
 
+/**
+ * Controller MVC responsável pela gestão de colaboradores pelo perfil de direção.
+ *
+ * Todas as ações devolvem páginas Thymeleaf ou redirecionamentos e nunca respostas
+ * JSON. A autorização fica reforçada no controller porque criação, edição e
+ * desativação de colaboradores alteram permissões de acesso ao sistema.
+ */
 @Controller
 @RequestMapping("/colaboradores")
 @PreAuthorize("hasRole('DIRETOR')")
@@ -27,6 +34,12 @@ public class ColaboradorController {
         this.colaboradorService = colaboradorService;
     }
 
+    /**
+     * Lista todos os colaboradores registados.
+     *
+     * @param model modelo da página
+     * @return template da lista de colaboradores
+     */
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("colaboradores", colaboradorService.listarTodos());
@@ -35,12 +48,27 @@ public class ColaboradorController {
         return "colaboradores/list";
     }
 
+    /**
+     * Apresenta o formulário de criação de colaborador.
+     *
+     * @param model modelo da página
+     * @return template do formulário de colaborador
+     */
     @GetMapping("/novo")
     public String novo(Model model) {
         prepararFormulario(model, new ColaboradorFormDto(), null, "Novo Colaborador");
         return "colaboradores/form";
     }
 
+    /**
+     * Processa a submissão do formulário de criação de colaborador.
+     *
+     * @param formDto dados submetidos pelo formulário
+     * @param bindingResult resultado da validação Bean Validation
+     * @param model modelo usado quando é necessário voltar ao formulário
+     * @param redirectAttributes mensagens flash para o redirecionamento
+     * @return redirecionamento para a lista ou template do formulário com erros
+     */
     @PostMapping
     public String criar(@Valid @ModelAttribute("colaboradorForm") ColaboradorFormDto formDto,
                         BindingResult bindingResult,
@@ -62,6 +90,13 @@ public class ColaboradorController {
         }
     }
 
+    /**
+     * Apresenta o formulário de edição preenchido com os dados atuais.
+     *
+     * @param id identificador do colaborador a editar
+     * @param model modelo da página
+     * @return template do formulário de colaborador
+     */
     @GetMapping("/{id}/editar")
     public String editar(@PathVariable Long id, Model model) {
         Colaborador colaborador = colaboradorService.obter(id);
@@ -75,6 +110,16 @@ public class ColaboradorController {
         return "colaboradores/form";
     }
 
+    /**
+     * Atualiza dados administrativos e permissões de um colaborador existente.
+     *
+     * @param id identificador do colaborador
+     * @param formDto dados submetidos pelo formulário
+     * @param bindingResult resultado da validação Bean Validation
+     * @param model modelo usado quando é necessário voltar ao formulário
+     * @param redirectAttributes mensagens flash para o redirecionamento
+     * @return redirecionamento para a lista ou template do formulário com erros
+     */
     @PostMapping("/{id}")
     public String atualizar(@PathVariable Long id,
                             @Valid @ModelAttribute("colaboradorForm") ColaboradorFormDto formDto,
@@ -97,6 +142,13 @@ public class ColaboradorController {
         }
     }
 
+    /**
+     * Desativa logicamente um colaborador sem apagar o histórico associado.
+     *
+     * @param id identificador do colaborador
+     * @param redirectAttributes mensagens flash para o redirecionamento
+     * @return redirecionamento para a lista de colaboradores
+     */
     @PostMapping("/{id}/desativar")
     public String desativar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         colaboradorService.desativar(id);

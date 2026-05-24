@@ -13,7 +13,7 @@ DB_PASSWORD ?= hotelpass
 export HOST_DB_PORT
 export TEST_HOST_DB_PORT
 
-.PHONY: help test package run run-mysql verify config db-up db-reset-test db-stop db-shell up down restart destroy ps logs logs-app logs-db clean
+.PHONY: help test package run run-mysql verify config db-up db-reset-test db-stop db-shell up down restart destroy ps logs logs-app logs-db docs docs-code docs-clean clean
 
 help:
 	@echo "Alvos disponíveis:"
@@ -36,6 +36,8 @@ help:
 	@echo "  make logs        - Mostrar logs agregados da stack"
 	@echo "  make logs-app    - Mostrar logs da app"
 	@echo "  make logs-db     - Mostrar logs da base de dados"
+	@echo "  make docs        - Gerar documentação Javadoc HTML"
+	@echo "  make docs-clean  - Remover Javadoc HTML gerado"
 	@echo "  make clean       - Limpar artefactos Maven"
 
 test:
@@ -95,6 +97,14 @@ logs-app:
 
 logs-db:
 	docker compose logs -f db
+
+docs: 
+	mvn javadoc:javadoc -DskipTests
+	@echo "Documentação gerada:"
+	@echo "  Código: target/generated-docs/index.html"
+
+docs-clean:
+	rm -rf target/generated-docs
 
 clean:
 	mvn clean
