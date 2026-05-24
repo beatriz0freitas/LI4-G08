@@ -97,4 +97,11 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
         @Param("dataInicio") LocalDate dataInicio,
         @Param("dataFim") LocalDate dataFim
     );
+
+    @Query("SELECT COUNT(r) FROM Reserva r " +
+           "WHERE NOT (r.dataFim < :dataInicio OR r.dataInicio > :dataFim)")
+    long countInPeriod(
+        @Param("dataInicio") LocalDate dataInicio,
+        @Param("dataFim") LocalDate dataFim
+    );
 }

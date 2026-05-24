@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt">
+<head th:insert="fragments/head :: head"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+	<th:block th:insert="fragments/navbar :: navbar"></th:block>
+	<th:block th:insert="fragments/sidebar :: sidebar"></th:block>
+
+	<div class="content-wrapper">
+		<div class="content-header">
+			<div class="container-fluid">
+				<h1 class="m-0" th:text="${pageTitle}">Colaborador</h1>
+			</div>
+		</div>
+
+		<section class="content">
+			<div class="container-fluid">
+				<div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+				<div class="card card-primary">
+					<div class="card-header">
+						<h3 class="card-title">Dados de acesso</h3>
+					</div>
+					<form th:action="${colaboradorId} ? @{/colaboradores/{id}(id=${colaboradorId})} : @{/colaboradores}"
+						  th:object="${colaboradorForm}" method="post">
+						<div class="card-body">
+							<div class="form-group">
+								<label for="username">Username</label>
+								<input id="username" type="text" th:field="*{username}" class="form-control"
+									   th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''">
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+							</div>
+
+							<div class="form-group">
+								<label for="nome">Nome</label>
+								<input id="nome" type="text" th:field="*{nome}" class="form-control"
+									   th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid' : ''">
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></div>
+							</div>
+
+							<div class="form-group">
+								<label for="email">Email</label>
+								<input id="email" type="email" th:field="*{email}" class="form-control"
+									   th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''">
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+							</div>
+
+							<div class="form-group">
+								<label for="password">Password</label>
+								<input id="password" type="password" th:field="*{password}" class="form-control">
+								<small class="form-text text-muted" th:if="${colaboradorId}">Preencher apenas para alterar a password.</small>
+							</div>
+
+							<div class="form-group">
+								<label for="tipoColaborador">Tipo de colaborador</label>
+								<select id="tipoColaborador" th:field="*{tipoColaborador}" class="form-control"
+										th:classappend="${#fields.hasErrors('tipoColaborador')} ? 'is-invalid' : ''">
+									<option value="">Selecionar</option>
+									<option th:each="tipo : ${tiposColaborador}" th:value="${tipo}" th:text="${tipo}"></option>
+								</select>
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('tipoColaborador')}" th:errors="*{tipoColaborador}"></div>
+							</div>
+
+							<div class="form-check">
+								<input id="ativo" type="checkbox" th:field="*{ativo}" class="form-check-input">
+								<label for="ativo" class="form-check-label">Ativo</label>
+							</div>
+						</div>
+						<div class="card-footer">
+							<button type="submit" class="btn btn-success">
+								<i class="fas fa-save mr-2"></i>Guardar
+							</button>
+							<a th:href="@{/colaboradores}" class="btn btn-secondary">
+								<i class="fas fa-times mr-2"></i>Cancelar
+							</a>
+						</div>
+					</form>
+				</div>
+			</div>
+		</section>
+	</div>
+
+	<th:block th:insert="fragments/footer :: footer"></th:block>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+</html>

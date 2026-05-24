@@ -5,11 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -22,6 +19,22 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login").permitAll()
+                .requestMatchers("/relatorios/**", "/colaboradores/**").hasRole("DIRETOR")
+                .requestMatchers("/dashboard").hasRole("DIRETOR")
+                .requestMatchers("/tutores/**", "/animais/**", "/reservas/**", "/estadias/**", "/pagamentos/**")
+                    .hasAnyRole("DIRETOR", "FUNCIONARIO_RECEPCAO")
+                .requestMatchers("/cuidados/**", "/extras/**")
+                    .hasAnyRole("DIRETOR", "CUIDADOR", "MEDICO_VETERINARIO")
+                .requestMatchers("/plano-cuidados/**")
+                    .hasAnyRole("DIRETOR", "FUNCIONARIO_RECEPCAO", "CUIDADOR", "MEDICO_VETERINARIO")
+                .requestMatchers("/clinica/**")
+                    .hasAnyRole("DIRETOR", "MEDICO_VETERINARIO")
+                .requestMatchers("/notas/**")
+                    .hasAnyRole("DIRETOR", "FUNCIONARIO_RECEPCAO", "CUIDADOR", "MEDICO_VETERINARIO")
+                .requestMatchers("/historico/**")
+                    .hasAnyRole("DIRETOR", "FUNCIONARIO_RECEPCAO", "MEDICO_VETERINARIO")
+                .requestMatchers("/alojamentos", "/limpeza/**")
+                    .hasAnyRole("DIRETOR", "FUNCIONARIO_RECEPCAO", "RESPONSAVEL_LIMPEZA")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -40,32 +53,6 @@ public class SecurityConfig {
             );
 
         return http.build();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder encoder) {
-        // Utilizadores de teste — serão substituídos por UserDetailsService com BD
-        var diretor = User.withUsername("diretor")
-            .password(encoder.encode("diretor123"))
-            .roles("DIRETOR")
-            .build();
-        var recepcao = User.withUsername("recepcao")
-            .password(encoder.encode("recepcao123"))
-            .roles("FUNCIONARIO_RECEPCAO")
-            .build();
-        var cuidador = User.withUsername("cuidador")
-            .password(encoder.encode("cuidador123"))
-            .roles("CUIDADOR")
-            .build();
-        var veterinario = User.withUsername("veterinario")
-            .password(encoder.encode("vet123"))
-            .roles("MEDICO_VETERINARIO")
-            .build();
-        var limpeza = User.withUsername("limpeza")
-            .password(encoder.encode("limpeza123"))
-            .roles("RESPONSAVEL_LIMPEZA")
-            .build();
-        return new InMemoryUserDetailsManager(diretor, recepcao, cuidador, veterinario, limpeza);
     }
 
     @Bean

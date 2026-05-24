@@ -52,6 +52,21 @@ public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
 	@Query("SELECT COUNT(e) FROM Estadia e WHERE e.estado = :estado")
 	long countByEstado(@Param("estado") EstadoEstadia estado);
 
+	@Query("""
+		SELECT COUNT(e)
+		FROM Estadia e
+		WHERE e.dataInicio <= :fim
+		  AND (e.dataFim IS NULL OR e.dataFim >= :inicio)
+		""")
+	long countSobrepostasPeriodo(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
+
+	@Query("""
+		SELECT COUNT(DISTINCT e.reserva.alojamento.id)
+		FROM Estadia e
+		WHERE e.estado = pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO
+		""")
+	long countAlojamentosOcupadosAgora();
+
 	java.util.Optional<Estadia> findByReservaId(Long reservaId);
 
 }

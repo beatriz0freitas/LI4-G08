@@ -1,117 +1,86 @@
 # Tasks: Relatórios e Colaboradores (Spec 005)
 
-**Input**: `spec.md`, `plan.md`, requisitos em `docs/Etapa1/02-requirements`
+**Input**: `spec.md`, `plan.md`, requisitos em `docs/Etapa1/02-requirements`, arquitetura em `docs/Etapa2/01-architecture/architecture.md` e permissões em `docs/Etapa2/06-role-permissions/permissoes.md`.
 
-## Phase 1: Setup (Shared Infrastructure)
+## Phase 1: Setup e Contrato MVC
 
-- [ ] T001 Create feature branch `005-relatorios-colaboradores` and push remote
-- [ ] T002 Create contracts folder and OpenAPI skeleton in specs/005-relatorios-colaboradores/contracts/openapi.yaml
-- [ ] T003 [P] Add Flyway migration placeholder: PatasBigodesApp/src/main/resources/db/migration/V005__relatorios_colaboradores.sql
-- [ ] T004 [P] Add initial DTOs: PatasBigodesApp/src/main/java/.../dto/RelatorioRequest.java and ColaboradorDTO.java
+- [ ] T001 Criar branch de feature `005-relatorios-colaboradores` e publicar no remoto.
+- [x] T002 Atualizar `specs/005-relatorios-colaboradores/contracts/contract.md` com rotas MVC, templates, formulários e downloads.
+- [x] T003 [P] Criar migrations Flyway para colaboradores e diretor inicial: `PatasBigodesApp/src/main/resources/db/migration/V6__create_colaborador.sql` e `V7__seed_diretor.sql`.
+- [x] T004 [P] Criar DTOs de formulário: `RelatorioFiltroFormDto` e `ColaboradorFormDto`.
 
----
+## Phase 2: Fundação de Segurança e Domínio
 
-## Phase 2: Foundational (Blocking Prerequisites)
+- [x] T005 Criar/validar enum `TipoColaborador` em `PatasBigodesApp/src/main/java/pt/hotel/animais/model/enums/TipoColaborador.java`.
+- [x] T006 Criar entidade `Colaborador` com `tipoColaborador: TipoColaborador`, password BCrypt e estado ativo.
+- [x] T007 [P] Criar `ColaboradorRepository`.
+- [x] T008 Implementar `IColaboradorService`/`ColaboradorService` com criar, editar, desativar e listar.
+- [x] T009 Migrar autenticação para `UserDetailsService` baseado em `ColaboradorRepository`, sem utilizadores de teste hardcoded em runtime.
 
-- [ ] T005 Setup DB schema changes (entities/migrations) for `Colaborador`, `Pagamento`, `ServicoExtra` (implement JPA entities and migrations): PatasBigodesApp/src/main/java/.../entity/Colaborador.java, Pagamento.java, ServicoExtra.java
-- [ ] T006 [P] Ensure authentication & roles exist and RNF-04 enforced: PatasBigodesApp/src/main/java/.../security/SecurityConfig.java (verify role constants and seed data)
-- [ ] T007 [P] Create repositories: PatasBigodesApp/src/main/java/.../repository/ColaboradorRepository.java, PagamentoRepository.java, ServicoExtraRepository.java
-- [ ] T008 Implement common pagination/filter utilities: PatasBigodesApp/src/main/java/.../util/Pagination.java
-- [ ] T009 Create API routing/controllers scaffold: PatasBigodesApp/src/main/java/.../controller/RelatorioController.java and ColaboradorController.java
+## Phase 3: US-03 - Gestão de Colaboradores
 
----
+**Goal**: O `DIRETOR` gere colaboradores através de páginas Thymeleaf.
 
-## Phase 3: User Story US-01 - Consultar disponibilidade e taxa de ocupação (Priority: P1)
+**Independent Test**: Autenticar como `DIRETOR`, abrir `/colaboradores/novo`, criar colaborador com `tipoColaborador = CUIDADOR` e confirmar presença em `/colaboradores`.
 
-**Goal**: Apresentar taxa de ocupação e contadores básicos no dashboard do diretor.
+- [x] T010 [US-03] Implementar `ColaboradorController` com `GET /colaboradores`, `GET /colaboradores/novo`, `POST /colaboradores`, `GET /colaboradores/{id}/editar`, `POST /colaboradores/{id}` e `POST /colaboradores/{id}/desativar`.
+- [x] T011 [US-03] Aplicar `@PreAuthorize("hasRole('DIRETOR')")` às rotas de colaboradores.
+- [x] T012 [US-03] Criar templates `colaboradores/list.html` e `colaboradores/form.html`.
+- [x] T013 [US-03] Popular o campo `tipoColaborador` no formulário a partir de `TipoColaborador.values()`.
+- [x] T014 [US-03] Testar validações de username/email duplicado, password obrigatória na criação e tipo inválido.
+- [x] T015 [US-03] Criar `ColaboradorControllerTest` e `ColaboradorServiceTest`.
 
-**Independent Test**: Usando dados de teste, aceder ao endpoint /api/dashboard/ocupacao e verificar campos retornados.
+## Phase 4: US-01 e US-02 - Dashboard do Diretor
 
-- [ ] T010 [US-01] Implement `IOcupacaoService`/`OcupacaoService` to compute occupancy percentage and counts: `PatasBigodesApp/src/main/java/.../service/IOcupacaoService.java` e `PatasBigodesApp/src/main/java/.../service/OcupacaoService.java`
-- [ ] T011 [US-01] Add repository query to count occupied boxes and total boxes: PatasBigodesApp/src/main/java/.../repository/AlojamentoRepository.java
-- [ ] T012 [US-01] Implement endpoint: GET `/api/dashboard/ocupacao` in PatasBigodesApp/src/main/java/.../controller/DashboardController.java
-- [ ] T013 [US-01] Add Thymeleaf fragment for the dashboard summary: PatasBigodesApp/src/main/resources/templates/fragments/dashboard_occupacao.html
-- [ ] T014 [US-01] Unit test for `OcupacaoService`: PatasBigodesApp/src/test/java/.../OcupacaoServiceTest.java
+**Goal**: Apresentar taxa de ocupação, estadias, reservas, faturação e pagamentos pendentes no dashboard.
 
----
+**Independent Test**: Autenticar como `DIRETOR`, abrir `/dashboard` e confirmar métricas principais renderizadas.
 
-## Phase 4: User Story US-02 - Consultar indicadores de faturação e pagamentos (Priority: P1)
+- [x] T016 [US-01] Atualizar `IDashboardService`/`DashboardService` ou criar métodos de agregação necessários para ocupação por período.
+- [x] T017 [US-02] Criar agregações de faturação por período, método e estado em `PagamentoRepository`.
+- [x] T018 [US-02] Renderizar painel financeiro em `templates/dashboard/index.html`.
+- [x] T019 [US-01/US-02] Garantir que `/dashboard` está acessível ao `DIRETOR` e bloqueado a perfis sem permissão financeira.
+- [x] T020 [US-01/US-02] Criar testes de serviço e controller para métricas do dashboard.
 
-**Goal**: Agregar faturação por período e por método de pagamento.
+## Phase 5: US-04 - Relatórios Operacionais
 
-**Independent Test**: Chamar endpoint `/api/indicadores/faturacao?start=...&end=...` e verificar agregações.
+**Goal**: Gerar relatórios filtráveis e exportar CSV/PDF pela interface web.
 
-- [ ] T015 [US-02] Implement `IFaturacaoService`/`FaturacaoService` (sum by periodo and by metodoPagamento): `PatasBigodesApp/src/main/java/.../service/IFaturacaoService.java` e `PatasBigodesApp/src/main/java/.../service/FaturacaoService.java`
-- [ ] T016 [US-02] Add `PagamentoRepository` queries to sum by date range and metodoPagamento: PatasBigodesApp/src/main/java/.../repository/PagamentoRepository.java
-- [ ] T017 [US-02] Implement endpoint GET `/api/indicadores/faturacao` in PatasBigodesApp/src/main/java/.../controller/IndicadoresController.java
-- [ ] T018 [US-02] Add dashboard panel fragment for faturação: PatasBigodesApp/src/main/resources/templates/fragments/dashboard_faturacao.html
-- [ ] T019 [US-02] Unit test for `FaturacaoService`: PatasBigodesApp/src/test/java/.../FaturacaoServiceTest.java
+**Independent Test**: Autenticar como `DIRETOR`, abrir `/relatorios`, filtrar período mensal, gerar relatório e exportar CSV.
 
----
+- [x] T021 [US-04] Implementar `IRelatorioService`/`RelatorioService` com agregações de ocupação, reservas, estadias, faturação e serviços extra.
+- [x] T022 [US-04] Implementar `RelatorioController` com `GET /relatorios`, `POST /relatorios/gerar`, `GET /relatorios/exportar/csv` e `GET /relatorios/exportar/pdf`.
+- [x] T023 [US-04] Aplicar `@PreAuthorize("hasRole('DIRETOR')")` ao `RelatorioController`.
+- [x] T024 [US-04] Criar template `relatorios/list.html` com filtros, tabela de resultados e ações de exportação.
+- [x] T025 [US-04] Implementar exportação CSV com cabeçalhos estáveis.
+- [x] T026 [US-04] Implementar geração PDF server-side simples.
+- [x] T027 [US-04] Criar `RelatorioServiceTest` e `RelatorioControllerTest`.
 
-## Phase 5: User Story US-03 - Gerir perfis de acesso dos colaboradores (Priority: P1)
+## Phase 6: US-05 - Histórico de Estadias e Pagamentos
 
-**Goal**: CRUD de colaboradores com atribuição de `tipoColaborador` e desactivação.
+**Goal**: Consolidar histórico operacional/financeiro nas páginas existentes.
 
-**Independent Test**: Usar API `/api/colaboradores` para criar, editar, listar e desactivar um colaborador.
+**Independent Test**: Autenticar como perfil autorizado, abrir `/historico` com filtros e confirmar eventos e pagamentos associados.
 
-- [ ] T020 [US-03] Implement `Colaborador` JPA entity and migration (if not present): PatasBigodesApp/src/main/java/.../entity/Colaborador.java
-- [ ] T021 [US-03] Implement `IColaboradorService`/`ColaboradorService` (create/edit/desactivar): `PatasBigodesApp/src/main/java/.../service/IColaboradorService.java` e `PatasBigodesApp/src/main/java/.../service/ColaboradorService.java`
-- [ ] T022 [US-03] Implement `ColaboradorController` endpoints (POST, PUT, GET, DELETE[soft]): PatasBigodesApp/src/main/java/.../controller/ColaboradorController.java
-- [ ] T023 [US-03] Implement Thymeleaf UI for colaboradores: PatasBigodesApp/src/main/resources/templates/colaboradores/list.html and edit.html
-- [ ] T024 [US-03] Unit tests for `ColaboradorService`: PatasBigodesApp/src/test/java/.../ColaboradorServiceTest.java
-- [ ] T025 [US-03] Seed script for default roles and an initial `DIRETOR` user: PatasBigodesApp/src/main/resources/data/seed-colaboradores.sql
+- [x] T028 [US-05] Rever `HistoricoController` e `templates/historico/list.html` para garantir filtros por reserva/estadia/período.
+- [x] T029 [US-05] Completar `IHistoricoService`/`HistoricoService` com agregação de eventos, pagamentos e serviços extra.
+- [x] T030 [US-05] Aplicar permissões conforme `permissoes.md`.
+- [x] T031 [US-05] Criar testes de histórico por perfil.
 
----
+## Phase 7: Segurança, QA e Documentação
 
-## Phase 6: User Story US-04 - Gerar relatórios operacionais por período (Priority: P1) 🎯 MVP
-
-**Goal**: Gerar relatórios agregados, permitir filtros e exportar CSV/PDF.
-
-**Independent Test**: POST `/api/relatorios/generate` com filtros e obter o resumo/export.
-
-- [ ] T026 [US-04] Implement `IRelatorioService`/`RelatorioService` with aggregation methods: `PatasBigodesApp/src/main/java/.../service/IRelatorioService.java` e `PatasBigodesApp/src/main/java/.../service/RelatorioService.java`
-- [ ] T027 [US-04] Implement background job mechanism (optional sync/blocking fallback): PatasBigodesApp/src/main/java/.../jobs/RelatorioJob.java
-- [ ] T028 [US-04] Implement CSV export util and endpoint GET `/api/relatorios/{id}/export/csv`: PatasBigodesApp/src/main/java/.../export/CsvExportService.java
-- [ ] T029 [US-04] Implement PDF export util and endpoint GET `/api/relatorios/{id}/export/pdf`: PatasBigodesApp/src/main/java/.../export/PdfExportService.java
-- [ ] T030 [US-04] Implement controller POST `/api/relatorios/generate` and GET `/api/relatorios/{id}`: PatasBigodesApp/src/main/java/.../controller/RelatorioController.java
-- [ ] T031 [US-04] Thymeleaf view for Relatórios: PatasBigodesApp/src/main/resources/templates/relatorios/list.html and relatorio_detail.html
-- [ ] T032 [US-04] Unit tests for `RelatorioService` aggregations: PatasBigodesApp/src/test/java/.../RelatorioServiceTest.java
-- [ ] T033 [US-04] Contract/integration test to validate CSV columns and content: specs/005-relatorios-colaboradores/tests/integration/test_relatorio_export.feature
-
----
-
-## Phase 7: User Story US-05 - Consultar histórico de estadias e pagamentos (Priority: P1)
-
-**Goal**: Fornecer endpoints e vistas para histórico por reserva/estadia com paginação e filtros.
-
-**Independent Test**: GET `/api/historico?reservaId=...` retorna eventos e pagamentos associados.
-
-- [ ] T034 [US-05] Implement `IHistoricoService`/`HistoricoService` para agregar eventos de estadia e pagamentos: `PatasBigodesApp/src/main/java/.../service/IHistoricoService.java` e `PatasBigodesApp/src/main/java/.../service/HistoricoService.java`
-- [ ] T035 [US-05] Implement repository queries para combinar `Estadia`, `Pagamento`, `ServicoExtra`: PatasBigodesApp/src/main/java/.../repository/EstadiaRepository.java
-- [ ] T036 [US-05] Implement endpoint GET `/api/historico` and Thymeleaf view: PatasBigodesApp/src/main/java/.../controller/HistoricoController.java and PatasBigodesApp/src/main/resources/templates/historico/list.html
-- [ ] T037 [US-05] Unit tests for `HistoricoService`: PatasBigodesApp/src/test/java/.../HistoricoServiceTest.java
-
----
-
-## Phase N: Polish & Cross-Cutting Concerns
-
-- [ ] T038 [P] Add logging, metrics and access audit for report generation and collaborator changes: PatasBigodesApp/src/main/java/.../aspect/AuditAspect.java
-- [ ] T039 [P] Security hardening: ensure RBAC checks on all controllers (use `@PreAuthorize` annotations)
-- [ ] T040 Update `spec.md` with final implementation decisions: specs/005-relatorios-colaboradores/spec.md
-- [ ] T041 Create `quickstart.md` with example requests and export steps: specs/005-relatorios-colaboradores/quickstart.md
-- [ ] T042 [P] Run manual QA scenario: follow Acceptance Tests in spec and record results in specs/005-relatorios-colaboradores/checklists/qa-results.md
-
----
+- [x] T032 [P] Criar testes de segurança com combinações da matriz de permissões.
+- [x] T033 [P] Configurar auditoria Spring Boot Actuator para geração de relatórios e alterações de colaboradores.
+- [x] T034 [P] Validar CSRF em todos os formulários POST.
+- [x] T035 Atualizar `quickstart.md` com passos de navegação na UI.
+- [x] T036 Registar resultados de QA em `specs/005-relatorios-colaboradores/checklists/qa-results.md`.
 
 ## Dependencies & Execution Order
 
-- Complete Phase 1 and Phase 2 before implementing user stories (Phase 3+)
-- User stories US-01..US-05 are P1 and can be implemented in the order above; some tasks within can run in parallel if different files are changed
-
----
+- Completar Phase 1 e Phase 2 antes das histórias de utilizador.
+- US-03 e US-04 são prioritárias porque materializam o pedido de direção: colaboradores e relatórios.
+- Testes de segurança devem ser executados depois de cada controller ficar funcional.
 
 ## Summary
-Total tasks: 42 (T001..T042)
 
-Each task includes an exact path to implement; convert tasks to issues or assign to developers as needed.
+Total tasks: 36 (`T001`..`T036`).

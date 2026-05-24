@@ -1,66 +1,74 @@
 # Plano de Implementação — Relatórios e Colaboradores (Spec 005)
 
-## Visão geral
-Objetivo: Implementar geração/exportação de relatórios operacionais e gestão de colaboradores conforme spec `spec.md`, garantindo rastreabilidade com os RF/RD da Etapa 1.
+## Visão Geral
+
+Objetivo: implementar geração/exportação de relatórios operacionais e gestão de colaboradores conforme `spec.md`, respeitando a arquitetura Spring MVC + Thymeleaf descrita em `docs/Etapa2/01-architecture/architecture.md`.
 
 ## Entregáveis
-- Endpoints backend para geração de relatórios filtráveis e exportação (CSV/PDF)
-- UI/Thymeleaf: vistas de Relatórios e Gestão de Colaboradores
-- Serviços e Repositórios: agregação de métricas, cálculo de ocupação, agregação de faturação e serviços extra
-- Testes de aceitação (Gherkin) e unitários para serviços críticos
-- Documentação técnica: contracts/ (API), quickstart.md
+
+- Controllers MVC que devolvem páginas Thymeleaf, redirecionamentos ou downloads de ficheiros.
+- Vistas Thymeleaf de relatórios e gestão de colaboradores.
+- Serviços e repositórios para agregação de métricas, cálculo de ocupação, faturação e serviços extra.
+- Modelo persistente de `Colaborador` com `tipoColaborador` como enum.
+- Testes de controllers MVC, serviços e autorização por perfil.
+- Documentação técnica de rotas MVC e permissões.
 
 ## Premissas
-- Base de dados já contém `Reserva`, `Estadia`, `Pagamento`, `ServicoExtra` (ou serão criados mapas de migração mínimos)
-- Autenticação/Autorização existente (RNF-04) — apenas perfis autorizados acedem às funcionalidades sensíveis
 
-## Ordem de implementação
+- A implementação segue controllers MVC, templates Thymeleaf, formulários e downloads server-side.
+- Autenticação/autorização segue RNF-04 e a matriz `docs/Etapa2/06-role-permissions/permissoes.md`.
+- Apenas o `DIRETOR` pode gerir colaboradores e consultar/exportar relatórios financeiros.
 
-1. Especificação de API & Contracts
-  - Definir endpoints REST: `/api/relatorios` (POST para gerar, GET para estado/export), `/api/colaboradores` (CRUD)
-  - Documentar payloads (FiltroRelatorio, RelatorioResumo, ColaboradorDTO)
-  - Deliverable: `specs/005-relatorios-colaboradores/contracts/` (OpenAPI snippet)
+## Ordem de Implementação
 
-2. Implementação backend inicial
-  - Implementar `IRelatorioService` e `RelatorioService` — agregações (ocupacaoPerc, estadiasCount, reservasCount, faturacaoTotal, servicosExtraTotal)
-  - Criar queries em `PagamentoRepository` para sumarização por período/método
-  - Implementar `ColaboradorController`, `IColaboradorService`, `ColaboradorService`, `ColaboradorRepository` (CRUD + desactivar)
-  - Acceptance: endpoints devolvem JSON apropriado e autenticado
+1. Contrato de interface MVC
+  - Documentar rotas de página, templates, formulários, query parameters e downloads em `contracts/contract.md`.
+  - Validar rotas contra `architecture.md` e `permissoes.md`.
 
-3. UI & Export
-  - Desenvolver Thymeleaf views para Relatórios (filtros, tabelas, sumário) e Gestão de Colaboradores
-  - Implementar export CSV e geração de PDF (server-side reporting simples)
-  - Acceptance: export gera ficheiros com colunas esperadas e inclui sumário
+2. Fundação de segurança e colaboradores
+  - Implementar `TipoColaborador` como enum, se ainda não existir na aplicação.
+  - Implementar `Colaborador`, `ColaboradorRepository`, `IColaboradorService` e `ColaboradorService`.
+  - Migrar autenticação de utilizadores em memória para colaboradores persistidos quando a equipa avançar para Etapa 3.
 
-4. Testes e QA
-  - Testes unitários para `RelatorioService` e `PagamentoRepository`
-  - Testes de aceitação Gherkin para `US-04` e `US-03`
-  - Revisão de segurança: verificação de permissões (RNF-04)
+3. Gestão de colaboradores
+  - Implementar `ColaboradorController` com rotas MVC de listagem, registo, edição e desativação.
+  - Criar templates `colaboradores/list.html` e `colaboradores/form.html`.
+  - Garantir que o formulário de registo é acessível apenas ao `DIRETOR`.
 
-5. Documentação e entrega
-  - `quickstart.md` com endpoints, exemplos de requests/exports
-  - Atualizar `spec.md` com decisões técnicas finais
+4. Relatórios
+  - Implementar `IRelatorioService`/`RelatorioService` com agregações de ocupação, estadias, reservas, pagamentos e serviços extra.
+  - Implementar `RelatorioController` com filtros por período e exportações CSV/PDF.
+  - Criar templates `relatorios/list.html` ou integrar no dashboard do diretor.
 
-## Tarefas técnicas (detalhadas)
-- API: POST `/api/relatorios/generate` {filtros} -> jobId | blocking response
-- API: GET `/api/relatorios/{jobId}` -> estado / resultado (download links)
-- SQL: queries parametrizadas para sumarização por período (usar índices em `dataInicio`, `dataFim`, `reservaId`)
-- Backend: suportar agrupamento por (dia, semana, mês) e paginação para tabelas
-- Segurança: verificar roles `DIRETOR` para endpoints de faturação detalhada
+5. Testes e QA
+  - Testes de serviços para agregações e validação de colaboradores.
+  - Testes MVC para renderização de páginas, submissão de formulários e downloads.
+  - Testes de autorização para confirmar a matriz de permissões.
 
-## Critérios de aceitação (mínimos)
-- Relatório padrão gerado e mostrado no UI com as métricas definidas em `spec.md` e exportável para CSV/PDF
-- CSV produzido com cabeçalhos: `periodo_start,periodo_end,ocupacaoPerc,estadiasCount,reservasCount,faturacaoTotal,metodoPagamento,servicosExtraTotal`
-- Gestão de colaboradores suporta CRUD e desactivação; lista reflecte alterações imediatamente
-- Testes automatizados cobrem agregação de faturação e regras de permissão
+6. Documentação e entrega
+  - Atualizar `quickstart.md` com passos de navegação na interface.
+  - Rever `spec.md`, `tasks.md` e `permissoes.md` antes da entrega.
 
-## Riscos e mitigação
-- Risco: grandes volumes tornam agregação lenta — Mitigação: executar como job assíncrono, pré-aggregate por dia em tabela materializada
-- Risco: inconsistências nos pagamentos — Mitigação: validar campos obrigatórios (`valor`,`metodoPagamento`,`estado`) e usar transacções nas operações de check-out
+## Tarefas Técnicas Chave
 
-## Próximos passos imediatos
-1. Criar branch de feature `005-relatorios-colaboradores` (se ainda não existir)
-2. Gerar `contracts/` com OpenAPI minimal
-3. Implementar `IRelatorioService`/`RelatorioService` e testes básicos
+- MVC: `GET /relatorios` para página de filtros e resultados.
+- MVC: `POST /relatorios/gerar` para gerar relatório e regressar à página.
+- Export: `GET /relatorios/exportar/csv` e `GET /relatorios/exportar/pdf`.
+- MVC: `GET /colaboradores`, `GET /colaboradores/novo`, `POST /colaboradores`, `GET /colaboradores/{id}/editar`, `POST /colaboradores/{id}`, `POST /colaboradores/{id}/desativar`.
+- Segurança: aplicar `hasRole('DIRETOR')` nas rotas de relatórios financeiros e colaboradores.
+- Dados: validar `tipoColaborador` como enum `TipoColaborador`.
 
----
+## Critérios de Aceitação
+
+- Relatório padrão é gerado e mostrado na interface com métricas definidas em `spec.md`.
+- CSV/PDF são descarregados a partir da interface e preservam os filtros aplicados.
+- Gestão de colaboradores suporta criação, edição e desativação pelo `DIRETOR`.
+- Lista de colaboradores reflete alterações imediatamente.
+- Testes automatizados cobrem agregações, validações de formulário e regras de permissão.
+
+## Riscos e Mitigação
+
+- Risco: agregações lentas em períodos grandes. Mitigação: índices por datas e fallback com estado de processamento na página.
+- Risco: permissões divergentes entre controller e navegação. Mitigação: matriz única em `permissoes.md` e testes por perfil.
+- Risco: enum de colaborador tratado como texto livre no formulário. Mitigação: popular select a partir de `TipoColaborador.values()` e validar no DTO.
+

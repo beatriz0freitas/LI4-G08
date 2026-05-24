@@ -22,6 +22,8 @@ public class DashboardController {
         model.addAttribute("reservasAtivas", dashboardService.contarReservasAtivas());
         model.addAttribute("estadiasEmCurso", dashboardService.contarEstadiasAtivas());
         model.addAttribute("pagamentosPendentes", dashboardService.contarPagamentosPendentes());
+        model.addAttribute("faturacaoTotal", dashboardService.faturacaoTotal());
+        model.addAttribute("activePage", "dashboard");
         return "dashboard/index";
     }
 }
