@@ -200,7 +200,7 @@ ServicoExtra
 IntervencaoClinica [C] → (1..*)
 
 Phase 5 (Reporting):
-RelatorioService
+IRelatorioService / RelatorioService
 ```
 
 ---
@@ -210,8 +210,13 @@ RelatorioService
 ### Business Rules (RD-01)
 
 ```java
-// Validation: Alojamento não está disponível se estadoLimpeza != CONCLUIDO
-public class AlojamentoService {
+// Contracto de aplicação exposto ao controller.
+public interface IAlojamentoService {
+    boolean estaDisponivel(Long alojamentoId);
+}
+
+// Implementação concreta com regras de domínio.
+public class AlojamentoService implements IAlojamentoService {
     public boolean estaDisponivel(Long alojamentoId) {
         Alojamento alojamento = repository.findById(alojamentoId).orElseThrow();
         

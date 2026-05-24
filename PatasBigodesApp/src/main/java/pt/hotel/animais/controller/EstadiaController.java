@@ -9,19 +9,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pt.hotel.animais.model.Estadia;
-import pt.hotel.animais.service.EstadiaService;
+import pt.hotel.animais.repository.EstadiaRepository;
+import pt.hotel.animais.service.IEstadiaService;
+import pt.hotel.animais.service.IPagamentoService;
 
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/estadias")
 public class EstadiaController {
 
-    private final EstadiaService estadiaService;
+    private final IEstadiaService estadiaService;
+    private final EstadiaRepository estadiaRepository;
+    private final IPagamentoService pagamentoService;
 
     @GetMapping
-    public String operacoes(Model model) {
+    public String operacoes(@RequestParam(required = false) Long estadiaId, Model model) {
         model.addAttribute("activePage", "estadias");
         model.addAttribute("pageTitle", "Check-in / Check-out");
+        if (estadiaId != null) {
+            estadiaRepository.findById(estadiaId).ifPresent(e -> {
+                try {
+                    var extras = pagamentoService.calcularExtras(e);
+                    model.addAttribute("extrasTotal", extras);
+                } catch (Exception ignored) { }
+            });
+            model.addAttribute("estadiaId", estadiaId);
+        }
         return "estadias/checkin-checkout";
     }
 

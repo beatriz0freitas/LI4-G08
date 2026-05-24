@@ -4,7 +4,7 @@
 
 **Decision**: A implementação desta feature deve seguir a arquitetura e os modelos já documentados em Etapa 2, sem introduzir novas convenções de pacote, novas camadas ou fluxos alternativos.
 
-**Rationale**: A [architecture.md](../../docs/Etapa2/01-architecture/architecture.md) define a aplicação como um monólito MVC em camadas com Thymeleaf e Spring Data JPA. A [class-diagram.md](../../docs/Etapa2/02-class-diagram/class-diagram.md) e os diagramas de sequência [UC-03.mmd](../../docs/Etapa2/03-seq-diagrams/UC-03.mmd) e [UC-04.mmd](../../docs/Etapa2/03-seq-diagrams/UC-04.mmd) detalham exatamente onde esta feature encaixa: `TutorAnimalController`, `ReservaController`, `TutorService`, `AnimalService`, `ReservaService`, `AlojamentoService` e respetivos repositórios.
+**Rationale**: A [architecture.md](../../docs/Etapa2/01-architecture/architecture.md) define a aplicação como um monólito MVC em camadas com Thymeleaf e Spring Data JPA. A [class-diagram.md](../../docs/Etapa2/02-class-diagram/class-diagram.md) e os diagramas de sequência [UC-03.mmd](../../docs/Etapa2/03-seq-diagrams/UC-03.mmd) e [UC-04.mmd](../../docs/Etapa2/03-seq-diagrams/UC-04.mmd) detalham exatamente onde esta feature encaixa: `TutorAnimalController`, `ReservaController`, interfaces `ITutorService`, `IAnimalService`, `IReservaService`, `IAlojamentoService`, implementações concretas `TutorService`, `AnimalService`, `ReservaService`, `AlojamentoService` e respetivos repositórios.
 
 **Alternatives considered**: Introduzir endpoints REST paralelos, uma camada de frontend separada ou fluxos de serviço não alinhados com os diagramas existentes. Essas opções foram rejeitadas por quebrarem a rastreabilidade e complicarem a implementação sem benefício funcional.
 

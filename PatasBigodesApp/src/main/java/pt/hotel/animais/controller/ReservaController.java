@@ -13,10 +13,10 @@ import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.Tutor;
 import pt.hotel.animais.model.enums.TipoAlojamento;
-import pt.hotel.animais.service.AlojamentoService;
-import pt.hotel.animais.service.AnimalService;
-import pt.hotel.animais.service.ReservaService;
-import pt.hotel.animais.service.TutorService;
+import pt.hotel.animais.service.IAlojamentoService;
+import pt.hotel.animais.service.IAnimalService;
+import pt.hotel.animais.service.IReservaService;
+import pt.hotel.animais.service.ITutorService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -32,10 +32,12 @@ import java.util.List;
 @RequestMapping("/reservas")
 public class ReservaController {
     
-    private final ReservaService reservaService;
-    private final AlojamentoService alojamentoService;
-    private final TutorService tutorService;
-    private final AnimalService animalService;
+    private final IReservaService reservaService;
+    private final IAlojamentoService alojamentoService;
+    private final ITutorService tutorService;
+    private final IAnimalService animalService;
+    private final pt.hotel.animais.repository.EstadiaRepository estadiaRepository;
+    private final pt.hotel.animais.service.IPagamentoService pagamentoService;
     
     /**
      * GET /reservas - Lista de reservas (geralmente com filtros).
@@ -196,6 +198,15 @@ public class ReservaController {
             model.addAttribute("pageTitle", "Reserva #" + id);
             model.addAttribute("breadcrumb", "Detalhes da Reserva");
             model.addAttribute("activePage", "reservas");
+
+            // mostrar extras se existir estadia associada
+            estadiaRepository.findByReservaId(id).ifPresent(estadia -> {
+                try {
+                    var extras = pagamentoService.calcularExtras(estadia);
+                    model.addAttribute("extrasTotal", extras);
+                    model.addAttribute("estadiaId", estadia.getId());
+                } catch (Exception ignored) {}
+            });
             
             return "reservas/confirmacao";
         } catch (IllegalArgumentException e) {

@@ -10,7 +10,6 @@ import pt.hotel.animais.model.enums.EstadoPagamento;
 import pt.hotel.animais.model.enums.MetodoPagamento;
 import pt.hotel.animais.model.enums.MomentoPagamento;
 import pt.hotel.animais.repository.EstadiaRepository;
-import pt.hotel.animais.service.PagamentoService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,12 +17,12 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class EstadiaService {
+public class EstadiaService implements IEstadiaService {
 
     private final EstadiaRepository estadiaRepository;
-    private final ReservaService reservaService;
-    private final PagamentoService pagamentoService;
-    private final AlojamentoService alojamentoService;
+    private final IReservaService reservaService;
+    private final IPagamentoService pagamentoService;
+    private final IAlojamentoService alojamentoService;
 
     public Estadia abrirEstadiaPorReserva(Long reservaId) {
         Reserva reserva = reservaService.obter(reservaId);

@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class LimpezaService {
+public class LimpezaService implements ILimpezaService {
     private final AlojamentoRepository alojamentoRepository;
 
     public List<Alojamento> listarAlojamentosPendentes() {

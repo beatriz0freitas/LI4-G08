@@ -1,0 +1,12 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Plano de Cuidados</title></head>
+<body>
+<h1>Plano de Cuidados (Estadia [[${estadiaId}]])</h1>
+<ul>
+    <li th:each="it : ${plano.itens}">
+        <span th:text="${it.dataHora}"></span> - <span th:text="${it.descricao}"></span>
+    </li>
+</ul>
+</body>
+</html>

@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import pt.hotel.animais.service.LimpezaService;
+import pt.hotel.animais.service.ILimpezaService;
 
 @Controller
 @RequiredArgsConstructor
 public class LimpezaController {
-    private final LimpezaService limpezaService;
+    private final ILimpezaService limpezaService;
 
     @GetMapping("/limpeza")
     @PreAuthorize("hasAnyRole('DIRETOR', 'RESPONSAVEL_LIMPEZA')")

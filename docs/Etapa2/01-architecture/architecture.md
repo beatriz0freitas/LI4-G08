@@ -55,8 +55,10 @@ Implementada com **Spring MVC** (`@Controller`) e templates **Thymeleaf** (`.htm
 | `ReservaController` | Criação, listagem e cancelamento de reservas | UC-04, UC-05 |
 | `EstadiaController` | Check-in, check-out, cuidados diários | UC-06, UC-07, UC-09 |
 | `PagamentoController` | Registo e consulta de pagamentos | UC-08 |
-| `ServicoExtraController` | Registo de serviços extra durante estadia | UC-10 |
-| `ClinicaController` | Registo e consulta de intervenções clínicas | UC-11 |
+| `ServicoExtraController` | Registo de serviços extra durante estadia (separado) | UC-10 |
+| `RegistoCuidadoController` | Registo e listagem de cuidados diários (separado) | UC-09 |
+| `NotaController` | Adição e consulta de notas operacionais em reservas (separado) | RF-05 |
+| `ClinicaController` | Registo e consulta de intervenções clínicas e alterações de estado de saúde (agrega `IntervencaoClinica` e `AlteracaoEstadoSaude`) | UC-11 |
 | `LimpezaController` | Marcação de alojamento como limpo | UC-12 |
 | `RelatorioController` | Dashboard e geração de relatórios | UC-13 |
 | `ColaboradorController` | Gestão de perfis de acesso (apenas Diretor) | US-03 |
@@ -65,21 +67,21 @@ Cada controlador recebe e devolve objetos **DTO** (_Data Transfer Objects_), nun
 
 ### 3.2 Camada de Aplicação (Services)
 
-Cada `@Service` encapsula regras de negócio e orquestra repositórios. As operações de escrita são anotadas com `@Transactional`.
+Cada serviço é definido por uma interface `INomeService` e por uma implementação concreta `NomeService` anotada com `@Service`. Os controllers dependem sempre da interface, enquanto a implementação encapsula regras de negócio, orquestra repositórios.
 
-| Service | Métodos principais | Regras de domínio aplicadas |
-|---|---|---|
-| `ColaboradorService` | `autenticar()`, `criarColaborador()`, `alterarPermissoes()` | RNF-04 |
-| `AlojamentoService` | `consultarDisponibilidade()`, `listarDisponiveis()` | RD-01 |
-| `TutorService` | `registarTutor()`, `pesquisar()` | RD-05 |
-| `AnimalService` | `registarAnimal()`, `atualizarEstadoSaude()`, `listarPorEstadoSaude()` | RD-05, RD-08 |
-| `ReservaService` | `criarReserva()`, `cancelarReserva()`, `listar()` | RD-01, RD-06 |
-| `EstadiaService` | `registarCheckIn()`, `registarCheckOut()`, `registarCuidadoDiario()` | RD-02, RD-03, RD-07 |
-| `ServicoExtraService` | `registarServicoExtra()`, `listarPorEstadia()` | RD-09 |
-| `ClinicaService` | `registarIntervencaoClinica()`, `consultarHistorial()` | RD-09 |
-| `PagamentoService` | `registarPagamentoCheckIn()`, `registarPagamentoCheckOut()` | RD-04 |
-| `LimpezaService` | `registarLimpezaConcluida()` | RD-01 |
-| `RelatorioService` | `gerarDashboard()`, `gerarRelatorioPeriodo()` | US-02, US-04, US-05 |
+| Interface | Implementação | Métodos principais | Regras de domínio aplicadas |
+|---|---|---|---|
+| `IColaboradorService` | `ColaboradorService` | `autenticar()`, `criarColaborador()`, `alterarPermissoes()` | RNF-04 |
+| `IAlojamentoService` | `AlojamentoService` | `consultarDisponibilidade()`, `listarDisponiveis()` | RD-01 |
+| `ITutorService` | `TutorService` | `registarTutor()`, `pesquisar()` | RD-05 |
+| `IAnimalService` | `AnimalService` | `registarAnimal()`, `atualizarEstadoSaude()`, `listarPorEstadoSaude()` | RD-05, RD-08 |
+| `IReservaService` | `ReservaService` | `criarReserva()`, `cancelarReserva()`, `listar()` | RD-01, RD-06 |
+| `IEstadiaService` | `EstadiaService` | `registarCheckIn()`, `registarCheckOut()`, `registarCuidadoDiario()` | RD-02, RD-03, RD-07 |
+| `IServicoExtraService` | `ServicoExtraService` | `registarServicoExtra()`, `listarPorEstadia()` | RD-09 |
+| `IClinicaService` | `ClinicaService` | `registarIntervencaoClinica()`, `consultarHistorial()` | RD-09 |
+| `IPagamentoService` | `PagamentoService` | `registarPagamentoCheckIn()`, `registarPagamentoCheckOut()` | RD-04 |
+| `ILimpezaService` | `LimpezaService` | `registarLimpezaConcluida()` | RD-01 |
+| `IRelatorioService` | `RelatorioService` | `gerarDashboard()`, `gerarRelatorioPeriodo()` | US-02, US-04, US-05 |
 
 ### 3.3 Camada de Domínio
 
@@ -152,21 +154,34 @@ pt.hotel.animais/
 │   ├── EstadiaController.java
 │   ├── PagamentoController.java
 │   ├── ServicoExtraController.java
+│   ├── RegistoCuidadoController.java
+│   ├── NotaController.java
 │   ├── ClinicaController.java
 │   ├── LimpezaController.java
 │   ├── RelatorioController.java
 │   └── ColaboradorController.java
 ├── service/
+│   ├── IColaboradorService.java
 │   ├── ColaboradorService.java
+│   ├── IAlojamentoService.java
 │   ├── AlojamentoService.java
+│   ├── ITutorService.java
 │   ├── TutorService.java
+│   ├── IAnimalService.java
 │   ├── AnimalService.java
+│   ├── IReservaService.java
 │   ├── ReservaService.java
+│   ├── IEstadiaService.java
 │   ├── EstadiaService.java
+│   ├── IServicoExtraService.java
 │   ├── ServicoExtraService.java
+│   ├── IClinicaService.java
 │   ├── ClinicaService.java
+│   ├── IPagamentoService.java
 │   ├── PagamentoService.java
+│   ├── ILimpezaService.java
 │   ├── LimpezaService.java
+│   ├── IRelatorioService.java
 │   └── RelatorioService.java
 ├── repository/
 │   ├── ColaboradorRepository.java

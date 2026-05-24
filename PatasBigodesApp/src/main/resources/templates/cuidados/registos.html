@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Registos de Cuidados</title></head>
+<body>
+<h1>Registos de Cuidados (Estadia [[${estadiaId}]])</h1>
+<div th:if="${successMessage}"><p th:text="${successMessage}"></p></div>
+<div th:if="${errorMessage}"><p th:text="${errorMessage}"></p></div>
+<form th:action="@{/cuidados/create}" method="post">
+    <input type="hidden" name="estadiaId" th:value="${estadiaId}" />
+    <label>Descrição: <input type="text" name="descricao" /></label>
+    <label>DataHora: <input type="datetime-local" name="dataHora" /></label>
+    <button type="submit">Registar</button>
+</form>
+<hr/>
+<ul>
+    <li th:each="r : ${registos}">
+        <span th:text="${r.dataHora}"></span> - <span th:text="${r.descricao}"></span>
+    </li>
+</ul>
+</body>
+</html>

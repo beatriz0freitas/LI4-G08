@@ -26,7 +26,7 @@ Existem já no projeto:
 - `SecurityConfig` — in-memory auth com 5 roles, BCrypt
 - `AuthController`, `DashboardController`, `AlojamentoController`, `LimpezaController` (parcialmente preenchidos)
 - Modelo: `Alojamento` com `EstadoLimpeza` enum
-- Services: `AlojamentoService`, `LimpezaService`
+- Services: interfaces `IAlojamentoService` e `ILimpezaService`, com implementações concretas `AlojamentoService` e `LimpezaService`
 - Templates Thymeleaf: login, dashboard, limpeza (estrutura base presente)
 - Migrations Flyway: V1 (alojamento table), V2 (seed data)
 
@@ -38,7 +38,7 @@ Existem já no projeto:
 |-----------|--------|----------|
 | **Domain Scope First** | ✓ OK | Todas as user stories (US-01, US-02, US-20, US-21) e requisitos (RF-01, RD-01) são do domínio hotel de animais e rastreáveis ao enunciado. Sem invenções. |
 | **Scenario-Driven Requirements** | ✓ OK | Spec inclui acceptance scenarios quantificados (< 2s em RNF-01, ENUM values conhecidos). Não há termos vagos não quantificados. |
-| **Modular Separation of Concerns** | ✓ OK | Arquitetura MVC em camadas (Presentation → Application → Domain → Data), conforme ADRs. SecurityConfig centraliza autenticação; AlojamentoService centraliza lógica de ocupação. |
+| **Modular Separation of Concerns** | ✓ OK | Arquitetura MVC em camadas (Presentation → Application → Domain → Data), conforme ADRs. SecurityConfig centraliza autenticação; `IAlojamentoService` expõe a lógica de ocupação e `AlojamentoService` implementa-a. |
 | **Verification Before Expansion** | ✓ OK | Spec define 4 success criteria com caminhos de teste independentes (SC-001..SC-004). Todas as user stories têm acceptance scenarios. |
 | **Data Integrity, Security, Operational Reliability** | ✓ OK | BCrypt para senhas; Spring Security para least privilege; RD-01 garante consistência de limpeza em ocupação; Logs e auditoria preparados. |
 
@@ -93,7 +93,9 @@ PatasBigodesApp/
 │   │   │   ├── repository/
 │   │   │   │   └── AlojamentoRepository.java
 │   │   │   ├── service/
+│   │   │   │   ├── IAlojamentoService.java
 │   │   │   │   ├── AlojamentoService.java
+│   │   │   │   ├── ILimpezaService.java
 │   │   │   │   └── LimpezaService.java
 │   │   │   └── util/
 │   │   │       └── SecurityUtils.java (helper para user context)

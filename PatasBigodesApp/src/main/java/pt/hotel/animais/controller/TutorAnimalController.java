@@ -13,8 +13,8 @@ import pt.hotel.animais.dto.AnimalFormDto;
 import pt.hotel.animais.dto.TutorFormDto;
 import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Tutor;
-import pt.hotel.animais.service.AnimalService;
-import pt.hotel.animais.service.TutorService;
+import pt.hotel.animais.service.IAnimalService;
+import pt.hotel.animais.service.ITutorService;
 
 import java.util.List;
 
@@ -27,8 +27,8 @@ import java.util.List;
 @RequestMapping("/tutores")
 public class TutorAnimalController {
     
-    private final TutorService tutorService;
-    private final AnimalService animalService;
+    private final ITutorService tutorService;
+    private final IAnimalService animalService;
     
     // ==================== TUTOR ENDPOINTS ====================
     

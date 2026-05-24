@@ -26,7 +26,7 @@
 
 ## 4. Consultas de direção (dashboard e histórico)
 
-**Decision**: Tratar dashboard operacional e histórico financeiro como fluxos de leitura independentes dos fluxos transacionais de receção. O dashboard mantém um `DashboardService` próprio, mas esse serviço atua apenas como orquestrador e consome métricas expostas pelos serviços de domínio (`ReservaService`, `EstadiaService`, `PagamentoService`, `AlojamentoService`). O histórico deve usar consultas paginadas com filtros por cliente, animal, estado e intervalo temporal, preservando os parâmetros entre páginas.
+**Decision**: Tratar dashboard operacional e histórico financeiro como fluxos de leitura independentes dos fluxos transacionais de receção. O dashboard mantém um par `IDashboardService`/`DashboardService` próprio, mas esse serviço atua apenas como orquestrador e consome métricas expostas pelas interfaces dos serviços de domínio (`IReservaService`, `IEstadiaService`, `IPagamentoService`, `IAlojamentoService`). O histórico deve usar consultas paginadas com filtros por cliente, animal, estado e intervalo temporal, preservando os parâmetros entre páginas.
 
 **Rationale**: RF-01 e RF-05 têm perfil de consumo diferente (análise/monitorização), exigindo endpoints e templates de consulta com filtros por período, navegação entre páginas e visibilidade de pendentes sem sobrecarregar a interface.
 

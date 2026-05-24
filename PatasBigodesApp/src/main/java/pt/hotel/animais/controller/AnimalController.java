@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import pt.hotel.animais.model.Animal;
-import pt.hotel.animais.service.AnimalService;
+import pt.hotel.animais.service.IAnimalService;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/animais")
 public class AnimalController {
     
-    private final AnimalService animalService;
+    private final IAnimalService animalService;
     
     /**
      * GET /animais - Lista geral de todos os animais.

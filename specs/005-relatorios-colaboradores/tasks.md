@@ -27,7 +27,7 @@
 
 **Independent Test**: Usando dados de teste, aceder ao endpoint /api/dashboard/ocupacao e verificar campos retornados.
 
-- [ ] T010 [US-01] Implement `OcupacaoService` to compute occupancy percentage and counts: PatasBigodesApp/src/main/java/.../service/OcupacaoService.java
+- [ ] T010 [US-01] Implement `IOcupacaoService`/`OcupacaoService` to compute occupancy percentage and counts: `PatasBigodesApp/src/main/java/.../service/IOcupacaoService.java` e `PatasBigodesApp/src/main/java/.../service/OcupacaoService.java`
 - [ ] T011 [US-01] Add repository query to count occupied boxes and total boxes: PatasBigodesApp/src/main/java/.../repository/AlojamentoRepository.java
 - [ ] T012 [US-01] Implement endpoint: GET `/api/dashboard/ocupacao` in PatasBigodesApp/src/main/java/.../controller/DashboardController.java
 - [ ] T013 [US-01] Add Thymeleaf fragment for the dashboard summary: PatasBigodesApp/src/main/resources/templates/fragments/dashboard_occupacao.html
@@ -41,7 +41,7 @@
 
 **Independent Test**: Chamar endpoint `/api/indicadores/faturacao?start=...&end=...` e verificar agregações.
 
-- [ ] T015 [US-02] Implement `FaturacaoService` (sum by periodo and by metodoPagamento): PatasBigodesApp/src/main/java/.../service/FaturacaoService.java
+- [ ] T015 [US-02] Implement `IFaturacaoService`/`FaturacaoService` (sum by periodo and by metodoPagamento): `PatasBigodesApp/src/main/java/.../service/IFaturacaoService.java` e `PatasBigodesApp/src/main/java/.../service/FaturacaoService.java`
 - [ ] T016 [US-02] Add `PagamentoRepository` queries to sum by date range and metodoPagamento: PatasBigodesApp/src/main/java/.../repository/PagamentoRepository.java
 - [ ] T017 [US-02] Implement endpoint GET `/api/indicadores/faturacao` in PatasBigodesApp/src/main/java/.../controller/IndicadoresController.java
 - [ ] T018 [US-02] Add dashboard panel fragment for faturação: PatasBigodesApp/src/main/resources/templates/fragments/dashboard_faturacao.html
@@ -56,7 +56,7 @@
 **Independent Test**: Usar API `/api/colaboradores` para criar, editar, listar e desactivar um colaborador.
 
 - [ ] T020 [US-03] Implement `Colaborador` JPA entity and migration (if not present): PatasBigodesApp/src/main/java/.../entity/Colaborador.java
-- [ ] T021 [US-03] Implement `ColaboradorService` (create/edit/desactivar): PatasBigodesApp/src/main/java/.../service/ColaboradorService.java
+- [ ] T021 [US-03] Implement `IColaboradorService`/`ColaboradorService` (create/edit/desactivar): `PatasBigodesApp/src/main/java/.../service/IColaboradorService.java` e `PatasBigodesApp/src/main/java/.../service/ColaboradorService.java`
 - [ ] T022 [US-03] Implement `ColaboradorController` endpoints (POST, PUT, GET, DELETE[soft]): PatasBigodesApp/src/main/java/.../controller/ColaboradorController.java
 - [ ] T023 [US-03] Implement Thymeleaf UI for colaboradores: PatasBigodesApp/src/main/resources/templates/colaboradores/list.html and edit.html
 - [ ] T024 [US-03] Unit tests for `ColaboradorService`: PatasBigodesApp/src/test/java/.../ColaboradorServiceTest.java
@@ -70,7 +70,7 @@
 
 **Independent Test**: POST `/api/relatorios/generate` com filtros e obter o resumo/export.
 
-- [ ] T026 [US-04] Implement `RelatorioService` with aggregation methods: PatasBigodesApp/src/main/java/.../service/RelatorioService.java
+- [ ] T026 [US-04] Implement `IRelatorioService`/`RelatorioService` with aggregation methods: `PatasBigodesApp/src/main/java/.../service/IRelatorioService.java` e `PatasBigodesApp/src/main/java/.../service/RelatorioService.java`
 - [ ] T027 [US-04] Implement background job mechanism (optional sync/blocking fallback): PatasBigodesApp/src/main/java/.../jobs/RelatorioJob.java
 - [ ] T028 [US-04] Implement CSV export util and endpoint GET `/api/relatorios/{id}/export/csv`: PatasBigodesApp/src/main/java/.../export/CsvExportService.java
 - [ ] T029 [US-04] Implement PDF export util and endpoint GET `/api/relatorios/{id}/export/pdf`: PatasBigodesApp/src/main/java/.../export/PdfExportService.java
@@ -87,7 +87,7 @@
 
 **Independent Test**: GET `/api/historico?reservaId=...` retorna eventos e pagamentos associados.
 
-- [ ] T034 [US-05] Implement `HistoricoService` para agregar eventos de estadia e pagamentos: PatasBigodesApp/src/main/java/.../service/HistoricoService.java
+- [ ] T034 [US-05] Implement `IHistoricoService`/`HistoricoService` para agregar eventos de estadia e pagamentos: `PatasBigodesApp/src/main/java/.../service/IHistoricoService.java` e `PatasBigodesApp/src/main/java/.../service/HistoricoService.java`
 - [ ] T035 [US-05] Implement repository queries para combinar `Estadia`, `Pagamento`, `ServicoExtra`: PatasBigodesApp/src/main/java/.../repository/EstadiaRepository.java
 - [ ] T036 [US-05] Implement endpoint GET `/api/historico` and Thymeleaf view: PatasBigodesApp/src/main/java/.../controller/HistoricoController.java and PatasBigodesApp/src/main/resources/templates/historico/list.html
 - [ ] T037 [US-05] Unit tests for `HistoricoService`: PatasBigodesApp/src/test/java/.../HistoricoServiceTest.java

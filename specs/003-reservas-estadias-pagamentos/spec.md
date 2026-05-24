@@ -144,7 +144,7 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 
 ### Functional Requirements
 
-- **RF-01 - Dashboard operacional**: O sistema deve disponibilizar um dashboard acessível ao perfil de diretor contendo, no mínimo, taxa de ocupação atual, número de estadias ativas, número de reservas futuras e valor total de faturação diária/mensal, com atualização automática (evento relevante ou máximo de 60 segundos). A implementação deve manter um `DashboardService` próprio, mas esse serviço deve apenas orquestrar métricas expostas pelos serviços de domínio, sem aceder diretamente aos repositórios.
+- **RF-01 - Dashboard operacional**: O sistema deve disponibilizar um dashboard acessível ao perfil de diretor contendo, no mínimo, taxa de ocupação atual, número de estadias ativas, número de reservas futuras e valor total de faturação diária/mensal, com atualização automática (evento relevante ou máximo de 60 segundos). A implementação deve manter `IDashboardService`/`DashboardService`, mas esse serviço deve apenas orquestrar métricas expostas pelas interfaces dos serviços de domínio, sem aceder diretamente aos repositórios.
 - **RF-05 - Histórico de estadias e pagamentos**: O sistema deve manter um histórico completo das estadias e pagamentos de cada animal, consultável pela receção e pela direção, com paginação e filtragem por cliente, animal, estado e intervalo temporal.
 - **RF-06 - Controlo de disponibilidade de boxes**: O sistema deve determinar disponibilidade em tempo real por três condições cumulativas: sem reserva confirmada no período, sem estadia ativa no período e limpeza concluída; deve impedir reservas inválidas e sugerir alternativas.
 - **RF-07 - Gestão de reservas**: O sistema deve permitir criação, confirmação e cancelamento de reservas, com registo de período, box e animal associados.
@@ -239,7 +239,7 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 
 - [Especificação de Arquitetura — Componentes](../../docs/Etapa2/01-architecture/architecture.md#3-componentes-e-responsabilidades):
   - `ReservaController`, `EstadiaController`, `PagamentoController` e suas responsabilidades
-  - `ReservaService`, `EstadiaService`, `PagamentoService` com regras de domínio
+  - Interfaces `IReservaService`, `IEstadiaService`, `IPagamentoService` e implementações `ReservaService`, `EstadiaService`, `PagamentoService` com regras de domínio
   - `ReservaRepository`, `EstadiaRepository`, `PagamentoRepository`
 
 - [Diagrama de Componentes](../../docs/Etapa2/01-architecture/components.mmd): Interação entre Controllers, Services, Repositories para Reservas e Estadias
