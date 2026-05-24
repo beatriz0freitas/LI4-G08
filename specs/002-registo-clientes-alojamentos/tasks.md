@@ -104,6 +104,16 @@
 - [ ] T032 Validate availability lookup timing against SC-003 by measuring the query path in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IAlojamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/AlojamentoService.java` and `PatasBigodesApp/src/test/java/pt/hotel/animais/service/AlojamentoServiceTest.java`
 - [ ] T033 Validate reservation confirmation timing against SC-004 and the overbooking guard against SC-005 in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IReservaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ReservaService.java` and `PatasBigodesApp/src/test/java/pt/hotel/animais/service/ReservaServiceTest.java`
 
+## Phase 9: Verification & Test Coverage
+
+**Purpose**: Fechar explicitamente as lacunas de verificação automática com cobertura unitária, de integração e de sistema.
+
+- [ ] T034 [P] Criar testes unitários para registo e pesquisa de tutor em `PatasBigodesApp/src/test/java/pt/hotel/animais/service/TutorServiceTest.java`
+- [ ] T035 [P] Criar testes unitários para associação de animal e validações de tutor em `PatasBigodesApp/src/test/java/pt/hotel/animais/service/AnimalServiceTest.java`
+- [ ] T036 [P] Criar testes de integração para os contratos de tutor e reserva em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/TutorAnimalControllerTest.java` e `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/ReservaControllerTest.java`
+- [ ] T037 [P] Criar teste de sistema end-to-end para o fluxo tutor → animal → disponibilidade → reserva em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/RececaoSystemSmokeTest.java`
+- [ ] T038 Executar a regressão focada de testes com `mvn test -Dtest=TutorServiceTest,AnimalServiceTest,TutorAnimalControllerTest,ReservaControllerTest,RececaoSystemSmokeTest` em `PatasBigodesApp/`
+
 ---
 
 ## Dependencies & Execution Order

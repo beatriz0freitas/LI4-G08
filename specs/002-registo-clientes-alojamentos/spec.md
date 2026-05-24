@@ -108,6 +108,8 @@ Como funcionário de receção, quero consultar o histórico de cada animal, par
 - Cada funcionalidade P1 deve ter pelo menos um teste de caminho feliz e um teste de validação/erro (ex.: NIF duplicado, box indisponível, conflito de período).
 - As regras de disponibilidade e integridade (RF-06, RF-07, RD-05, RD-06) devem ter testes dedicados na camada de serviço.
 - Deve existir pelo menos um teste de integração para UC-03 e UC-04.
+- Cada funcionalidade P1 deve ter pelo menos um teste unitário na camada de serviço, um teste de integração no controller/contrato e um teste de sistema end-to-end.
+- Deve existir pelo menos um teste de sistema que percorra o fluxo tutor → animal → disponibilidade → reserva sem depender de dados partilhados de outras features.
 
 ### Key Entities
 
@@ -138,6 +140,7 @@ Como funcionário de receção, quero consultar o histórico de cada animal, par
 - **SC-009**: Existe pelo menos 1 teste automatizado por funcionalidade P1 desta feature (US-09, US-12, US-06).
 - **SC-010**: Existe pelo menos 1 teste de integração por caso de uso coberto nesta fase (UC-03 e UC-04).
 - **SC-011**: As regras críticas de disponibilidade e associação tutor-animal têm testes automatizados com resultado verde no pipeline local.
+- **SC-012**: Cada funcionalidade P1 tem pelo menos 1 teste unitário, 1 teste de integração e 1 teste de sistema executável no pipeline local.
 
 ---
 

@@ -25,14 +25,14 @@ public class PagamentoCheckInIntegrationTest {
     private PagamentoRepository pagamentoRepository;
 
     @Test
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "DIRETOR")
     void pagamentoRepository_is_available() {
         long count = pagamentoRepository.count();
         Assertions.assertTrue(count >= 0);
     }
 
     @Test
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "DIRETOR")
     void dashboard_endpoint_is_accessible() throws Exception {
         mockMvc.perform(get("/dashboard"))
             .andExpect(status().isOk());

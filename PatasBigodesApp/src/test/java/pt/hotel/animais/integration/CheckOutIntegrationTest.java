@@ -20,7 +20,7 @@ public class CheckOutIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    @WithMockUser(roles = "USER")
+    @WithMockUser(roles = "DIRETOR")
     void historico_endpoint_returns_ok() throws Exception {
         mockMvc.perform(get("/historico"))
             .andExpect(status().isOk());
