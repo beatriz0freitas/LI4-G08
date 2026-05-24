@@ -67,21 +67,21 @@ Cada controlador recebe e devolve objetos **DTO** (_Data Transfer Objects_), nun
 
 ### 3.2 Camada de Aplicação (Services)
 
-Cada `@Service` encapsula regras de negócio e orquestra repositórios. As operações de escrita são anotadas com `@Transactional`.
+Cada serviço é definido por uma interface `INomeService` e por uma implementação concreta `NomeService` anotada com `@Service`. Os controllers dependem sempre da interface, enquanto a implementação encapsula regras de negócio, orquestra repositórios.
 
-| Service | Métodos principais | Regras de domínio aplicadas |
-|---|---|---|
-| `ColaboradorService` | `autenticar()`, `criarColaborador()`, `alterarPermissoes()` | RNF-04 |
-| `AlojamentoService` | `consultarDisponibilidade()`, `listarDisponiveis()` | RD-01 |
-| `TutorService` | `registarTutor()`, `pesquisar()` | RD-05 |
-| `AnimalService` | `registarAnimal()`, `atualizarEstadoSaude()`, `listarPorEstadoSaude()` | RD-05, RD-08 |
-| `ReservaService` | `criarReserva()`, `cancelarReserva()`, `listar()` | RD-01, RD-06 |
-| `EstadiaService` | `registarCheckIn()`, `registarCheckOut()`, `registarCuidadoDiario()` | RD-02, RD-03, RD-07 |
-| `ServicoExtraService` | `registarServicoExtra()`, `listarPorEstadia()` | RD-09 |
-| `ClinicaService` | `registarIntervencaoClinica()`, `consultarHistorial()` | RD-09 |
-| `PagamentoService` | `registarPagamentoCheckIn()`, `registarPagamentoCheckOut()` | RD-04 |
-| `LimpezaService` | `registarLimpezaConcluida()` | RD-01 |
-| `RelatorioService` | `gerarDashboard()`, `gerarRelatorioPeriodo()` | US-02, US-04, US-05 |
+| Interface | Implementação | Métodos principais | Regras de domínio aplicadas |
+|---|---|---|---|
+| `IColaboradorService` | `ColaboradorService` | `autenticar()`, `criarColaborador()`, `alterarPermissoes()` | RNF-04 |
+| `IAlojamentoService` | `AlojamentoService` | `consultarDisponibilidade()`, `listarDisponiveis()` | RD-01 |
+| `ITutorService` | `TutorService` | `registarTutor()`, `pesquisar()` | RD-05 |
+| `IAnimalService` | `AnimalService` | `registarAnimal()`, `atualizarEstadoSaude()`, `listarPorEstadoSaude()` | RD-05, RD-08 |
+| `IReservaService` | `ReservaService` | `criarReserva()`, `cancelarReserva()`, `listar()` | RD-01, RD-06 |
+| `IEstadiaService` | `EstadiaService` | `registarCheckIn()`, `registarCheckOut()`, `registarCuidadoDiario()` | RD-02, RD-03, RD-07 |
+| `IServicoExtraService` | `ServicoExtraService` | `registarServicoExtra()`, `listarPorEstadia()` | RD-09 |
+| `IClinicaService` | `ClinicaService` | `registarIntervencaoClinica()`, `consultarHistorial()` | RD-09 |
+| `IPagamentoService` | `PagamentoService` | `registarPagamentoCheckIn()`, `registarPagamentoCheckOut()` | RD-04 |
+| `ILimpezaService` | `LimpezaService` | `registarLimpezaConcluida()` | RD-01 |
+| `IRelatorioService` | `RelatorioService` | `gerarDashboard()`, `gerarRelatorioPeriodo()` | US-02, US-04, US-05 |
 
 ### 3.3 Camada de Domínio
 
@@ -161,16 +161,27 @@ pt.hotel.animais/
 │   ├── RelatorioController.java
 │   └── ColaboradorController.java
 ├── service/
+│   ├── IColaboradorService.java
 │   ├── ColaboradorService.java
+│   ├── IAlojamentoService.java
 │   ├── AlojamentoService.java
+│   ├── ITutorService.java
 │   ├── TutorService.java
+│   ├── IAnimalService.java
 │   ├── AnimalService.java
+│   ├── IReservaService.java
 │   ├── ReservaService.java
+│   ├── IEstadiaService.java
 │   ├── EstadiaService.java
+│   ├── IServicoExtraService.java
 │   ├── ServicoExtraService.java
+│   ├── IClinicaService.java
 │   ├── ClinicaService.java
+│   ├── IPagamentoService.java
 │   ├── PagamentoService.java
+│   ├── ILimpezaService.java
 │   ├── LimpezaService.java
+│   ├── IRelatorioService.java
 │   └── RelatorioService.java
 ├── repository/
 │   ├── ColaboradorRepository.java

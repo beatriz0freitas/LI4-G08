@@ -38,7 +38,7 @@
 - [X] T006 [P] Criar teste de integração para login, logout e rotas protegidas em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/SecurityIntegrationTest.java`
 - [X] T007 [P] Finalizar a entidade `Alojamento` e o enum `EstadoLimpeza` em `PatasBigodesApp/src/main/java/pt/hotel/animais/model/Alojamento.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/model/enums/EstadoLimpeza.java`
 - [X] T008 Finalizar as queries base do repositório de alojamentos em `PatasBigodesApp/src/main/java/pt/hotel/animais/repository/AlojamentoRepository.java`
-- [X] T009 Consolidar as regras de listagem e limpeza nos services em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/AlojamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/LimpezaService.java`
+- [X] T009 Consolidar as regras de listagem e limpeza nos services em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IAlojamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/AlojamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ILimpezaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/LimpezaService.java`
 - [X] T010 [P] Ajustar o ecrã de login e o placeholder de módulos em `PatasBigodesApp/src/main/resources/templates/auth/login.html` e `PatasBigodesApp/src/main/resources/templates/placeholders/modulo.html`
 
 **Checkpoint**: a fundação está pronta; as user stories já podem ser trabalhadas sem refatorações estruturais.
@@ -99,7 +99,7 @@
 
 - [ ] T020 [US3] Renderizar a lista de alojamentos pendentes com tabela AdminLTE em `PatasBigodesApp/src/main/resources/templates/limpeza/listar.html`
 - [ ] T021 [US3] Ligar a ação de marcar como limpo e as flash messages em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/LimpezaController.java`
-- [ ] T022 [US3] Garantir a transição transacional do estado de limpeza em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/LimpezaService.java`
+- [ ] T022 [US3] Garantir a transição transacional do estado de limpeza em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ILimpezaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/LimpezaService.java`
 
 **Checkpoint**: a limpeza fica operável e a regra de disponibilidade passa a ser respeitada no fluxo diário.
 

@@ -20,7 +20,7 @@ O diagrama inclui:
 ## Decisoes de modelacao
 1. O diagrama e de design tecnico (Etapa 2), por isso acrescenta controllers, services e repositories ao modelo de dominio.
 2. As relacoes entre entidades preservam as cardinalidades definidas na Etapa 1.
-3. Os controllers dependem de interfaces de service, e as classes concretas sao modeladas como implementacoes (`*ServiceImpl`).
+3. Os controllers dependem de interfaces de service (`INomeService`), e as classes concretas sao modeladas sem sufixo adicional (`NomeService`).
 4. Os metodos dos services refletem operacoes principais descritas em arquitetura e casos de uso.
 5. Os repositories mostram apenas operacoes relevantes para regras de negocio criticas (disponibilidade, check-in/check-out, pagamentos e historico clinico).
 6. A navegabilidade das associacoes de dominio privilegia quem detem a referencia (por exemplo, `Reserva -> Animal`, `Estadia -> Reserva`, `Nota -> Colaborador`, `RegistoCuidado -> Colaborador`).

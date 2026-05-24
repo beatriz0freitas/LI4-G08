@@ -156,10 +156,10 @@ CREATE TABLE alteracao_estado_saude (
 - `ServicoExtraFormDto { Long estadiaId; String tipo; BigDecimal custo; LocalDateTime dataHora; }`
 
 3) Service method signatures (examples):
-- `RegistoCuidadoDto create(RegistoCuidadoFormDto req)` in `RegistoCuidadoService`
-- `Page<RegistoCuidadoDto> listByEstadia(Long estadiaId, Pageable pageable)` in `RegistoCuidadoService`
-- `ServicoExtraDto register(ServicoExtraFormDto req)` in `ServicoExtraService`
-- `IntervencaoClinicaDto register(IntervencaoClinicaFormDto req)` in `ClinicaService`
+- `RegistoCuidadoDto create(RegistoCuidadoFormDto req)` em `IRegistoCuidadoService`, implementado por `RegistoCuidadoService`
+- `Page<RegistoCuidadoDto> listByEstadia(Long estadiaId, Pageable pageable)` em `IRegistoCuidadoService`, implementado por `RegistoCuidadoService`
+- `ServicoExtraDto register(ServicoExtraFormDto req)` em `IServicoExtraService`, implementado por `ServicoExtraService`
+- `IntervencaoClinicaDto register(IntervencaoClinicaFormDto req)` em `IClinicaService`, implementado por `ClinicaService`
 
 Controllers:
 - `ClinicaController` — Agrega endpoints MVC (Thymeleaf SSR) para as operações clínicas e operacionais deste feature: registo/listagem de `RegistoCuidado`, registo de `ServicoExtra`, registo/consulta de `IntervencaoClinica`, registo de `AlteracaoEstadoSaude` e adição de `Nota` operacional. O controller expõe vistas e formulários HTML; não serão adicionados endpoints REST nesta fase.

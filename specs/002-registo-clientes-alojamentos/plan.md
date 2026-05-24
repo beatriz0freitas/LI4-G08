@@ -70,9 +70,13 @@ PatasBigodesApp/
     │   │   │   ├── TutorAnimalController.java
     │   │   │   └── ReservaController.java
     │   │   ├── service/
+    │   │   │   ├── ITutorService.java
     │   │   │   ├── TutorService.java
+    │   │   │   ├── IAnimalService.java
     │   │   │   ├── AnimalService.java
+    │   │   │   ├── IReservaService.java
     │   │   │   ├── ReservaService.java
+    │   │   │   ├── IAlojamentoService.java
     │   │   │   └── AlojamentoService.java
     │   │   ├── repository/
     │   │   │   ├── TutorRepository.java
@@ -184,4 +188,3 @@ Expected task breakdown:
 ## Corrections / Implementation Updates (2026-05-06)
 
 Durante a execução foram aplicadas correções técnicas e de navegação que afectam parte do plano e das tasks. O registo completo dessas alterações encontra-se em `refinements.md`.
-
