@@ -1,11 +1,15 @@
 package pt.hotel.animais.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import pt.hotel.animais.model.enums.EstadoEstadia;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "estadia")
+@Getter
+@Setter
 public class Estadia {
 
     @Id
@@ -33,17 +37,4 @@ public class Estadia {
     protected void onCreate() {
         dataCriacao = LocalDateTime.now();
     }
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public Reserva getReserva() { return reserva; }
-    public void setReserva(Reserva reserva) { this.reserva = reserva; }
-    public LocalDateTime getDataInicio() { return dataInicio; }
-    public void setDataInicio(LocalDateTime dataInicio) { this.dataInicio = dataInicio; }
-    public LocalDateTime getDataFim() { return dataFim; }
-    public void setDataFim(LocalDateTime dataFim) { this.dataFim = dataFim; }
-    public EstadoEstadia getEstado() { return estado; }
-    public void setEstado(EstadoEstadia estado) { this.estado = estado; }
-    public LocalDateTime getDataCriacao() { return dataCriacao; }
-    public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }
 }

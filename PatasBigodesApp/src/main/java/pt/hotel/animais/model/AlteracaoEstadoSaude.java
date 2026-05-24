@@ -1,11 +1,15 @@
 package pt.hotel.animais.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import pt.hotel.animais.model.enums.EstadoSaude;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "alteracao_estado_saude")
+@Getter
+@Setter
 public class AlteracaoEstadoSaude {
 
     @Id
@@ -34,19 +38,4 @@ public class AlteracaoEstadoSaude {
 
     @PrePersist
     protected void onCreate() { createdAt = LocalDateTime.now(); }
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public Estadia getEstadia() { return estadia; }
-    public void setEstadia(Estadia estadia) { this.estadia = estadia; }
-    public String getDescricao() { return descricao; }
-    public void setDescricao(String descricao) { this.descricao = descricao; }
-    public EstadoSaude getSeveridade() { return severidade; }
-    public void setSeveridade(EstadoSaude severidade) { this.severidade = severidade; }
-    public LocalDateTime getDataHora() { return dataHora; }
-    public void setDataHora(LocalDateTime dataHora) { this.dataHora = dataHora; }
-    public Long getAutorId() { return autorId; }
-    public void setAutorId(Long autorId) { this.autorId = autorId; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

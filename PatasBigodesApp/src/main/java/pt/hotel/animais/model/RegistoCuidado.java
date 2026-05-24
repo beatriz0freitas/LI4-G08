@@ -1,10 +1,14 @@
 package pt.hotel.animais.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "registo_cuidado")
+@Getter
+@Setter
 public class RegistoCuidado {
 
     @Id
@@ -29,17 +33,4 @@ public class RegistoCuidado {
 
     @PrePersist
     protected void onCreate() { createdAt = LocalDateTime.now(); }
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public Estadia getEstadia() { return estadia; }
-    public void setEstadia(Estadia estadia) { this.estadia = estadia; }
-    public String getDescricao() { return descricao; }
-    public void setDescricao(String descricao) { this.descricao = descricao; }
-    public LocalDateTime getDataHora() { return dataHora; }
-    public void setDataHora(LocalDateTime dataHora) { this.dataHora = dataHora; }
-    public Long getAutorId() { return autorId; }
-    public void setAutorId(Long autorId) { this.autorId = autorId; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

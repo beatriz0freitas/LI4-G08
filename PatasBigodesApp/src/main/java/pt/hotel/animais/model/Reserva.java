@@ -1,6 +1,8 @@
 package pt.hotel.animais.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import pt.hotel.animais.model.enums.EstadoReserva;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,6 +12,8 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "reserva")
+@Getter
+@Setter
 public class Reserva {
     
     @Id
@@ -44,72 +48,6 @@ public class Reserva {
     @PrePersist
     protected void onCreate() {
         dataCriacao = LocalDateTime.now();
-    }
-    
-    // Getters e Setters
-    
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
-    }
-    
-    public Tutor getTutor() {
-        return tutor;
-    }
-    
-    public void setTutor(Tutor tutor) {
-        this.tutor = tutor;
-    }
-    
-    public Animal getAnimal() {
-        return animal;
-    }
-    
-    public void setAnimal(Animal animal) {
-        this.animal = animal;
-    }
-    
-    public Alojamento getAlojamento() {
-        return alojamento;
-    }
-    
-    public void setAlojamento(Alojamento alojamento) {
-        this.alojamento = alojamento;
-    }
-    
-    public LocalDate getDataInicio() {
-        return dataInicio;
-    }
-    
-    public void setDataInicio(LocalDate dataInicio) {
-        this.dataInicio = dataInicio;
-    }
-    
-    public LocalDate getDataFim() {
-        return dataFim;
-    }
-    
-    public void setDataFim(LocalDate dataFim) {
-        this.dataFim = dataFim;
-    }
-    
-    public EstadoReserva getEstado() {
-        return estado;
-    }
-    
-    public void setEstado(EstadoReserva estado) {
-        this.estado = estado;
-    }
-    
-    public LocalDateTime getDataCriacao() {
-        return dataCriacao;
-    }
-    
-    public void setDataCriacao(LocalDateTime dataCriacao) {
-        this.dataCriacao = dataCriacao;
     }
     
     /**

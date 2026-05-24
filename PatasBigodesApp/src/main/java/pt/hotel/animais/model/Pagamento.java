@@ -1,6 +1,8 @@
 package pt.hotel.animais.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import java.math.BigDecimal;
 import pt.hotel.animais.model.enums.EstadoPagamento;
 import pt.hotel.animais.model.enums.MetodoPagamento;
@@ -10,6 +12,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "pagamento")
+@Getter
+@Setter
 public class Pagamento {
 
     @Id
@@ -42,19 +46,4 @@ public class Pagamento {
     protected void onCreate() {
         dataCriacao = LocalDateTime.now();
     }
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public Estadia getEstadia() { return estadia; }
-    public void setEstadia(Estadia estadia) { this.estadia = estadia; }
-    public BigDecimal getValor() { return valor; }
-    public void setValor(BigDecimal valor) { this.valor = valor; }
-    public MetodoPagamento getMetodoPagamento() { return metodoPagamento; }
-    public void setMetodoPagamento(MetodoPagamento metodoPagamento) { this.metodoPagamento = metodoPagamento; }
-    public MomentoPagamento getMomentoPagamento() { return momentoPagamento; }
-    public void setMomentoPagamento(MomentoPagamento momentoPagamento) { this.momentoPagamento = momentoPagamento; }
-    public EstadoPagamento getEstadoPagamento() { return estadoPagamento; }
-    public void setEstadoPagamento(EstadoPagamento estadoPagamento) { this.estadoPagamento = estadoPagamento; }
-    public LocalDateTime getDataCriacao() { return dataCriacao; }
-    public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }
 }
