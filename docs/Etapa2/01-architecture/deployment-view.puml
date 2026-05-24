@@ -1,15 +1,16 @@
-@startuml
+@startuml deployment_view
+
+
 top to bottom direction
 skinparam shadowing true
-skinparam componentStyle rectangle
 skinparam defaultTextAlignment center
-skinparam nodesep 60
-skinparam ranksep 60
+skinparam nodesep 55
+skinparam ranksep 55
 
 skinparam node {
   BackgroundColor #EAF4FF
   BorderColor #4A6FA5
-  RoundCorner 18
+  RoundCorner 16
 }
 
 skinparam artifact {
@@ -23,10 +24,9 @@ skinparam database {
   BorderColor #5B8A5A
 }
 
-skinparam rectangle {
+skinparam folder {
   BackgroundColor #F7F7F7
   BorderColor #9A9A9A
-  RoundCorner 16
 }
 
 skinparam note {
@@ -34,57 +34,58 @@ skinparam note {
   BorderColor #A0A0A0
 }
 
-rectangle "rede local (LAN) - 192.168.x.x" as lan {
-  node "Servidor Central\nUbuntu Server 24.04 LTS" as srv {
-    artifact "business.jar\nLógica de Negócio" as art_biz
-    artifact "auth.jar\nAuthService / RBAC" as art_auth
-    database "SGBD Relacional\n(PostgreSQL)" as art_db
+rectangle "Rede local do hotel" as LAN {
+
+  node "Posto Rececao" as WS_REC {
+    artifact "Browser\nChrome/Firefox/Edge" as B_REC
+  }
+
+  node "Posto Direcao" as WS_DIR {
+    artifact "Browser\nChrome/Firefox/Edge" as B_DIR
+  }
+
+  node "Posto Cuidados" as WS_CUID {
+    artifact "Browser\nChrome/Firefox/Edge" as B_CUID
+  }
+
+  node "Posto Veterinario" as WS_VET {
+    artifact "Browser\nChrome/Firefox/Edge" as B_VET
+  }
+
+  node "Posto Limpeza" as WS_LIMP {
+    artifact "Browser\nChrome/Firefox/Edge" as B_LIMP
+  }
+
+  node "Servidor do Hotel\nLinux/Windows Server ou Host Docker" as HOST {
+
+    node "Aplicacao Web\nJava 21 + Spring Boot 3" as APP {
+      artifact "app.jar\nTomcat integrado\nporta 8080" as JAR
+      artifact "Templates Thymeleaf\n+ ficheiros estaticos" as TPL
+    }
+
+    database "MySQL \nbase hotelanimais\nporta 3306 interna" as DB
   }
 }
 
-artifact "backup diário\ncron + dump SQL" as backup
+B_REC --> APP : HTTP :8080
+B_DIR --> APP : HTTP :8080
+B_CUID --> APP : HTTP :8080
+B_VET --> APP : HTTP :8080
+B_LIMP --> APP : HTTP :8080
 
-node "Posto - Receção\nWindows / hardware existente" as ws_rec {
-  artifact "ui-recepcao.jar" as art_rec
-}
+APP --> DB : JDBC :3306
 
-node "Posto - Direção\nWindows / hardware existente" as ws_dir {
-  artifact "ui-diretor.jar" as art_dir
-}
-
-node "Postos - Cuidadores (x2)\nWindows / hardware existente" as ws_cuid {
-  artifact "ui-cuidador.jar" as art_cuid
-}
-
-node "Posto - Vet. / Limpeza\nWindows / hardware existente" as ws_vet {
-  artifact "ui-vet.jar\nui-limpeza.jar" as art_vet
-}
-
-ws_rec -[hidden]right-> ws_dir
-ws_dir -[hidden]right-> ws_cuid
-ws_cuid -[hidden]right-> ws_vet
-lan -[hidden]down-> ws_dir
-srv -[hidden]right-> backup
-
-ws_rec <--> srv : TCP/IP / LAN
-ws_dir <--> srv
-ws_cuid <--> srv
-ws_vet <--> srv
-
-srv ..> backup : backup diário
-
-note bottom of ws_dir
-  Protocolo de comunicação: invocação remota de métodos (RMI)
-  ou API interna via socket TCP/IP.
-  Porta: [a definir na Etapa 3].
+note right of APP
+  A interface é renderizada no servidor
+  com Thymeleaf. Os postos precisam
+  apenas de browser.
 end note
 
-legend bottom
-Vista de implantação do sistema:
-- O servidor central aloja toda a lógica de negócio e o SGBD (ADR-02).
-- As estações de trabalho executam apenas os artefactos de UI por perfil (ADR-05).
-- A comunicação entre postos e servidor é feita exclusivamente por LAN.
-- O backup automático diário (RNF-08) corre no servidor via cron.
-endlegend
+note right of DB
+  A base de dados não é acedida
+  diretamente pelos postos de trabalho.
+  Apenas a aplicação comunica por JDBC.
+end note
+
 
 @enduml
