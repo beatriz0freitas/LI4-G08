@@ -11,7 +11,7 @@
 
 - [ ] T001 Create the Flyway migration for tutor, animal, reserva and availability-related constraints in `PatasBigodesApp/src/main/resources/db/migration/V3__create_tutor_animal_reserva.sql`
 - [ ] T002 [P] Add the shared navigation and layout fragments aligned with the Etapa 2 mockups in `PatasBigodesApp/src/main/resources/templates/fragments/navbar.html` and `PatasBigodesApp/src/main/resources/templates/fragments/sidebar.html`
-- [ ] T003 [P] Create the shared Thymeleaf layout and base fragment files in `PatasBigodesApp/src/main/resources/templates/layout.html`, `PatasBigodesApp/src/main/resources/templates/fragments/head.html`, `PatasBigodesApp/src/main/resources/templates/fragments/footer.html`, and `PatasBigodesApp/src/main/resources/templates/placeholders/modulo.html`
+- [ ] T003 [P] Create the shared Thymeleaf layout and base fragment files in `PatasBigodesApp/src/main/resources/templates/layout.html`, `PatasBigodesApp/src/main/resources/templates/fragments/head.html`, and `PatasBigodesApp/src/main/resources/templates/fragments/footer.html`
 
 ---
 
@@ -98,7 +98,7 @@
 
 **Purpose**: Final consistency pass across views, navigation and feature documentation.
 
-- [ ] T029 [P] Update the navigation and visual copy to stay aligned with the Etapa 2 UI mockups in `PatasBigodesApp/src/main/resources/templates/fragments/navbar.html`, `PatasBigodesApp/src/main/resources/templates/fragments/sidebar.html`, and `PatasBigodesApp/src/main/resources/templates/placeholders/modulo.html`
+- [ ] T029 [P] Update the navigation and visual copy to stay aligned with the Etapa 2 UI mockups in `PatasBigodesApp/src/main/resources/templates/fragments/navbar.html` and `PatasBigodesApp/src/main/resources/templates/fragments/sidebar.html`
 - [ ] T030 Validate the end-to-end quickstart flow documented in `specs/002-registo-clientes-alojamentos/quickstart.md`
 - [ ] T031 Validate tutor lookup timing against SC-006 by measuring search by NIF and name in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ITutorService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/TutorService.java` and `PatasBigodesApp/src/test/java/pt/hotel/animais/service/TutorServiceTest.java`
 - [ ] T032 Validate availability lookup timing against SC-003 by measuring the query path in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IAlojamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/AlojamentoService.java` and `PatasBigodesApp/src/test/java/pt/hotel/animais/service/AlojamentoServiceTest.java`

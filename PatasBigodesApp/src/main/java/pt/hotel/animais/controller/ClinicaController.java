@@ -24,6 +24,19 @@ public class ClinicaController {
     private final IIntervencaoClinicaService intervencaoClinicaService;
     private final IAlteracaoEstadoSaudeService alteracaoEstadoSaudeService;
 
+    /**
+     * Apresenta a página de entrada da área clínica.
+     *
+     * @param model modelo MVC usado pelo template Thymeleaf
+     * @return template HTML da área clínica
+     */
+    @GetMapping
+    public String index(Model model) {
+        model.addAttribute("activePage", "clinica");
+        model.addAttribute("pageTitle", "Clínica Veterinária");
+        return "clinica/index";
+    }
+
     @GetMapping("/intervencoes")
     public String listIntervencoes(@RequestParam Long estadiaId, @PageableDefault(size = 10) org.springframework.data.domain.Pageable pageable, Model model) {
         var page = intervencaoClinicaService.listByEstadia(estadiaId, pageable);

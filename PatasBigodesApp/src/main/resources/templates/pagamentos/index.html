@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="fragments/head :: head"></th:block>
+    <title>Pagamentos</title>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <th:block th:replace="fragments/navbar :: navbar"></th:block>
+    <th:block th:replace="fragments/sidebar :: sidebar"></th:block>
+
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Pagamentos</h1>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Operações de pagamento</h3>
+                            </div>
+                            <div class="card-body">
+                                <p>Os pagamentos de check-in e check-out são registados nos fluxos da estadia correspondente.</p>
+                                <a th:href="@{/historico}" class="btn btn-primary">
+                                    <i class="fas fa-receipt"></i> Abrir histórico financeiro
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Estadias</h3>
+                            </div>
+                            <div class="card-body">
+                                <p>Use a lista de estadias para executar check-in, check-out e cobrança complementar.</p>
+                                <a th:href="@{/estadias}" class="btn btn-secondary">
+                                    <i class="fas fa-cash-register"></i> Ver estadias
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <th:block th:replace="fragments/footer :: footer"></th:block>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+</html>

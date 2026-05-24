@@ -1,6 +1,8 @@
 package pt.hotel.animais.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +25,19 @@ public class PagamentoController {
 
     public PagamentoController(IPagamentoService pagamentoService) {
         this.pagamentoService = pagamentoService;
+    }
+
+    /**
+     * Apresenta a página de entrada do módulo de pagamentos.
+     *
+     * @param model modelo MVC usado pelo template Thymeleaf
+     * @return template HTML da área de pagamentos
+     */
+    @GetMapping
+    public String index(Model model) {
+        model.addAttribute("activePage", "pagamentos");
+        model.addAttribute("pageTitle", "Pagamentos");
+        return "pagamentos/index";
     }
 
     /**

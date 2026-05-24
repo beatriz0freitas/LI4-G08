@@ -19,15 +19,15 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login").permitAll()
-                .requestMatchers("/relatorios/**", "/colaboradores/**").hasRole("DIRETOR")
+                .requestMatchers("/relatorios", "/relatorios/**", "/colaboradores", "/colaboradores/**").hasRole("DIRETOR")
                 .requestMatchers("/dashboard").hasRole("DIRETOR")
-                .requestMatchers("/tutores/**", "/animais/**", "/reservas/**", "/estadias/**", "/pagamentos/**")
+                .requestMatchers("/tutores/**", "/animais/**", "/reservas/**", "/estadias/**", "/pagamentos", "/pagamentos/**")
                     .hasAnyRole("DIRETOR", "FUNCIONARIO_RECEPCAO")
                 .requestMatchers("/cuidados/**", "/extras/**")
                     .hasAnyRole("DIRETOR", "CUIDADOR", "MEDICO_VETERINARIO")
                 .requestMatchers("/plano-cuidados/**")
                     .hasAnyRole("DIRETOR", "FUNCIONARIO_RECEPCAO", "CUIDADOR", "MEDICO_VETERINARIO")
-                .requestMatchers("/clinica/**")
+                .requestMatchers("/clinica", "/clinica/**")
                     .hasAnyRole("DIRETOR", "MEDICO_VETERINARIO")
                 .requestMatchers("/notas/**")
                     .hasAnyRole("DIRETOR", "FUNCIONARIO_RECEPCAO", "CUIDADOR", "MEDICO_VETERINARIO")
