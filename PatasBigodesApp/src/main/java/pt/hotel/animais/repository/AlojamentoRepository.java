@@ -21,6 +21,8 @@ public interface AlojamentoRepository extends JpaRepository<Alojamento, Long> {
     List<Alojamento> findAllByOrderByIdentificacaoAsc();
 
     long countByEstadoLimpeza(EstadoLimpeza estadoLimpeza);
+
+    long countByTipo(TipoAlojamento tipo);
     
     /**
      * Procura alojamentos disponíveis (limpos e sem conflitos de reserva) para um período específico.

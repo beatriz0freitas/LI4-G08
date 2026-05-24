@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt">
+<head th:insert="fragments/head :: head"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+	<th:block th:insert="fragments/navbar :: navbar"></th:block>
+	<th:block th:insert="fragments/sidebar :: sidebar"></th:block>
+
+	<div class="content-wrapper">
+		<div class="content-header">
+			<div class="container-fluid">
+				<h1 class="m-0">Relatórios</h1>
+			</div>
+		</div>
+
+		<section class="content">
+			<div class="container-fluid">
+				<div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+				<div class="card card-primary">
+					<div class="card-header">
+						<h3 class="card-title">Filtros</h3>
+					</div>
+					<form th:action="@{/relatorios/gerar}" th:object="${filtro}" method="post">
+						<div class="card-body">
+							<div class="row">
+								<div class="col-md-3">
+									<div class="form-group">
+										<label for="dataInicio">Data início</label>
+										<input id="dataInicio" type="date" th:field="*{dataInicio}" class="form-control">
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="form-group">
+										<label for="dataFim">Data fim</label>
+										<input id="dataFim" type="date" th:field="*{dataFim}" class="form-control">
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="form-group">
+										<label for="tipoAlojamento">Tipo de alojamento</label>
+										<select id="tipoAlojamento" th:field="*{tipoAlojamento}" class="form-control">
+											<option value="">Todos</option>
+											<option th:each="tipo : ${tiposAlojamento}" th:value="${tipo}" th:text="${tipo}"></option>
+										</select>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="form-group">
+										<label for="agruparPor">Agrupar por</label>
+										<select id="agruparPor" th:field="*{agruparPor}" class="form-control">
+											<option th:each="grupo : ${gruposRelatorio}" th:value="${grupo}" th:text="${grupo}"></option>
+										</select>
+									</div>
+								</div>
+							</div>
+							<div class="form-check">
+								<input id="incluirServicosExtra" type="checkbox" th:field="*{incluirServicosExtra}" class="form-check-input">
+								<label for="incluirServicosExtra" class="form-check-label">Incluir serviços extra</label>
+							</div>
+						</div>
+						<div class="card-footer">
+							<button type="submit" class="btn btn-primary">
+								<i class="fas fa-chart-bar mr-2"></i>Gerar
+							</button>
+							<a th:href="@{/relatorios/exportar/csv(dataInicio=*{dataInicio},dataFim=*{dataFim},tipoAlojamento=*{tipoAlojamento},incluirServicosExtra=*{incluirServicosExtra},agruparPor=*{agruparPor})}" class="btn btn-outline-secondary">
+								<i class="fas fa-file-csv mr-2"></i>CSV
+							</a>
+							<a th:href="@{/relatorios/exportar/pdf(dataInicio=*{dataInicio},dataFim=*{dataFim},tipoAlojamento=*{tipoAlojamento},incluirServicosExtra=*{incluirServicosExtra},agruparPor=*{agruparPor})}" class="btn btn-outline-secondary">
+								<i class="fas fa-file-pdf mr-2"></i>PDF
+							</a>
+						</div>
+					</form>
+				</div>
+
+				<div class="row" th:if="${relatorio}">
+					<div class="col-lg-3 col-6">
+						<div class="small-box bg-info">
+							<div class="inner">
+								<h3 th:text="${#numbers.formatDecimal(relatorio.taxaOcupacao, 1, 2)} + '%'">0%</h3>
+								<p>Taxa de ocupação</p>
+							</div>
+							<div class="icon"><i class="fas fa-bed"></i></div>
+						</div>
+					</div>
+					<div class="col-lg-3 col-6">
+						<div class="small-box bg-success">
+							<div class="inner">
+								<h3 th:text="${relatorio.reservasCount}">0</h3>
+								<p>Reservas no período</p>
+							</div>
+							<div class="icon"><i class="fas fa-calendar-check"></i></div>
+						</div>
+					</div>
+					<div class="col-lg-3 col-6">
+						<div class="small-box bg-warning">
+							<div class="inner">
+								<h3 th:text="${relatorio.estadiasCount}">0</h3>
+								<p>Estadias no período</p>
+							</div>
+							<div class="icon"><i class="fas fa-dog"></i></div>
+						</div>
+					</div>
+					<div class="col-lg-3 col-6">
+						<div class="small-box bg-danger">
+							<div class="inner">
+								<h3 th:text="${relatorio.pagamentosPendentes}">0</h3>
+								<p>Pagamentos pendentes</p>
+							</div>
+							<div class="icon"><i class="fas fa-euro-sign"></i></div>
+						</div>
+					</div>
+				</div>
+
+				<div class="card" th:if="${relatorio}">
+					<div class="card-header">
+						<h3 class="card-title">Resumo financeiro</h3>
+					</div>
+					<div class="card-body">
+						<p><strong>Faturação total:</strong> <span th:text="${relatorio.faturacaoTotal}">0</span></p>
+						<p><strong>Serviços extra:</strong> <span th:text="${relatorio.servicosExtraTotal}">0</span></p>
+						<table class="table table-sm">
+							<thead>
+							<tr><th>Método</th><th>Valor</th></tr>
+							</thead>
+							<tbody>
+							<tr th:each="entry : ${relatorio.faturacaoPorMetodo}">
+								<td th:text="${entry.key}">METODO</td>
+								<td th:text="${entry.value}">0</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+
+	<th:block th:insert="fragments/footer :: footer"></th:block>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+</html>

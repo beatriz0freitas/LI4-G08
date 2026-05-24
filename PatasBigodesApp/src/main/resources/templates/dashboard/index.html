@@ -67,10 +67,13 @@
 					<div class="col-12">
 						<div class="card">
 							<div class="card-header">
-								<h3 class="card-title">Visão operacional</h3>
+								<h3 class="card-title">Visão operacional e financeira</h3>
 							</div>
 							<div class="card-body">
-								<p class="mb-0">A fundação da aplicação está pronta para suportar os módulos de reservas, cuidados e relatórios nas fases seguintes.</p>
+								<p><strong>Faturação registada:</strong> <span th:text="${faturacaoTotal}">0</span></p>
+								<a th:href="@{/relatorios}" class="btn btn-primary">
+									<i class="fas fa-chart-bar mr-2"></i>Abrir relatórios
+								</a>
 							</div>
 						</div>
 					</div>
