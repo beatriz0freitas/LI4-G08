@@ -161,4 +161,7 @@ CREATE TABLE alteracao_estado_saude (
 - `ServicoExtraDto register(ServicoExtraFormDto req)` in `ServicoExtraService`
 - `IntervencaoClinicaDto register(IntervencaoClinicaFormDto req)` in `ClinicaService`
 
+Controllers:
+- `ClinicaController` — Agrega endpoints MVC (Thymeleaf SSR) para as operações clínicas e operacionais deste feature: registo/listagem de `RegistoCuidado`, registo de `ServicoExtra`, registo/consulta de `IntervencaoClinica`, registo de `AlteracaoEstadoSaude` e adição de `Nota` operacional. O controller expõe vistas e formulários HTML; não serão adicionados endpoints REST nesta fase.
+
 These skeletons should be copied into the repository as initial templates for the corresponding tasks (T001/T002/T009/T010 etc.).

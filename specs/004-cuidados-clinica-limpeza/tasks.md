@@ -43,7 +43,7 @@
 
 ### Tests for User Story US-14
 
-- [ ] T005 [P] [US14] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/PlanoCuidadosControllerIT.java` for viewing the care plan of an active stay
+- [ ] T005 [P] [US14] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/PlanoCuidadosControllerTest.java` for viewing the care plan of an active stay
 
 ### Implementation for User Story US-14
 
@@ -62,7 +62,7 @@
 
 ### Tests for User Story US-15
 
-- [ ] T008 [P] [US15] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/RegistoCuidadoControllerIT.java` for create-and-list care records
+- [ ] T008 [P] [US15] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/RegistoCuidadoControllerTest.java` for create-and-list care records
 
 ### Implementation for User Story US-15
 
@@ -82,7 +82,7 @@
 
 ### Tests for User Story US-18
 
-- [ ] T012 [P] [US18] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ServicoExtraControllerIT.java` for registering extras and verifying billing inclusion
+- [ ] T012 [P] [US18] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ServicoExtraControllerTest.java` for registering extras and verifying billing inclusion
 
 ### Implementation for User Story US-18
 
@@ -102,7 +102,7 @@
 
 ### Tests for User Story US-22
 
-- [ ] T016 [P] [US22] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/HistoricoControllerIT.java` for filtered history consultation
+- [ ] T016 [P] [US22] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/HistoricoControllerTest.java` for filtered history consultation
 
 ### Implementation for User Story US-22
 
@@ -122,13 +122,13 @@
 
 ### Tests for User Story US-16
 
-- [ ] T020 [P] [US16] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/AlteracaoEstadoSaudeControllerIT.java` for recording health-state changes
+- [ ] T020 [P] [US16] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ClinicaControllerTest.java` for recording health-state changes
 
 ### Implementation for User Story US-16
 
 - [x] T021 [P] [US16] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/AlteracaoEstadoSaudeFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/AlteracaoEstadoSaudeDto.java`
 - [ ] T022 [US16] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/AlteracaoEstadoSaudeService.java` with role checks and recent-change listing
-- [ ] T023 [US16] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/AlteracaoEstadoSaudeController.java` and `PatasBigodesApp/src/main/resources/templates/clinica/alteracoes.html`
+- [ ] T023 [US16] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ClinicaController.java` and `PatasBigodesApp/src/main/resources/templates/clinica/alteracoes.html`
 
 **Checkpoint**: User Story US-16 should now be fully functional and testable independently
 
@@ -142,7 +142,7 @@
 
 ### Tests for User Story US-17
 
-- [ ] T024 [P] [US17] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/NotaControllerIT.java` for adding and viewing reservation notes
+- [ ] T024 [P] [US17] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/NotaControllerTest.java` for adding and viewing reservation notes
 
 ### Implementation for User Story US-17
 
@@ -162,13 +162,13 @@
 
 ### Tests for User Story US-23
 
-- [ ] T028 [P] [US23] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/IntervencaoClinicaControllerIT.java` for veterinary interventions and billing inclusion
+- [ ] T028 [P] [US23] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ClinicaControllerTest.java` for veterinary interventions and billing inclusion
 
 ### Implementation for User Story US-23
 
 - [x] T029 [P] [US23] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/IntervencaoClinicaFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/IntervencaoClinicaDto.java`
 - [ ] T030 [US23] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IntervencaoClinicaService.java` and the billing hook in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
-- [ ] T031 [US23] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/IntervencaoClinicaController.java` and `PatasBigodesApp/src/main/resources/templates/clinica/intervencoes.html`
+- [ ] T031 [US23] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ClinicaController.java` and `PatasBigodesApp/src/main/resources/templates/clinica/intervencoes.html`
 
 **Checkpoint**: User Story US-23 should now be fully functional and testable independently
 
@@ -179,7 +179,7 @@
 **Purpose**: Improvements that affect multiple user stories
 
 - [ ] T032 [P] Update feature documentation in `specs/004-cuidados-clinica-limpeza/plan.md`, `specs/004-cuidados-clinica-limpeza/research.md`, `specs/004-cuidados-clinica-limpeza/data-model.md`, and `specs/004-cuidados-clinica-limpeza/quickstart.md` after implementation details are finalized
-- [ ] T033 [P] Run targeted regression tests in `PatasBigodesApp` with `mvn test -Dtest=PlanoCuidadosControllerIT,RegistoCuidadoControllerIT,ServicoExtraControllerIT,HistoricoControllerIT,AlteracaoEstadoSaudeControllerIT,NotaControllerIT,IntervencaoClinicaControllerIT`
+- [ ] T033 [P] Run targeted regression tests in `PatasBigodesApp` with `mvn test -Dtest=PlanoCuidadosControllerTest,ClinicaControllerTest,HistoricoControllerTest`
 
 ---
 
@@ -225,8 +225,9 @@
 ## Parallel Example: User Story US-15
 
 ```bash
-Task: "Add integration test in PatasBigodesApp/src/test/java/pt/hotel/animais/controller/RegistoCuidadoControllerIT.java for create-and-list care records"
-Task: "Add request/view DTOs in PatasBigodesApp/src/main/java/pt/hotel/animais/dto/RegistoCuidadoFormDto.java and PatasBigodesApp/src/main/java/pt/hotel/animais/dto/RegistoCuidadoDto.java"
+Task: "Add integration test in PatasBigodesApp/src/test/java/pt/hotel/animais/controller/RegistoCuidadoControllerTest.java for create-and-list care records"
+Task: "Add request/form DTOs in PatasBigodesApp/src/main/java/pt/hotel/animais/dto/RegistoCuidadoFormDto.java and PatasBigodesApp/src/main/java/pt/hotel/animais/dto/RegistoCuidadoDto.java"
+
 ```
 
 ---
