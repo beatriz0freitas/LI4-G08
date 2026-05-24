@@ -17,7 +17,7 @@ import java.time.Duration;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class PagamentoService {
+public class PagamentoService implements IPagamentoService {
 
     private final PagamentoRepository pagamentoRepository;
     private final EstadiaRepository estadiaRepository;

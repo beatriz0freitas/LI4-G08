@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class AlteracaoEstadoSaudeService {
+public class AlteracaoEstadoSaudeService implements IAlteracaoEstadoSaudeService {
 
     private final AlteracaoEstadoSaudeRepository repository;
     private final EstadiaRepository estadiaRepository;

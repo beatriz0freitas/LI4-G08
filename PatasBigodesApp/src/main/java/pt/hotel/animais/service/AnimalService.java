@@ -16,10 +16,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class AnimalService {
+public class AnimalService implements IAnimalService {
     
     private final AnimalRepository animalRepository;
-    private final TutorService tutorService;
+    private final ITutorService tutorService;
     
     /**
      * Regista um novo animal associado a um tutor.

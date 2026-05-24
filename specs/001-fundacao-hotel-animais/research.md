@@ -132,7 +132,7 @@ public Colaborador authenticate(String username, String password) { ... }
 - **AuthController**: 90%+ (login, logout, redirect)
 - **DashboardController**: 85%+ (ocupação, faturação)
 - **LimpezaController**: 90%+ (listar, marcar concluído)
-- **Services**: 95%+ (AlojamentoService, LimpezaService)
+- **Services**: 95%+ (`IAlojamentoService`/`AlojamentoService`, `ILimpezaService`/`LimpezaService`)
 
 ---
 

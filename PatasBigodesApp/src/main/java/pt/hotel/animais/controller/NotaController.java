@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pt.hotel.animais.dto.NotaFormDto;
-import pt.hotel.animais.service.NotaService;
+import pt.hotel.animais.service.INotaService;
 
 import java.security.Principal;
 
@@ -15,7 +15,7 @@ import java.security.Principal;
 @RequestMapping("/notas")
 public class NotaController {
 
-    private final NotaService notaService;
+    private final INotaService notaService;
 
     @PostMapping("/create")
     public String create(NotaFormDto form, Principal principal, RedirectAttributes redirect) {

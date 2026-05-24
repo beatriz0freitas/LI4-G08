@@ -10,6 +10,7 @@ import pt.hotel.animais.repository.EstadiaRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import pt.hotel.animais.dto.HistoricoFiltroDto;
 import pt.hotel.animais.dto.HistoricoItemDto;
 import pt.hotel.animais.repository.RegistoCuidadoRepository;
@@ -21,7 +22,7 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 
 @Service
-public class HistoricoService {
+public class HistoricoService implements IHistoricoService {
 
     private final EstadiaRepository estadiaRepository;
 
@@ -96,7 +97,7 @@ public class HistoricoService {
         // simple paging
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), items.size());
-        var pageContent = start > end ? List.of() : items.subList(start, end);
+        List<HistoricoItemDto> pageContent = start > end ? List.of() : items.subList(start, end);
         return new org.springframework.data.domain.PageImpl<>(pageContent, pageable, items.size());
     }
 

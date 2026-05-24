@@ -118,7 +118,7 @@ Relações: `Estadia` 1..* `RegistoCuidado` ; `Estadia` 1..* `ServicoExtra` ; `E
 - Formatos de data/hora seguem a convenção da aplicação (ISO local) e fusos não são foco nesta fase.
 
 ## Dependências
-- Depende de `EstadiaService`/`ReservaService` existentes para validações de estado (ver [docs/Etapa2/01-architecture/architecture.md](docs/Etapa2/01-architecture/architecture.md#L1)).
+- Depende das interfaces `IEstadiaService`/`IReservaService` e das implementações `EstadiaService`/`ReservaService` existentes para validações de estado (ver [docs/Etapa2/01-architecture/architecture.md](docs/Etapa2/01-architecture/architecture.md#L1)).
 - Requer decisões de implementação sobre DTOs e mapeamento (seguindo [ADR-06](../../docs/Etapa2/04-architecture-decisions/ADR-06-isolamento-apresentacao-dtos.md#L1)).
 
 ## Testes de Aceitação Propostos

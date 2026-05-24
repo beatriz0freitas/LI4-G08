@@ -41,7 +41,7 @@
 - [x] T008 Criar entidade `Pagamento` em `PatasBigodesApp/src/main/java/pt/hotel/animais/model/Pagamento.java`
 - [x] T009 [P] Criar `EstadiaRepository` em `PatasBigodesApp/src/main/java/pt/hotel/animais/repository/EstadiaRepository.java`
 - [x] T010 [P] Criar `PagamentoRepository` em `PatasBigodesApp/src/main/java/pt/hotel/animais/repository/PagamentoRepository.java`
-- [x] T011 Implementar validações de invariantes RD no serviço base em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/RegraDominioService.java`
+- [x] T011 Implementar validações de invariantes RD no serviço base em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IRegraDominioService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/RegraDominioService.java`
 - [x] T012 [P] Adicionar regras de autorização por perfil em `PatasBigodesApp/src/main/java/pt/hotel/animais/config/SecurityConfig.java`
 
 **Checkpoint**: Base de persistência, domínio e segurança pronta para avançar nas user stories.
@@ -64,9 +64,9 @@
 
 ### Implementation for User Story 1
 
-- [x] T017 [US1] Implementar validação de criação de reserva (RF-07, RD-01) em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ReservaService.java`
-- [x] T062 [US1] Implementar confirmação explícita de reserva (RF-07) em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ReservaService.java`
-- [x] T018 [US1] Implementar cancelamento de reserva sem reativação (RD-06) em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ReservaService.java`
+- [x] T017 [US1] Implementar validação de criação de reserva (RF-07, RD-01) em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IReservaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ReservaService.java`
+- [x] T062 [US1] Implementar confirmação explícita de reserva (RF-07) em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IReservaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ReservaService.java`
+- [x] T018 [US1] Implementar cancelamento de reserva sem reativação (RD-06) em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IReservaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ReservaService.java`
 - [x] T019 [US1] Implementar endpoint `POST /reservas` em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`
 - [x] T063 [US1] Implementar endpoint `POST /reservas/{id}/confirmar` em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`
 - [x] T020 [US1] Implementar endpoint `POST /reservas/{id}/cancelar` em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`
@@ -89,7 +89,7 @@
 
 ### Implementation for User Story 2
 
-- [x] T024 [US2] Implementar cálculo de disponibilidade em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/AlojamentoService.java`
+- [x] T024 [US2] Implementar cálculo de disponibilidade em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IAlojamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/AlojamentoService.java`
 - [x] T025 [US2] Implementar endpoint `GET /reservas/disponibilidade` em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`
 - [x] T026 [US2] Implementar UI de consulta e sugestão de alternativas em `PatasBigodesApp/src/main/resources/templates/reservas/disponibilidade.html`
 
@@ -112,9 +112,9 @@
 
 ### Implementation for User Story 3
 
-- [x] T031 [US3] Implementar fluxo de check-in e criação de estadia em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
-- [x] T032 [US3] Implementar fluxo de check-out e fecho de estadia em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
-- [x] T033 [US3] Implementar transições de estado do alojamento em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/AlojamentoService.java`
+- [x] T031 [US3] Implementar fluxo de check-in e criação de estadia em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
+- [x] T032 [US3] Implementar fluxo de check-out e fecho de estadia em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
+- [x] T033 [US3] Implementar transições de estado do alojamento em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IAlojamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/AlojamentoService.java`
 - [x] T034 [US3] Implementar endpoints de check-in/check-out em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/EstadiaController.java`
 - [x] T035 [US3] Implementar ecrãs de operação de estadia em `PatasBigodesApp/src/main/resources/templates/estadias/checkin-checkout.html`
 
@@ -135,9 +135,9 @@
 
 ### Implementation for User Story 4
 
-- [x] T038 [US4] Implementar cálculo de pagamento base em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
-- [x] T039 [US4] Implementar persistência de pagamento `CHECK_IN` em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
-- [x] T040 [US4] Integrar pagamento de check-in no fluxo de check-in em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
+- [x] T038 [US4] Implementar cálculo de pagamento base em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
+- [x] T039 [US4] Implementar persistência de pagamento `CHECK_IN` em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
+- [x] T040 [US4] Integrar pagamento de check-in no fluxo de check-in em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
 
 **Checkpoint**: US4 funcional e testável de forma independente.
 
@@ -156,15 +156,15 @@
 
 ### Implementation for User Story 5
 
-- [ ] T043 [US5] Implementar cálculo de faturação complementar no check-out em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
-- [ ] T044 [US5] Implementar persistência de pagamento `CHECK_OUT` em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
-- [ ] T045 [US5] Integrar cobrança complementar no fecho de estadia em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
+- [ ] T043 [US5] Implementar cálculo de faturação complementar no check-out em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
+- [ ] T044 [US5] Implementar persistência de pagamento `CHECK_OUT` em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
+- [ ] T045 [US5] Integrar cobrança complementar no fecho de estadia em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
 
 ### Implementation status update
 
-- [x] T043 [US5] Implementar cálculo de faturação complementar no check-out em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java` (placeholder: 0.00)
-- [x] T044 [US5] Implementar persistência de pagamento `CHECK_OUT` em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
-- [x] T045 [US5] Integrar cobrança complementar no fecho de estadia em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
+- [x] T043 [US5] Implementar cálculo de faturação complementar no check-out em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java` (placeholder: 0.00)
+- [x] T044 [US5] Implementar persistência de pagamento `CHECK_OUT` em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
+- [x] T045 [US5] Integrar cobrança complementar no fecho de estadia em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
 
 **Checkpoint**: US5 funcional e testável de forma independente.
 
@@ -183,13 +183,13 @@
 
 ### Implementation for User Story 6
 
-- [x] T048 [US6] Implementar agregação de histórico em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/HistoricoService.java`
+- [x] T048 [US6] Implementar agregação de histórico em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IHistoricoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/HistoricoService.java`
 - [x] T049 [US6] Implementar endpoint `GET /historico` em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/HistoricoController.java`
 - [x] T050 [US6] Implementar template de histórico em `PatasBigodesApp/src/main/resources/templates/dashboard/historico.html`
 
 ### Implementation status update
 
-- [x] T048 [US6] Implementar agregação de histórico em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/HistoricoService.java` (placeholder returning todas estadias)
+- [x] T048 [US6] Implementar agregação de histórico em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IHistoricoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/HistoricoService.java` (placeholder returning todas estadias)
 - [x] T049 [US6] Implementar endpoint `GET /historico` em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/HistoricoController.java` (template placeholder em `templates/historico/list.html`)
 
 **Checkpoint**: US6 funcional e testável de forma independente.
@@ -209,14 +209,14 @@
 
 ### Implementation for User Story 7
 
-- [x] T053 [US7] Implementar serviço de indicadores e pendentes em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/DashboardService.java`
+- [x] T053 [US7] Implementar serviço de indicadores e pendentes em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IDashboardService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/DashboardService.java`
 - [x] T054 [US7] Implementar endpoint `GET /dashboard` em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/DashboardController.java`
 - [x] T055 [US7] Implementar template de dashboard de direção em `PatasBigodesApp/src/main/resources/templates/dashboard/index.html`
 
 ### Progress update
 
 - [x] T051 [P] [US7] Criar teste de serviço para agregados de dashboard em `PatasBigodesApp/src/test/java/pt/hotel/animais/service/DashboardServiceIntegrationTest.java`
-- [x] T053 [US7] Implementar serviço de indicadores e pendentes em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/DashboardService.java`
+- [x] T053 [US7] Implementar serviço de indicadores e pendentes em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IDashboardService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/DashboardService.java`
 - [x] T054 [US7] Implementar endpoint `GET /dashboard` em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/DashboardController.java`
 - [x] T055 [US7] Implementar template de dashboard de direção em `PatasBigodesApp/src/main/resources/templates/dashboard/index.html`
 

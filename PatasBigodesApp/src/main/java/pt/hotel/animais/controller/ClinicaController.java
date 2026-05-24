@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pt.hotel.animais.dto.IntervencaoClinicaFormDto;
 import pt.hotel.animais.dto.AlteracaoEstadoSaudeFormDto;
-import pt.hotel.animais.service.IntervencaoClinicaService;
-import pt.hotel.animais.service.AlteracaoEstadoSaudeService;
+import pt.hotel.animais.service.IIntervencaoClinicaService;
+import pt.hotel.animais.service.IAlteracaoEstadoSaudeService;
 
 import java.security.Principal;
 
@@ -21,8 +21,8 @@ import java.security.Principal;
 @RequestMapping("/clinica")
 public class ClinicaController {
 
-    private final IntervencaoClinicaService intervencaoClinicaService;
-    private final AlteracaoEstadoSaudeService alteracaoEstadoSaudeService;
+    private final IIntervencaoClinicaService intervencaoClinicaService;
+    private final IAlteracaoEstadoSaudeService alteracaoEstadoSaudeService;
 
     @GetMapping("/intervencoes")
     public String listIntervencoes(@RequestParam Long estadiaId, @PageableDefault(size = 10) org.springframework.data.domain.Pageable pageable, Model model) {

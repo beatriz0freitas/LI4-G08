@@ -22,12 +22,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class ReservaService {
+public class ReservaService implements IReservaService {
     
     private final ReservaRepository reservaRepository;
-    private final TutorService tutorService;
-    private final AnimalService animalService;
-    private final AlojamentoService alojamentoService;
+    private final ITutorService tutorService;
+    private final IAnimalService animalService;
+    private final IAlojamentoService alojamentoService;
     
     /**
      * Cria uma nova reserva com validações rigorosas.

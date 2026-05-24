@@ -12,7 +12,7 @@ import pt.hotel.animais.repository.ReservaRepository;
 
 @Service
 @RequiredArgsConstructor
-public class NotaService {
+public class NotaService implements INotaService {
 
     private final NotaRepository notaRepository;
     private final ReservaRepository reservaRepository;

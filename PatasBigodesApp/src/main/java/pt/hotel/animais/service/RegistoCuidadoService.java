@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class RegistoCuidadoService {
+public class RegistoCuidadoService implements IRegistoCuidadoService {
 
     private final RegistoCuidadoRepository registoCuidadoRepository;
     private final EstadiaRepository estadiaRepository;

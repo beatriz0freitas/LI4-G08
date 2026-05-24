@@ -93,7 +93,7 @@ PatasBigodesApp/
 ### 1. Domain model
 
 - `data-model.md` define entidades `Reserva`, `Estadia`, `Pagamento`, e impacto em `Alojamento`, incluindo atributos, validações e transições de estado.
-- As regras transversais de domínio e auditoria devem ser centralizadas num componente de validação compartilhado (por exemplo, `RegraDominioService`) para evitar duplicação de regras entre serviços.
+- As regras transversais de domínio e auditoria devem ser centralizadas num serviço partilhado com interface e implementação (por exemplo, `IRegraDominioService` e `RegraDominioService`) para evitar duplicação de regras entre serviços.
 
 ### 2. Interface contracts
 

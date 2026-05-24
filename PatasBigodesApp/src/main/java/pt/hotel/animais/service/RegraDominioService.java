@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 
 @Service
-public class RegraDominioService {
+public class RegraDominioService implements IRegraDominioService {
 
     /**
      * Valida invariantes simples do domínio. Exemplo: não permitir datas inválidas.
@@ -38,4 +38,3 @@ public class RegraDominioService {
         return pageable;
     }
 }
-

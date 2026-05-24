@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pt.hotel.animais.dto.ServicoExtraFormDto;
-import pt.hotel.animais.service.ServicoExtraService;
+import pt.hotel.animais.service.IServicoExtraService;
 
 import java.security.Principal;
 
@@ -19,7 +19,7 @@ import java.security.Principal;
 @RequestMapping("/extras")
 public class ServicoExtraController {
 
-    private final ServicoExtraService servicoExtraService;
+    private final IServicoExtraService servicoExtraService;
 
     @GetMapping
     public String list(@RequestParam Long estadiaId, @PageableDefault(size = 10) org.springframework.data.domain.Pageable pageable, Model model) {
