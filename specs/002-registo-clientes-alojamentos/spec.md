@@ -18,7 +18,13 @@ Esta feature deve ser interpretada e implementada em coerência com os artefacto
 - [class-diagram.md](../../docs/Etapa2/02-class-diagram/class-diagram.md) para a estrutura de entidades, services e repositories.
 - [UC-03.mmd](../../docs/Etapa2/03-seq-diagrams/UC-03.mmd) e [UC-04.mmd](../../docs/Etapa2/03-seq-diagrams/UC-04.mmd) para os fluxos de registo e criação de reserva.
 - [ADR-01-monolito-camadas.md](../../docs/Etapa2/04-architecture-decisions/ADR-01-monolito-camadas.md), [ADR-02-spring-mvc-thymeleaf-ssr.md](../../docs/Etapa2/04-architecture-decisions/ADR-02-spring-mvc-thymeleaf-ssr.md), [ADR-03-persistencia-sgbd-relacional.md](../../docs/Etapa2/04-architecture-decisions/ADR-03-persistencia-sgbd-relacional.md), [ADR-04-mysql-base-dados.md](../../docs/Etapa2/04-architecture-decisions/ADR-04-mysql-base-dados.md), [ADR-05-controlo-acesso-perfil.md](../../docs/Etapa2/04-architecture-decisions/ADR-05-controlo-acesso-perfil.md) e [ADR-06-isolamento-apresentacao-dtos.md](../../docs/Etapa2/04-architecture-decisions/ADR-06-isolamento-apresentacao-dtos.md) para as decisões arquiteturais base.
-- Os mockups de interface de Etapa 2, em especial [wf03-reservas.html](../../docs/Etapa2/05-ui-interface-mockup/wf03-reservas.html), devem ser usados como referência visual para os ecrãs de disponibilidade e criação de reservas; os restantes mockups da pasta `05-ui-interface-mockup` devem orientar a consistência visual do fluxo.
+- Os mockups de interface de Etapa 2 devem ser usados como referência visual para os ecrãs de disponibilidade e criação de reservas. Em particular:
+
+- [wf03-reservas.html](../../docs/Etapa2/05-ui-interface-mockup/wf03-reservas.html) — ecrã principal de reservas e assistente de criação.
+- [wf08-disponibilidade.html](../../docs/Etapa2/05-ui-interface-mockup/wf08-disponibilidade.html) — vista de disponibilidade com filtros por período.
+- [wf05-historico-clinico.html](../../docs/Etapa2/05-ui-interface-mockup/wf05-historico-clinico.html) — referência para a apresentação de históricos por animal.
+
+Ver também a pasta completa de mockups: `docs/Etapa2/05-ui-interface-mockup/` para consistência visual.
 
 ---
 
