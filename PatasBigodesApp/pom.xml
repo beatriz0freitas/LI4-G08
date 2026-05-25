@@ -169,6 +169,17 @@
                     <excludedClasses>
                         <param>pt.hotel.animais.service.*UserDetails*</param>
                     </excludedClasses>
+                    <!-- excluir testes @SpringBootTest que precisam de MySQL -->
+                    <excludedTestClasses>
+                        <param>pt.hotel.animais.service.ReservaServiceTests</param>
+                        <param>pt.hotel.animais.service.TutorServiceTimingTests</param>
+                        <param>pt.hotel.animais.service.AlojamentoServiceTimingTests</param>
+                        <param>pt.hotel.animais.service.PagamentoCheckInCalculoTest</param>
+                        <param>pt.hotel.animais.service.CheckInServiceTest</param>
+                        <param>pt.hotel.animais.service.CheckInServiceTest_simple</param>
+                        <param>pt.hotel.animais.service.CheckOutSequenceServiceTest</param>
+                        <param>pt.hotel.animais.service.DashboardServiceIntegrationTest</param>
+                    </excludedTestClasses>
                     <mutators>
                         <mutator>STRONGER</mutator>
                     </mutators>
