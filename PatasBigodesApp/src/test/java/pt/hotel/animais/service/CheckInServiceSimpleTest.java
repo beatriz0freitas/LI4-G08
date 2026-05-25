@@ -9,7 +9,7 @@ import pt.hotel.animais.repository.EstadiaRepository;
 
 @SpringBootTest
 @Transactional
-public class CheckInServiceTest_simple {
+public class CheckInServiceSimpleTest {
 
     @Autowired
     private EstadiaService estadiaService;

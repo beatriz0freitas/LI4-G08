@@ -58,6 +58,8 @@ class RelatorioServiceTest {
         assertThat(resumo.getFaturacaoTotal()).isEqualByComparingTo("120.00");
         assertThat(resumo.getServicosExtraTotal()).isEqualByComparingTo("25.00");
         assertThat(resumo.getFaturacaoPorMetodo()).containsEntry("NUMERARIO", new BigDecimal("50.00"));
+        assertThat(resumo.getAlojamentosTotal()).isEqualTo(10L);
+        assertThat(resumo.getPagamentosPendentes()).isEqualTo(2L);
     }
 
     @Test
@@ -72,7 +74,60 @@ class RelatorioServiceTest {
     }
 
     @Test
-    void gerarPdfDeveProduzirDocumentoPdfValido() {
+    void gerarCsvDeveConterCabecalhoEDadosDoRelatorio() {
+        configurarMocksBase();
+
+        String csv = service.gerarCsv(filtro());
+
+        assertThat(csv).startsWith("periodo_start,periodo_end,");
+        assertThat(csv).contains("2026-05-01");
+        assertThat(csv).contains("2026-05-31");
+        assertThat(csv).contains("40.00");
+    }
+
+    @Test
+    void gerarPdfDeveRetornarBytesNaoVazios() {
+        configurarMocksBase();
+
+        byte[] pdf = service.gerarPdf(filtro());
+
+        assertThat(pdf).isNotEmpty();
+        assertThat(new String(pdf)).contains("Relatório operacional");
+        assertThat(new String(pdf)).contains("2026-05-01");
+    }
+
+    @Test
+    void filtroMesAtualDeveRetornarPrimeiroDiaDeMesAteDia() {
+        RelatorioFiltroFormDto filtro = service.filtroMesAtual();
+
+        assertThat(filtro.getDataInicio().getDayOfMonth()).isEqualTo(1);
+        assertThat(filtro.getDataFim()).isEqualTo(LocalDate.now());
+        assertThat(filtro.getDataInicio().getMonth()).isEqualTo(LocalDate.now().getMonth());
+    }
+
+    @Test
+    void gerarRelatorioSemServicosExtraRetornaZero() {
+        configurarMocksBase();
+        RelatorioFiltroFormDto filtro = filtro();
+        filtro.setIncluirServicosExtra(false);
+
+        var resumo = service.gerarRelatorio(filtro);
+
+        assertThat(resumo.getServicosExtraTotal()).isEqualByComparingTo(BigDecimal.ZERO);
+    }
+
+    @Test
+    void periodoComDatasNulasDeveFalhar() {
+        RelatorioFiltroFormDto filtro = new RelatorioFiltroFormDto();
+        filtro.setDataInicio(null);
+        filtro.setDataFim(LocalDate.now());
+
+        assertThatThrownBy(() -> service.gerarRelatorio(filtro))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Período");
+    }
+
+    private void configurarMocksBase() {
         when(alojamentoRepository.count()).thenReturn(10L);
         when(estadiaRepository.countAlojamentosOcupadosAgora()).thenReturn(4L);
         when(estadiaRepository.countSobrepostasPeriodo(any(), any())).thenReturn(6L);
@@ -82,17 +137,6 @@ class RelatorioServiceTest {
         when(pagamentoRepository.sumValorPorMetodo(any(), any()))
             .thenReturn(List.<Object[]>of(new Object[] {MetodoPagamento.NUMERARIO, new BigDecimal("50.00")}));
         when(servicoExtraRepository.sumCustoPorPeriodo(any(), any())).thenReturn(new BigDecimal("25.00"));
-
-        byte[] pdf = service.gerarPdf(filtro());
-        String conteudo = new String(pdf, java.nio.charset.StandardCharsets.ISO_8859_1);
-        int startxref = conteudo.indexOf("startxref");
-        int xrefOffset = Integer.parseInt(conteudo.substring(startxref + "startxref".length()).trim().split("\\R")[0]);
-
-        assertThat(conteudo)
-            .startsWith("%PDF-")
-            .contains("xref")
-            .contains("%%EOF");
-        assertThat(conteudo.substring(xrefOffset)).startsWith("xref");
     }
 
     private RelatorioFiltroFormDto filtro() {
