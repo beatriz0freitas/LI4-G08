@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Repositório para TarefaCuidado.
- * LAC-02: Suporta queries de tarefas por plano e por estado de conclusão
+ * Suporta queries de tarefas por plano e por estado de conclusão
  */
 @Repository
 public interface TarefaCuidadoRepository extends JpaRepository<TarefaCuidado, Long> {

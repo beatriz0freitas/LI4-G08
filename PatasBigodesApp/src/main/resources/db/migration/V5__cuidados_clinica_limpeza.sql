@@ -1,6 +1,6 @@
--- V5: Cuidados, Clinica e Limpeza - tabelas iniciais (atualizada LAC-02: adicionadas PlanoCuidados e TarefaCuidado)
+-- V5: Cuidados, Clinica e Limpeza - tabelas iniciais (adicionadas PlanoCuidados e TarefaCuidado)
 
--- Create PlanoCuidados (NOVA - LAC-02: núcleo do plano dinâmico de cuidados)
+-- Create PlanoCuidados ( núcleo do plano dinâmico de cuidados)
 CREATE TABLE plano_cuidados (
   id BIGINT PRIMARY KEY AUTO_INCREMENT,
   animal_id BIGINT NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE plano_cuidados (
   CONSTRAINT uk_pc_estadia UNIQUE (estadia_id)
 );
 
--- Create TarefaCuidado (NOVA - LAC-02: tarefas recorrentes estruturadas no plano)
+-- Create TarefaCuidado ( tarefas recorrentes estruturadas no plano)
 CREATE TABLE tarefa_cuidado (
   id BIGINT PRIMARY KEY AUTO_INCREMENT,
   plano_cuidados_id BIGINT NOT NULL,

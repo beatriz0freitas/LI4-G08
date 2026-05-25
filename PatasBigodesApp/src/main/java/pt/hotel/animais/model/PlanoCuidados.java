@@ -10,7 +10,6 @@ import java.util.List;
 
 /**
  * Plano de cuidados para um animal durante uma estadia.
- * LAC-02: Entidade nova que modeliza o plano dinâmico com duplo vínculo:
  * - Animal: mantém histórico persistente de planos
  * - Estadia: cada estadia tem um plano ativo (UNIQUE constraint)
  */

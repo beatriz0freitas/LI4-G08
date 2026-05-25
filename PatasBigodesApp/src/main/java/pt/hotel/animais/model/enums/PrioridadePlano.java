@@ -2,7 +2,6 @@ package pt.hotel.animais.model.enums;
 
 /**
  * Prioridade do plano de cuidados.
- * LAC-02: Dinâmica conforme AlteracaoEstadoSaude (US-16)
  */
 public enum PrioridadePlano {
     ROTINA,      // Cuidados normais, sem urgência

@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 
 /**
  * Tarefa de cuidado dentro de um plano.
- * LAC-02: Entidade nova que modeliza tarefas recorrentes estruturadas.
  * Diferente de RegistoCuidado (anotações livres):
  * - TarefaCuidado: estruturado, com tipo e periodicidade, checklist
  * - RegistoCuidado: anotações livres sobre cuidados realizados

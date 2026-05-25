@@ -9,7 +9,6 @@ import pt.hotel.animais.model.enums.PrioridadePlano;
 
 /**
  * Interface de serviço para PlanoCuidados.
- * LAC-02: Gerencia o plano dinâmico de cuidados com 8 operações principais
  */
 public interface IPlanoCuidadosService {
 
@@ -46,7 +45,7 @@ public interface IPlanoCuidadosService {
 
     /**
      * Atualizar a prioridade do plano.
-     * LAC-02: Chamado automaticamente por AlteracaoEstadoSaudeService quando severidade = CRITICO
+     * Chamado automaticamente por AlteracaoEstadoSaudeService quando severidade = CRITICO
      */
     void atualizarPrioridade(Long planoCuidadosId, PrioridadePlano novaPrioridade, Long autorId) throws Exception;
 

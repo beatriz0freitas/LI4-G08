@@ -49,12 +49,12 @@ public class AlteracaoEstadoSaudeService implements IAlteracaoEstadoSaudeService
 
         AlteracaoEstadoSaude saved = repository.save(a);
 
-        // LAC-02: Hook de escalação automática de prioridade quando severidade é CRITICO
+        // Hook de escalação automática de prioridade quando severidade é CRITICO
         if (a.getSeveridade() == EstadoSaude.CRITICO) {
             try {
                 planoCuidadosRepository.findByEstadiaId(estadia.getId()).ifPresent(plano -> {
                     try {
-                        log.info("Hook LAC-02: Escalando prioridade do plano {} para CRITICO", plano.getId());
+                        log.info("Escalando prioridade do plano {} para CRITICO", plano.getId());
                         planoCuidadosService.atualizarPrioridade(plano.getId(), PrioridadePlano.CRITICO, 
                                                                  a.getAutorId() != null ? a.getAutorId() : 1L);
                     } catch (Exception e) {

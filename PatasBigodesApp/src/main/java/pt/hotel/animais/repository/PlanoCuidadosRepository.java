@@ -10,7 +10,7 @@ import java.util.Optional;
 
 /**
  * Repositório para PlanoCuidados.
- * LAC-02: Suporta o duplo vínculo (Animal histórico + Estadia ativa)
+ * Suporta o duplo vínculo (Animal histórico + Estadia ativa)
  */
 @Repository
 public interface PlanoCuidadosRepository extends JpaRepository<PlanoCuidados, Long> {
