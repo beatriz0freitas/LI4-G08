@@ -13,8 +13,8 @@
 |-----------|--------|----------|----------|-------|-----------|
 | Serviços unitários e regras de domínio | 130 | 130 | 0 | 0 | 0 |
 | Controllers WebMvc sem BD | 40 | 40 | 0 | 0 | 0 |
-| Integração, repositórios, timing e SpringBootTest com MySQL | 35 | 35 | 0 | 0 | 0 |
-| **Total com MySQL** | **205** | **205** | **0** | **0** | **0** |
+| Integração, repositórios, timing e SpringBootTest com MySQL | 37 | 37 | 0 | 0 | 0 |
+| **Total com MySQL** | **207** | **207** | **0** | **0** | **0** |
 
 Esta execução subiu o serviço `db-tests` do Docker Compose, esperou pelo estado `healthy`, aplicou 7 migrações Flyway na base `hotelanimais_test` e correu a suíte Maven completa contra MySQL em `localhost:3308`.
 
@@ -89,13 +89,14 @@ Durante a execução foram emitidos avisos de Thymeleaf sobre a sintaxe antiga d
 | `TutorAnimalControllerTemplateTest` | 1 | PASS |
 | `AlojamentoServiceTimingTests` | 1 | PASS |
 | `CheckInServiceTest` | 3 | PASS |
+| `CheckInServiceSimpleTest` | 2 | PASS |
 | `CheckOutSequenceServiceTest` | 3 | PASS |
 | `DashboardServiceIntegrationTest` | 1 | PASS |
 | `PagamentoCheckInCalculoTest` | 1 | PASS |
 | `ReservaServiceTests` | 2 | PASS |
 | `TutorServiceTimingTests` | 1 | PASS |
 
-**Nota de rastreabilidade:** existe também `CheckInServiceTest_simple.java` em `src/test`, mas o nome da classe não termina em `Test`, `Tests` ou `TestCase`. Por isso, não é executado pelo padrão normal do Maven Surefire usado em `mvn test` e não está incluído nos 205 testes desta execução.
+**Nota de rastreabilidade:** o antigo `CheckInServiceTest_simple.java` foi renomeado para `CheckInServiceSimpleTest.java`, passando a cumprir o padrão do Maven Surefire e a entrar na execução normal de `mvn test`.
 
 ---
 

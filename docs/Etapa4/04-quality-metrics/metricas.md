@@ -16,7 +16,7 @@ A norma ISO/IEC 25010 define um modelo de qualidade de produto de software com 8
 
 | Indicador | Resultado |
 |-----------|-----------|
-| Testes automatizados executados | 205 |
+| Testes automatizados executados | 207 |
 | Falhas / erros / ignorados | 0 / 0 / 0 |
 | Cobertura de instruções | 80.4% |
 | Cobertura de linhas | 80.2% |
@@ -35,7 +35,7 @@ A norma ISO/IEC 25010 define um modelo de qualidade de produto de software com 8
 | Sub-característica | Avaliação | Evidência |
 |--------------------|-----------|-----------|
 | Completude funcional | Alta, com uma exceção | RF-01 a RF-10 e RF-12 a RF-17 têm testes automatizados; RF-11 está parcial |
-| Correção funcional | Alta | 205 testes com MySQL passam sem falhas |
+| Correção funcional | Alta | 207 testes com MySQL passam sem falhas |
 | Adequação funcional | Alta | Testes de aceitação cobrem UC-01 a UC-13 |
 
 **Métrica:** 16 de 17 requisitos funcionais verificados de forma completa por testes automatizados.  
@@ -75,7 +75,7 @@ A norma ISO/IEC 25010 define um modelo de qualidade de produto de software com 8
 
 | Sub-característica | Avaliação | Evidência |
 |--------------------|-----------|-----------|
-| Maturidade | Alta | 205 testes passam; PITest apresenta 72.1% de mutation score |
+| Maturidade | Alta | 207 testes passam; PITest apresenta 72.1% de mutation score |
 | Disponibilidade | Boa | Spring Boot Actuator e Docker Compose suportam operação controlada |
 | Tolerância a falhas | Média | Exceções de negócio tratadas; sem mecanismos distribuídos, por não serem necessários no contexto |
 | Recuperabilidade | Parcial | Transações JPA existem; backups automáticos dependem de operação/infraestrutura |
@@ -114,7 +114,7 @@ A norma ISO/IEC 25010 define um modelo de qualidade de produto de software com 8
 | Reusabilidade | Boa | DTOs e `RegraDominioService` concentram validações reutilizáveis |
 | Analisabilidade | Boa | Cobertura de métodos de 85.2% e relatórios HTML JaCoCo/PITest |
 | Modificabilidade | Boa | Testes unitários com Mockito reduzem risco de regressão |
-| Testabilidade | Alta | 205 testes automatizados, incluindo integração com MySQL |
+| Testabilidade | Alta | 207 testes automatizados, incluindo integração com MySQL |
 
 **Mutation testing:**
 
@@ -158,7 +158,6 @@ A norma ISO/IEC 25010 define um modelo de qualidade de produto de software com 8
 | RF-11 | `PlanoCuidadosService` ainda não implementado | Implementar serviço e adicionar testes unitários e de aceitação |
 | Cobertura de ramos | 71.0%, ainda inferior à cobertura de métodos | Adicionar testes para caminhos alternativos de validação e erro |
 | Testes de integração | Executados com sucesso, mas dependem de Docker/MySQL local | Manter `make test-integration` como validação antes da entrega final |
-| Nomeação de testes | `CheckInServiceTest_simple.java` existe em `src/test`, mas não é executado por `mvn test` devido ao padrão do Maven Surefire | Renomear para terminar em `Test` ou remover se for apenas um teste auxiliar antigo |
 | Usabilidade | Sem teste formal com utilizadores | Fazer sessão curta de aceitação com perfis reais ou simulados |
 | RNF-08 | Backups não provados por teste automatizado | Documentar estratégia operacional e ensaiar recuperação |
 | PITest | 79 mutações sobreviveram e 51 ficaram sem cobertura | Priorizar mutações sobreviventes em serviços críticos |
