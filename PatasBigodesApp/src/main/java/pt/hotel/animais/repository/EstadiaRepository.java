@@ -10,6 +10,7 @@ import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.enums.EstadoEstadia;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
@@ -68,5 +69,15 @@ public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
 	long countAlojamentosOcupadosAgora();
 
 	java.util.Optional<Estadia> findByReservaId(Long reservaId);
+
+	@Query("""
+		SELECT e FROM Estadia e
+		JOIN FETCH e.reserva r
+		JOIN FETCH r.animal a
+		JOIN FETCH r.alojamento al
+		WHERE e.estado = pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO
+		ORDER BY r.dataFim ASC, e.dataInicio ASC
+		""")
+	List<Estadia> findEstadiasEmCursoDashboard(Pageable pageable);
 
 }
