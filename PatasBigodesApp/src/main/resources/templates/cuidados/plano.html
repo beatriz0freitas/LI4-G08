@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: page(title='Plano de Cuidados')">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page(title='Plano de Cuidados')}">
 <head>
     <meta charset="utf-8">
     <title>Plano de Cuidados</title>
@@ -26,13 +26,13 @@
                         <div class="col-md-3">
                             <strong>Prioridade:</strong> 
                             <span th:text="${plano.prioridade}" 
-                                  th:class="${'badge ' + (#strings.contains(plano.prioridade, 'CRITICO') ? 'bg-danger' : 
-                                            #strings.contains(plano.prioridade, 'URGENTE') ? 'bg-warning' : 'bg-info')}"></span>
+                                  th:class="${'badge ' + (plano.prioridade != null && plano.prioridade.name() == 'CRITICO' ? 'bg-danger' : 
+                                            plano.prioridade != null && plano.prioridade.name() == 'URGENTE' ? 'bg-warning' : 'bg-info')}"></span>
                         </div>
                         <div class="col-md-3">
                             <strong>Status:</strong>
-                            <span th:text="${plano.ativo ? 'Ativo' : 'Encerrado'}" 
-                                  th:class="${'badge ' + (plano.ativo ? 'bg-success' : 'bg-secondary')}"></span>
+                            <span th:text="${plano.ativo == true ? 'Ativo' : 'Encerrado'}" 
+                                  th:class="${'badge ' + (plano.ativo == true ? 'bg-success' : 'bg-secondary')}"></span>
                         </div>
                         <div class="col-md-3">
                             <strong>Início:</strong> <span th:text="${#temporals.format(plano.dataInicio, 'dd/MM/yyyy HH:mm')}"></span>
@@ -70,10 +70,10 @@
                     <h5 class="card-title">Tarefas de Cuidado</h5>
                 </div>
                 <div class="card-body">
-                    <div th:if="${plano.tarefas.size() == 0}" class="alert alert-info">
+                    <div th:if="${plano.tarefas == null || plano.tarefas.size() == 0}" class="alert alert-info">
                         Nenhuma tarefa adicionada ao plano
                     </div>
-                    <table th:if="${plano.tarefas.size() > 0}" class="table table-striped">
+                    <table th:if="${plano.tarefas != null && plano.tarefas.size() > 0}" class="table table-striped">
                         <thead>
                             <tr>
                                 <th>Tipo</th>
@@ -152,7 +152,7 @@
                             <option th:each="p : ${prioridades}" 
                                     th:value="${p}" 
                                     th:text="${p}"
-                                    th:selected="${p.name() == plano.prioridade}"></option>
+                                    th:selected="${plano.prioridade != null && p.name() == plano.prioridade.name()}"></option>
                         </select>
                         <button type="submit" class="btn btn-warning">Atualizar Prioridade</button>
                     </form>
@@ -160,7 +160,7 @@
             </div>
         </div>
 
-        <div th:if="${!plano}" class="alert alert-warning">
+        <div th:if="${plano == null}" class="alert alert-warning">
             <p>Nenhum plano de cuidados encontrado para esta estadia.</p>
             <form th:action="@{/plano-cuidados/criar}" method="post">
                 <input type="hidden" name="estadiaId" th:value="${estadiaId}">

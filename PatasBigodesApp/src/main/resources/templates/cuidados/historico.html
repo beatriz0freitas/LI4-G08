@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: page(title='Histórico de Planos')">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page(title='Histórico de Planos')}">
 <head>
     <meta charset="utf-8">
     <title>Histórico de Planos de Cuidados</title>
@@ -46,15 +46,15 @@
                             <td th:text="${#temporals.format(plano.dataFim, 'dd/MM/yyyy HH:mm')}"></td>
                             <td>
                                 <span th:text="${plano.prioridade}" 
-                                      th:class="${'badge ' + (#strings.contains(plano.prioridade, 'CRITICO') ? 'bg-danger' : 
-                                                #strings.contains(plano.prioridade, 'URGENTE') ? 'bg-warning' : 'bg-info')}"></span>
+                                      th:class="${'badge ' + (plano.prioridade != null && plano.prioridade.name() == 'CRITICO' ? 'bg-danger' : 
+                                                plano.prioridade != null && plano.prioridade.name() == 'URGENTE' ? 'bg-warning' : 'bg-info')}"></span>
                             </td>
                             <td>
-                                <span th:text="${plano.ativo ? 'Ativo' : 'Encerrado'}" 
-                                      th:class="${'badge ' + (plano.ativo ? 'bg-success' : 'bg-secondary')}"></span>
+                                <span th:text="${plano.ativo == true ? 'Ativo' : 'Encerrado'}" 
+                                      th:class="${'badge ' + (plano.ativo == true ? 'bg-success' : 'bg-secondary')}"></span>
                             </td>
                             <td>
-                                <span th:text="${plano.tarefas.size()}" class="badge bg-secondary"></span>
+                                <span th:text="${plano.tarefas != null ? plano.tarefas.size() : 0}" class="badge bg-secondary"></span>
                             </td>
                             <td>
                                 <a th:href="@{/plano-cuidados(estadiaId=${plano.estadiaId})}" class="btn btn-sm btn-info">Ver</a>
