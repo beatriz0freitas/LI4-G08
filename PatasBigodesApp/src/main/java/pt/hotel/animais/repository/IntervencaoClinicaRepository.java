@@ -8,4 +8,6 @@ import java.util.List;
 @Repository
 public interface IntervencaoClinicaRepository extends JpaRepository<IntervencaoClinica, Long> {
     List<IntervencaoClinica> findByEstadiaId(Long estadiaId);
+
+    List<IntervencaoClinica> findByEstadiaReservaAnimalIdOrderByDataHoraDesc(Long animalId);
 }
