@@ -1,20 +1,25 @@
 <!doctype html>
 <html lang="pt" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <th:block th:replace="fragments/head :: head"></th:block>
-    <title>Clínica Veterinária</title>
+    <th:block th:replace="~{fragments/head :: head}"></th:block>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
-    <th:block th:replace="fragments/navbar :: navbar"></th:block>
-    <th:block th:replace="fragments/sidebar :: sidebar"></th:block>
+    <th:block th:replace="~{fragments/navbar :: navbar}"></th:block>
+    <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
 
     <div class="content-wrapper">
         <section class="content-header">
             <div class="container-fluid">
-                <div class="row mb-2">
+                <div class="row mb-2 align-items-center">
                     <div class="col-sm-6">
-                        <h1>Clínica Veterinária</h1>
+                        <h1 class="m-0">Clínica Veterinária</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Início</a></li>
+                            <li class="breadcrumb-item active">Clínica</li>
+                        </ol>
                     </div>
                 </div>
             </div>
@@ -22,30 +27,71 @@
 
         <section class="content">
             <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Histórico clínico</h3>
-                            </div>
-                            <div class="card-body">
-                                <p>Consulte estadias em curso ou anteriores para abrir intervenções clínicas e alterações ao estado de saúde.</p>
-                                <a th:href="@{/historico}" class="btn btn-primary">
-                                    <i class="fas fa-notes-medical"></i> Abrir histórico
-                                </a>
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle mr-2"></i><span th:text="${successMessage}">Registo criado</span>
+                    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                </div>
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle mr-2"></i><span th:text="${errorMessage}">Erro</span>
+                    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header bg-primary">
+                        <h3 class="card-title">Animais</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="animalSearch">Procurar animal</label>
+                            <div class="input-group">
+                                <input type="search" id="animalSearch" class="form-control" placeholder="Nome, tutor, espécie, raça ou estado de saúde">
+                                <div class="input-group-append">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Registos clínicos</h3>
-                            </div>
-                            <div class="card-body">
-                                <p>Os registos clínicos são associados a uma estadia específica para manter rastreabilidade operacional.</p>
-                                <a th:href="@{/estadias}" class="btn btn-secondary">
-                                    <i class="fas fa-stethoscope"></i> Ver estadias
-                                </a>
+
+                        <div th:if="${#lists.isEmpty(animais)}" class="alert alert-info mb-0">
+                            Não existem animais registados.
+                        </div>
+
+                        <div th:if="${not #lists.isEmpty(animais)}" class="table-responsive">
+                            <table class="table table-hover table-sm mb-0" id="animalTable">
+                                <thead>
+                                <tr>
+                                    <th>Animal</th>
+                                    <th>Tutor</th>
+                                    <th>Raça</th>
+                                    <th>Peso</th>
+                                    <th>Estado de saúde</th>
+                                    <th class="text-right">Ação</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="animal : ${animais}"
+                                    th:attr="data-search=|${animal.nome} ${animal.tutor.nome} ${animal.especie.label} ${animal.raca} ${animal.estadoSaude.label}|">
+                                    <td>
+                                        <strong th:text="${animal.nome}">Simba</strong>
+                                        <div class="text-muted small" th:text="${animal.especie.label}">Cão</div>
+                                    </td>
+                                    <td th:text="${animal.tutor.nome}">Tutor</td>
+                                    <td th:text="${animal.raca}">Labrador</td>
+                                    <td th:text="${animal.peso != null ? animal.peso + ' kg' : 'Por definir'}">32 kg</td>
+                                    <td>
+                                        <span class="badge"
+                                              th:classappend="${animal.estadoSaude.name() == 'NORMAL' ? 'badge-success' : (animal.estadoSaude.name() == 'ALTERADO' ? 'badge-warning' : 'badge-danger')}"
+                                              th:text="${animal.estadoSaude.label}">Normal</span>
+                                    </td>
+                                    <td class="text-right">
+                                        <a th:href="@{/clinica/animais/{id}(id=${animal.id})}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-notes-medical mr-1"></i>Abrir ficha
+                                        </a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div id="animalSearchEmpty" class="text-muted text-center py-3 d-none">
+                                Nenhum animal corresponde à pesquisa.
                             </div>
                         </div>
                     </div>
@@ -54,11 +100,29 @@
         </section>
     </div>
 
-    <th:block th:replace="fragments/footer :: footer"></th:block>
+    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+<script>
+    $(function () {
+        $('#animalSearch').on('input', function () {
+            const termo = this.value.toLowerCase().trim();
+            let visiveis = 0;
+
+            $('#animalTable tbody tr').each(function () {
+                const corresponde = $(this).data('search').toLowerCase().includes(termo);
+                $(this).toggle(corresponde);
+                if (corresponde) {
+                    visiveis++;
+                }
+            });
+
+            $('#animalSearchEmpty').toggleClass('d-none', visiveis > 0);
+        });
+    });
+</script>
 </body>
 </html>

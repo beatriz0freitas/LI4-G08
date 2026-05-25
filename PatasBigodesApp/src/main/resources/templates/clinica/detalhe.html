@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/head :: head}"></th:block>
+    <style>
+        .timeline-mini { position: relative; padding-left: 25px; border-left: 2px solid #d2d6de; margin-left: 10px; }
+        .timeline-mini .ev { position: relative; margin-bottom: 1rem; }
+        .timeline-mini .dot { position: absolute; left: -32px; top: 3px; width: 14px; height: 14px; border-radius: 50%; box-shadow: 0 0 0 4px #ecf0f5; }
+        .st-ocupado { background: #dc3545; }
+        .st-reservado { background: #17a2b8; }
+        .health-summary dt { color: #6c757d; font-size: .78rem; font-weight: 600; }
+        .health-summary dd { margin-bottom: .75rem; }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <th:block th:replace="~{fragments/navbar :: navbar}"></th:block>
+    <th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
+
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2 align-items-center">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Ficha Clínica</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Início</a></li>
+                            <li class="breadcrumb-item"><a th:href="@{/clinica}">Clínica</a></li>
+                            <li class="breadcrumb-item active" th:text="${animalSelecionado.nome}">Animal</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content">
+            <div class="container-fluid">
+                <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle mr-2"></i><span th:text="${successMessage}">Registo criado</span>
+                    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                </div>
+                <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle mr-2"></i><span th:text="${errorMessage}">Erro</span>
+                    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+                </div>
+
+                <div class="mb-3">
+                    <a th:href="@{/clinica}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar à lista
+                    </a>
+                </div>
+
+                <div class="card">
+                    <div class="card-header bg-info">
+                        <h3 class="card-title">
+                            <span th:text="${animalSelecionado.nome}">Simba</span>
+                            <span th:text="| - ${animalSelecionado.especie.label} (${animalSelecionado.raca})|"> - Cão</span>
+                        </h3>
+                        <div class="card-tools">
+                            <span class="badge"
+                                  th:classappend="${animalSelecionado.estadoSaude.name() == 'NORMAL' ? 'badge-success' : (animalSelecionado.estadoSaude.name() == 'ALTERADO' ? 'badge-warning' : 'badge-danger')}"
+                                  th:text="${animalSelecionado.estadoSaude.label}">Normal</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row health-summary mb-0">
+                            <div class="col-md-3">
+                                <dt>Tutor</dt>
+                                <dd th:text="${animalSelecionado.tutor.nome}">Tutor</dd>
+                            </div>
+                            <div class="col-md-3">
+                                <dt>Peso</dt>
+                                <dd th:text="${animalSelecionado.peso != null ? animalSelecionado.peso + ' kg' : 'Por definir'}">32 kg</dd>
+                            </div>
+                            <div class="col-md-3">
+                                <dt>Data de nascimento</dt>
+                                <dd th:text="${#temporals.format(animalSelecionado.dataNascimento, 'dd/MM/yyyy')}">01/01/2020</dd>
+                            </div>
+                            <div class="col-md-3">
+                                <dt>Alojamento / estadia</dt>
+                                <dd th:if="${estadiaSelecionada != null}"
+                                    th:text="|${estadiaSelecionada.reserva.alojamento.identificacao} · ${#temporals.format(estadiaSelecionada.reserva.dataInicio, 'dd/MM/yyyy')} a ${#temporals.format(estadiaSelecionada.reserva.dataFim, 'dd/MM/yyyy')}|">
+                                    Box C-12
+                                </dd>
+                                <dd th:if="${estadiaSelecionada == null}" class="text-muted">Sem estadia registada</dd>
+                            </div>
+                            <div class="col-md-6">
+                                <dt>Medicação em curso</dt>
+                                <dd th:text="${animalSelecionado.medicacaoCurso != null and !#strings.isEmpty(animalSelecionado.medicacaoCurso) ? animalSelecionado.medicacaoCurso : 'Sem medicação registada'}">Omeprazol</dd>
+                            </div>
+                            <div class="col-md-6">
+                                <dt>Necessidades alimentares / alergias</dt>
+                                <dd th:text="${animalSelecionado.necessidadesAlimentares != null and !#strings.isEmpty(animalSelecionado.necessidadesAlimentares) ? animalSelecionado.necessidadesAlimentares : 'Sem necessidades registadas'}">Frango</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-7">
+                        <div class="card">
+                            <div class="card-header bg-dark">
+                                <h3 class="card-title">Historial clínico</h3>
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${#lists.isEmpty(eventosClinicos)}" class="text-muted">
+                                    Ainda não existem registos clínicos para este animal.
+                                </div>
+                                <div th:if="${not #lists.isEmpty(eventosClinicos)}" class="timeline-mini">
+                                    <div class="ev" th:each="evento : ${eventosClinicos}">
+                                        <span class="dot" th:classappend="${evento.dotClass}"></span>
+                                        <span class="badge" th:classappend="${evento.badgeClass}" th:text="${evento.tipo}">INTERVENÇÃO</span>
+                                        <div class="text-muted small" th:text="${evento.dataHora != null ? #temporals.format(evento.dataHora, 'dd/MM/yyyy HH:mm') : 'Sem data'}">24/04/2026</div>
+                                        <p class="mb-1" th:text="${evento.descricao}">Descrição</p>
+                                        <small class="text-muted" th:text="${evento.detalhe}">Detalhe</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <div th:if="${estadiaSelecionada == null}" class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>É necessária uma estadia para registar intervenções ou alterações de saúde.
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Registar intervenção</h3>
+                            </div>
+                            <form th:action="@{/clinica/intervencoes/create}" method="post">
+                                <div class="card-body">
+                                    <input type="hidden" name="estadiaId" th:value="${estadiaSelecionada != null ? estadiaSelecionada.id : ''}">
+                                    <div class="form-group">
+                                        <label>Descrição</label>
+                                        <textarea name="descricao" class="form-control" rows="3" required></textarea>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label>Custo</label>
+                                            <input type="number" step="0.01" min="0" name="custo" class="form-control" value="0.00" required>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>Data e hora</label>
+                                            <input type="datetime-local" name="dataHora" class="form-control" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button type="submit" class="btn btn-success" th:disabled="${estadiaSelecionada == null}">
+                                        <i class="fas fa-plus mr-2"></i>Registar intervenção
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Registar alteração de saúde</h3>
+                            </div>
+                            <form th:action="@{/clinica/alteracoes/create}" method="post">
+                                <div class="card-body">
+                                    <input type="hidden" name="estadiaId" th:value="${estadiaSelecionada != null ? estadiaSelecionada.id : ''}">
+                                    <div class="form-group">
+                                        <label>Descrição</label>
+                                        <textarea name="descricao" class="form-control" rows="3" required></textarea>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label>Estado</label>
+                                            <select name="severidade" class="form-control" required>
+                                                <option th:each="estado : ${estadosSaude}" th:value="${estado.name()}" th:text="${estado.label}">Normal</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>Data e hora</label>
+                                            <input type="datetime-local" name="dataHora" class="form-control" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button type="submit" class="btn btn-warning" th:disabled="${estadiaSelecionada == null}">
+                                        <i class="fas fa-heartbeat mr-2"></i>Registar alteração
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <th:block th:replace="~{fragments/footer :: footer}"></th:block>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+</html>
