@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<th:block th:replace="fragments/head :: head"></th:block>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+	<th:block th:replace="fragments/navbar :: navbar"></th:block>
+	<th:block th:replace="fragments/sidebar :: sidebar"></th:block>
+
+	<div class="content-wrapper">
+		<section class="content-header">
+			<div class="container-fluid">
+				<div class="row mb-2">
+					<div class="col-sm-6">
+						<h1>Início</h1>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="content">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-lg-3 col-md-6" sec:authorize="hasRole('DIRETOR')">
+						<a th:href="@{/dashboard}" class="small-box bg-info text-white text-decoration-none d-block">
+							<div class="inner">
+								<h3>Direção</h3>
+								<p>Dashboard e relatórios</p>
+							</div>
+							<div class="icon"><i class="fas fa-chart-line"></i></div>
+						</a>
+					</div>
+
+					<div class="col-lg-3 col-md-6" sec:authorize="hasAnyRole('DIRETOR','FUNCIONARIO_RECEPCAO')">
+						<a th:href="@{/reservas}" class="small-box bg-success text-white text-decoration-none d-block">
+							<div class="inner">
+								<h3>Receção</h3>
+								<p>Tutores, animais e reservas</p>
+							</div>
+							<div class="icon"><i class="fas fa-users"></i></div>
+						</a>
+					</div>
+
+					<div class="col-lg-3 col-md-6" sec:authorize="hasAnyRole('DIRETOR','CUIDADOR','MEDICO_VETERINARIO')">
+						<a th:href="@{/plano-cuidados}" class="small-box bg-warning text-white text-decoration-none d-block">
+							<div class="inner">
+								<h3>Cuidados</h3>
+								<p>Planos e registos</p>
+							</div>
+							<div class="icon"><i class="fas fa-notes-medical"></i></div>
+						</a>
+					</div>
+
+					<div class="col-lg-3 col-md-6" sec:authorize="hasAnyRole('DIRETOR','FUNCIONARIO_RECEPCAO','RESPONSAVEL_LIMPEZA')">
+						<a th:href="@{/limpeza}" class="small-box bg-secondary text-white text-decoration-none d-block">
+							<div class="inner">
+								<h3>Operação</h3>
+								<p>Alojamentos e limpeza</p>
+							</div>
+							<div class="icon"><i class="fas fa-broom"></i></div>
+						</a>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+
+	<th:block th:replace="fragments/footer :: footer"></th:block>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+</html>

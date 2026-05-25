@@ -32,10 +32,10 @@ class SecurityIntegrationTest {
     }
 
     @Test
-    void loginValidoRedirecionaParaDashboard() throws Exception {
+    void loginValidoRedirecionaParaPaginaInicial() throws Exception {
         mockMvc.perform(formLogin("/login").user("diretor").password("diretor123"))
                 .andExpect(authenticated().withUsername("diretor"))
-                .andExpect(redirectedUrl("/dashboard"));
+                .andExpect(redirectedUrl("/"));
     }
 
     @Test

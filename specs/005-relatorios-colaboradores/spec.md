@@ -11,6 +11,13 @@ Esta feature completa os fluxos de direção e administração do Hotel de Anima
 
 Os fluxos desta feature devem ser implementados exclusivamente por controllers MVC. Os controllers recebem dados por formulários e query parameters, invocam serviços de aplicação e devolvem nomes de templates Thymeleaf, `redirect:` ou ficheiros de exportação (`text/csv`, `application/pdf`) quando o utilizador pede download.
 
+## Mockups de UI
+
+Referências visuais para esta feature (Etapa 2 - `05-ui-interface-mockup`):
+
+- [wf02-dashboard-diretor.html](../../docs/Etapa2/05-ui-interface-mockup/wf02-dashboard-diretor.html) — dashboard e indicadores para o `DIRETOR`.
+- [wf07-colaboradores.html](../../docs/Etapa2/05-ui-interface-mockup/wf07-colaboradores.html) — ecrã de listagem e gestão de colaboradores.
+
 ## User Scenarios & Testing *(mandatory)*
 
 As user stories de referência são as definidas em [user-stories.md](../../docs/Etapa1/01-user-stories/user-stories.md), na secção "Diretor / Gestor". Este spec usa essas histórias sem as reescrever:

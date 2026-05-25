@@ -14,6 +14,11 @@ Completar a rastreabilidade da operação diária e do acompanhamento clínico d
 - Requisitos não-funcionais relevantes: [RNF-02](docs/Etapa1/02-requirements/non-functional/RNF-02.md#L1), [RNF-09](docs/Etapa1/02-requirements/non-functional/RNF-09.md#L1)
 - Arquitetura / decisões: [ADR-01 Monolito Camadas](../../docs/Etapa2/04-architecture-decisions/ADR-01-monolito-camadas.md#L1), [ADR-02 Spring MVC + Thymeleaf SSR](../../docs/Etapa2/04-architecture-decisions/ADR-02-spring-mvc-thymeleaf-ssr.md#L1), [ADR-06 DTOs na apresentação](../../docs/Etapa2/04-architecture-decisions/ADR-06-isolamento-apresentacao-dtos.md#L1)
 - Componentes e diagramas: [components.mmd](docs/Etapa2/01-architecture/components.mmd#L1), fluxos de sequência relevantes em [docs/Etapa2/03-seq-diagrams/UC-09.mmd](docs/Etapa2/03-seq-diagrams/UC-09.mmd#L1), [UC-10.mmd](docs/Etapa2/03-seq-diagrams/UC-10.mmd#L1), [UC-11.mmd](docs/Etapa2/03-seq-diagrams/UC-11.mmd#L1)
+- Mockups UI: [docs/Etapa2/05-ui-interface-mockup/](../../../docs/Etapa2/05-ui-interface-mockup/)
+- [wf04-plano-cuidados.html](../../docs/Etapa2/05-ui-interface-mockup/wf04-plano-cuidados.html)
+- [wf05-historico-clinico.html](../../docs/Etapa2/05-ui-interface-mockup/wf05-historico-clinico.html)
+- [wf06-limpeza.html](../../docs/Etapa2/05-ui-interface-mockup/wf06-limpeza.html)
+- [wf09-historial.html](../../docs/Etapa2/05-ui-interface-mockup/wf09-historial.html)
 
 
 ## User Scenarios & Testing (Prioritizados)
