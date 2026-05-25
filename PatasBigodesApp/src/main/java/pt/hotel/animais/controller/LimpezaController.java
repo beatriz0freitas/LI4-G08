@@ -18,8 +18,10 @@ public class LimpezaController {
     @GetMapping("/limpeza")
     @PreAuthorize("hasAnyRole('DIRETOR', 'RESPONSAVEL_LIMPEZA')")
     public String listarPendentes(Model model) {
+        var alojamentosPendentes = limpezaService.listarAlojamentosPendentes();
         model.addAttribute("activePage", "limpeza");
-        model.addAttribute("alojamentosPendentes", limpezaService.listarAlojamentosPendentes());
+        model.addAttribute("alojamentosPendentes", alojamentosPendentes);
+        model.addAttribute("totalPendentesLimpeza", alojamentosPendentes.size());
         return "limpeza/listar";
     }
 
