@@ -2,10 +2,10 @@
 
 **Projeto:** PatasBigodesApp (LI4-G08)  
 **Data:** 2026-05-25  
-**Gerado com apoio de:** Claude Code (LLM)
+**Gerado com apoio de:** LLM, com revisão manual sobre requisitos e código
 
 > Cada caso de teste (TC) está ligado ao requisito funcional (RF) que verifica.  
-> A coluna "Teste automatizado" indica o método `@Test` correspondente.
+> A coluna "Teste automatizado" indica o método `@Test` correspondente ou a classe de teste quando o requisito é coberto por mais do que um método.
 
 ---
 
@@ -80,7 +80,7 @@
 
 | ID | Descrição | Tipo | Teste automatizado |
 |----|-----------|------|--------------------|
-| TC-06.1 | Alojamento com tipo incompatível com espécie devolvve falso | Unit | `AlojamentoServiceTest.estaDisponivelComEspecieRetornaFalsoSeTipoIncompativel` |
+| TC-06.1 | Alojamento com tipo incompatível com espécie devolve falso | Unit | `AlojamentoServiceTest.estaDisponivelComEspecieRetornaFalsoSeTipoIncompativel` |
 | TC-06.2 | `consultarDisponibilidade` rejeita datas nulas | Unit | `AlojamentoServiceTest.consultarDisponibilidadeDeveRejeitarDatasInvalidas` |
 | TC-06.3 | `consultarDisponibilidade` rejeita fim antes de início | Unit | `AlojamentoServiceTest.consultarDisponibilidadeDeveRejeitarDatasInvalidas` |
 | TC-06.4 | Contar disponíveis conta apenas estado CONCLUIDO | Unit | `AlojamentoServiceTest.contarAlojamentosDisponiveisDeveContarConcluidos` |
@@ -243,3 +243,63 @@
 | RF-16 | 4 | ✅ |
 | RF-17 | 5 | ✅ |
 | **Total** | **91** | **16/17 ✅** |
+
+---
+
+## Verificação da SRS
+
+Esta secção resume a satisfação dos requisitos da SRS com base nos testes automatizados existentes e nos resultados de `make test-integration`.
+
+### Requisitos Funcionais
+
+| Grupo | Estado | Evidência |
+|-------|--------|-----------|
+| RF-01 a RF-10 | Verificado | Casos TC-01.1 a TC-10.6 |
+| RF-11 | Parcial | Existe teste de controller; serviço de plano de cuidados ainda pendente |
+| RF-12 a RF-17 | Verificado | Casos TC-12.1 a TC-17.5 |
+
+### Regras de Domínio
+
+| RD | Estado | Evidência principal |
+|----|--------|---------------------|
+| RD-01 | Verificado | TC-06.2, TC-06.3, TC-06.6 |
+| RD-02 | Verificado | TC-08.1, TC-08.2 |
+| RD-03 | Verificado | TC-08.1, TC-09.1, TC-09.2 |
+| RD-04 | Verificado | TC-08.5, TC-08.6, TC-09.6, TC-10.1 |
+| RD-05 | Verificado | TC-04.7, TC-04.8 |
+| RD-06 | Verificado | TC-07.4, TC-07.5 |
+| RD-07 | Verificado | TC-07.3 e testes de integração catalogados |
+| RD-08 | Verificado | TC-06.1 |
+| RD-09 | Verificado | TC-17.1, TC-17.4, TC-17.5 |
+
+### Requisitos Não Funcionais
+
+| RNF | Estado | Evidência / Limitação |
+|-----|--------|-----------------------|
+| RNF-01 | Parcial | Testes temporais foram executados com MySQL, mas não houve teste de carga com 10 utilizadores simultâneos |
+| RNF-02 | Parcial | MockMvc valida templates e fluxos; não houve teste formal com utilizadores |
+| RNF-03 | Parcial | Suportado por desenho operacional; disponibilidade real depende da infraestrutura |
+| RNF-04 | Verificado | `SecurityAuthorizationMvcTest`, `HistoricoAuthorizationMvcTest` |
+| RNF-05 | Verificado | BCrypt, autenticação e autorização por perfil |
+| RNF-06 | Parcial | Suportado por aplicação web e Docker; sem validação em hardware real do hotel |
+| RNF-07 | Parcial | Sem teste de carga ou crescimento de dados nesta etapa |
+| RNF-08 | Parcial | Cópias de segurança não exercitadas por teste automatizado |
+| RNF-09 | Parcial | Arquitetura permite extensão, mas operação contínua não foi ensaiada |
+
+### Testes de Aceitação por UC
+
+| UC | Estado | Evidência |
+|----|--------|-----------|
+| UC-01 | Verificado | Testes de autenticação/autorização |
+| UC-02 | Verificado | Testes de disponibilidade |
+| UC-03 | Verificado | Testes de tutor e animal |
+| UC-04 | Verificado | Testes de criação de reserva |
+| UC-05 | Verificado | Testes de cancelamento de reserva |
+| UC-06 | Verificado | Testes de check-in |
+| UC-07 | Verificado | Testes de check-out |
+| UC-08 | Verificado | Testes de pagamento |
+| UC-09 | Verificado | Testes de registo de cuidados |
+| UC-10 | Verificado | Testes de serviços extra |
+| UC-11 | Verificado | Testes de histórico e clínica |
+| UC-12 | Verificado | Testes de limpeza |
+| UC-13 | Verificado | Testes de relatórios e dashboard |

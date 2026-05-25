@@ -63,7 +63,7 @@ help:
 
 # Testes unitários e WebMvcTest — não precisam de Docker
 UNIT_EXCLUDES := "!ReservaServiceTests,!TutorServiceTimingTests,!PagamentoCheckInCalculoTest,\
-!CheckInServiceTest,!CheckOutSequenceServiceTest,!CheckInServiceTest_simple,\
+!CheckInServiceTest,!CheckOutSequenceServiceTest,!CheckInServiceSimpleTest,\
 !LimpezaControllerTest,!HotelAnimaisApplicationTests,!DashboardServiceIntegrationTest,\
 !CheckInIntegrationTest,!CheckOutIntegrationTest,!DisponibilidadeIntegrationTest,\
 !PagamentoCheckInIntegrationTest,!ReservaCancelIntegrationTest,!ReservaConfirmIntegrationTest,\
