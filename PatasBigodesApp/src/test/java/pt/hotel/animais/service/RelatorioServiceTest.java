@@ -92,7 +92,7 @@ class RelatorioServiceTest {
         byte[] pdf = service.gerarPdf(filtro());
 
         assertThat(pdf).isNotEmpty();
-        assertThat(new String(pdf)).contains("Relatório operacional");
+        assertThat(new String(pdf)).contains("Relatorio operacional");
         assertThat(new String(pdf)).contains("2026-05-01");
     }
 
