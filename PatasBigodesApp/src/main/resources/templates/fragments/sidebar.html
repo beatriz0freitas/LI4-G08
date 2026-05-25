@@ -40,7 +40,7 @@
 							</li>
 						</ul>
 					</li>
-					<li class="nav-item has-treeview" th:classappend="${activePage == 'tutores' or activePage == 'animais' or activePage == 'reservas'} ? ' menu-open' : ''">
+					<li class="nav-item has-treeview" sec:authorize="hasAnyRole('DIRETOR', 'FUNCIONARIO_RECEPCAO')" th:classappend="${activePage == 'tutores' or activePage == 'animais' or activePage == 'reservas'} ? ' menu-open' : ''">
 						<a href="#" class="nav-link" th:classappend="${activePage == 'tutores' or activePage == 'animais' or activePage == 'reservas'} ? ' active' : ''">
 							<i class="nav-icon fas fa-users"></i>
 							<p>Receção<i class="right fas fa-angle-left"></i></p>
@@ -66,19 +66,19 @@
 							</li>
 						</ul>
 					</li>
-					<li class="nav-item has-treeview" th:classappend="${activePage == 'estadias' or activePage == 'historico'} ? ' menu-open' : ''">
+					<li class="nav-item has-treeview" sec:authorize="hasAnyRole('DIRETOR', 'FUNCIONARIO_RECEPCAO', 'MEDICO_VETERINARIO')" th:classappend="${activePage == 'estadias' or activePage == 'historico'} ? ' menu-open' : ''">
 						<a href="#" class="nav-link" th:classappend="${activePage == 'estadias' or activePage == 'historico'} ? ' active' : ''">
 							<i class="nav-icon fas fa-bed"></i>
 							<p>Estadias<i class="right fas fa-angle-left"></i></p>
 						</a>
 						<ul class="nav nav-treeview">
-							<li class="nav-item">
+							<li class="nav-item" sec:authorize="hasAnyRole('DIRETOR', 'FUNCIONARIO_RECEPCAO')">
 								<a th:href="@{/estadias}" class="nav-link" th:classappend="${activePage == 'estadias'} ? ' active' : ''">
 									<i class="far fa-circle nav-icon"></i>
 									<p>Check-in / Check-out</p>
 								</a>
 							</li>
-							<li class="nav-item">
+							<li class="nav-item" sec:authorize="hasAnyRole('DIRETOR', 'FUNCIONARIO_RECEPCAO', 'MEDICO_VETERINARIO')">
 								<a th:href="@{/historico}" class="nav-link" th:classappend="${activePage == 'historico'} ? ' active' : ''">
 									<i class="far fa-circle nav-icon"></i>
 									<p>Histórico</p>
@@ -86,22 +86,22 @@
 							</li>
 						</ul>
 					</li>
-					<li class="nav-item">
+					<li class="nav-item" sec:authorize="hasAnyRole('DIRETOR', 'MEDICO_VETERINARIO')">
+						<a th:href="@{/clinica}" class="nav-link" th:classappend="${activePage == 'clinica'} ? ' active' : ''">
+							<i class="nav-icon fas fa-notes-medical"></i>
+							<p>Clínica</p>
+						</a>
+					</li>
+					<li class="nav-item" sec:authorize="hasAnyRole('DIRETOR', 'FUNCIONARIO_RECEPCAO', 'RESPONSAVEL_LIMPEZA')">
 						<a th:href="@{/alojamentos}" class="nav-link" th:classappend="${activePage == 'alojamentos'} ? ' active' : ''">
 							<i class="nav-icon fas fa-house"></i>
 							<p>Alojamentos</p>
 						</a>
 					</li>
-					<li class="nav-item">
+					<li class="nav-item" sec:authorize="hasAnyRole('DIRETOR', 'RESPONSAVEL_LIMPEZA')">
 						<a th:href="@{/limpeza}" class="nav-link" th:classappend="${activePage == 'limpeza'} ? ' active' : ''">
 							<i class="nav-icon fas fa-broom"></i>
 							<p>Limpeza</p>
-						</a>
-					</li>
-					<li class="nav-item">
-						<a th:href="@{/modulos}" class="nav-link" th:classappend="${activePage == 'modulos'} ? ' active' : ''">
-							<i class="nav-icon fas fa-ellipsis-h"></i>
-							<p>Módulos</p>
 						</a>
 					</li>
 				</ul>
