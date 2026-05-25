@@ -1,0 +1,39 @@
+# Git
+.git/
+.gitignore
+.github/
+
+# Build artifacts
+target/
+build/
+*.class
+*.jar
+*.zip
+*.tar.gz
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+*~
+
+# Documentation
+docs/
+README.md
+AGENTS.md
+
+# Testing
+.test/
+coverage/
+*.log
+
+# Environment
+.env
+.env.local
+*.properties
+
+# OS
+.DS_Store
+Thumbs.db

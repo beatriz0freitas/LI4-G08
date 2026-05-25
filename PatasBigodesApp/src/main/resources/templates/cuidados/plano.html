@@ -1,12 +1,174 @@
-<!doctype html>
-<html>
-<head><meta charset="utf-8"><title>Plano de Cuidados</title></head>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: page(title='Plano de Cuidados')">
+<head>
+    <meta charset="utf-8">
+    <title>Plano de Cuidados</title>
+</head>
 <body>
-<h1>Plano de Cuidados (Estadia [[${estadiaId}]])</h1>
-<ul>
-    <li th:each="it : ${plano.itens}">
-        <span th:text="${it.dataHora}"></span> - <span th:text="${it.descricao}"></span>
-    </li>
-</ul>
+<main th:fragment="content">
+    <!-- Alertas -->
+    <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
+    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+
+    <!-- Cabeçalho -->
+    <div class="container-fluid">
+        <h1>Plano de Cuidados</h1>
+        <p class="text-muted">Estadia: <span th:text="${estadiaId}"></span></p>
+
+        <div th:if="${plano}">
+            <!-- Informações Básicas do Plano -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Informações do Plano</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <strong>Prioridade:</strong> 
+                            <span th:text="${plano.prioridade}" 
+                                  th:class="${'badge ' + (#strings.contains(plano.prioridade, 'CRITICO') ? 'bg-danger' : 
+                                            #strings.contains(plano.prioridade, 'URGENTE') ? 'bg-warning' : 'bg-info')}"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Status:</strong>
+                            <span th:text="${plano.ativo ? 'Ativo' : 'Encerrado'}" 
+                                  th:class="${'badge ' + (plano.ativo ? 'bg-success' : 'bg-secondary')}"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Início:</strong> <span th:text="${#temporals.format(plano.dataInicio, 'dd/MM/yyyy HH:mm')}"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Fim:</strong> <span th:text="${#temporals.format(plano.dataFim, 'dd/MM/yyyy HH:mm')}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instruções -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Instruções Gerais</h5>
+                </div>
+                <div class="card-body">
+                    <p th:text="${plano.instrucoes ?: 'Nenhuma instrução registada'}" class="text-muted"></p>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="collapse" data-bs-target="#formInstrucoes">
+                        Adicionar Instrução
+                    </button>
+                    <div id="formInstrucoes" class="collapse mt-3">
+                        <form th:action="@{/plano-cuidados/{id}/instrucoes(id=${plano.id})}" method="post" class="form-inline">
+                            <input type="hidden" name="estadiaId" th:value="${estadiaId}">
+                            <textarea name="instrucoes" class="form-control w-100 mb-2" rows="3" required></textarea>
+                            <button type="submit" class="btn btn-primary">Adicionar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarefas -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title">Tarefas de Cuidado</h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${plano.tarefas.size() == 0}" class="alert alert-info">
+                        Nenhuma tarefa adicionada ao plano
+                    </div>
+                    <table th:if="${plano.tarefas.size() > 0}" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                                <th>Periodicidade</th>
+                                <th>Data/Hora</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="tarefa : ${plano.tarefas}">
+                                <td th:text="${tarefa.tipo}"></td>
+                                <td th:text="${tarefa.descricao}"></td>
+                                <td><span th:text="${tarefa.periodicidade}" class="badge bg-info"></span></td>
+                                <td th:text="${#temporals.format(tarefa.dataHora, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <span th:text="${tarefa.concluida ? 'Concluída' : 'Pendente'}" 
+                                          th:class="${'badge ' + (tarefa.concluida ? 'bg-success' : 'bg-warning')}"></span>
+                                </td>
+                                <td>
+                                    <form th:if="${!tarefa.concluida}" th:action="@{/plano-cuidados/tarefa/{id}/concluir(id=${tarefa.id})}" method="post" style="display:inline;">
+                                        <input type="hidden" name="estadiaId" th:value="${estadiaId}">
+                                        <button type="submit" class="btn btn-sm btn-success">Marcar Concluída</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Formulário para Adicionar Tarefa -->
+                    <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#formTarefa">
+                        + Adicionar Tarefa
+                    </button>
+                    <div id="formTarefa" class="collapse mt-3">
+                        <form th:action="@{/plano-cuidados/{id}/tarefa(id=${plano.id})}" method="post" class="border p-3 rounded">
+                            <input type="hidden" name="estadiaId" th:value="${estadiaId}">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Tipo de Tarefa</label>
+                                    <input type="text" name="tipo" class="form-control" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Periodicidade</label>
+                                    <select name="periodicidade" class="form-control" required>
+                                        <option value="">Selecionar...</option>
+                                        <option value="UNICA">Única</option>
+                                        <option value="DIARIA">Diária</option>
+                                        <option value="SEMANAL">Semanal</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Descrição</label>
+                                <textarea name="descricao" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Data/Hora</label>
+                                <input type="datetime-local" name="dataHora" class="form-control" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Adicionar Tarefa</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Atualizar Prioridade -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Ajustar Prioridade</h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/plano-cuidados/{id}/prioridade(id=${plano.id})}" method="post" class="form-inline">
+                        <input type="hidden" name="estadiaId" th:value="${estadiaId}">
+                        <select name="prioridade" class="form-control me-2" required>
+                            <option th:each="p : ${prioridades}" 
+                                    th:value="${p}" 
+                                    th:text="${p}"
+                                    th:selected="${p.name() == plano.prioridade}"></option>
+                        </select>
+                        <button type="submit" class="btn btn-warning">Atualizar Prioridade</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${!plano}" class="alert alert-warning">
+            <p>Nenhum plano de cuidados encontrado para esta estadia.</p>
+            <form th:action="@{/plano-cuidados/criar}" method="post">
+                <input type="hidden" name="estadiaId" th:value="${estadiaId}">
+                <input type="hidden" name="animalId" value="1"> <!-- Obter do contexto em produção -->
+                <button type="submit" class="btn btn-primary">Criar Plano</button>
+            </form>
+        </div>
+    </div>
+</main>
 </body>
 </html>
