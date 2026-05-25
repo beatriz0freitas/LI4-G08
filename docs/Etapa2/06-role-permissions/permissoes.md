@@ -25,7 +25,7 @@ O controlo de acesso deve ser aplicado nos controllers Spring MVC com `@PreAutho
 | Relatórios por período | `/relatorios`, `/relatorios/gerar`, `/relatorios/exportar/csv`, `/relatorios/exportar/pdf` | Sim | Não | Não | Não | Não | RF-03, UC-13 |
 | Gestão de colaboradores | `/colaboradores`, `/colaboradores/novo`, `/colaboradores/{id}/editar`, `/colaboradores/{id}/desativar` | Sim | Não | Não | Não | Não | RF-02, US-03 |
 | Registo de novo colaborador | `/colaboradores/novo` | Sim | Não | Não | Não | Não | RF-02, US-03 |
-| Consulta de alojamentos/disponibilidade | `/alojamentos`, `/reservas/disponibilidade` | Sim | Sim | Não | Não | Sim | RF-01, UC-02, UC-12 |
+| Consulta de alojamentos/disponibilidade | `/alojamentos`, `/reservas/disponibilidade` | Sim | Sim | Não | Não | Não | RF-01, UC-02 |
 | Tutores e animais | `/tutores`, `/tutores/novo`, `/tutores/{id}`, `/tutores/{id}/editar`, `/animais` | Sim | Sim | Não | Não | Não | UC-03 |
 | Reservas | `/reservas`, `/reservas/novo`, `/reservas/{id}`, `/reservas/{id}/cancelar`, `/reservas/{id}/confirmar` | Sim | Sim | Não | Não | Não | UC-04, UC-05 |
 | Check-in e check-out | `/estadias`, `/estadias/check-in`, `/estadias/check-out` | Sim | Sim | Não | Não | Não | UC-06, UC-07, RF-09 |

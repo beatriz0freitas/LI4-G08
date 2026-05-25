@@ -23,6 +23,10 @@ public interface AlojamentoRepository extends JpaRepository<Alojamento, Long> {
     long countByEstadoLimpeza(EstadoLimpeza estadoLimpeza);
 
     long countByTipo(TipoAlojamento tipo);
+
+    @Query("SELECT COUNT(DISTINCT r.alojamento.id) FROM Reserva r " +
+           "WHERE r.estado = pt.hotel.animais.model.enums.EstadoReserva.ATIVA")
+    long countAlojamentosComReservasAtivas();
     
     /**
      * Procura alojamentos disponíveis (limpos e sem conflitos de reserva) para um período específico.

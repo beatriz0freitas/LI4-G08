@@ -36,6 +36,10 @@ public class AlojamentoService implements IAlojamentoService {
     public long contarAlojamentosPendentesLimpeza() {
         return alojamentoRepository.countByEstadoLimpeza(EstadoLimpeza.PENDENTE);
     }
+
+    public long contarAlojamentosComReservasAtivas() {
+        return alojamentoRepository.countAlojamentosComReservasAtivas();
+    }
     
     /**
      * Procura alojamentos disponíveis para um período específico.

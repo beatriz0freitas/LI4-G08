@@ -92,7 +92,7 @@
 							<p>Clínica</p>
 						</a>
 					</li>
-					<li class="nav-item" sec:authorize="hasAnyRole('DIRETOR', 'FUNCIONARIO_RECEPCAO', 'RESPONSAVEL_LIMPEZA')">
+					<li class="nav-item" sec:authorize="hasAnyRole('DIRETOR', 'FUNCIONARIO_RECEPCAO')">
 						<a th:href="@{/alojamentos}" class="nav-link" th:classappend="${activePage == 'alojamentos'} ? ' active' : ''">
 							<i class="nav-icon fas fa-house"></i>
 							<p>Alojamentos</p>

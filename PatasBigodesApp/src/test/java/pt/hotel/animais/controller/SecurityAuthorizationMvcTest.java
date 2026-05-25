@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import pt.hotel.animais.config.SecurityConfig;
 import pt.hotel.animais.dto.RelatorioResumoDto;
 import pt.hotel.animais.service.IColaboradorService;
+import pt.hotel.animais.service.IAlojamentoService;
 import pt.hotel.animais.service.IDashboardService;
 import pt.hotel.animais.service.IRelatorioService;
 
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = {ColaboradorController.class, RelatorioController.class, DashboardController.class})
+@WebMvcTest(controllers = {ColaboradorController.class, RelatorioController.class, DashboardController.class, AlojamentoController.class})
 @Import(SecurityConfig.class)
 class SecurityAuthorizationMvcTest {
 
@@ -35,6 +36,9 @@ class SecurityAuthorizationMvcTest {
 
     @MockBean
     private IDashboardService dashboardService;
+
+    @MockBean
+    private IAlojamentoService alojamentoService;
 
     @Test
     void rotaSensivelSemAutenticacaoRedirecionaParaLogin() throws Exception {
@@ -53,6 +57,16 @@ class SecurityAuthorizationMvcTest {
     @WithMockUser(roles = "CUIDADOR")
     void cuidadorNaoAcedeARelatorios() throws Exception {
         mockMvc.perform(get("/relatorios"))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "RESPONSAVEL_LIMPEZA")
+    void responsavelLimpezaNaoAcedeAListaGeralDeAlojamentos() throws Exception {
+        mockMvc.perform(get("/alojamentos"))
+            .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/alojamentos/1"))
             .andExpect(status().isForbidden());
     }
 

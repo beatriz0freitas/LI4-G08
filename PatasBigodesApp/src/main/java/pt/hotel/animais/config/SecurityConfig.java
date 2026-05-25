@@ -33,8 +33,10 @@ public class SecurityConfig {
                     .hasAnyRole("DIRETOR", "FUNCIONARIO_RECEPCAO", "CUIDADOR", "MEDICO_VETERINARIO")
                 .requestMatchers("/historico/**")
                     .hasAnyRole("DIRETOR", "FUNCIONARIO_RECEPCAO", "MEDICO_VETERINARIO")
-                .requestMatchers("/alojamentos", "/limpeza/**")
-                    .hasAnyRole("DIRETOR", "FUNCIONARIO_RECEPCAO", "RESPONSAVEL_LIMPEZA")
+                .requestMatchers("/alojamentos", "/alojamentos/**")
+                    .hasAnyRole("DIRETOR", "FUNCIONARIO_RECEPCAO")
+                .requestMatchers("/limpeza", "/limpeza/**")
+                    .hasAnyRole("DIRETOR", "RESPONSAVEL_LIMPEZA")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

@@ -14,6 +14,8 @@ public interface IAlojamentoService {
 
     long contarAlojamentosPendentesLimpeza();
 
+    long contarAlojamentosComReservasAtivas();
+
     List<DisponibilidadeAlojamentoDto> consultarDisponibilidade(LocalDate dataInicio, LocalDate dataFim);
 
     List<DisponibilidadeAlojamentoDto> consultarDisponibilidade(LocalDate dataInicio, LocalDate dataFim, Especie especie);
