@@ -130,15 +130,16 @@ Testam fluxos completos com base de dados MySQL em Docker. Estes testes não faz
 | `TutorAnimalControllerTemplateTest` | Template de tutor e animal | 1 |
 | `AlojamentoServiceTimingTests` | Tempo de resposta de alojamentos | 1 |
 | `CheckInServiceTest` | Serviço de check-in com contexto Spring | 3 |
+| `CheckInServiceSimpleTest` | Validação de arranque do serviço de check-in | 2 |
 | `CheckOutSequenceServiceTest` | Sequência de check-out | 3 |
 | `DashboardServiceIntegrationTest` | Métricas do dashboard | 1 |
 | `PagamentoCheckInCalculoTest` | Cálculo de pagamento no check-in | 1 |
 | `ReservaServiceTests` | Overbooking e concorrência | 2 |
 | `TutorServiceTimingTests` | Tempo de resposta de tutores | 1 |
 
-**Total integração, repositórios, timing e SpringBootTest com MySQL:** 35 testes.
+**Total integração, repositórios, timing e SpringBootTest com MySQL:** 37 testes.
 
-**Nota:** `CheckInServiceTest_simple.java` existe no código de testes, mas não é executado por `mvn test` porque o nome da classe não corresponde aos padrões normais do Maven Surefire. Caso a equipa queira mantê-lo na suíte, deve ser renomeado para terminar em `Test`.
+**Nota:** `CheckInServiceSimpleTest.java` é um teste de integração porque usa `@SpringBootTest` e depende do contexto Spring completo; por isso, fica excluído do `make test-unit` e incluído no `make test-integration`.
 
 ### 3.4 Testes de Aceitação
 
@@ -178,7 +179,7 @@ Os testes de aceitação foram definidos a partir dos casos de uso UC-01 a UC-13
 | Critério | Meta | Resultado |
 |----------|------|-----------|
 | Testes unitários e WebMvc passam sem BD | 100% | 170/170 |
-| Suíte completa com MySQL passa | 100% | 205/205 |
+| Suíte completa com MySQL passa | 100% | 207/207 |
 | Cobertura de instruções | >= 60% | 80.4% |
 | Cobertura de métodos | >= 70% | 85.2% |
 | Falhas na execução com Docker/MySQL | 0 | 0 |

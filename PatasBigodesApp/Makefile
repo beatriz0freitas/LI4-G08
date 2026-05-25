@@ -17,7 +17,7 @@ DB_PASSWORD ?= hotelpass
 export HOST_DB_PORT
 export TEST_HOST_DB_PORT
 
-.PHONY: help test test-unit test-integration coverage coverage-unit mutation open-coverage open-mutation package run run-mysql verify config db-up db-reset-test db-stop db-shell up down restart destroy ps logs logs-app logs-db docs docs-code docs-clean clean
+.PHONY: help test test-unit test-integration coverage coverage-unit mutation open-coverage open-mutation e2e playwright-install concurrent-test backup-test package run run-mysql verify config db-up db-reset-test db-stop db-shell up down restart destroy ps logs logs-app logs-db docs docs-code docs-clean clean
 
 help:
 	@echo ""
@@ -52,6 +52,12 @@ help:
 	@echo "  make db-stop           Parar MySQL"
 	@echo "  make db-shell          Abrir cliente MySQL"
 	@echo ""
+	@echo "  TESTES NÃO-FUNCIONAIS"
+	@echo "  make concurrent-test   RNF-01: 10 utilizadores em simultâneo (requer Docker)"
+	@echo "  make e2e               Browser E2E com Playwright (requer Docker)"
+	@echo "  make playwright-install  Descarregar browsers Playwright (uma vez)"
+	@echo "  make backup-test       RNF-08: teste de backup e recuperação (requer Docker)"
+	@echo ""
 	@echo "  OUTROS"
 	@echo "  make ps                Estado dos contentores"
 	@echo "  make logs              Logs da stack"
@@ -69,7 +75,8 @@ UNIT_EXCLUDES := "!ReservaServiceTests,!TutorServiceTimingTests,!PagamentoCheckI
 !PagamentoCheckInIntegrationTest,!ReservaCancelIntegrationTest,!ReservaConfirmIntegrationTest,\
 !ReservaCreateIntegrationTest,!SecurityIntegrationTest,!AlojamentoRepositoryIntegrationTest,\
 !HistoricoRepositoryIntegrationTest,!DashboardControllerTest,!ReservaRenderingControllerTest,\
-!ReservaWizardControllerTest,!TutorAnimalControllerTemplateTest,!AlojamentoServiceTimingTests"
+!ReservaWizardControllerTest,!TutorAnimalControllerTemplateTest,!AlojamentoServiceTimingTests,\
+!ConcurrentAccessTest,!PlaywrightE2ETest"
 
 test-unit:
 	@echo "→ A correr testes unitários (sem Docker)..."
@@ -120,6 +127,44 @@ mutation:
 open-mutation:
 	@xdg-open target/pit-reports/index.html 2>/dev/null || open target/pit-reports/index.html 2>/dev/null || \
 	  echo "Abre manualmente: target/pit-reports/index.html"
+
+# RNF-01 — 10 utilizadores em simultâneo
+concurrent-test:
+	@echo "→ A iniciar MySQL de testes..."
+	$(MAKE) db-reset-test
+	@echo "→ A correr teste de carga concorrente (RNF-01)..."
+	DB_HOST=$(DB_HOST) DB_PORT=$(TEST_DB_PORT) DB_NAME=$(TEST_DB_NAME) \
+	  DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) \
+	  mvn test -Dtest="ConcurrentAccessTest" -Dsurefire.failIfNoSpecifiedTests=false
+	@echo "→ Concluído."
+
+# Browser E2E com Playwright
+playwright-install:
+	@echo "→ A descarregar browsers Playwright..."
+	mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install chromium" -Dexec.classpathScope=test
+	@echo "→ Browsers instalados."
+
+e2e:
+	@echo "→ A iniciar MySQL de testes..."
+	$(MAKE) db-reset-test
+	@echo "→ A correr testes E2E com Playwright..."
+	DB_HOST=$(DB_HOST) DB_PORT=$(TEST_DB_PORT) DB_NAME=$(TEST_DB_NAME) \
+	  DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) \
+	  mvn test -Dtest="PlaywrightE2ETest" -Dsurefire.failIfNoSpecifiedTests=false
+	@echo "→ Concluído."
+
+# RNF-08 — Backup e recuperação
+backup-test:
+	@echo "→ A iniciar MySQL de testes..."
+	$(MAKE) db-reset-test
+	@echo "→ A aplicar migrações Flyway no esquema de testes..."
+	mvn flyway:migrate \
+	  -Dflyway.url="jdbc:mysql://$(DB_HOST):$(TEST_DB_PORT)/$(TEST_DB_NAME)?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Lisbon" \
+	  -Dflyway.user=$(DB_USERNAME) -Dflyway.password=$(DB_PASSWORD) \
+	  -Dflyway.locations=classpath:db/migration -q
+	@echo "→ A executar teste de backup e recuperação (RNF-08)..."
+	TEST_DB_NAME=$(TEST_DB_NAME) DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) \
+	  bash scripts/test-backup-recovery.sh
 
 package:
 	mvn clean package

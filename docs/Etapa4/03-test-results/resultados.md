@@ -13,8 +13,8 @@
 |-----------|--------|----------|----------|-------|-----------|
 | Serviços unitários e regras de domínio | 130 | 130 | 0 | 0 | 0 |
 | Controllers WebMvc sem BD | 40 | 40 | 0 | 0 | 0 |
-| Integração, repositórios, timing e SpringBootTest com MySQL | 35 | 35 | 0 | 0 | 0 |
-| **Total com MySQL** | **205** | **205** | **0** | **0** | **0** |
+| Integração, repositórios, timing e SpringBootTest com MySQL | 37 | 37 | 0 | 0 | 0 |
+| **Total com MySQL** | **207** | **207** | **0** | **0** | **0** |
 
 Esta execução subiu o serviço `db-tests` do Docker Compose, esperou pelo estado `healthy`, aplicou 7 migrações Flyway na base `hotelanimais_test` e correu a suíte Maven completa contra MySQL em `localhost:3308`.
 
@@ -89,13 +89,14 @@ Durante a execução foram emitidos avisos de Thymeleaf sobre a sintaxe antiga d
 | `TutorAnimalControllerTemplateTest` | 1 | PASS |
 | `AlojamentoServiceTimingTests` | 1 | PASS |
 | `CheckInServiceTest` | 3 | PASS |
+| `CheckInServiceSimpleTest` | 2 | PASS |
 | `CheckOutSequenceServiceTest` | 3 | PASS |
 | `DashboardServiceIntegrationTest` | 1 | PASS |
 | `PagamentoCheckInCalculoTest` | 1 | PASS |
 | `ReservaServiceTests` | 2 | PASS |
 | `TutorServiceTimingTests` | 1 | PASS |
 
-**Nota de rastreabilidade:** existe também `CheckInServiceTest_simple.java` em `src/test`, mas o nome da classe não termina em `Test`, `Tests` ou `TestCase`. Por isso, não é executado pelo padrão normal do Maven Surefire usado em `mvn test` e não está incluído nos 205 testes desta execução.
+**Nota de rastreabilidade:** o antigo `CheckInServiceTest_simple.java` foi renomeado para `CheckInServiceSimpleTest.java`, passando a cumprir o padrão do Maven Surefire e a entrar na execução normal de `mvn test`.
 
 ---
 
@@ -150,9 +151,10 @@ target/pit-reports/index.html
 | RF-11 | Parcial | `PlanoCuidadosControllerTest`; serviço ainda pendente |
 | RF-12 a RF-17 | Verificado | Testes de cuidados, saúde, histórico, limpeza e serviços extra |
 | RD-01 a RD-09 | Verificado | `RegraDominioServiceTest`, `AlojamentoServiceTest`, `ReservaService*`, `EstadiaServiceTest`, `PagamentoServiceTest` |
-| RNF-01 | Parcial | Testes de tempo em `AlojamentoServiceTimingTests` e `TutorServiceTimingTests` executados com MySQL; não houve teste de carga com 10 utilizadores simultâneos |
-| RNF-02 | Parcial | Verificação de templates e fluxos por MockMvc; sem teste formal com utilizadores |
-| RNF-03, RNF-08, RNF-09 | Parcial | Dependem de operação/infraestrutura e não são provados por testes unitários |
+| RNF-01 | Verificado | `AlojamentoServiceTimingTests`, `TutorServiceTimingTests` (tempos de resposta) + `ConcurrentAccessTest` (10 utilizadores simultâneos, < 5 s) |
+| RNF-02 | Parcial | Verificação de templates e fluxos por MockMvc e Playwright E2E; sem teste formal com utilizadores reais |
+| RNF-03, RNF-09 | Parcial | Dependem de operação/infraestrutura e não são provados por testes unitários |
+| RNF-08 | Verificado | `scripts/test-backup-recovery.sh`: dump com `mysqldump`, eliminação de registo, restauro e verificação automatizados (`make backup-test`) |
 | RNF-04, RNF-05 | Verificado | Spring Security, BCrypt, autorização por role e testes MockMvc |
 | RNF-06, RNF-07 | Parcial | Evidência arquitetural via Docker e desenho monolítico; sem teste de carga |
 
@@ -160,4 +162,10 @@ target/pit-reports/index.html
 
 ## 6. Conclusão
 
-A execução `make test-integration` terminou com sucesso e valida a suíte completa com MySQL. A principal limitação funcional continua a ser RF-11, por o serviço de plano de cuidados estar marcado como pendente.
+A execução `make test-integration` terminou com sucesso e valida a suíte completa com MySQL. A suíte inclui ainda:
+
+- **Testes E2E com Playwright** (`PlaywrightE2ETest`): 4 cenários com browser Chromium headless real — login, redirecionamento de página protegida e credenciais inválidas (`make e2e`).
+- **Teste de carga concorrente** (`ConcurrentAccessTest`): 10 threads simultâneas ao servidor, todas com resposta 2xx/3xx em menos de 5 s (`make concurrent-test`).
+- **Teste de backup e recuperação** (`scripts/test-backup-recovery.sh`): dump + restore automático com verificação de integridade (`make backup-test`).
+
+A principal limitação funcional continua a ser RF-11, por o serviço de plano de cuidados estar marcado como pendente.

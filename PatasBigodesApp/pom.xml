@@ -101,6 +101,12 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.microsoft.playwright</groupId>
+            <artifactId>playwright</artifactId>
+            <version>1.48.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -179,6 +185,8 @@
                         <param>pt.hotel.animais.service.CheckInServiceTest_simple</param>
                         <param>pt.hotel.animais.service.CheckOutSequenceServiceTest</param>
                         <param>pt.hotel.animais.service.DashboardServiceIntegrationTest</param>
+                        <param>pt.hotel.animais.integration.ConcurrentAccessTest</param>
+                        <param>pt.hotel.animais.e2e.PlaywrightE2ETest</param>
                     </excludedTestClasses>
                     <mutators>
                         <mutator>STRONGER</mutator>
