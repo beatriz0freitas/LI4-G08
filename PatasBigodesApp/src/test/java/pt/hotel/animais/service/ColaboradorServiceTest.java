@@ -8,12 +8,15 @@ import pt.hotel.animais.model.Colaborador;
 import pt.hotel.animais.model.enums.TipoColaborador;
 import pt.hotel.animais.repository.ColaboradorRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class ColaboradorServiceTest {
@@ -58,6 +61,91 @@ class ColaboradorServiceTest {
         service.desativar(10L);
 
         assertThat(colaborador.isAtivo()).isFalse();
+    }
+
+    @Test
+    void listarTodosDeveDelegarParaRepositorio() {
+        Colaborador c = new Colaborador();
+        c.setId(1L);
+        when(repository.findAll()).thenReturn(List.of(c));
+
+        List<Colaborador> resultado = service.listarTodos();
+
+        assertThat(resultado).hasSize(1);
+        verify(repository).findAll();
+    }
+
+    @Test
+    void obterDeveRetornarColaboradorExistente() {
+        Colaborador c = new Colaborador();
+        c.setId(5L);
+        c.setNome("Teste");
+        when(repository.findById(5L)).thenReturn(Optional.of(c));
+
+        Colaborador resultado = service.obter(5L);
+
+        assertThat(resultado.getNome()).isEqualTo("Teste");
+    }
+
+    @Test
+    void obterDeveLancarExcecaoSeNaoEncontrado() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.obter(99L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("não encontrado");
+    }
+
+    @Test
+    void atualizarDeveAlterarCamposEGuardar() {
+        Colaborador existente = new Colaborador();
+        existente.setId(1L);
+        existente.setUsername("antigo");
+        existente.setNome("Antigo Nome");
+        existente.setEmail("antigo@hotel.local");
+        existente.setAtivo(true);
+
+        when(repository.findById(1L)).thenReturn(Optional.of(existente));
+        when(repository.existsByUsernameAndIdNot(eq("novo"), eq(1L))).thenReturn(false);
+        when(repository.existsByEmailAndIdNot(eq("novo@hotel.local"), eq(1L))).thenReturn(false);
+        when(repository.save(any(Colaborador.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        ColaboradorFormDto form = form();
+        Colaborador atualizado = service.atualizar(1L, form);
+
+        assertThat(atualizado.getNome()).isEqualTo("Novo Colaborador");
+        verify(repository).save(existente);
+    }
+
+    @Test
+    void atualizarComUsernameConflituosoDeveFalhar() {
+        Colaborador existente = new Colaborador();
+        existente.setId(1L);
+        when(repository.findById(1L)).thenReturn(Optional.of(existente));
+        when(repository.existsByUsernameAndIdNot("novo", 1L)).thenReturn(true);
+
+        assertThatThrownBy(() -> service.atualizar(1L, form()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("username");
+    }
+
+    @Test
+    void criarComUsernameExistenteDeveFalhar() {
+        when(repository.existsByUsername("novo")).thenReturn(true);
+
+        assertThatThrownBy(() -> service.criar(form()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("username");
+    }
+
+    @Test
+    void criarComEmailExistenteDeveFalhar() {
+        when(repository.existsByUsername("novo")).thenReturn(false);
+        when(repository.existsByEmail("novo@hotel.local")).thenReturn(true);
+
+        assertThatThrownBy(() -> service.criar(form()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("email");
     }
 
     private ColaboradorFormDto form() {
