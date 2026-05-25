@@ -21,6 +21,8 @@
         <java.version>21</java.version>
         <maven-javadoc-plugin.version>3.10.1</maven-javadoc-plugin.version>
         <jacoco.version>0.8.12</jacoco.version>
+        <pitest.version>1.17.0</pitest.version>
+        <pitest-junit5.version>1.2.1</pitest-junit5.version>
     </properties>
 
     <dependencies>
@@ -141,6 +143,52 @@
                     <docencoding>UTF-8</docencoding>
                     <charset>UTF-8</charset>
                     <failOnError>false</failOnError>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>${pitest.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>${pitest-junit5.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <!-- apenas classes de serviço e domínio — controllers e config são testados via MockMvc -->
+                    <targetClasses>
+                        <param>pt.hotel.animais.service.*</param>
+                        <param>pt.hotel.animais.model.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>pt.hotel.animais.service.*</param>
+                    </targetTests>
+                    <excludedClasses>
+                        <param>pt.hotel.animais.service.*UserDetails*</param>
+                    </excludedClasses>
+                    <!-- excluir testes @SpringBootTest que precisam de MySQL -->
+                    <excludedTestClasses>
+                        <param>pt.hotel.animais.service.ReservaServiceTests</param>
+                        <param>pt.hotel.animais.service.TutorServiceTimingTests</param>
+                        <param>pt.hotel.animais.service.AlojamentoServiceTimingTests</param>
+                        <param>pt.hotel.animais.service.PagamentoCheckInCalculoTest</param>
+                        <param>pt.hotel.animais.service.CheckInServiceTest</param>
+                        <param>pt.hotel.animais.service.CheckInServiceTest_simple</param>
+                        <param>pt.hotel.animais.service.CheckOutSequenceServiceTest</param>
+                        <param>pt.hotel.animais.service.DashboardServiceIntegrationTest</param>
+                    </excludedTestClasses>
+                    <mutators>
+                        <mutator>STRONGER</mutator>
+                    </mutators>
+                    <outputFormats>
+                        <outputFormat>HTML</outputFormat>
+                        <outputFormat>XML</outputFormat>
+                    </outputFormats>
+                    <timestampedReports>false</timestampedReports>
+                    <threads>2</threads>
                 </configuration>
             </plugin>
 
