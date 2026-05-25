@@ -47,9 +47,9 @@ A norma ISO/IEC 25010 define um modelo de qualidade de produto de software com 8
 |--------------------|-----------|-----------|
 | Comportamento temporal | Adequado | `AlojamentoServiceTimingTests` e `TutorServiceTimingTests` validam tempos de resposta em cenários específicos com MySQL |
 | Utilização de recursos | Adequado | Arquitetura monolítica em camadas, sem overhead distribuído |
-| Capacidade | Parcial | Testes unitários e alguns testes temporais existem, mas não há teste de carga formal |
+| Capacidade | Verificado | `ConcurrentAccessTest` lança 10 threads simultâneas com `CountDownLatch`; todas obtêm resposta 2xx/3xx em menos de 5 s |
 
-**Relação com RNF-01:** parcialmente verificado. O requisito define limites até 10 utilizadores simultâneos; essa concorrência não foi medida nesta etapa.
+**Relação com RNF-01:** verificado. `ConcurrentAccessTest` prova que o sistema responde corretamente a 10 utilizadores simultâneos dentro do limite de 5 segundos (`make concurrent-test`).
 
 ### 3.3 Compatibilidade
 
@@ -78,7 +78,7 @@ A norma ISO/IEC 25010 define um modelo de qualidade de produto de software com 8
 | Maturidade | Alta | 207 testes passam; PITest apresenta 72.1% de mutation score |
 | Disponibilidade | Boa | Spring Boot Actuator e Docker Compose suportam operação controlada |
 | Tolerância a falhas | Média | Exceções de negócio tratadas; sem mecanismos distribuídos, por não serem necessários no contexto |
-| Recuperabilidade | Parcial | Transações JPA existem; backups automáticos dependem de operação/infraestrutura |
+| Recuperabilidade | Verificado | `scripts/test-backup-recovery.sh`: dump com `mysqldump`, eliminação de registo, restauro e verificação automatizados (`make backup-test`) |
 
 **Métricas de cobertura:**
 
@@ -159,5 +159,4 @@ A norma ISO/IEC 25010 define um modelo de qualidade de produto de software com 8
 | Cobertura de ramos | 71.0%, ainda inferior à cobertura de métodos | Adicionar testes para caminhos alternativos de validação e erro |
 | Testes de integração | Executados com sucesso, mas dependem de Docker/MySQL local | Manter `make test-integration` como validação antes da entrega final |
 | Usabilidade | Sem teste formal com utilizadores | Fazer sessão curta de aceitação com perfis reais ou simulados |
-| RNF-08 | Backups não provados por teste automatizado | Documentar estratégia operacional e ensaiar recuperação |
-| PITest | 79 mutações sobreviveram e 51 ficaram sem cobertura | Priorizar mutações sobreviventes em serviços críticos |
+| PITest | 80 mutações sobreviveram e 51 ficaram sem cobertura | Priorizar mutações sobreviventes nos serviços de maior criticidade |

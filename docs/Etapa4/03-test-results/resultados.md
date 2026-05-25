@@ -151,9 +151,10 @@ target/pit-reports/index.html
 | RF-11 | Parcial | `PlanoCuidadosControllerTest`; serviço ainda pendente |
 | RF-12 a RF-17 | Verificado | Testes de cuidados, saúde, histórico, limpeza e serviços extra |
 | RD-01 a RD-09 | Verificado | `RegraDominioServiceTest`, `AlojamentoServiceTest`, `ReservaService*`, `EstadiaServiceTest`, `PagamentoServiceTest` |
-| RNF-01 | Parcial | Testes de tempo em `AlojamentoServiceTimingTests` e `TutorServiceTimingTests` executados com MySQL; não houve teste de carga com 10 utilizadores simultâneos |
-| RNF-02 | Parcial | Verificação de templates e fluxos por MockMvc; sem teste formal com utilizadores |
-| RNF-03, RNF-08, RNF-09 | Parcial | Dependem de operação/infraestrutura e não são provados por testes unitários |
+| RNF-01 | Verificado | `AlojamentoServiceTimingTests`, `TutorServiceTimingTests` (tempos de resposta) + `ConcurrentAccessTest` (10 utilizadores simultâneos, < 5 s) |
+| RNF-02 | Parcial | Verificação de templates e fluxos por MockMvc e Playwright E2E; sem teste formal com utilizadores reais |
+| RNF-03, RNF-09 | Parcial | Dependem de operação/infraestrutura e não são provados por testes unitários |
+| RNF-08 | Verificado | `scripts/test-backup-recovery.sh`: dump com `mysqldump`, eliminação de registo, restauro e verificação automatizados (`make backup-test`) |
 | RNF-04, RNF-05 | Verificado | Spring Security, BCrypt, autorização por role e testes MockMvc |
 | RNF-06, RNF-07 | Parcial | Evidência arquitetural via Docker e desenho monolítico; sem teste de carga |
 
@@ -161,4 +162,10 @@ target/pit-reports/index.html
 
 ## 6. Conclusão
 
-A execução `make test-integration` terminou com sucesso e valida a suíte completa com MySQL. A principal limitação funcional continua a ser RF-11, por o serviço de plano de cuidados estar marcado como pendente.
+A execução `make test-integration` terminou com sucesso e valida a suíte completa com MySQL. A suíte inclui ainda:
+
+- **Testes E2E com Playwright** (`PlaywrightE2ETest`): 4 cenários com browser Chromium headless real — login, redirecionamento de página protegida e credenciais inválidas (`make e2e`).
+- **Teste de carga concorrente** (`ConcurrentAccessTest`): 10 threads simultâneas ao servidor, todas com resposta 2xx/3xx em menos de 5 s (`make concurrent-test`).
+- **Teste de backup e recuperação** (`scripts/test-backup-recovery.sh`): dump + restore automático com verificação de integridade (`make backup-test`).
+
+A principal limitação funcional continua a ser RF-11, por o serviço de plano de cuidados estar marcado como pendente.
