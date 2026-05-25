@@ -15,12 +15,16 @@ import pt.hotel.animais.repository.PagamentoRepository;
 import pt.hotel.animais.repository.ReservaRepository;
 import pt.hotel.animais.repository.ServicoExtraRepository;
 
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -116,28 +120,92 @@ public class RelatorioService implements IRelatorioService {
      * @return bytes do documento PDF simplificado
      */
     @Override
+    //NOTA: REVER ISTO
     public byte[] gerarPdf(RelatorioFiltroFormDto filtro) {
         RelatorioResumoDto resumo = gerarRelatorio(filtro);
-        String conteudo = """
-            Relatório operacional
-            Período: %s a %s
-            Taxa de ocupação: %.2f%%
-            Estadias: %d
-            Reservas: %d
-            Faturação total: %s
-            Pagamentos pendentes: %d
-            Serviços extra: %s
-            """.formatted(
-                filtro.getDataInicio(),
-                filtro.getDataFim(),
-                resumo.getTaxaOcupacao(),
-                resumo.getEstadiasCount(),
-                resumo.getReservasCount(),
-                resumo.getFaturacaoTotal(),
-                resumo.getPagamentosPendentes(),
-                resumo.getServicosExtraTotal()
-            );
-        return conteudo.getBytes(StandardCharsets.UTF_8);
+        List<String> linhas = new ArrayList<>();
+        linhas.add("Relatório operacional e financeiro");
+        linhas.add("Período: " + filtro.getDataInicio() + " a " + filtro.getDataFim());
+        linhas.add("Alojamentos totais considerados: " + resumo.getAlojamentosTotal());
+        linhas.add("Alojamentos ocupados: " + resumo.getAlojamentosOcupados());
+        linhas.add("Taxa de ocupação: " + String.format(java.util.Locale.US, "%.2f%%", resumo.getTaxaOcupacao()));
+        linhas.add("Estadias no período: " + resumo.getEstadiasCount());
+        linhas.add("Reservas no período: " + resumo.getReservasCount());
+        linhas.add("Faturação total: " + resumo.getFaturacaoTotal());
+        linhas.add("Pagamentos pendentes: " + resumo.getPagamentosPendentes());
+        linhas.add("Serviços extra: " + resumo.getServicosExtraTotal());
+        linhas.add("Faturação por método:");
+        resumo.getFaturacaoPorMetodo().forEach((metodo, valor) -> linhas.add(" - " + metodo + ": " + valor));
+        return construirPdf(linhas);
+    }
+
+    private byte[] construirPdf(List<String> linhas) {
+        StringBuilder stream = new StringBuilder();
+        stream.append("BT\r\n");
+        stream.append("/F1 18 Tf\r\n");
+        stream.append("50 790 Td\r\n");
+
+        for (int i = 0; i < linhas.size(); i++) {
+            if (i == 1) {
+                stream.append("/F1 11 Tf\r\n");
+            }
+            if (i > 0) {
+                stream.append("0 -22 Td\r\n");
+            }
+            stream.append("(").append(escaparPdf(normalizarTextoPdf(linhas.get(i)))).append(") Tj\r\n");
+        }
+        stream.append("ET\r\n");
+
+        byte[] streamBytes = stream.toString().getBytes(StandardCharsets.US_ASCII);
+        List<String> objetos = List.of(
+            "<< /Type /Catalog /Pages 2 0 R >>",
+            "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+            "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+            "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+            "<< /Length " + streamBytes.length + " >>\r\nstream\r\n" + stream + "endstream"
+        );
+
+        ByteArrayOutputStream pdf = new ByteArrayOutputStream();
+        escreverPdf(pdf, "%PDF-1.4\r\n%\u00e2\u00e3\u00cf\u00d3\r\n");
+        List<Integer> offsets = new ArrayList<>();
+        for (int i = 0; i < objetos.size(); i++) {
+            offsets.add(pdf.size());
+            escreverPdf(pdf, (i + 1) + " 0 obj\r\n");
+            escreverPdf(pdf, objetos.get(i));
+            escreverPdf(pdf, "\r\nendobj\r\n");
+        }
+
+        int xrefOffset = pdf.size();
+        escreverPdf(pdf, "xref\r\n");
+        escreverPdf(pdf, "0 " + (objetos.size() + 1) + "\r\n");
+        escreverPdf(pdf, "0000000000 65535 f \r\n");
+        for (Integer offset : offsets) {
+            escreverPdf(pdf, String.format("%010d 00000 n \r\n", offset));
+        }
+        escreverPdf(pdf, "trailer\r\n");
+        escreverPdf(pdf, "<< /Size " + (objetos.size() + 1) + " /Root 1 0 R >>\r\n");
+        escreverPdf(pdf, "startxref\r\n");
+        escreverPdf(pdf, xrefOffset + "\r\n");
+        escreverPdf(pdf, "%%EOF\r\n");
+
+        return pdf.toByteArray();
+    }
+
+    private String escaparPdf(String texto) {
+        return texto
+            .replace("\\", "\\\\")
+            .replace("(", "\\(")
+            .replace(")", "\\)");
+    }
+
+    private String normalizarTextoPdf(String texto) {
+        return Normalizer.normalize(texto, Normalizer.Form.NFD)
+            .replaceAll("\\p{M}", "")
+            .replaceAll("[^\\x20-\\x7E]", "");
+    }
+
+    private void escreverPdf(ByteArrayOutputStream output, String texto) {
+        output.writeBytes(texto.getBytes(StandardCharsets.ISO_8859_1));
     }
 
     private Map<String, BigDecimal> faturacaoPorMetodo(LocalDateTime inicio, LocalDateTime fim) {

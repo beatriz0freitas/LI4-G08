@@ -71,6 +71,30 @@ class RelatorioServiceTest {
             .hasMessageContaining("data de início");
     }
 
+    @Test
+    void gerarPdfDeveProduzirDocumentoPdfValido() {
+        when(alojamentoRepository.count()).thenReturn(10L);
+        when(estadiaRepository.countAlojamentosOcupadosAgora()).thenReturn(4L);
+        when(estadiaRepository.countSobrepostasPeriodo(any(), any())).thenReturn(6L);
+        when(reservaRepository.countInPeriod(any(), any())).thenReturn(8L);
+        when(pagamentoRepository.sumValorPorPeriodo(any(), any())).thenReturn(new BigDecimal("120.00"));
+        when(pagamentoRepository.countPendentesPorPeriodo(any(), any())).thenReturn(2L);
+        when(pagamentoRepository.sumValorPorMetodo(any(), any()))
+            .thenReturn(List.<Object[]>of(new Object[] {MetodoPagamento.NUMERARIO, new BigDecimal("50.00")}));
+        when(servicoExtraRepository.sumCustoPorPeriodo(any(), any())).thenReturn(new BigDecimal("25.00"));
+
+        byte[] pdf = service.gerarPdf(filtro());
+        String conteudo = new String(pdf, java.nio.charset.StandardCharsets.ISO_8859_1);
+        int startxref = conteudo.indexOf("startxref");
+        int xrefOffset = Integer.parseInt(conteudo.substring(startxref + "startxref".length()).trim().split("\\R")[0]);
+
+        assertThat(conteudo)
+            .startsWith("%PDF-")
+            .contains("xref")
+            .contains("%%EOF");
+        assertThat(conteudo.substring(xrefOffset)).startsWith("xref");
+    }
+
     private RelatorioFiltroFormDto filtro() {
         RelatorioFiltroFormDto filtro = new RelatorioFiltroFormDto();
         filtro.setDataInicio(LocalDate.of(2026, 5, 1));

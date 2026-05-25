@@ -10,6 +10,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import pt.hotel.animais.dto.RelatorioResumoDto;
 import pt.hotel.animais.service.IRelatorioService;
 
+import java.time.LocalDate;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -45,6 +47,24 @@ class RelatorioControllerTest {
 
     @Test
     @WithMockUser(roles = "DIRETOR")
+    void filtrosDevemPermanecerPreenchidosEAInterfaceNaoUsaSmallBoxes() throws Exception {
+        when(relatorioService.gerarRelatorio(any())).thenReturn(new RelatorioResumoDto());
+
+        mockMvc.perform(get("/relatorios")
+                .param("dataInicio", "2026-05-01")
+                .param("dataFim", "2026-05-31")
+                .param("agruparPor", "DIA")
+                .param("incluirServicosExtra", "true"))
+            .andExpect(status().isOk())
+            .andExpect(model().attribute("filtro", org.hamcrest.Matchers.hasProperty("dataInicio", org.hamcrest.Matchers.equalTo(LocalDate.of(2026, 5, 1)))))
+            .andExpect(model().attribute("filtro", org.hamcrest.Matchers.hasProperty("dataFim", org.hamcrest.Matchers.equalTo(LocalDate.of(2026, 5, 31)))))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("value=\"2026-05-01\"")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("value=\"2026-05-31\"")))
+            .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("<div class=\"small-box"))));
+    }
+
+    @Test
+    @WithMockUser(roles = "DIRETOR")
     void gerarComPeriodoInvalidoDeveMostrarErro() throws Exception {
         mockMvc.perform(post("/relatorios/gerar")
                 .with(csrf())
@@ -66,5 +86,19 @@ class RelatorioControllerTest {
             .andExpect(status().isOk())
             .andExpect(header().string("Content-Disposition", "attachment; filename=\"relatorio.csv\""))
             .andExpect(content().contentTypeCompatibleWith("text/csv"));
+    }
+
+    @Test
+    @WithMockUser(roles = "DIRETOR")
+    void exportarPdfDeveDevolverFicheiroPdf() throws Exception {
+        when(relatorioService.gerarPdf(any())).thenReturn("%PDF-1.4\n%%EOF\n".getBytes());
+
+        mockMvc.perform(get("/relatorios/exportar/pdf")
+                .param("dataInicio", "2026-05-01")
+                .param("dataFim", "2026-05-31"))
+            .andExpect(status().isOk())
+            .andExpect(header().string("Content-Disposition", "attachment; filename=\"relatorio.pdf\""))
+            .andExpect(content().contentTypeCompatibleWith("application/pdf"))
+            .andExpect(content().bytes("%PDF-1.4\n%%EOF\n".getBytes()));
     }
 }
