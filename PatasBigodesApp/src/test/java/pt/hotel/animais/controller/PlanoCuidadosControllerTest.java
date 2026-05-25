@@ -2,33 +2,22 @@ package pt.hotel.animais.controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.view.AbstractView;
 import pt.hotel.animais.config.SecurityConfig;
 import pt.hotel.animais.dto.PlanoCuidadosDto;
 import pt.hotel.animais.dto.TarefaCuidadoDto;
 import pt.hotel.animais.model.enums.PrioridadePlano;
 import pt.hotel.animais.service.IPlanoCuidadosService;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -43,10 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-@WebMvcTest(
-        controllers = PlanoCuidadosController.class,
-        excludeAutoConfiguration = ThymeleafAutoConfiguration.class
-)
+@WebMvcTest(controllers = PlanoCuidadosController.class)
 @Import(SecurityConfig.class)
 class PlanoCuidadosControllerTest {
 
@@ -55,23 +41,6 @@ class PlanoCuidadosControllerTest {
 
     @MockBean
     private IPlanoCuidadosService planoCuidadosService;
-
-    @TestConfiguration
-    static class NoopViewResolverConfig {
-
-        @Bean
-        @Order(Ordered.HIGHEST_PRECEDENCE)
-        ViewResolver noopViewResolver() {
-            return (String viewName, Locale locale) -> new AbstractView() {
-                @Override
-                protected void renderMergedOutputModel(Map<String, Object> model,
-                                                       HttpServletRequest request,
-                                                       HttpServletResponse response) {
-                    response.setStatus(HttpServletResponse.SC_OK);
-                }
-            };
-        }
-    }
 
     /**
      * LAC-02: Teste para visualizar plano ativo de uma estadia.
