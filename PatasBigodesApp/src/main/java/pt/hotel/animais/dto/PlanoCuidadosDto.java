@@ -1,11 +1,12 @@
 package pt.hotel.animais.dto;
 
+import pt.hotel.animais.model.enums.PrioridadePlano;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
  * DTO de resposta para plano de cuidados.
- * LAC-02: Retorna o plano com tarefas, prioridade e instruções
  */
 public class PlanoCuidadosDto {
     private Long id;
@@ -13,7 +14,7 @@ public class PlanoCuidadosDto {
     private Long estadiaId;
     private LocalDateTime dataInicio;
     private LocalDateTime dataFim;
-    private String prioridade;
+    private PrioridadePlano prioridade;
     private Boolean ativo;
     private String instrucoes;
     private List<TarefaCuidadoDto> tarefas;
@@ -21,7 +22,7 @@ public class PlanoCuidadosDto {
     public PlanoCuidadosDto() {}
 
     public PlanoCuidadosDto(Long id, Long animalId, Long estadiaId, LocalDateTime dataInicio,
-                            LocalDateTime dataFim, String prioridade, Boolean ativo, String instrucoes) {
+                            LocalDateTime dataFim, PrioridadePlano prioridade, Boolean ativo, String instrucoes) {
         this.id = id;
         this.animalId = animalId;
         this.estadiaId = estadiaId;
@@ -42,8 +43,8 @@ public class PlanoCuidadosDto {
     public void setDataInicio(LocalDateTime dataInicio) { this.dataInicio = dataInicio; }
     public LocalDateTime getDataFim() { return dataFim; }
     public void setDataFim(LocalDateTime dataFim) { this.dataFim = dataFim; }
-    public String getPrioridade() { return prioridade; }
-    public void setPrioridade(String prioridade) { this.prioridade = prioridade; }
+    public PrioridadePlano getPrioridade() { return prioridade; }
+    public void setPrioridade(PrioridadePlano prioridade) { this.prioridade = prioridade; }
     public Boolean getAtivo() { return ativo; }
     public void setAtivo(Boolean ativo) { this.ativo = ativo; }
     public String getInstrucoes() { return instrucoes; }
