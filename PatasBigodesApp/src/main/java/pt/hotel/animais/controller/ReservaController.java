@@ -67,10 +67,10 @@ public class ReservaController {
     }
     
     /**
-     * POST /reservas/buscar-disponibilidade - Busca alojamentos disponíveis.
+     * POST /reservas/procurar-disponibilidade - Procura alojamentos disponíveis.
      */
-    @PostMapping("/buscar-disponibilidade")
-    public String buscarDisponibilidade(
+    @PostMapping("/procurar-disponibilidade")
+    public String procurarDisponibilidade(
         @RequestParam("dataInicio") LocalDate dataInicio,
         @RequestParam("dataFim") LocalDate dataFim,
         RedirectAttributes redirectAttributes,

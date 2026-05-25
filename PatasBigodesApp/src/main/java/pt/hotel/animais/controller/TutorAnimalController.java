@@ -33,8 +33,8 @@ public class TutorAnimalController {
     // ==================== TUTOR ENDPOINTS ====================
     
     /**
-     * GET /tutores - Lista de tutores com busca opcional.
-     * Suporta busca por nome ou NIF.
+     * GET /tutores - Lista de tutores com procura opcional.
+     * Suporta procura por nome ou NIF.
      */
     @GetMapping
     public String listar(
@@ -44,9 +44,9 @@ public class TutorAnimalController {
         List<Tutor> tutores;
         
         if (search != null && !search.trim().isEmpty()) {
-            // Tenta buscar por NIF ou nome
+            // Tenta procurar por NIF ou nome
             if (search.matches("\\d+")) {
-                // Se é só números, busca por NIF
+                // Se é só números, procura por NIF
                 try {
                     Tutor tutor = tutorService.procurarPorNif(search);
                     tutores = List.of(tutor);
@@ -54,7 +54,7 @@ public class TutorAnimalController {
                     tutores = List.of();
                 }
             } else {
-                // Busca por nome
+                // Procura por nome
                 tutores = tutorService.procurarPorNome(search);
             }
             model.addAttribute("search", search);

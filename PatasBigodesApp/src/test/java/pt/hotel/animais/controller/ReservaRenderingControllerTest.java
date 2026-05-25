@@ -90,18 +90,18 @@ class ReservaRenderingControllerTest {
 
     @Test
     @WithMockUser(username = "recepcao", roles = {"FUNCIONARIO_RECEPCAO"})
-    void buscarDisponibilidadeDeveRenderizarResultadosELinkParaNovaReserva() throws Exception {
-        Alojamento alojamento = criarAlojamento("Busca-CAN-1");
+    void procurarDisponibilidadeDeveRenderizarResultadosELinkParaNovaReserva() throws Exception {
+        Alojamento alojamento = criarAlojamento("Procura-CAN-1");
         LocalDate dataInicio = LocalDate.now().plusDays(40);
         LocalDate dataFim = dataInicio.plusDays(3);
 
-        mockMvc.perform(post("/reservas/buscar-disponibilidade")
+        mockMvc.perform(post("/reservas/procurar-disponibilidade")
                 .with(csrf())
                 .param("dataInicio", dataInicio.toString())
                 .param("dataFim", dataFim.toString()))
             .andExpect(status().isOk())
             .andExpect(view().name("reservas/index"))
-            .andExpect(content().string(containsString("Busca-CAN-1")))
+            .andExpect(content().string(containsString("Procura-CAN-1")))
             .andExpect(content().string(containsString("alojamentoId=" + alojamento.getId())))
             .andExpect(content().string(containsString("dataInicio=" + dataInicio)))
             .andExpect(content().string(containsString("dataFim=" + dataFim)));

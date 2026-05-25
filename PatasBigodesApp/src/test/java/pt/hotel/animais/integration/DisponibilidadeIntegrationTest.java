@@ -71,7 +71,7 @@ class DisponibilidadeIntegrationTest {
 
     @Test
     @WithMockUser(username = "10", roles = {"FUNCIONARIO_RECEPCAO"})
-    void postBuscarDisponibilidadeDeveRenderizarResultados() throws Exception {
+    void postProcurarDisponibilidadeDeveRenderizarResultados() throws Exception {
         assertMocksInjected();
 
         LocalDate dataInicio = LocalDate.now().plusDays(14);
@@ -83,7 +83,7 @@ class DisponibilidadeIntegrationTest {
 
         when(alojamentoService.consultarDisponibilidade(eq(dataInicio), eq(dataFim))).thenReturn(List.of(dto));
 
-        mockMvc.perform(post("/reservas/buscar-disponibilidade")
+        mockMvc.perform(post("/reservas/procurar-disponibilidade")
                 .with(csrf())
                 .param("dataInicio", dataInicio.toString())
                 .param("dataFim", dataFim.toString()))

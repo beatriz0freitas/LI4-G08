@@ -19,7 +19,7 @@ public interface TutorRepository extends JpaRepository<Tutor, Long> {
     Optional<Tutor> findByNif(String nif);
     
     /**
-     * Procura tutores pelo nome (busca parcial).
+     * Procura tutores pelo nome (procura parcial).
      */
     List<Tutor> findByNomeContainingIgnoreCase(String nome);
     

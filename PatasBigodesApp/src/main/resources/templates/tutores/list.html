@@ -48,15 +48,15 @@
 							<h3 class="card-title">Gestão de Tutores</h3>
 						</div>
 						<div class="card-body">
-							<!-- Barra de busca -->
+							<!-- Barra de procura -->
 							<form th:action="@{/tutores}" method="get" class="mb-3">
 								<div class="input-group">
 									<input type="text" name="search" class="form-control" 
-										   placeholder="Buscar por NIF ou nome..." 
+										   placeholder="Procurar por NIF ou nome..." 
 										   th:value="${search}">
 									<div class="input-group-append">
 										<button class="btn btn-outline-secondary" type="submit">
-											<i class="fas fa-search"></i> Buscar
+											<i class="fas fa-search"></i> Procurar
 										</button>
 										<a th:href="@{/tutores}" class="btn btn-outline-secondary ml-2">
 											<i class="fas fa-redo"></i> Limpar

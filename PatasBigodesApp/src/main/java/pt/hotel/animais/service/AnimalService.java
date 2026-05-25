@@ -61,12 +61,12 @@ public class AnimalService implements IAnimalService {
     }
     
     /**
-     * Procura animais pelo nome (busca parcial).
+     * Procura animais pelo nome (procura parcial).
      */
     @Transactional(readOnly = true)
     public List<Animal> procurarPorNome(String nome) {
         if (nome == null || nome.trim().isEmpty()) {
-            throw new IllegalArgumentException("Nome deve ser fornecido para busca");
+            throw new IllegalArgumentException("Nome deve ser fornecido para procura");
         }
         return animalRepository.findByNomeContainingIgnoreCase(nome);
     }

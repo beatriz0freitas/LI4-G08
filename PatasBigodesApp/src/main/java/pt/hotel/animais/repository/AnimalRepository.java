@@ -21,7 +21,7 @@ public interface AnimalRepository extends JpaRepository<Animal, Long> {
     List<Animal> findByTutorId(Long tutorId);
     
     /**
-     * Procura animais pelo nome (busca parcial).
+     * Procura animais pelo nome (procura parcial).
      */
     @EntityGraph(attributePaths = "tutor")
     List<Animal> findByNomeContainingIgnoreCase(String nome);
