@@ -54,6 +54,7 @@ class NotaServiceTest {
         assertThat(resultado.getId()).isEqualTo(10L);
         assertThat(resultado.getReservaId()).isEqualTo(1L);
         assertThat(resultado.getDescricao()).isEqualTo("Animal comeu bem hoje");
+        assertThat(resultado.getDataHora()).isNotNull();
         verify(notaRepository).save(any(Nota.class));
     }
 

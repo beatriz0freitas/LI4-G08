@@ -58,6 +58,8 @@ class RelatorioServiceTest {
         assertThat(resumo.getFaturacaoTotal()).isEqualByComparingTo("120.00");
         assertThat(resumo.getServicosExtraTotal()).isEqualByComparingTo("25.00");
         assertThat(resumo.getFaturacaoPorMetodo()).containsEntry("NUMERARIO", new BigDecimal("50.00"));
+        assertThat(resumo.getAlojamentosTotal()).isEqualTo(10L);
+        assertThat(resumo.getPagamentosPendentes()).isEqualTo(2L);
     }
 
     @Test
@@ -101,6 +103,17 @@ class RelatorioServiceTest {
         assertThat(filtro.getDataInicio().getDayOfMonth()).isEqualTo(1);
         assertThat(filtro.getDataFim()).isEqualTo(LocalDate.now());
         assertThat(filtro.getDataInicio().getMonth()).isEqualTo(LocalDate.now().getMonth());
+    }
+
+    @Test
+    void gerarRelatorioSemServicosExtraRetornaZero() {
+        configurarMocksBase();
+        RelatorioFiltroFormDto filtro = filtro();
+        filtro.setIncluirServicosExtra(false);
+
+        var resumo = service.gerarRelatorio(filtro);
+
+        assertThat(resumo.getServicosExtraTotal()).isEqualByComparingTo(BigDecimal.ZERO);
     }
 
     @Test

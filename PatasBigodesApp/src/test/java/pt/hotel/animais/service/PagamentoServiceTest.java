@@ -77,6 +77,8 @@ class PagamentoServiceTest {
         assertThat(resultado.getValor()).isEqualByComparingTo(new BigDecimal("50.00"));
         assertThat(resultado.getEstadoPagamento()).isEqualTo(EstadoPagamento.LIQUIDADO);
         assertThat(resultado.getMetodoPagamento()).isEqualTo(MetodoPagamento.CARTAO_DEBITO);
+        assertThat(resultado.getMomentoPagamento()).isEqualTo(MomentoPagamento.CHECK_IN);
+        assertThat(resultado.getEstadia()).isNotNull();
         verify(pagamentoRepository).save(any(Pagamento.class));
     }
 
@@ -119,6 +121,8 @@ class PagamentoServiceTest {
 
         assertThat(resultado.getMomentoPagamento()).isEqualTo(MomentoPagamento.CHECK_OUT);
         assertThat(resultado.getValor()).isEqualByComparingTo(new BigDecimal("15.00"));
+        assertThat(resultado.getEstadoPagamento()).isEqualTo(EstadoPagamento.LIQUIDADO);
+        assertThat(resultado.getEstadia()).isNotNull();
     }
 
     @Test

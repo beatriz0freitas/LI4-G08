@@ -53,6 +53,8 @@ class RegistoCuidadoServiceTest {
         assertThat(resultado.getId()).isEqualTo(10L);
         assertThat(resultado.getDescricao()).isEqualTo("Banho dado");
         assertThat(resultado.getEstadiaId()).isEqualTo(1L);
+        assertThat(resultado.getDataHora()).isNotNull();
+        assertThat(resultado.getAutorNome()).isEqualTo("5");
         verify(registoCuidadoRepository).save(any(RegistoCuidado.class));
     }
 

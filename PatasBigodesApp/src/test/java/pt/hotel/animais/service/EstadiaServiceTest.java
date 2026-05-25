@@ -5,13 +5,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.ArgumentCaptor;
+import pt.hotel.animais.dto.PagamentoDto;
 import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.model.enums.EstadoReserva;
+import pt.hotel.animais.model.enums.MetodoPagamento;
+import pt.hotel.animais.model.enums.MomentoPagamento;
 import pt.hotel.animais.repository.EstadiaRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -48,14 +53,37 @@ class EstadiaServiceTest {
             e.setId(1L);
             return e;
         });
-        when(pagamentoService.calcularValorBase(any())).thenReturn(java.math.BigDecimal.TEN);
+        when(pagamentoService.calcularValorBase(any())).thenReturn(BigDecimal.TEN);
 
         Estadia resultado = estadiaService.abrirEstadiaPorReserva(10L);
 
         assertThat(resultado.getEstado()).isEqualTo(EstadoEstadia.EM_CURSO);
         assertThat(resultado.getDataInicio()).isNotNull();
+        assertThat(resultado.getReserva()).isSameAs(reserva);
         verify(reservaService).concluir(10L);
         verify(pagamentoService).registrarPagamento(any());
+    }
+
+    @Test
+    void abrirEstadiaPorReservaDeveRegistarPagamentoComCamposCorretos() {
+        Reserva reserva = criarReserva(10L, EstadoReserva.ATIVA);
+        when(reservaService.obter(10L)).thenReturn(reserva);
+        when(estadiaRepository.save(any(Estadia.class))).thenAnswer(inv -> {
+            Estadia e = inv.getArgument(0);
+            e.setId(5L);
+            return e;
+        });
+        when(pagamentoService.calcularValorBase(any())).thenReturn(new BigDecimal("20.00"));
+
+        estadiaService.abrirEstadiaPorReserva(10L);
+
+        ArgumentCaptor<PagamentoDto> captor = ArgumentCaptor.forClass(PagamentoDto.class);
+        verify(pagamentoService).registrarPagamento(captor.capture());
+        PagamentoDto dto = captor.getValue();
+        assertThat(dto.getEstadiaId()).isEqualTo(5L);
+        assertThat(dto.getValor()).isEqualByComparingTo("20.00");
+        assertThat(dto.getMetodoPagamento()).isEqualTo(MetodoPagamento.NAO_DEFINIDO);
+        assertThat(dto.getMomentoPagamento()).isEqualTo(MomentoPagamento.CHECK_IN);
     }
 
     @Test
@@ -77,12 +105,55 @@ class EstadiaServiceTest {
 
         when(estadiaRepository.findById(5L)).thenReturn(Optional.of(estadia));
         when(estadiaRepository.save(any(Estadia.class))).thenAnswer(inv -> inv.getArgument(0));
-        when(pagamentoService.calcularExtras(any())).thenReturn(java.math.BigDecimal.ZERO);
+        when(pagamentoService.calcularExtras(any())).thenReturn(BigDecimal.ZERO);
 
         Estadia resultado = estadiaService.checkOut(5L);
 
         assertThat(resultado.getEstado()).isEqualTo(EstadoEstadia.TERMINADA);
         assertThat(resultado.getDataFim()).isNotNull();
+    }
+
+    @Test
+    void checkOutComExtrasPositivosDeveRegistarPagamentoCheckOut() {
+        Estadia estadia = criarEstadia(5L, EstadoEstadia.EM_CURSO);
+        estadia.setReserva(criarReservaComAlojamento());
+
+        when(estadiaRepository.findById(5L)).thenReturn(Optional.of(estadia));
+        when(estadiaRepository.save(any(Estadia.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(pagamentoService.calcularExtras(any())).thenReturn(new BigDecimal("30.00"));
+
+        estadiaService.checkOut(5L);
+
+        verify(pagamentoService).registrarPagamentoCheckOut(eq(5L), eq(new BigDecimal("30.00")), any());
+    }
+
+    @Test
+    void checkOutComExtrasZeroNaoRegistaPagamento() {
+        Estadia estadia = criarEstadia(5L, EstadoEstadia.EM_CURSO);
+        estadia.setReserva(criarReservaComAlojamento());
+
+        when(estadiaRepository.findById(5L)).thenReturn(Optional.of(estadia));
+        when(estadiaRepository.save(any(Estadia.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(pagamentoService.calcularExtras(any())).thenReturn(BigDecimal.ZERO);
+
+        estadiaService.checkOut(5L);
+
+        verify(pagamentoService, never()).registrarPagamentoCheckOut(any(), any(), any());
+    }
+
+    @Test
+    void checkOutDeveChamarMarcarPendenteLimpeza() {
+        Estadia estadia = criarEstadia(5L, EstadoEstadia.EM_CURSO);
+        Reserva reserva = criarReservaComAlojamento();
+        estadia.setReserva(reserva);
+
+        when(estadiaRepository.findById(5L)).thenReturn(Optional.of(estadia));
+        when(estadiaRepository.save(any(Estadia.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(pagamentoService.calcularExtras(any())).thenReturn(BigDecimal.ZERO);
+
+        estadiaService.checkOut(5L);
+
+        verify(alojamentoService).marcarPendenteLimpeza(1L);
     }
 
     @Test

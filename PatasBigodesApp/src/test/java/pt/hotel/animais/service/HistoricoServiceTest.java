@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,6 +85,78 @@ class HistoricoServiceTest {
         assertThat(resultado.getContent())
                 .extracting(HistoricoItemDto::getTipo)
                 .containsExactlyInAnyOrder("REGISTO_CUIDADO", "SERVICO_EXTRA", "INTERVENCAO_CLINICA", "NOTA");
+    }
+
+    @Test
+    void consultarDevePreencherCamposDoRegistoCuidado() {
+        HistoricoFiltroDto filtro = new HistoricoFiltroDto();
+        filtro.setEstadiaId(1L);
+
+        Estadia estadia = criarEstadia(1L);
+        RegistoCuidado rc = criarRegistoCuidado(7L, estadia);
+        rc.setDescricao("Banho completo");
+
+        when(regRepo.findByEstadiaIdOrderByDataHoraDesc(1L)).thenReturn(List.of(rc));
+        when(seRepo.findByEstadiaId(1L)).thenReturn(List.of());
+        when(icRepo.findByEstadiaId(1L)).thenReturn(List.of());
+        when(estadiaRepository.findById(1L)).thenReturn(Optional.empty());
+
+        Page<HistoricoItemDto> resultado = service.consultar(filtro, PageRequest.of(0, 10),
+                regRepo, seRepo, icRepo, notaRepo);
+
+        HistoricoItemDto item = resultado.getContent().get(0);
+        assertThat(item.getId()).isEqualTo(7L);
+        assertThat(item.getEstadiaId()).isEqualTo(1L);
+        assertThat(item.getDescricao()).isEqualTo("Banho completo");
+        assertThat(item.getDataHora()).isNotNull();
+        assertThat(item.getTipo()).isEqualTo("REGISTO_CUIDADO");
+    }
+
+    @Test
+    void consultarDevePreencherCamposDoServicoExtra() {
+        HistoricoFiltroDto filtro = new HistoricoFiltroDto();
+        filtro.setEstadiaId(1L);
+
+        Estadia estadia = criarEstadia(1L);
+        ServicoExtra se = criarServicoExtra(8L, estadia);
+
+        when(regRepo.findByEstadiaIdOrderByDataHoraDesc(1L)).thenReturn(List.of());
+        when(seRepo.findByEstadiaId(1L)).thenReturn(List.of(se));
+        when(icRepo.findByEstadiaId(1L)).thenReturn(List.of());
+        when(estadiaRepository.findById(1L)).thenReturn(Optional.empty());
+
+        Page<HistoricoItemDto> resultado = service.consultar(filtro, PageRequest.of(0, 10),
+                regRepo, seRepo, icRepo, notaRepo);
+
+        HistoricoItemDto item = resultado.getContent().get(0);
+        assertThat(item.getId()).isEqualTo(8L);
+        assertThat(item.getEstadiaId()).isEqualTo(1L);
+        assertThat(item.getDataHora()).isNotNull();
+        assertThat(item.getTipo()).isEqualTo("SERVICO_EXTRA");
+    }
+
+    @Test
+    void consultarDevePreencherCamposDaIntervencao() {
+        HistoricoFiltroDto filtro = new HistoricoFiltroDto();
+        filtro.setEstadiaId(1L);
+
+        Estadia estadia = criarEstadia(1L);
+        IntervencaoClinica ic = criarIntervencao(9L, estadia);
+        ic.setDescricao("Vacinação anual");
+
+        when(regRepo.findByEstadiaIdOrderByDataHoraDesc(1L)).thenReturn(List.of());
+        when(seRepo.findByEstadiaId(1L)).thenReturn(List.of());
+        when(icRepo.findByEstadiaId(1L)).thenReturn(List.of(ic));
+        when(estadiaRepository.findById(1L)).thenReturn(Optional.empty());
+
+        Page<HistoricoItemDto> resultado = service.consultar(filtro, PageRequest.of(0, 10),
+                regRepo, seRepo, icRepo, notaRepo);
+
+        HistoricoItemDto item = resultado.getContent().get(0);
+        assertThat(item.getId()).isEqualTo(9L);
+        assertThat(item.getDescricao()).isEqualTo("Vacinação anual");
+        assertThat(item.getEstadiaId()).isEqualTo(1L);
+        assertThat(item.getTipo()).isEqualTo("INTERVENCAO_CLINICA");
     }
 
     @Test
@@ -157,6 +230,16 @@ class HistoricoServiceTest {
                 PageRequest.of(0, 10));
 
         verify(estadiaRepository).pesquisarHistorico(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void listarHistoricoComDatasNulasDeveDelegarNoRepositorio() {
+        when(estadiaRepository.pesquisarHistorico(any(), any(), any(), any(), any(), any()))
+                .thenReturn(org.springframework.data.domain.Page.empty());
+
+        service.listarHistorico(null, null, null, null, null, PageRequest.of(0, 10));
+
+        verify(estadiaRepository).pesquisarHistorico(any(), any(), any(), isNull(), isNull(), any());
     }
 
     private Estadia criarEstadia(Long id) {

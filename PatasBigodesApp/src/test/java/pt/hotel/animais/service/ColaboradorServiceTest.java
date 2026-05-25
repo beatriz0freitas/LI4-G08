@@ -38,6 +38,10 @@ class ColaboradorServiceTest {
         assertThat(criado.getTipoColaborador()).isEqualTo(TipoColaborador.CUIDADOR);
         assertThat(criado.getPasswordHash()).isNotEqualTo("segredo123");
         assertThat(encoder.matches("segredo123", criado.getPasswordHash())).isTrue();
+        assertThat(criado.getUsername()).isEqualTo("novo");
+        assertThat(criado.getEmail()).isEqualTo("novo@hotel.local");
+        assertThat(criado.isAtivo()).isTrue();
+        verify(eventPublisher).publishEvent(any());
     }
 
     @Test
@@ -61,6 +65,7 @@ class ColaboradorServiceTest {
         service.desativar(10L);
 
         assertThat(colaborador.isAtivo()).isFalse();
+        verify(eventPublisher).publishEvent(any());
     }
 
     @Test
@@ -103,7 +108,7 @@ class ColaboradorServiceTest {
         existente.setUsername("antigo");
         existente.setNome("Antigo Nome");
         existente.setEmail("antigo@hotel.local");
-        existente.setAtivo(true);
+        existente.setAtivo(false);
 
         when(repository.findById(1L)).thenReturn(Optional.of(existente));
         when(repository.existsByUsernameAndIdNot(eq("novo"), eq(1L))).thenReturn(false);
@@ -114,7 +119,32 @@ class ColaboradorServiceTest {
         Colaborador atualizado = service.atualizar(1L, form);
 
         assertThat(atualizado.getNome()).isEqualTo("Novo Colaborador");
+        assertThat(atualizado.getUsername()).isEqualTo("novo");
+        assertThat(atualizado.getEmail()).isEqualTo("novo@hotel.local");
+        assertThat(atualizado.isAtivo()).isTrue();
+        assertThat(atualizado.getTipoColaborador()).isEqualTo(TipoColaborador.CUIDADOR);
+        assertThat(encoder.matches("segredo123", atualizado.getPasswordHash())).isTrue();
         verify(repository).save(existente);
+        verify(eventPublisher).publishEvent(any());
+    }
+
+    @Test
+    void atualizarSemNovaPasswordNaoAlteraPasswordHash() {
+        Colaborador existente = new Colaborador();
+        existente.setId(2L);
+        existente.setPasswordHash("$2a$hash-original");
+
+        ColaboradorFormDto form = form();
+        form.setPassword("");
+
+        when(repository.findById(2L)).thenReturn(Optional.of(existente));
+        when(repository.existsByUsernameAndIdNot(eq("novo"), eq(2L))).thenReturn(false);
+        when(repository.existsByEmailAndIdNot(eq("novo@hotel.local"), eq(2L))).thenReturn(false);
+        when(repository.save(any(Colaborador.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Colaborador atualizado = service.atualizar(2L, form);
+
+        assertThat(atualizado.getPasswordHash()).isEqualTo("$2a$hash-original");
     }
 
     @Test

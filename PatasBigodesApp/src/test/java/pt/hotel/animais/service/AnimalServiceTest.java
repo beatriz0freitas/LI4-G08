@@ -38,6 +38,11 @@ class AnimalServiceTest {
     void registarDeveCriarAnimalAssociadoAoTutor() {
         Tutor tutor = criarTutor(1L);
         AnimalFormDto form = criarForm(1L, "Rex", Especie.CAO);
+        form.setRaca("Labrador");
+        form.setPeso(new BigDecimal("12.5"));
+        form.setEstadoSaude(EstadoSaude.NORMAL);
+        form.setNecessidadesAlimentares("Ração premium");
+        form.setMedicacaoCurso("Nenhuma");
 
         when(tutorService.obter(1L)).thenReturn(tutor);
         when(animalRepository.save(any(Animal.class))).thenAnswer(inv -> {
@@ -52,6 +57,11 @@ class AnimalServiceTest {
         assertThat(resultado.getNome()).isEqualTo("Rex");
         assertThat(resultado.getEspecie()).isEqualTo(Especie.CAO);
         assertThat(resultado.getTutor()).isSameAs(tutor);
+        assertThat(resultado.getRaca()).isEqualTo("Labrador");
+        assertThat(resultado.getPeso()).isEqualByComparingTo("12.5");
+        assertThat(resultado.getEstadoSaude()).isEqualTo(EstadoSaude.NORMAL);
+        assertThat(resultado.getNecessidadesAlimentares()).isEqualTo("Ração premium");
+        assertThat(resultado.getMedicacaoCurso()).isEqualTo("Nenhuma");
         verify(animalRepository).save(any(Animal.class));
     }
 
@@ -105,9 +115,15 @@ class AnimalServiceTest {
     }
 
     @Test
-    void atualizarDeveModificarDadosDoAnimal() {
+    void atualizarDeveModificarTodosOsCampos() {
         Animal animal = criarAnimal(5L, criarTutor(1L));
         AnimalFormDto form = criarForm(1L, "Max", Especie.GATO);
+        form.setRaca("Persa");
+        form.setDataNascimento(LocalDate.of(2020, 3, 15));
+        form.setPeso(new BigDecimal("4.5"));
+        form.setEstadoSaude(EstadoSaude.ALTERADO);
+        form.setNecessidadesAlimentares("Ração especial");
+        form.setMedicacaoCurso("Antibiótico");
 
         when(animalRepository.findById(5L)).thenReturn(Optional.of(animal));
         when(animalRepository.save(any(Animal.class))).thenAnswer(inv -> inv.getArgument(0));
@@ -116,6 +132,12 @@ class AnimalServiceTest {
 
         assertThat(resultado.getNome()).isEqualTo("Max");
         assertThat(resultado.getEspecie()).isEqualTo(Especie.GATO);
+        assertThat(resultado.getRaca()).isEqualTo("Persa");
+        assertThat(resultado.getDataNascimento()).isEqualTo(LocalDate.of(2020, 3, 15));
+        assertThat(resultado.getPeso()).isEqualByComparingTo("4.5");
+        assertThat(resultado.getEstadoSaude()).isEqualTo(EstadoSaude.ALTERADO);
+        assertThat(resultado.getNecessidadesAlimentares()).isEqualTo("Ração especial");
+        assertThat(resultado.getMedicacaoCurso()).isEqualTo("Antibiótico");
     }
 
     @Test
