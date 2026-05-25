@@ -8,6 +8,16 @@
 ## Resumo
 Completar a rastreabilidade da operação diária e do acompanhamento clínico durante estadias: registo de cuidados diários, notas operacionais em reservas, serviços extra (banho, passeio, outro) e intervenções clínicas com histórico. Esta especificação descreve cenários de utilizador, requisitos funcionais testáveis, entidades de domínio, critérios de sucesso e dependências com a documentação existente (Etapa 1 e Etapa 2).
 
+## Clarifications
+
+### Session 2026-05-25
+
+- **Q: Qual é a origem/fonte do plano de cuidados?** → **A:** Combinação: histórico do animal + instruções da reserva (US-17) + ajustes manuais na estadia.
+- **Q: Plano estático ou dinâmico durante a estadia?** → **A:** Dinâmico; pode ser modificado a qualquer momento, com histórico de alterações mantido para auditoria.
+- **Q: Granularidade do plano (tarefas estruturadas vs instruções livres)?** → **A:** Híbrido: tarefas recorrentes estruturadas (ex.: ALIMENTACAO_MANHA, MEDICACAO_12H) + campo de notas/instruções adicionais.
+- **Q: Plano vinculado à Estadia ou ao Animal?** → **A:** Duplo vínculo: animal mantém histórico persistente de cuidados recorrentes; cada estadia herda/cria cópia ajustável do plano do animal.
+- **Q: Estados/ciclos de vida do plano durante a estadia?** → **A:** Plano com priorização (ROTINA, URGENTE, CRÍTICO) que muda conforme alterações de saúde (US-16); encerra automaticamente pós-check-out.
+
 ## Mapeamento a artefactos existentes
 - Use Cases: [UC-09 - Registar Cuidados Diarios](docs/Etapa1/03-use-cases/UC-09.md#L1), [UC-10 - Registar Servico Extra](docs/Etapa1/03-use-cases/UC-10.md#L1), [UC-11 - Gerir Historial Clinico](docs/Etapa1/03-use-cases/UC-11.md#L1)
 - User Stories: US-14, US-15, US-16, US-17, US-18, US-22, US-23 (ver rastreabilidade em [docs/Etapa1/01-user-stories/user-stories.md](docs/Etapa1/01-user-stories/user-stories.md#L1))
@@ -25,12 +35,13 @@ Completar a rastreabilidade da operação diária e do acompanhamento clínico d
 Cada cenário inclui um teste de aceitação independente e executável.
 
 ### US-14 - Consultar plano de cuidados (Prioridade: P1)
-Descrição: Cuidador consulta o plano de cuidados do animal em estadia, incluindo tarefas recorrentes e instruções específicas.
-Porque P1: Permite ao cuidador conhecer as rotinas e cumprir instruções clínicas/operacionais.
-Independent Test: Abrir a vista do plano de cuidados para uma estadia activa e verificar que as entradas correspondem às instruções registadas na reserva/animal.
+Descrição: Cuidador consulta o plano de cuidados do animal em estadia, incluindo tarefas recorrentes estruturadas e instruções específicas, com prioridade atual (ROTINA/URGENTE/CRITICO).
+Porque P1: Permite ao cuidador conhecer as rotinas, cumprir instruções clínicas/operacionais e adaptar-se a mudanças de saúde.
+Independent Test: Abrir a vista do plano de cuidados para uma estadia activa e verificar que: (1) tarefas recorrentes aparecem conforme agendadas; (2) instruções da reserva/animal são visíveis; (3) prioridade reflete o estado de saúde atual.
 Acceptance Scenarios:
-1. Dado um animal em estadia activa, quando o cuidador abre a vista "Plano de Cuidados", então o sistema devolve a lista de cuidados planeados e registos recentes.
-2. A vista permite filtrar por tipo de cuidado e por período.
+1. Dado um animal em estadia activa com cuidados no histórico, quando o cuidador abre a vista "Plano de Cuidados", então o sistema devolve tarefas estruturadas (ex.: ALIMENTACAO_MANHA, MEDICACAO_12H) com checklist de conclusão, + instruções livres registadas.
+2. Quando o veterinário regista uma alteração de saúde CRITICA (US-16), a prioridade do plano muda para CRITICO; cuidador vê flag visual e instrução de aviso.
+3. Cuidador pode adicionar notas adicionais ao plano durante a estadia sem perder instruções originais; histórico de alterações é auditado.
 
 ### US-15 - Registar cuidado diário (Prioridade: P1)
 Descrição: Funcionário/cuidador regista um cuidado diário para um animal em estadia (ex.: alimentação, medicação, passeio), com descrição livre, timestamp e autor.
@@ -99,15 +110,36 @@ Todos os requisitos abaixo usam os identificadores canónicos do repositório.
 ### Requisitos de Domínio
 - **RD-04**: O pagamento no check-in cobre exclusivamente o valor da estadia; os serviços extra e as intervenções veterinárias são cobrados no check-out.
 - **RD-09**: O custo de um serviço extra ou de uma intervenção veterinária deve ser registado no momento da sua ocorrência e associado à reserva em curso, não podendo ser alterado após o check-out.
+- **RD-10**: O plano de cuidados é originário da combinação: histórico de cuidados recorrentes do animal + instruções da reserva (notas US-17) + ajustes manuais durante a estadia. O plano é dinâmico e pode ser modificado, com todas as alterações auditadas (autor, timestamp). A prioridade do plano (ROTINA/URGENTE/CRITICO) muda conforme alterações de saúde registadas (US-16). O plano encerra automaticamente no check-out.
 
 ## Key Entities (Resumo de domínio)
-- `RegistoCuidado` (id, estadiaId, descricao, dataHora, autorId)
+
+### Plano de Cuidados (Nova entidade)
+- `PlanoCuidados` (id, animalId, estadiaId, dataInicio, dataFim, prioridade: Enum {ROTINA, URGENTE, CRITICO}, ativo: Boolean)
+  - Contém lista de `TarefaCuidado` (tarefas recorrentes estruturadas)
+  - Contém campo `instrucoes` (texto livre para notas especiais)
+  - Vínculo duplo: animal mantém histórico; estadia cria cópia ajustável
+  - Dinâmico: pode ser modificado durante estadia; alterações auditadas
+
+### Tarefa de Cuidado (Entidade secundária)
+- `TarefaCuidado` (id, planoCuidadosId, tipo: String {ALIMENTACAO_MANHA, ALIMENTACAO_TARDE, MEDICACAO_12H, PASSEIO, LIMPEZA, OUTRO}, descricao, periodicidade: Enum {UNICA, DIARIA, SEMANAL}, dataHora, concluida: Boolean, autorConclusao: UUID)
+
+### Outras entidades (já documentadas)
+- `RegistoCuidado` (id, estadiaId, descricao, dataHora, autorId) — anotações livres sobre cuidados realizados
 - `ServicoExtra` (id, estadiaId, tipo: Enum {BANHO, PASSEIO, OUTRO}, custo, dataHora, autorId)
 - `IntervencaoClinica` (id, estadiaId, descricao, custo, dataHora, medicoId)
 - `Nota` (id, reservaId, descricao, autorId, dataHora)
-- `AlteracaoEstadoSaude` (id, estadiaId, descricao, severidade, dataHora, autorId)
+- `AlteracaoEstadoSaude` (id, estadiaId, descricao, severidade: Enum {ROTINA, URGENTE, CRITICO}, dataHora, autorId) — dispara mudança de prioridade do plano
 
-Relações: `Estadia` 1..* `RegistoCuidado` ; `Estadia` 1..* `ServicoExtra` ; `Estadia` 1..* `IntervencaoClinica` ; `Reserva` 1..* `Nota` ; `Estadia` 1..* `AlteracaoEstadoSaude`.
+### Relações
+- `Animal` 1..* `PlanoCuidados` (histórico)
+- `Estadia` 1..1 `PlanoCuidados` (cópia ativa)
+- `PlanoCuidados` 1..* `TarefaCuidado`
+- `Estadia` 1..* `RegistoCuidado`
+- `Estadia` 1..* `ServicoExtra`
+- `Estadia` 1..* `IntervencaoClinica`
+- `Reserva` 1..* `Nota`
+- `Estadia` 1..* `AlteracaoEstadoSaude`
 
 ## Success Criteria (Mensuráveis)
 - **SC-001**: Funcionalidade básica (criar/listar Registos de cuidado) implementada e testada com cobertura de integração (end-to-end) — 100% dos cenários P1 passam.
