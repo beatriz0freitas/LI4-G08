@@ -32,7 +32,7 @@
   .answer-line { width: 100%; height: 32px; border: none; border-bottom: 1px solid #dadce0; outline: none; font-family: inherit; font-size: 14px; color: #202124; background: transparent; transition: border-color 0.2s; }
   .answer-line:focus { border-bottom: 2px solid #7248b9; }
   .answer-line::placeholder { color: #bdc1c6; }
-  .conditional { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f1f3f4; display: none; }
+  .conditional { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f1f3f4; display: block; }
   .conditional.show { display: block; }
   .conditional .q-label { font-size: 14px; margin-bottom: 10px; }
   .scale-wrapper { overflow-x: auto; padding-bottom: 4px; }
@@ -80,7 +80,11 @@
     <div class="q-label">Que tipo de animal possui? <span class="required-star">*</span></div>
     <label class="option-row"><input type="radio" name="animal"><span class="option-label">Cão</span></label>
     <label class="option-row"><input type="radio" name="animal"><span class="option-label">Gato</span></label>
-    <label class="option-row"><input type="radio" name="animal"><span class="option-label">Outro</span></label>
+    <label class="option-row"><input type="radio" name="animal" onchange="toggle('bloco-animal-outro', true)"><span class="option-label">Outro</span></label>
+    <div class="conditional" id="bloco-animal-outro">
+      <div class="q-label">Se selecionou outro, qual?</div>
+      <input class="answer-line" type="text" placeholder="A minha resposta">
+    </div>
   </div>
 
   <div class="section-card">
@@ -113,7 +117,7 @@
     <label class="option-row"><input type="radio" name="dif" onchange="toggle('bloco-dif',false)"><span class="option-label">Não</span></label>
     <div class="conditional" id="bloco-dif">
       <div class="q-label">Se sim, quais foram as principais dificuldades?</div>
-      <input class="answer-line" type="text" placeholder="A minha resposta">
+      <textarea class="answer-line" rows="3" style="height:auto; resize:vertical; padding-top:6px;"></textarea>
     </div>
   </div>
 
@@ -127,10 +131,8 @@
     <label class="option-row"><input type="radio" name="add" onchange="toggle('bloco-add',true)"><span class="option-label">Sim</span></label>
     <label class="option-row"><input type="radio" name="add" onchange="toggle('bloco-add',false)"><span class="option-label">Não</span></label>
     <div class="conditional" id="bloco-add">
-      <div class="q-label">Se sim, quais? <span class="hint-text">Pode selecionar mais do que uma opção</span></div>
-      <label class="option-row"><input type="checkbox"><span class="option-label">Treino / atividades</span></label>
-      <label class="option-row"><input type="checkbox"><span class="option-label">Acompanhamento veterinário</span></label>
-      <label class="option-row"><input type="checkbox"><span class="option-label">Passeios adicionais</span></label>
+      <div class="q-label">Se sim, quais?</div>
+      <input class="answer-line" type="text">
     </div>
   </div>
 
