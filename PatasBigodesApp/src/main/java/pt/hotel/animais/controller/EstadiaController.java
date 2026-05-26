@@ -9,12 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pt.hotel.animais.model.Estadia;
-import pt.hotel.animais.repository.EstadiaRepository;
-import pt.hotel.animais.repository.ReservaRepository;
 import pt.hotel.animais.service.IEstadiaService;
-import pt.hotel.animais.service.IPagamentoService;
-
-import java.time.LocalDateTime;
 
 @Controller
 @RequiredArgsConstructor
@@ -22,9 +17,6 @@ import java.time.LocalDateTime;
 public class EstadiaController {
 
     private final IEstadiaService estadiaService;
-    private final EstadiaRepository estadiaRepository;
-    private final ReservaRepository reservaRepository;
-    private final IPagamentoService pagamentoService;
 
     @GetMapping
     public String operacoes(@RequestParam(required = false) Long reservaId,
@@ -46,13 +38,9 @@ public class EstadiaController {
         }
 
         model.addAttribute("reservaId", reservaId);
-        reservaRepository.findWithDetalhesById(reservaId).ifPresentOrElse(reserva -> {
-            Estadia estadiaPrevista = new Estadia();
-            estadiaPrevista.setReserva(reserva);
-            estadiaPrevista.setDataInicio(LocalDateTime.now());
-
-            model.addAttribute("reservaSelecionada", reserva);
-            model.addAttribute("valorCheckIn", pagamentoService.calcularValorBase(estadiaPrevista));
+        estadiaService.obterResumoCheckIn(reservaId).ifPresentOrElse(resumo -> {
+            model.addAttribute("reservaSelecionada", resumo.getReserva());
+            model.addAttribute("valorCheckIn", resumo.getValorCheckIn());
         }, () -> model.addAttribute("erroCheckIn", "Reserva não encontrada."));
     }
 
@@ -62,9 +50,9 @@ public class EstadiaController {
         }
 
         model.addAttribute("estadiaId", estadiaId);
-        estadiaRepository.findByIdComDetalhes(estadiaId).ifPresentOrElse(estadia -> {
-            model.addAttribute("estadiaSelecionada", estadia);
-            model.addAttribute("valorCheckOut", pagamentoService.calcularCobrancaComplementar(estadia));
+        estadiaService.obterResumoCheckOut(estadiaId).ifPresentOrElse(resumo -> {
+            model.addAttribute("estadiaSelecionada", resumo.getEstadia());
+            model.addAttribute("valorCheckOut", resumo.getValorCheckOut());
         }, () -> model.addAttribute("erroCheckOut", "Estadia não encontrada."));
     }
 

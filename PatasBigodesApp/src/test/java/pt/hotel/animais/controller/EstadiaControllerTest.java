@@ -7,15 +7,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import pt.hotel.animais.dto.ResumoCheckInDto;
+import pt.hotel.animais.dto.ResumoCheckOutDto;
 import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.Tutor;
-import pt.hotel.animais.repository.EstadiaRepository;
-import pt.hotel.animais.repository.ReservaRepository;
 import pt.hotel.animais.service.IEstadiaService;
-import pt.hotel.animais.service.IPagamentoService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -45,15 +44,6 @@ class EstadiaControllerTest {
     @MockBean
     private IEstadiaService estadiaService;
 
-    @MockBean
-    private EstadiaRepository estadiaRepository;
-
-    @MockBean
-    private ReservaRepository reservaRepository;
-
-    @MockBean
-    private IPagamentoService pagamentoService;
-
     @Test
     @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
     void operacoesDeveRenderizarPagina() throws Exception {
@@ -70,8 +60,8 @@ class EstadiaControllerTest {
         e.setId(1L);
         e.setDataInicio(LocalDateTime.now());
         e.setReserva(criarReservaComDetalhes());
-        when(estadiaRepository.findByIdComDetalhes(1L)).thenReturn(Optional.of(e));
-        when(pagamentoService.calcularCobrancaComplementar(any())).thenReturn(new BigDecimal("25.00"));
+        when(estadiaService.obterResumoCheckOut(1L))
+                .thenReturn(Optional.of(new ResumoCheckOutDto(e, new BigDecimal("25.00"))));
 
         mockMvc.perform(get("/estadias").param("estadiaId", "1"))
                 .andExpect(status().isOk())
@@ -83,8 +73,8 @@ class EstadiaControllerTest {
     @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
     void operacoesComReservaIdDeveAdicionarReservaEValorAoModelo() throws Exception {
         Reserva reserva = criarReservaComDetalhes();
-        when(reservaRepository.findWithDetalhesById(10L)).thenReturn(Optional.of(reserva));
-        when(pagamentoService.calcularValorBase(any())).thenReturn(new BigDecimal("45.00"));
+        when(estadiaService.obterResumoCheckIn(10L))
+                .thenReturn(Optional.of(new ResumoCheckInDto(reserva, new BigDecimal("45.00"))));
 
         mockMvc.perform(get("/estadias").param("reservaId", "10"))
                 .andExpect(status().isOk())

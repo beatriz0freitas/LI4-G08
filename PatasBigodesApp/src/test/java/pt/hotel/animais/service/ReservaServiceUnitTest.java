@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.enums.EstadoReserva;
+import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.repository.ReservaRepository;
 
 import java.time.LocalDate;
@@ -30,6 +31,10 @@ class ReservaServiceUnitTest {
     private IAnimalService animalService;
     @Mock
     private IAvailabilityDomainService availabilityDomainService;
+    @Mock
+    private EstadiaRepository estadiaRepository;
+    @Mock
+    private IPagamentoService pagamentoService;
 
     @InjectMocks
     private ReservaService service;
