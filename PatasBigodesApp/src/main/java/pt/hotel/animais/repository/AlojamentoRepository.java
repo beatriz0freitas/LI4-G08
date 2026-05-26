@@ -38,7 +38,7 @@ public interface AlojamentoRepository extends JpaRepository<Alojamento, Long> {
     long countDisponiveisOperacionais();
 
     @Query("SELECT COUNT(DISTINCT r.alojamento.id) FROM Reserva r " +
-           "WHERE r.estado = pt.hotel.animais.model.enums.EstadoReserva.ATIVA")
+           "WHERE r.estado IN (pt.hotel.animais.model.enums.EstadoReserva.ATIVA, pt.hotel.animais.model.enums.EstadoReserva.CONFIRMADA)")
     long countAlojamentosComReservasAtivas();
     
     /**
@@ -48,7 +48,7 @@ public interface AlojamentoRepository extends JpaRepository<Alojamento, Long> {
            "WHERE a.estadoLimpeza = pt.hotel.animais.model.enums.EstadoLimpeza.CONCLUIDO " +
            "AND a.id NOT IN (" +
            "  SELECT r.alojamento.id FROM Reserva r " +
-           "  WHERE r.estado = pt.hotel.animais.model.enums.EstadoReserva.ATIVA " +
+           "  WHERE r.estado IN (pt.hotel.animais.model.enums.EstadoReserva.ATIVA, pt.hotel.animais.model.enums.EstadoReserva.CONFIRMADA) " +
            "  AND NOT (r.dataFim < :dataInicio OR r.dataInicio > :dataFim)" +
            ") " +
            "AND a.id NOT IN (" +
@@ -69,7 +69,7 @@ public interface AlojamentoRepository extends JpaRepository<Alojamento, Long> {
            "AND a.tipo = :tipo " +
            "AND a.id NOT IN (" +
            "  SELECT r.alojamento.id FROM Reserva r " +
-           "  WHERE r.estado = pt.hotel.animais.model.enums.EstadoReserva.ATIVA " +
+           "  WHERE r.estado IN (pt.hotel.animais.model.enums.EstadoReserva.ATIVA, pt.hotel.animais.model.enums.EstadoReserva.CONFIRMADA) " +
            "  AND NOT (r.dataFim < :dataInicio OR r.dataInicio > :dataFim)" +
            ") " +
            "AND a.id NOT IN (" +
@@ -88,7 +88,7 @@ public interface AlojamentoRepository extends JpaRepository<Alojamento, Long> {
      */
     @Query("SELECT COUNT(r) FROM Reserva r " +
            "WHERE r.alojamento.id = :alojamentoId " +
-           "AND r.estado = pt.hotel.animais.model.enums.EstadoReserva.ATIVA " +
+           "AND r.estado IN (pt.hotel.animais.model.enums.EstadoReserva.ATIVA, pt.hotel.animais.model.enums.EstadoReserva.CONFIRMADA) " +
            "AND NOT (r.dataFim < :dataInicio OR r.dataInicio > :dataFim)")
     long countConflictingReservas(
         @Param("alojamentoId") Long alojamentoId,

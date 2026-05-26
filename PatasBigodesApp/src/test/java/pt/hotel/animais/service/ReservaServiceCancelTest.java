@@ -75,6 +75,18 @@ class ReservaServiceCancelTest {
         verify(reservaRepository, never()).save(any());
     }
 
+    @Test
+    void cancelarDeveRejeitarReservaConfirmada() {
+        Reserva reserva = criarReserva(12L, EstadoReserva.CONFIRMADA);
+        when(reservaRepository.findWithDetalhesById(12L)).thenReturn(Optional.of(reserva));
+
+        assertThatThrownBy(() -> reservaService.cancelar(12L))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("não pode ser cancelada");
+
+        verify(reservaRepository, never()).save(any());
+    }
+
     private Reserva criarReserva(Long id, EstadoReserva estado) {
         Tutor tutor = new Tutor();
         tutor.setId(1L);

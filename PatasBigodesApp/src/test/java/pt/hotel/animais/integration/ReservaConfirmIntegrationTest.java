@@ -17,7 +17,9 @@ import pt.hotel.animais.service.IPagamentoService;
 import pt.hotel.animais.service.IReservaService;
 import pt.hotel.animais.service.ITutorService;
 
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
@@ -51,14 +53,27 @@ class ReservaConfirmIntegrationTest {
 
     @Test
     @WithMockUser(username = "12", roles = {"FUNCIONARIO_RECEPCAO"})
-    void confirmarReservaDeveRedirecionarParaLista() throws Exception {
+    void confirmarReservaNaoDeveChamarServicoPorqueConfirmacaoOcorreNoCheckIn() throws Exception {
         assertMocksInjected();
 
         mockMvc.perform(post("/reservas/42/confirmar").with(csrf()))
             .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("/reservas"));
+            .andExpect(redirectedUrl("/reservas/42"));
 
-        verify(reservaService).concluir(42L);
+        verify(reservaService, never()).confirmar(42L);
+        verify(reservaService, never()).concluir(42L);
+    }
+
+    @Test
+    @WithMockUser(username = "12", roles = {"FUNCIONARIO_RECEPCAO"})
+    void concluirReservaNaoDeveChamarServicoDeConclusaoManual() throws Exception {
+        assertMocksInjected();
+
+        mockMvc.perform(post("/reservas/42/concluir").with(csrf()))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/reservas/42"));
+
+        verifyNoInteractions(reservaService);
     }
 
     private void assertMocksInjected() {

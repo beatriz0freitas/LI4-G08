@@ -5,6 +5,7 @@ package pt.hotel.animais.model.enums;
  */
 public enum EstadoReserva {
     ATIVA("Ativa"),
+    CONFIRMADA("Confirmada"),
     CANCELADA("Cancelada"),
     CONCLUIDA("Concluída");
 

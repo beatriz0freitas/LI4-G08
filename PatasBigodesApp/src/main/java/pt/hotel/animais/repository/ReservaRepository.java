@@ -46,11 +46,11 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     List<Reserva> findByAlojamentoId(Long alojamentoId);
     
     /**
-     * Procura reservas ativas de um alojamento dentro de um período.
+     * Procura reservas ativas ou confirmadas de um alojamento dentro de um período.
      * Utilizado para verificar disponibilidade.
      */
     @Query("SELECT r FROM Reserva r WHERE r.alojamento.id = :alojamentoId " +
-           "AND r.estado = pt.hotel.animais.model.enums.EstadoReserva.ATIVA " +
+           "AND r.estado IN (pt.hotel.animais.model.enums.EstadoReserva.ATIVA, pt.hotel.animais.model.enums.EstadoReserva.CONFIRMADA) " +
            "AND NOT (r.dataFim < :dataInicio OR r.dataInicio > :dataFim)")
     List<Reserva> findActiveReservasInPeriod(
         @Param("alojamentoId") Long alojamentoId,
@@ -80,17 +80,18 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     long countByEstado(@Param("estado") EstadoReserva estado);
 
     /**
-     * Conta reservas ativas com data de início futura.
+     * Conta reservas ativas ou confirmadas com data de início futura.
      */
-    @Query("SELECT COUNT(r) FROM Reserva r WHERE r.estado = pt.hotel.animais.model.enums.EstadoReserva.ATIVA " +
+    @Query("SELECT COUNT(r) FROM Reserva r " +
+           "WHERE r.estado IN (pt.hotel.animais.model.enums.EstadoReserva.ATIVA, pt.hotel.animais.model.enums.EstadoReserva.CONFIRMADA) " +
            "AND r.dataInicio > :hoje")
     long countFuturas(@Param("hoje") LocalDate hoje);
     
     /**
-     * Conta as reservas ativas num determinado período para um alojamento.
+     * Conta as reservas ativas ou confirmadas num determinado período para um alojamento.
      */
     @Query("SELECT COUNT(r) FROM Reserva r WHERE r.alojamento.id = :alojamentoId " +
-           "AND r.estado = pt.hotel.animais.model.enums.EstadoReserva.ATIVA " +
+           "AND r.estado IN (pt.hotel.animais.model.enums.EstadoReserva.ATIVA, pt.hotel.animais.model.enums.EstadoReserva.CONFIRMADA) " +
            "AND NOT (r.dataFim < :dataInicio OR r.dataInicio > :dataFim)")
     long countActiveInPeriod(
         @Param("alojamentoId") Long alojamentoId,

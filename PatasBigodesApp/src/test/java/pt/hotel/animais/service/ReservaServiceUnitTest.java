@@ -91,8 +91,30 @@ class ReservaServiceUnitTest {
     }
 
     @Test
-    void concluirDeveAlterarEstadoParaConcluida() {
+    void confirmarDeveAlterarEstadoParaConfirmada() {
         Reserva r = reserva(1L, EstadoReserva.ATIVA);
+        when(reservaRepository.findWithDetalhesById(1L)).thenReturn(Optional.of(r));
+        when(reservaRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Reserva resultado = service.confirmar(1L);
+
+        assertThat(resultado.getEstado()).isEqualTo(EstadoReserva.CONFIRMADA);
+        verify(reservaRepository).save(r);
+    }
+
+    @Test
+    void confirmarDeveRejeitarReservaNaoAtiva() {
+        Reserva r = reserva(1L, EstadoReserva.CONFIRMADA);
+        when(reservaRepository.findWithDetalhesById(1L)).thenReturn(Optional.of(r));
+
+        assertThatThrownBy(() -> service.confirmar(1L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("ativas");
+    }
+
+    @Test
+    void concluirDeveAlterarEstadoConfirmadoParaConcluida() {
+        Reserva r = reserva(1L, EstadoReserva.CONFIRMADA);
         when(reservaRepository.findWithDetalhesById(1L)).thenReturn(Optional.of(r));
         when(reservaRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -103,13 +125,13 @@ class ReservaServiceUnitTest {
     }
 
     @Test
-    void concluirDeveRejeitarReservaNaoAtiva() {
-        Reserva r = reserva(1L, EstadoReserva.CANCELADA);
+    void concluirDeveRejeitarReservaNaoConfirmada() {
+        Reserva r = reserva(1L, EstadoReserva.ATIVA);
         when(reservaRepository.findWithDetalhesById(1L)).thenReturn(Optional.of(r));
 
         assertThatThrownBy(() -> service.concluir(1L))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("ativas");
+                .hasMessageContaining("confirmadas");
     }
 
     @Test

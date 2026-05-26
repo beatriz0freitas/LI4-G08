@@ -35,14 +35,10 @@ Definir os contratos de interação da receção para disponibilidade, reservas,
   - sem sobreposição temporal
   - limpeza concluída
 
-### Confirmar reserva
+### Confirmação da reserva
 
-- **Method**: `POST`
-- **Path**: `/reservas/{id}/confirmar`
-- **Validation**:
-  - reserva existente e elegível para confirmação
-  - utilizador com permissão de receção
-- **Success**: confirmação operacional registada na reserva (timestamp/utilizador) e evento de auditoria persistido
+- **Rule**: não existe confirmação administrativa autónoma. A reserva passa de `ATIVA` para `CONFIRMADA` apenas no fluxo de check-in.
+- **Legacy path**: `POST /reservas/{id}/confirmar`, quando invocado, não altera o estado da reserva e redireciona para o detalhe com mensagem de validação.
 
 ### Cancelar reserva
 
@@ -61,11 +57,12 @@ Definir os contratos de interação da receção para disponibilidade, reservas,
   - `reservaId`
   - `metodoPagamento` obrigatório (`NUMERARIO`, `CARTAO_DEBITO` ou `CARTAO_CREDITO`)
 - **Success**:
+  - reserva associada passa de `ATIVA` para `CONFIRMADA`
   - estadia criada em `EM_CURSO`
   - alojamento marcado `OCUPADO`
   - pagamento de `CHECK_IN` registado como `LIQUIDADO`
 - **Validation**:
-  - reserva válida para check-in (RD-02)
+  - reserva em estado `ATIVA` válida para check-in (RD-02)
   - método de pagamento explícito obrigatório; não existe método por defeito
 
 ### Registar check-out
@@ -76,6 +73,7 @@ Definir os contratos de interação da receção para disponibilidade, reservas,
   - `metodoPagamento` obrigatório (`NUMERARIO`, `CARTAO_DEBITO` ou `CARTAO_CREDITO`)
 - **Success**:
   - estadia marcada `TERMINADA`
+  - reserva associada marcada `CONCLUIDA`
   - alojamento marcado `PENDENTE_LIMPEZA`
   - pagamento complementar de `CHECK_OUT` registado quando aplicável
 - **Validation**:
@@ -92,5 +90,5 @@ Definir os contratos de interação da receção para disponibilidade, reservas,
 
 ## Auditabilidade e Segurança
 
-- Todas as operações críticas (`criar`, `confirmar`, `cancelar`, `check-in`, `check-out`, `registar pagamento`) devem gerar evento de auditoria com utilizador, timestamp, entidade e resultado.
+- Todas as operações críticas (`criar`, `cancelar`, `check-in`, `check-out`, `registar pagamento`) devem gerar evento de auditoria com utilizador, timestamp, entidade e resultado.
 - Operações sem permissão de perfil devem devolver acesso negado sem exposição de dados sensíveis.

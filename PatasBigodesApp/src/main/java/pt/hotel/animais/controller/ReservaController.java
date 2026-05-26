@@ -243,18 +243,15 @@ public class ReservaController {
         RedirectAttributes redirectAttributes,
         Model model
     ) {
-        try {
-            reservaService.concluir(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Reserva concluída com sucesso");
-            return "redirect:/reservas";
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "redirect:/reservas/" + id;
-        }
+        redirectAttributes.addFlashAttribute(
+            "errorMessage",
+            "A reserva só pode ser concluída automaticamente após o check-out da estadia associada"
+        );
+        return "redirect:/reservas/" + id;
     }
 
     /**
-     * POST /reservas/{id}/confirmar - Alias para concluir/confirmar reserva
+     * POST /reservas/{id}/confirmar - A confirmação ocorre apenas no check-in.
      */
     @PostMapping("/{id}/confirmar")
     public String confirmar(
@@ -262,14 +259,11 @@ public class ReservaController {
         RedirectAttributes redirectAttributes,
         Model model
     ) {
-        try {
-            reservaService.concluir(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Reserva confirmada com sucesso");
-            return "redirect:/reservas";
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "redirect:/reservas/" + id;
-        }
+        redirectAttributes.addFlashAttribute(
+            "errorMessage",
+            "A reserva só fica confirmada durante o check-in"
+        );
+        return "redirect:/reservas/" + id;
     }
 
     private void prepararFormularioReserva(ReservaFormDto reservaForm, Model model) {

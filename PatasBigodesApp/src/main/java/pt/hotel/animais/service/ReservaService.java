@@ -68,7 +68,7 @@ public class ReservaService implements IReservaService {
         
         if (conflitos > 0) {
             throw new IllegalArgumentException(
-                "O alojamento já tem reservas ativas neste período. Conflito: overbooking não permitido."
+                "O alojamento já tem reservas ativas ou confirmadas neste período. Conflito: overbooking não permitido."
             );
         }
         
@@ -151,17 +151,33 @@ public class ReservaService implements IReservaService {
     }
     
     /**
-     * Marca uma reserva como concluída.
+     * Confirma uma reserva ativa durante o check-in.
+     */
+    public Reserva confirmar(Long id) {
+        Reserva reserva = obter(id);
+
+        if (reserva.getEstado() != EstadoReserva.ATIVA) {
+            throw new IllegalArgumentException(
+                "Apenas reservas ativas podem ser confirmadas"
+            );
+        }
+
+        reserva.setEstado(EstadoReserva.CONFIRMADA);
+        return reservaRepository.save(reserva);
+    }
+
+    /**
+     * Marca uma reserva confirmada como concluída após check-out da estadia.
      */
     public Reserva concluir(Long id) {
         Reserva reserva = obter(id);
-        
-        if (reserva.getEstado() != EstadoReserva.ATIVA) {
+
+        if (reserva.getEstado() != EstadoReserva.CONFIRMADA) {
             throw new IllegalArgumentException(
-                "Apenas reservas ativas podem ser concluídas"
+                "Apenas reservas confirmadas podem ser concluídas após check-out"
             );
         }
-        
+
         reserva.setEstado(EstadoReserva.CONCLUIDA);
         return reservaRepository.save(reserva);
     }
