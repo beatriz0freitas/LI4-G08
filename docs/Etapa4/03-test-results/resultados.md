@@ -9,6 +9,25 @@
 
 ## 1. Sumário de Execução
 
+### 1.1 Validação complementar da LAC-15
+
+**Data de execução:** 2026-05-26  
+**Comando:** `mvn test -Dtest=CheckInServiceTest,CheckOutSequenceServiceTest,CheckInIntegrationTest,CheckOutIntegrationTest,PlanoCuidadosServiceTest,FluxoOperacionalEndToEndIntegrationTest`  
+**Base de dados:** MySQL de teste em Docker Compose (`hotelanimais_test`, `localhost:3308`)  
+**Java:** OpenJDK 21.0.2
+
+| Categoria | Testes | Passaram | Falharam | Erros | Ignorados |
+|-----------|--------|----------|----------|-------|-----------|
+| Fluxos críticos de check-in/check-out, plano de cuidados e e2e operacional | 38 | 38 | 0 | 0 | 0 |
+
+Esta execução valida especificamente a mitigação da `LAC-15`, reforçando os fluxos críticos que antes estavam cobertos de forma superficial. Foram incluídos testes de serviço e integração para check-in, check-out, plano de cuidados e o fluxo completo:
+
+reserva → check-in → registo de cuidado → serviço extra → intervenção clínica → check-out → pagamento final → limpeza → relatório.
+
+Durante esta validação foram confirmadas as migrações Flyway `V10__allow_reserva_confirmada_estado.sql` e `V11__allow_servico_extra_catalog_type_only.sql`, necessárias para alinhar a base de dados com os estados e associações usados pela implementação.
+
+### 1.2 Execução completa anterior
+
 | Categoria | Testes | Passaram | Falharam | Erros | Ignorados |
 |-----------|--------|----------|----------|-------|-----------|
 | Serviços unitários e regras de domínio | 130 | 130 | 0 | 0 | 0 |
@@ -148,7 +167,7 @@ target/pit-reports/index.html
 | Grupo da SRS | Estado | Evidência |
 |--------------|--------|-----------|
 | RF-01 a RF-10 | Verificado | Testes de serviços, controllers e segurança |
-| RF-11 | Parcial | `PlanoCuidadosControllerTest`; serviço ainda pendente |
+| RF-11 | Verificado | `PlanoCuidadosControllerTest` e `PlanoCuidadosServiceTest` |
 | RF-12 a RF-17 | Verificado | Testes de cuidados, saúde, histórico, limpeza e serviços extra |
 | RD-01 a RD-09 | Verificado | `RegraDominioServiceTest`, `AlojamentoServiceTest`, `ReservaService*`, `EstadiaServiceTest`, `PagamentoServiceTest` |
 | RNF-01 | Verificado | `AlojamentoServiceTimingTests`, `TutorServiceTimingTests` (tempos de resposta) + `ConcurrentAccessTest` (10 utilizadores simultâneos, < 5 s) |
@@ -168,4 +187,4 @@ A execução `make test-integration` terminou com sucesso e valida a suíte comp
 - **Teste de carga concorrente** (`ConcurrentAccessTest`): 10 threads simultâneas ao servidor, todas com resposta 2xx/3xx em menos de 5 s (`make concurrent-test`).
 - **Teste de backup e recuperação** (`scripts/test-backup-recovery.sh`): dump + restore automático com verificação de integridade (`make backup-test`).
 
-A principal limitação funcional continua a ser RF-11, por o serviço de plano de cuidados estar marcado como pendente.
+A principal limitação remanescente é que alguns RNF dependem de operação/infraestrutura ou validação com utilizadores reais, não sendo totalmente provados por testes automatizados.
