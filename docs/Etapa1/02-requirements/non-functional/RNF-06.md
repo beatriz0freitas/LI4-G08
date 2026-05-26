@@ -1,8 +1,9 @@
-# RNF-06 - Compatibilidade
+# RNF-06 - Consistência da informação
 
 **Descrição:**
-O sistema deve ser compatível com os equipamentos já existentes no hotel, sem necessidade de aquisição de hardware adicional.
+O sistema deve garantir que alterações relevantes ficam refletidas de forma consistente nas consultas e indicadores que dependem desses dados, evitando informação contraditória entre diferentes áreas do sistema.
 
-**Origem:** US-06, US-14
+
+**Origem:** US-01, US-02, US-14
 
 **Prioridade:** Must Have

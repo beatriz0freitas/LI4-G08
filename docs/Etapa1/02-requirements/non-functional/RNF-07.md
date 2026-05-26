@@ -1,8 +1,8 @@
-# RNF-07 - Escalabilidade
+# RNF-07 - Consulta eficiente de informação acumulada
 
 **Descrição:**
-O sistema deve ser escalável, suportando o crescimento do número de boxes, animais e utilizadores sem degradação de desempenho.
+O sistema deve permitir consultar informação acumulada sem degradação percetível nas operações frequentes dos utilizadores. As consultas devem continuar eficientes à medida que se acumulam dados.
 
-**Origem:** US-01, US-06
+**Origem:** US-05, US-24
 
 **Prioridade:** Should Have
