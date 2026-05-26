@@ -42,7 +42,17 @@
                                         <label for="reservaId">ID da Reserva</label>
                                         <input id="reservaId" name="reservaId" type="number" class="form-control" placeholder="Introduza o ID da reserva" required />
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Check-in</button>
+                                    <div class="form-group">
+                                        <label for="metodoPagamentoCheckIn">Método de pagamento da estadia</label>
+                                        <select id="metodoPagamentoCheckIn" name="metodoPagamento" class="form-control" required>
+                                            <option value="NUMERARIO">Numerário</option>
+                                            <option value="CARTAO_DEBITO">Cartão de débito</option>
+                                            <option value="CARTAO_CREDITO">Cartão de crédito</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-cash-register"></i> Registar check-in e pagamento
+                                    </button>
                                 </form>
                             </div>
                         </div>
@@ -58,7 +68,17 @@
                                         <label for="estadiaId">ID da Estadia</label>
                                         <input id="estadiaId" name="estadiaId" type="number" class="form-control" placeholder="Introduza o ID da estadia" required />
                                     </div>
-                                    <button type="submit" class="btn btn-success">Check-out</button>
+                                    <div class="form-group">
+                                        <label for="metodoPagamentoCheckOut">Método de pagamento dos extras</label>
+                                        <select id="metodoPagamentoCheckOut" name="metodoPagamento" class="form-control" required>
+                                            <option value="NUMERARIO">Numerário</option>
+                                            <option value="CARTAO_DEBITO">Cartão de débito</option>
+                                            <option value="CARTAO_CREDITO">Cartão de crédito</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-receipt"></i> Registar check-out e pagamento
+                                    </button>
                                 </form>
                             </div>
                         </div>
@@ -70,7 +90,7 @@
                         <div class="card">
                             <div class="card-header"><h3 class="card-title">Dicas</h3></div>
                             <div class="card-body">
-                                <p>Use o ID da reserva (visível na listagem de reservas) para registar o check-in. Após check-out o responsável é notificado e o alojamento é marcado para limpeza.</p>
+                                <p>Use o ID da reserva para registar o check-in e liquidar a estadia base. No check-out é liquidada apenas a cobrança complementar de extras, clínica e eventuais dias adicionais.</p>
                                 <div th:if="${estadiaId}">
                                     <p>Extras total para a estadia <strong th:text="${estadiaId}"></strong>: <span th:text="${extrasTotal}">0.00</span> EUR</p>
                                 </div>
