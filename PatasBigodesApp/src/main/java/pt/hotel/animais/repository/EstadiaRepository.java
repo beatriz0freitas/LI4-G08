@@ -73,6 +73,15 @@ public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
 
 	@Query("""
 		SELECT e FROM Estadia e
+		JOIN e.reserva r
+		JOIN r.animal a
+		WHERE a.id = :animalId
+		  AND e.estado = pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO
+		""")
+	Optional<Estadia> findEmCursoPorAnimal(@Param("animalId") Long animalId);
+
+	@Query("""
+		SELECT e FROM Estadia e
 		JOIN FETCH e.reserva r
 		JOIN FETCH r.animal a
 		JOIN FETCH r.tutor t
