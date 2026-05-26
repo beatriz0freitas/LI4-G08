@@ -70,11 +70,10 @@ public class EstadiaController {
 
     @PostMapping("/check-in")
     public String checkIn(@RequestParam("reservaId") Long reservaId, 
-                          @RequestParam(value = "metodoPagamento", defaultValue = "NUMERARIO") String metodoPagamentoStr,
+                          @RequestParam(value = "metodoPagamento", required = false) String metodoPagamentoStr,
                           RedirectAttributes redirectAttributes) {
         try {
-            pt.hotel.animais.model.enums.MetodoPagamento metodoPagamento = 
-                pt.hotel.animais.model.enums.MetodoPagamento.valueOf(metodoPagamentoStr);
+            pt.hotel.animais.model.enums.MetodoPagamento metodoPagamento = parseMetodoPagamento(metodoPagamentoStr);
             Estadia estadia = estadiaService.abrirEstadiaPorReserva(reservaId, metodoPagamento);
             redirectAttributes.addFlashAttribute("successMessage", "Check-in registado: " + estadia.getId());
             return "redirect:/estadias";
@@ -86,11 +85,10 @@ public class EstadiaController {
 
     @PostMapping("/check-out")
     public String checkOut(@RequestParam("estadiaId") Long estadiaId,
-                           @RequestParam(value = "metodoPagamento", defaultValue = "NUMERARIO") String metodoPagamentoStr,
+                           @RequestParam(value = "metodoPagamento", required = false) String metodoPagamentoStr,
                            RedirectAttributes redirectAttributes) {
         try {
-            pt.hotel.animais.model.enums.MetodoPagamento metodoPagamento = 
-                pt.hotel.animais.model.enums.MetodoPagamento.valueOf(metodoPagamentoStr);
+            pt.hotel.animais.model.enums.MetodoPagamento metodoPagamento = parseMetodoPagamento(metodoPagamentoStr);
             Estadia estadia = estadiaService.checkOut(estadiaId, metodoPagamento);
             redirectAttributes.addFlashAttribute("successMessage", "Check-out registado: " + estadia.getId());
             return "redirect:/historico";
@@ -98,5 +96,12 @@ public class EstadiaController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/historico";
         }
+    }
+
+    private pt.hotel.animais.model.enums.MetodoPagamento parseMetodoPagamento(String metodoPagamentoStr) {
+        if (metodoPagamentoStr == null || metodoPagamentoStr.isBlank()) {
+            throw new IllegalArgumentException("Método de pagamento é obrigatório");
+        }
+        return pt.hotel.animais.model.enums.MetodoPagamento.valueOf(metodoPagamentoStr);
     }
 }

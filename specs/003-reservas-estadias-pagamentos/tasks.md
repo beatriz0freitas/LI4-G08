@@ -144,6 +144,7 @@
 - [x] T040 [US4] Integrar pagamento de check-in no fluxo de check-in em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
 - [x] T040A [US4] Substituir tarifa fixa por consulta a `TipoAlojamentoTarifaService` no cálculo de pagamento base.
 - [x] T040B [US4] Atualizar interface de check-in para recolher método de pagamento obrigatório.
+- [x] T040C [US4] Remover método de pagamento por defeito no controller e testar rejeição de check-in sem método.
 
 **Checkpoint**: US4 funcional e testável de forma independente.
 

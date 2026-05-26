@@ -23,7 +23,10 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -122,6 +125,19 @@ class EstadiaControllerTest {
 
     @Test
     @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
+    void checkInSemMetodoPagamentoDeveRejeitarSemValorPorDefeito() throws Exception {
+        mockMvc.perform(post("/estadias/check-in")
+                        .with(csrf())
+                        .param("reservaId", "10"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/reservas"))
+                .andExpect(flash().attributeExists("errorMessage"));
+
+        verify(estadiaService, never()).abrirEstadiaPorReserva(anyLong(), any());
+    }
+
+    @Test
+    @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
     void checkOutValidoDeveRedirecionarParaHistorico() throws Exception {
         Estadia e = new Estadia();
         e.setId(3L);
@@ -149,6 +165,19 @@ class EstadiaControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/historico"))
                 .andExpect(flash().attributeExists("errorMessage"));
+    }
+
+    @Test
+    @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
+    void checkOutSemMetodoPagamentoDeveRejeitarSemValorPorDefeito() throws Exception {
+        mockMvc.perform(post("/estadias/check-out")
+                        .with(csrf())
+                        .param("estadiaId", "3"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/historico"))
+                .andExpect(flash().attributeExists("errorMessage"));
+
+        verify(estadiaService, never()).checkOut(anyLong(), any());
     }
 
     private Reserva criarReservaComDetalhes() {
