@@ -13,8 +13,11 @@ import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.repository.RegistoCuidadoRepository;
 import pt.hotel.animais.repository.EstadiaRepository;
+import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,6 +26,7 @@ public class RegistoCuidadoService implements IRegistoCuidadoService {
 
     private final RegistoCuidadoRepository registoCuidadoRepository;
     private final EstadiaRepository estadiaRepository;
+    private final AuditoriaOperacaoService auditoriaOperacaoService;
 
     @Transactional
     public RegistoCuidadoDto create(RegistoCuidadoFormDto req, Long autorId) {
@@ -44,6 +48,14 @@ public class RegistoCuidadoService implements IRegistoCuidadoService {
         rc.setAutorId(autorId);
 
         RegistoCuidado saved = registoCuidadoRepository.save(rc);
+        auditoriaOperacaoService.registarSucesso(
+            autorId,
+            "CUIDADO_REGISTADO",
+            "Cuidado",
+            saved.getId(),
+            "CREATE",
+            detalhesCuidado(saved)
+        );
         return toDto(saved);
     }
 
@@ -66,5 +78,14 @@ public class RegistoCuidadoService implements IRegistoCuidadoService {
         d.setDataHora(r.getDataHora());
         d.setAutorNome(r.getAutorId() != null ? String.valueOf(r.getAutorId()) : null);
         return d;
+    }
+
+    private Map<String, Object> detalhesCuidado(RegistoCuidado registo) {
+        Map<String, Object> detalhes = new LinkedHashMap<>();
+        detalhes.put("estadiaId", registo.getEstadia() != null ? registo.getEstadia().getId() : null);
+        detalhes.put("autorId", registo.getAutorId());
+        detalhes.put("dataHora", registo.getDataHora() != null ? registo.getDataHora().toString() : null);
+        detalhes.put("descricao", registo.getDescricao());
+        return detalhes;
     }
 }

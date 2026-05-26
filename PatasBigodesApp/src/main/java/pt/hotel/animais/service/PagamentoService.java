@@ -13,11 +13,14 @@ import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.repository.IntervencaoClinicaRepository;
 import pt.hotel.animais.repository.PagamentoRepository;
 import pt.hotel.animais.repository.ServicoExtraRepository;
+import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Serviço de gestão de pagamentos.
@@ -38,6 +41,7 @@ public class PagamentoService implements IPagamentoService {
     private final ServicoExtraRepository servicoExtraRepository;
     private final IntervencaoClinicaRepository intervencaoClinicaRepository;
     private final TipoAlojamentoTarifaService tipoAlojamentoTarifaService;
+    private final AuditoriaOperacaoService auditoriaOperacaoService;
 
     /**
      * Calcula o valor base da estadia no check-in.
@@ -77,7 +81,15 @@ public class PagamentoService implements IPagamentoService {
         pagamento.setMomentoPagamento(dto.getMomentoPagamento());
         pagamento.setEstadoPagamento(dto.getEstadoPagamento() == null ? EstadoPagamento.LIQUIDADO : dto.getEstadoPagamento());
 
-        return pagamentoRepository.save(pagamento);
+        Pagamento guardado = pagamentoRepository.save(pagamento);
+        auditoriaOperacaoService.registarSucesso(
+            "PAGAMENTO_CRIADO",
+            "Pagamento",
+            guardado.getId(),
+            "CREATE",
+            detalhesPagamento(guardado)
+        );
+        return guardado;
     }
 
     /**
@@ -150,7 +162,15 @@ public class PagamentoService implements IPagamentoService {
         pagamento.setMomentoPagamento(MomentoPagamento.CHECK_OUT);
         pagamento.setEstadoPagamento(EstadoPagamento.LIQUIDADO);
 
-        return pagamentoRepository.save(pagamento);
+        Pagamento guardado = pagamentoRepository.save(pagamento);
+        auditoriaOperacaoService.registarSucesso(
+            "PAGAMENTO_LIQUIDADO",
+            "Pagamento",
+            guardado.getId(),
+            "CREATE",
+            detalhesPagamento(guardado)
+        );
+        return guardado;
     }
 
     /**
@@ -167,5 +187,15 @@ public class PagamentoService implements IPagamentoService {
     @Transactional(readOnly = true)
     public long contarPagamentosPendentes() {
         return pagamentoRepository.countPendentes();
+    }
+
+    private Map<String, Object> detalhesPagamento(Pagamento pagamento) {
+        Map<String, Object> detalhes = new LinkedHashMap<>();
+        detalhes.put("estadiaId", pagamento.getEstadia() != null ? pagamento.getEstadia().getId() : null);
+        detalhes.put("valor", pagamento.getValor() != null ? pagamento.getValor().toPlainString() : null);
+        detalhes.put("metodoPagamento", pagamento.getMetodoPagamento() != null ? pagamento.getMetodoPagamento().name() : null);
+        detalhes.put("momentoPagamento", pagamento.getMomentoPagamento() != null ? pagamento.getMomentoPagamento().name() : null);
+        detalhes.put("estadoPagamento", pagamento.getEstadoPagamento() != null ? pagamento.getEstadoPagamento().name() : null);
+        return detalhes;
     }
 }
