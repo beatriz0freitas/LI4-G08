@@ -21,6 +21,27 @@
 4. Guardar e confirmar que o colaborador aparece na lista.
 5. Usar editar/desativar para gerir o acesso.
 
+## Auditoria
+
+1. Abrir `/auditoria` com sessão de `DIRETOR`.
+2. Filtrar por `dataInicio`, `dataFim`, utilizador, operação, entidade ou resultado.
+3. Confirmar que a tabela apresenta eventos com timestamp, utilizador, operação, entidade, ID afetado, ação e resultado.
+4. Usar o botão `CSV` para descarregar a auditoria filtrada.
+
+Eventos registados automaticamente:
+
+- Colaboradores: criação, edição e desativação.
+- Reservas/estadias/pagamentos: criação de reserva, cancelamento, check-in, check-out, criação e liquidação de pagamento.
+- Cuidados/clínica/limpeza: registo de cuidado, intervenção clínica, serviço extra e limpeza realizada.
+
+Nota: a operação `EDITAR_RESERVA` está documentada na LAC-13, mas o fluxo de edição de reserva ainda não existe na aplicação atual.
+
+## Retenção de Auditoria
+
+- A retenção configurada é de 12 meses.
+- O job `AuditoriaSchedulerJob` executa diariamente às 03h00.
+- Eventos anteriores ao período de retenção são apagados fisicamente por `AuditoriaService.limparzardosAntigos(1)`.
+
 ## Utilizadores Iniciais
 
 - `diretor` / `diretor123`

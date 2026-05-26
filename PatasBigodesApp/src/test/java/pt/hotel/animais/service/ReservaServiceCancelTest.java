@@ -13,6 +13,7 @@ import pt.hotel.animais.model.enums.Especie;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
 import pt.hotel.animais.model.enums.EstadoReserva;
 import pt.hotel.animais.repository.ReservaRepository;
+import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -39,6 +40,9 @@ class ReservaServiceCancelTest {
 
     @Mock
     private IAvailabilityDomainService availabilityDomainService;
+
+    @Mock
+    private AuditoriaOperacaoService auditoriaOperacaoService;
 
     @InjectMocks
     private ReservaService reservaService;

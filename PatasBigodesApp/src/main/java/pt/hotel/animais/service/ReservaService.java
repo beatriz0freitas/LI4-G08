@@ -12,9 +12,12 @@ import pt.hotel.animais.model.Tutor;
 import pt.hotel.animais.model.enums.EstadoReserva;
 import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.repository.ReservaRepository;
+import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -33,6 +36,7 @@ public class ReservaService implements IReservaService {
     private final IAvailabilityDomainService availabilityDomainService;
     private final EstadiaRepository estadiaRepository;
     private final IPagamentoService pagamentoService;
+    private final AuditoriaOperacaoService auditoriaOperacaoService;
     
     /**
      * Cria uma nova reserva com validações rigorosas.
@@ -94,7 +98,15 @@ public class ReservaService implements IReservaService {
         reserva.setDataFim(formDto.getDataFim());
         reserva.setEstado(EstadoReserva.ATIVA);
         
-        return reservaRepository.save(reserva);
+        Reserva criada = reservaRepository.save(reserva);
+        auditoriaOperacaoService.registarSucesso(
+            "CRIAR_RESERVA",
+            "Reserva",
+            criada.getId(),
+            "CREATE",
+            detalhesReserva(criada)
+        );
+        return criada;
     }
     
     /**
@@ -161,7 +173,15 @@ public class ReservaService implements IReservaService {
         }
         
         reserva.setEstado(EstadoReserva.CANCELADA);
-        return reservaRepository.save(reserva);
+        Reserva cancelada = reservaRepository.save(reserva);
+        auditoriaOperacaoService.registarSucesso(
+            "CANCELAR_RESERVA",
+            "Reserva",
+            cancelada.getId(),
+            "UPDATE",
+            Map.of("estadoNovo", EstadoReserva.CANCELADA.name())
+        );
+        return cancelada;
     }
     
     /**
@@ -218,5 +238,16 @@ public class ReservaService implements IReservaService {
     @Transactional(readOnly = true)
     public List<Reserva> listarTodas() {
         return reservaRepository.findAllWithDetalhes();
+    }
+
+    private Map<String, Object> detalhesReserva(Reserva reserva) {
+        Map<String, Object> detalhes = new LinkedHashMap<>();
+        detalhes.put("tutorId", reserva.getTutor() != null ? reserva.getTutor().getId() : null);
+        detalhes.put("animalId", reserva.getAnimal() != null ? reserva.getAnimal().getId() : null);
+        detalhes.put("alojamentoId", reserva.getAlojamento() != null ? reserva.getAlojamento().getId() : null);
+        detalhes.put("dataInicio", reserva.getDataInicio() != null ? reserva.getDataInicio().toString() : null);
+        detalhes.put("dataFim", reserva.getDataFim() != null ? reserva.getDataFim().toString() : null);
+        detalhes.put("estado", reserva.getEstado() != null ? reserva.getEstado().name() : null);
+        return detalhes;
     }
 }

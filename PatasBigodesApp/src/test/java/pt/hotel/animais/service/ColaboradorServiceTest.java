@@ -1,12 +1,12 @@
 package pt.hotel.animais.service;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import pt.hotel.animais.dto.ColaboradorFormDto;
 import pt.hotel.animais.model.Colaborador;
 import pt.hotel.animais.model.enums.TipoColaborador;
 import pt.hotel.animais.repository.ColaboradorRepository;
+import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,8 +23,8 @@ class ColaboradorServiceTest {
 
     private final ColaboradorRepository repository = mock(ColaboradorRepository.class);
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
-    private final ColaboradorService service = new ColaboradorService(repository, encoder, eventPublisher);
+    private final AuditoriaOperacaoService auditoriaOperacaoService = mock(AuditoriaOperacaoService.class);
+    private final ColaboradorService service = new ColaboradorService(repository, encoder, auditoriaOperacaoService);
 
     @Test
     void criarDeveCodificarPasswordEGuardarTipoEnum() {
@@ -41,7 +41,7 @@ class ColaboradorServiceTest {
         assertThat(criado.getUsername()).isEqualTo("novo");
         assertThat(criado.getEmail()).isEqualTo("novo@hotel.local");
         assertThat(criado.isAtivo()).isTrue();
-        verify(eventPublisher).publishEvent(any());
+        verify(auditoriaOperacaoService).registarSucesso(eq("CRIAR_COLABORADOR"), eq("Colaborador"), any(), eq("CREATE"), any());
     }
 
     @Test
@@ -65,7 +65,7 @@ class ColaboradorServiceTest {
         service.desativar(10L);
 
         assertThat(colaborador.isAtivo()).isFalse();
-        verify(eventPublisher).publishEvent(any());
+        verify(auditoriaOperacaoService).registarSucesso(eq("DESATIVAR_COLABORADOR"), eq("Colaborador"), eq(10L), eq("UPDATE"), any());
     }
 
     @Test
@@ -125,7 +125,7 @@ class ColaboradorServiceTest {
         assertThat(atualizado.getTipoColaborador()).isEqualTo(TipoColaborador.CUIDADOR);
         assertThat(encoder.matches("segredo123", atualizado.getPasswordHash())).isTrue();
         verify(repository).save(existente);
-        verify(eventPublisher).publishEvent(any());
+        verify(auditoriaOperacaoService).registarSucesso(eq("EDITAR_COLABORADOR"), eq("Colaborador"), eq(1L), eq("UPDATE"), any());
     }
 
     @Test

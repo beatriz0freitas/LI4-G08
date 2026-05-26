@@ -529,30 +529,33 @@ Sem auditoria transversal, a aplicação não consegue responder bem a perguntas
 
 Isto é relevante para responsabilização, depuração e avaliação de qualidade.
 
-**Como corrigir**
+**Resolução** ✅ (2026-05-26)
 
-1. Definir na spec `005` que eventos devem ser auditados.
-2. Criar uma lista mínima de eventos:
-   - criação/edição/cancelamento de reserva;
-   - check-in;
-   - check-out;
-   - criação/anulação de pagamento;
-   - registo de serviço extra;
-   - registo de intervenção clínica;
-   - alteração de estado de limpeza;
-   - geração/exportação de relatório;
-   - operações de gestão de colaboradores.
-3. Implementar publicação de eventos em serviços, não em controladores.
-4. Persistir ou expor auditoria conforme definido na spec.
-5. Criar testes para garantir que os eventos são emitidos.
+Clarificação executada com sucesso em sessão de `speckit.clarify`. Respostas consolidadas:
+
+1. **Ámbito**: Auditoria Completa — todas as operações críticas (criar/editar/cancelar reserva, check-in, check-out, pagamento, cuidados, clínica, limpeza, colaboradores).
+2. **Formato**: Tabela dedicada `AuditoriaEvento` com 10 campos (id, timestamp, utilizadorId, operacao, entidade, entityId, acao, detalhes JSON, resultado, motivoFalha).
+3. **Retenção**: 12 meses, acesso restrito a `DIRETOR`, com filtros por data/utilizador/operação.
+
+**Artefatos gerados**:
+- `specs/005-relatorios-colaboradores/spec.md` — atualizado com FR-011, SC-008/009, Clarifications
+- `specs/005-relatorios-colaboradores/plan.md` — 15 fases de implementação (de 6 originais)
+- `specs/005-relatorios-colaboradores/data-model.md` — entidade `AuditoriaEvento` com índices
+- `specs/005-relatorios-colaboradores/lac-13-impact-analysis.md` — análise completa de impacto (novo)
+- `specs/005-relatorios-colaboradores/lac-13-resolution-summary.md` — síntese de resolução (novo)
+
+**Próximos passos**:
+1. Publicar `docs/auditoria-interface.md` com interface esperada.
+2. Implementar Fase 1 (fundação de auditoria) em spec 005.
+3. Coordenar integração com specs 003 e 004.
 
 **Spec responsável**
 
-- Principal: `specs/005-relatorios-colaboradores/`, se a auditoria fizer parte da administração e qualidade.
-- Secundárias: `specs/003-reservas-estadias-pagamentos/` e `specs/004-cuidados-clinica-limpeza/`, porque os eventos auditados pertencem a estes fluxos.
-- Requisitos/tarefas afetados: cenários de auditoria da spec `005`, incluindo tarefas de QA e integridade.
+- Principal: `specs/005-relatorios-colaboradores/` (resolvida).
+- Secundárias: `specs/003-reservas-estadias-pagamentos/` e `specs/004-cuidados-clinica-limpeza/` (para integração de eventos).
+- Requisitos afetados: FR-011, SC-008, SC-009 (novos), `US-01`, `US-02`, `US-03`, `US-05`.
 
-### LAC-14 - Relatórios não cumprem totalmente exportação PDF e agrupamento
+---### LAC-14 - Relatórios não cumprem totalmente exportação PDF e agrupamento
 
 **Problema atual**
 

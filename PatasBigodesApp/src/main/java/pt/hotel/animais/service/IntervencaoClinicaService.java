@@ -13,9 +13,12 @@ import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.repository.IntervencaoClinicaRepository;
 import pt.hotel.animais.repository.EstadiaRepository;
+import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.Authentication;
@@ -27,6 +30,7 @@ public class IntervencaoClinicaService implements IIntervencaoClinicaService {
 
     private final IntervencaoClinicaRepository intervencaoClinicaRepository;
     private final EstadiaRepository estadiaRepository;
+    private final AuditoriaOperacaoService auditoriaOperacaoService;
 
     @Transactional
     public IntervencaoClinicaDto register(IntervencaoClinicaFormDto form, Long autorId) {
@@ -48,6 +52,14 @@ public class IntervencaoClinicaService implements IIntervencaoClinicaService {
         ic.setMedicoId(autorId);
 
         IntervencaoClinica saved = intervencaoClinicaRepository.save(ic);
+        auditoriaOperacaoService.registarSucesso(
+            autorId,
+            "INTERVENCAO_CLINICA",
+            "Intervencao",
+            saved.getId(),
+            "CREATE",
+            detalhesIntervencao(saved)
+        );
         return toDto(saved);
     }
 
@@ -108,5 +120,15 @@ public class IntervencaoClinicaService implements IIntervencaoClinicaService {
         d.setCusto(i.getCusto());
         d.setDataHora(i.getDataHora());
         return d;
+    }
+
+    private Map<String, Object> detalhesIntervencao(IntervencaoClinica intervencao) {
+        Map<String, Object> detalhes = new LinkedHashMap<>();
+        detalhes.put("estadiaId", intervencao.getEstadia() != null ? intervencao.getEstadia().getId() : null);
+        detalhes.put("medicoId", intervencao.getMedicoId());
+        detalhes.put("custo", intervencao.getCusto() != null ? intervencao.getCusto().toPlainString() : null);
+        detalhes.put("dataHora", intervencao.getDataHora() != null ? intervencao.getDataHora().toString() : null);
+        detalhes.put("descricao", intervencao.getDescricao());
+        return detalhes;
     }
 }
