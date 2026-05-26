@@ -9,6 +9,7 @@ import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.enums.EstadoReserva;
 import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.repository.ReservaRepository;
+import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -35,6 +36,8 @@ class ReservaServiceUnitTest {
     private EstadiaRepository estadiaRepository;
     @Mock
     private IPagamentoService pagamentoService;
+    @Mock
+    private AuditoriaOperacaoService auditoriaOperacaoService;
 
     @InjectMocks
     private ReservaService service;
