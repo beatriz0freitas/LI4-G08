@@ -12,6 +12,7 @@ import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.repository.IntervencaoClinicaRepository;
 import pt.hotel.animais.repository.PagamentoRepository;
 import pt.hotel.animais.repository.ServicoExtraRepository;
+import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -40,6 +41,9 @@ class PagamentoServiceTest {
 
     @Mock
     private TipoAlojamentoTarifaService tipoAlojamentoTarifaService;
+
+    @Mock
+    private AuditoriaOperacaoService auditoriaOperacaoService;
 
     @InjectMocks
     private PagamentoService pagamentoService;

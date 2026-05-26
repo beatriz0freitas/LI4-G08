@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
 import pt.hotel.animais.repository.AlojamentoRepository;
+import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,9 @@ import static org.mockito.Mockito.*;
 class LimpezaServiceTest {
     @Mock
     private AlojamentoRepository alojamentoRepository;
+
+    @Mock
+    private AuditoriaOperacaoService auditoriaOperacaoService;
 
     @InjectMocks
     private LimpezaService limpezaService;
