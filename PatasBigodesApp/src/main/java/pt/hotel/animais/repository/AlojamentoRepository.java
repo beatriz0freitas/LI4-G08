@@ -1,11 +1,12 @@
 package pt.hotel.animais.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import jakarta.persistence.LockModeType;
 import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,14 +16,30 @@ public interface AlojamentoRepository extends JpaRepository<Alojamento, Long> {
 
     List<Alojamento> findByEstadoLimpezaAndTipoOrderByIdentificacaoAsc(
         EstadoLimpeza estadoLimpeza,
-        TipoAlojamento tipo
+        String tipo
     );
 
     List<Alojamento> findAllByOrderByIdentificacaoAsc();
 
     long countByEstadoLimpeza(EstadoLimpeza estadoLimpeza);
 
-    long countByTipo(TipoAlojamento tipo);
+    long countByTipo(String tipo);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT a FROM Alojamento a WHERE a.id = :id")
+    java.util.Optional<Alojamento> findByIdForUpdate(@Param("id") Long id);
+
+    @Query("SELECT COUNT(a) FROM Alojamento a " +
+           "WHERE a.estadoLimpeza = pt.hotel.animais.model.enums.EstadoLimpeza.CONCLUIDO " +
+           "AND a.id NOT IN (" +
+           "  SELECT e.reserva.alojamento.id FROM Estadia e " +
+           "  WHERE e.estado = pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO" +
+           ")")
+    long countDisponiveisOperacionais();
+
+    @Query("SELECT COUNT(DISTINCT r.alojamento.id) FROM Reserva r " +
+           "WHERE r.estado IN (pt.hotel.animais.model.enums.EstadoReserva.ATIVA, pt.hotel.animais.model.enums.EstadoReserva.CONFIRMADA)")
+    long countAlojamentosComReservasAtivas();
     
     /**
      * Procura alojamentos disponíveis (limpos e sem conflitos de reserva) para um período específico.
@@ -31,8 +48,12 @@ public interface AlojamentoRepository extends JpaRepository<Alojamento, Long> {
            "WHERE a.estadoLimpeza = pt.hotel.animais.model.enums.EstadoLimpeza.CONCLUIDO " +
            "AND a.id NOT IN (" +
            "  SELECT r.alojamento.id FROM Reserva r " +
-           "  WHERE r.estado = pt.hotel.animais.model.enums.EstadoReserva.ATIVA " +
+           "  WHERE r.estado IN (pt.hotel.animais.model.enums.EstadoReserva.ATIVA, pt.hotel.animais.model.enums.EstadoReserva.CONFIRMADA) " +
            "  AND NOT (r.dataFim < :dataInicio OR r.dataInicio > :dataFim)" +
+           ") " +
+           "AND a.id NOT IN (" +
+           "  SELECT e.reserva.alojamento.id FROM Estadia e " +
+           "  WHERE e.estado = pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO" +
            ") " +
            "ORDER BY a.identificacao ASC")
     List<Alojamento> findAvailableForPeriod(
@@ -48,14 +69,18 @@ public interface AlojamentoRepository extends JpaRepository<Alojamento, Long> {
            "AND a.tipo = :tipo " +
            "AND a.id NOT IN (" +
            "  SELECT r.alojamento.id FROM Reserva r " +
-           "  WHERE r.estado = pt.hotel.animais.model.enums.EstadoReserva.ATIVA " +
+           "  WHERE r.estado IN (pt.hotel.animais.model.enums.EstadoReserva.ATIVA, pt.hotel.animais.model.enums.EstadoReserva.CONFIRMADA) " +
            "  AND NOT (r.dataFim < :dataInicio OR r.dataInicio > :dataFim)" +
+           ") " +
+           "AND a.id NOT IN (" +
+           "  SELECT e.reserva.alojamento.id FROM Estadia e " +
+           "  WHERE e.estado = pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO" +
            ") " +
            "ORDER BY a.identificacao ASC")
     List<Alojamento> findAvailableForPeriodAndTipo(
         @Param("dataInicio") LocalDate dataInicio,
         @Param("dataFim") LocalDate dataFim,
-        @Param("tipo") TipoAlojamento tipo
+        @Param("tipo") String tipo
     );
     
     /**
@@ -63,11 +88,16 @@ public interface AlojamentoRepository extends JpaRepository<Alojamento, Long> {
      */
     @Query("SELECT COUNT(r) FROM Reserva r " +
            "WHERE r.alojamento.id = :alojamentoId " +
-           "AND r.estado = pt.hotel.animais.model.enums.EstadoReserva.ATIVA " +
+           "AND r.estado IN (pt.hotel.animais.model.enums.EstadoReserva.ATIVA, pt.hotel.animais.model.enums.EstadoReserva.CONFIRMADA) " +
            "AND NOT (r.dataFim < :dataInicio OR r.dataInicio > :dataFim)")
     long countConflictingReservas(
         @Param("alojamentoId") Long alojamentoId,
         @Param("dataInicio") LocalDate dataInicio,
         @Param("dataFim") LocalDate dataFim
     );
+
+    @Query("SELECT COUNT(e) FROM Estadia e " +
+           "WHERE e.reserva.alojamento.id = :alojamentoId " +
+           "AND e.estado = pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO")
+    long countEstadiasAtivasPorAlojamento(@Param("alojamentoId") Long alojamentoId);
 }

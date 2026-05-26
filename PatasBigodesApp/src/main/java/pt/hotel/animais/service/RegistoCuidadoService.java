@@ -33,6 +33,10 @@ public class RegistoCuidadoService implements IRegistoCuidadoService {
             throw new IllegalArgumentException("Não é possível registar cuidado para estadia que não está em curso");
         }
 
+        if (req.getDescricao() == null || req.getDescricao().isBlank()) {
+            throw new IllegalArgumentException("Descrição do registo de cuidado é obrigatória");
+        }
+
         RegistoCuidado rc = new RegistoCuidado();
         rc.setEstadia(estadia);
         rc.setDescricao(req.getDescricao());

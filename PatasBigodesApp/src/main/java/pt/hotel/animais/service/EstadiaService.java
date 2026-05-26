@@ -4,16 +4,25 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.hotel.animais.dto.PagamentoDto;
+import pt.hotel.animais.dto.ResumoCheckInDto;
+import pt.hotel.animais.dto.ResumoCheckOutDto;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.enums.EstadoPagamento;
+import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.model.enums.MetodoPagamento;
 import pt.hotel.animais.model.enums.MomentoPagamento;
+import pt.hotel.animais.repository.AnimalRepository;
 import pt.hotel.animais.repository.EstadiaRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
+/**
+ * Serviço para gestão do ciclo de vida da estadia.
+ * Check-out é transacional (ACID): se qualquer passo falhar, tudo é revertido.
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -23,21 +32,38 @@ public class EstadiaService implements IEstadiaService {
     private final IReservaService reservaService;
     private final IPagamentoService pagamentoService;
     private final IAlojamentoService alojamentoService;
+    private final AnimalRepository animalRepository;
 
-    public Estadia abrirEstadiaPorReserva(Long reservaId) {
+    /**
+     * Abre uma estadia a partir de uma reserva ativa.
+     * Confirma a reserva, cria estadia e regista pagamento base na mesma transação.
+     */
+    public Estadia abrirEstadiaPorReserva(Long reservaId, MetodoPagamento metodoPagamento) {
+        if (metodoPagamento == null) {
+            throw new IllegalArgumentException("Método de pagamento é obrigatório no check-in");
+        }
+
         Reserva reserva = reservaService.obter(reservaId);
 
-        if (!reserva.isAtiva()) {
+        if (!reserva.podeFazerCheckIn()) {
             throw new IllegalArgumentException("Reserva não está em estado válido para check-in");
         }
+
+        Long animalId = reserva.getAnimal().getId();
+        animalRepository.findByIdForUpdate(animalId)
+            .orElseThrow(() -> new IllegalArgumentException("Animal não encontrado"));
+        estadiaRepository.findEmCursoPorAnimal(animalId).ifPresent(estadiaExistente -> {
+            throw new EstadiaExistenteException(
+                "O animal já tem uma estadia em curso. Termine a estadia atual antes de registar novo check-in."
+            );
+        });
+
+        reserva = reservaService.confirmar(reservaId);
 
         Estadia estadia = new Estadia();
         estadia.setReserva(reserva);
         estadia.setDataInicio(LocalDateTime.now());
-        estadia.setEstado(pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO);
-
-        // marcar reserva como concluída para evitar reuso
-        reservaService.concluir(reservaId);
+        estadia.setEstado(EstadoEstadia.EM_CURSO);
 
         Estadia saved = estadiaRepository.save(estadia);
 
@@ -46,7 +72,7 @@ public class EstadiaService implements IEstadiaService {
         PagamentoDto pagamentoDto = new PagamentoDto();
         pagamentoDto.setEstadiaId(saved.getId());
         pagamentoDto.setValor(valorBase);
-        pagamentoDto.setMetodoPagamento(MetodoPagamento.NAO_DEFINIDO);
+        pagamentoDto.setMetodoPagamento(metodoPagamento);
         pagamentoDto.setMomentoPagamento(MomentoPagamento.CHECK_IN);
         pagamentoDto.setEstadoPagamento(EstadoPagamento.LIQUIDADO);
 
@@ -55,41 +81,90 @@ public class EstadiaService implements IEstadiaService {
         return saved;
     }
 
-    public Estadia checkOut(Long estadiaId) {
+    /**
+    * Check-out transacional para pagamento e fecho da estadia.
+     * 
+    * Sequência obrigatória para o fecho operacional:
+     * 1. Validar que método de pagamento é real (obrigatório)
+     * 2. Definir dataFim da estadia
+     * 3. Calcular cobrança complementar
+     * 4. Registar pagamento de check-out
+    * 5. Mudar estado para TERMINADA
+    * 6. Concluir a reserva associada
+    * 7. Marcar alojamento para limpeza
+     * 
+    * Se qualquer passo falhar, a transação é revertida.
+     */
+    @Transactional
+    public Estadia checkOut(Long estadiaId, MetodoPagamento metodoPagamento) {
+        if (metodoPagamento == null) {
+            throw new IllegalArgumentException("Método de pagamento é obrigatório no check-out");
+        }
+
         Estadia estadia = estadiaRepository.findById(estadiaId)
                 .orElseThrow(() -> new IllegalArgumentException("Estadia não encontrada"));
 
-        if (estadia.getEstado() != pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO) {
+        if (estadia.getEstado() != EstadoEstadia.EM_CURSO) {
             throw new IllegalArgumentException("Estadia não está em curso");
         }
 
+        // Passo 1 + 2: Definir dataFim (validação de método já feita acima)
         estadia.setDataFim(LocalDateTime.now());
-        estadia.setEstado(pt.hotel.animais.model.enums.EstadoEstadia.TERMINADA);
 
+        // Passo 3 + 4: Calcular e registar pagamento de check-out
+        // O pagamento é registado mesmo que seja zero (para auditoria)
+        pagamentoService.registrarPagamentoCheckOut(estadiaId, metodoPagamento);
+
+        // Passo 5: Marcar como TERMINADA
+        estadia.setEstado(EstadoEstadia.TERMINADA);
         Estadia saved = estadiaRepository.save(estadia);
 
-        // Calcular extras e registar pagamento de check-out (se aplicável)
-        try {
-            java.math.BigDecimal extras = pagamentoService.calcularExtras(saved);
-            if (extras != null && extras.compareTo(java.math.BigDecimal.ZERO) > 0) {
-                pagamentoService.registrarPagamentoCheckOut(saved.getId(), extras, MetodoPagamento.NAO_DEFINIDO);
-            }
-        } catch (Exception ignored) {
-            // Não falhar o check-out se o registo de pagamento falhar
+        // Passo 6: Concluir reserva associada antes da limpeza
+        var reserva = estadia.getReserva();
+        if (reserva != null) {
+            reservaService.concluir(reserva.getId());
         }
 
-        // Atualiza estado do alojamento para pendente de limpeza
-        try {
-            var reserva = saved.getReserva();
-            if (reserva != null && reserva.getAlojamento() != null) {
-                var alojamentoId = reserva.getAlojamento().getId();
-                alojamentoService.marcarPendenteLimpeza(alojamentoId);
-            }
-        } catch (Exception ignored) {
-            // Não falhar o check-out se atualização de alojamento não puder ocorrer
+        // Passo 7: A limpeza é parte da mesma transação
+        if (reserva != null && reserva.getAlojamento() != null) {
+            alojamentoService.marcarPendenteLimpeza(reserva.getAlojamento().getId());
         }
 
         return saved;
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<ResumoCheckInDto> obterResumoCheckIn(Long reservaId) {
+        if (reservaId == null) {
+            return Optional.empty();
+        }
+
+        try {
+            Reserva reserva = reservaService.obter(reservaId);
+            Estadia estadiaPrevista = new Estadia();
+            estadiaPrevista.setReserva(reserva);
+            estadiaPrevista.setDataInicio(LocalDateTime.now());
+
+            return Optional.of(new ResumoCheckInDto(
+                reserva,
+                pagamentoService.calcularValorBase(estadiaPrevista)
+            ));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<ResumoCheckOutDto> obterResumoCheckOut(Long estadiaId) {
+        if (estadiaId == null) {
+            return Optional.empty();
+        }
+
+        return estadiaRepository.findByIdComDetalhes(estadiaId)
+            .map(estadia -> new ResumoCheckOutDto(
+                estadia,
+                pagamentoService.calcularCobrancaComplementar(estadia)
+            ));
     }
 
     /**
@@ -97,6 +172,6 @@ public class EstadiaService implements IEstadiaService {
      */
     @Transactional(readOnly = true)
     public long contarEstadiasEmCurso() {
-        return estadiaRepository.countByEstado(pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO);
+        return estadiaRepository.countByEstado(EstadoEstadia.EM_CURSO);
     }
 }

@@ -8,4 +8,6 @@ import java.util.List;
 @Repository
 public interface AlteracaoEstadoSaudeRepository extends JpaRepository<AlteracaoEstadoSaude, Long> {
     List<AlteracaoEstadoSaude> findByEstadiaIdOrderByDataHoraDesc(Long estadiaId);
+
+    List<AlteracaoEstadoSaude> findByEstadiaReservaAnimalIdOrderByDataHoraDesc(Long animalId);
 }

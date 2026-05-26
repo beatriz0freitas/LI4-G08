@@ -10,6 +10,8 @@ import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.enums.EstadoEstadia;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
@@ -68,5 +70,47 @@ public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
 	long countAlojamentosOcupadosAgora();
 
 	java.util.Optional<Estadia> findByReservaId(Long reservaId);
+
+	@Query("""
+		SELECT e FROM Estadia e
+		JOIN e.reserva r
+		JOIN r.animal a
+		WHERE a.id = :animalId
+		  AND e.estado = pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO
+		""")
+	Optional<Estadia> findEmCursoPorAnimal(@Param("animalId") Long animalId);
+
+	@Query("""
+		SELECT e FROM Estadia e
+		JOIN FETCH e.reserva r
+		JOIN FETCH r.animal a
+		JOIN FETCH r.tutor t
+		JOIN FETCH r.alojamento al
+		WHERE e.id = :id
+		""")
+	Optional<Estadia> findByIdComDetalhes(@Param("id") Long id);
+
+	@Query("""
+		SELECT e FROM Estadia e
+		JOIN FETCH e.reserva r
+		JOIN FETCH r.animal a
+		JOIN FETCH r.tutor t
+		JOIN FETCH r.alojamento al
+		WHERE a.id = :animalId
+		ORDER BY
+		  CASE WHEN e.estado = pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO THEN 0 ELSE 1 END,
+		  e.dataInicio DESC
+		""")
+	List<Estadia> findByAnimalIdComDetalhes(@Param("animalId") Long animalId);
+
+	@Query("""
+		SELECT e FROM Estadia e
+		JOIN FETCH e.reserva r
+		JOIN FETCH r.animal a
+		JOIN FETCH r.alojamento al
+		WHERE e.estado = pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO
+		ORDER BY r.dataFim ASC, e.dataInicio ASC
+		""")
+	List<Estadia> findEstadiasEmCursoDashboard(Pageable pageable);
 
 }

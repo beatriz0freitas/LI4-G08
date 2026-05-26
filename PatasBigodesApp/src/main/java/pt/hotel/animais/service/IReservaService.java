@@ -1,14 +1,18 @@
 package pt.hotel.animais.service;
 
+import pt.hotel.animais.dto.ReservaDetalheFinanceiroDto;
 import pt.hotel.animais.dto.ReservaFormDto;
 import pt.hotel.animais.model.Reserva;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IReservaService {
     Reserva criar(ReservaFormDto formDto);
 
     Reserva obter(Long id);
+
+    Optional<ReservaDetalheFinanceiroDto> obterDetalheFinanceiro(Long id);
 
     List<Reserva> procurarPorTutor(Long tutorId);
 
@@ -19,6 +23,8 @@ public interface IReservaService {
     List<Reserva> procurarPorAlojamento(Long alojamentoId);
 
     Reserva cancelar(Long id);
+
+    Reserva confirmar(Long id);
 
     Reserva concluir(Long id);
 

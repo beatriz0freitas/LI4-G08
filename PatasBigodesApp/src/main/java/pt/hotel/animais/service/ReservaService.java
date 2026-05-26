@@ -3,16 +3,19 @@ package pt.hotel.animais.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pt.hotel.animais.dto.ReservaDetalheFinanceiroDto;
 import pt.hotel.animais.dto.ReservaFormDto;
 import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.Tutor;
 import pt.hotel.animais.model.enums.EstadoReserva;
+import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.repository.ReservaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Serviço para gerenciar reservas.
@@ -27,7 +30,9 @@ public class ReservaService implements IReservaService {
     private final ReservaRepository reservaRepository;
     private final ITutorService tutorService;
     private final IAnimalService animalService;
-    private final IAlojamentoService alojamentoService;
+    private final IAvailabilityDomainService availabilityDomainService;
+    private final EstadiaRepository estadiaRepository;
+    private final IPagamentoService pagamentoService;
     
     /**
      * Cria uma nova reserva com validações rigorosas.
@@ -50,9 +55,6 @@ public class ReservaService implements IReservaService {
             throw new IllegalArgumentException("O animal não pertence ao tutor especificado");
         }
         
-        // Valida que alojamento existe e está disponível
-        Alojamento alojamento = alojamentoService.obter(formDto.getAlojamentoId());
-        
         // Valida as datas
         if (formDto.getDataInicio() == null || formDto.getDataFim() == null) {
             throw new IllegalArgumentException("Datas de entrada obrigatórias");
@@ -62,7 +64,7 @@ public class ReservaService implements IReservaService {
             throw new IllegalArgumentException("Data de início deve ser anterior a data de fim");
         }
         
-        // Verifica overbooking: não há reservas ativas que se sobreponham
+        // Verifica overbooking antes do lock para devolver erro explícito de reserva sobreposta.
         long conflitos = reservaRepository.countActiveInPeriod(
             formDto.getAlojamentoId(),
             formDto.getDataInicio(),
@@ -71,21 +73,17 @@ public class ReservaService implements IReservaService {
         
         if (conflitos > 0) {
             throw new IllegalArgumentException(
-                "O alojamento já tem reservas ativas neste período. Conflito: overbooking não permitido."
+                "O alojamento já tem reservas ativas ou confirmadas neste período. Conflito: overbooking não permitido."
             );
         }
         
-        // Verifica se o alojamento está limpo, livre e adequado à espécie do animal
-        if (!alojamentoService.estaDisponivel(
+        // Valida a regra completa de disponibilidade com lock pessimista no alojamento.
+        Alojamento alojamento = availabilityDomainService.validarDisponivelParaReservaComLock(
             formDto.getAlojamentoId(),
             formDto.getDataInicio(),
             formDto.getDataFim(),
             animal.getEspecie()
-        )) {
-            throw new IllegalArgumentException(
-                "O alojamento não está disponível ou não é adequado à espécie do animal"
-            );
-        }
+        );
         
         // Cria a reserva
         Reserva reserva = new Reserva();
@@ -106,6 +104,15 @@ public class ReservaService implements IReservaService {
     public Reserva obter(Long id) {
         return reservaRepository.findWithDetalhesById(id)
             .orElseThrow(() -> new IllegalArgumentException("Reserva com ID " + id + " não encontrada"));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<ReservaDetalheFinanceiroDto> obterDetalheFinanceiro(Long id) {
+        return estadiaRepository.findByReservaId(id)
+            .map(estadia -> new ReservaDetalheFinanceiroDto(
+                estadia.getId(),
+                pagamentoService.calcularCobrancaComplementar(estadia)
+            ));
     }
     
     /**
@@ -158,17 +165,33 @@ public class ReservaService implements IReservaService {
     }
     
     /**
-     * Marca uma reserva como concluída.
+     * Confirma uma reserva ativa durante o check-in.
+     */
+    public Reserva confirmar(Long id) {
+        Reserva reserva = obter(id);
+
+        if (reserva.getEstado() != EstadoReserva.ATIVA) {
+            throw new IllegalArgumentException(
+                "Apenas reservas ativas podem ser confirmadas"
+            );
+        }
+
+        reserva.setEstado(EstadoReserva.CONFIRMADA);
+        return reservaRepository.save(reserva);
+    }
+
+    /**
+     * Marca uma reserva confirmada como concluída após check-out da estadia.
      */
     public Reserva concluir(Long id) {
         Reserva reserva = obter(id);
-        
-        if (reserva.getEstado() != EstadoReserva.ATIVA) {
+
+        if (reserva.getEstado() != EstadoReserva.CONFIRMADA) {
             throw new IllegalArgumentException(
-                "Apenas reservas ativas podem ser concluídas"
+                "Apenas reservas confirmadas podem ser concluídas após check-out"
             );
         }
-        
+
         reserva.setEstado(EstadoReserva.CONCLUIDA);
         return reservaRepository.save(reserva);
     }

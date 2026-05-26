@@ -11,10 +11,14 @@
 	<div class="content-wrapper">
 		<section class="content-header">
 			<div class="container-fluid">
-				<div class="row mb-2">
-					<div class="col-sm-6">
+				<div class="d-flex align-items-center justify-content-between mb-2">
+					<div>
 						<h1>Dashboard</h1>
+						<p class="text-muted mb-0">Visão operacional e financeira da direção</p>
 					</div>
+					<a th:href="@{/relatorios}" class="btn btn-primary">
+						<i class="fas fa-chart-bar mr-2"></i>Abrir relatórios
+					</a>
 				</div>
 			</div>
 		</section>
@@ -25,30 +29,33 @@
 					<div class="col-lg-3 col-6">
 						<div class="small-box bg-info">
 							<div class="inner">
-								<h3 th:text="${alojamentosDisponiveis}">0</h3>
-								<p>Alojamentos disponíveis</p>
+								<h3 th:text="${#numbers.formatDecimal(taxaOcupacao, 1, 2)} + '%'">0%</h3>
+								<p>Taxa de ocupação</p>
+								<small th:text="|${alojamentosOcupados}/${alojamentosTotal} alojamentos|">0/0 alojamentos</small>
 							</div>
-							<div class="icon"><i class="fas fa-house"></i></div>
+							<div class="icon"><i class="fas fa-percent"></i></div>
 						</div>
 					</div>
 
 					<div class="col-lg-3 col-6">
 						<div class="small-box bg-success">
 							<div class="inner">
-								<h3 th:text="${reservasAtivas}">0</h3>
-								<p>Reservas ativas</p>
+								<h3 th:text="${estadiasEmCurso}">0</h3>
+								<p>Estadias ativas</p>
+								<small>em curso agora</small>
 							</div>
-							<div class="icon"><i class="fas fa-calendar-check"></i></div>
+							<div class="icon"><i class="fas fa-bed"></i></div>
 						</div>
 					</div>
 
 					<div class="col-lg-3 col-6">
 						<div class="small-box bg-warning">
 							<div class="inner">
-								<h3 th:text="${estadiasEmCurso}">0</h3>
-								<p>Estadias em curso</p>
+								<h3 th:text="${faturacaoMes}">0</h3>
+								<p>Faturação (mês)</p>
+								<small>mês corrente</small>
 							</div>
-							<div class="icon"><i class="fas fa-dog"></i></div>
+							<div class="icon"><i class="fas fa-euro-sign"></i></div>
 						</div>
 					</div>
 
@@ -57,23 +64,74 @@
 							<div class="inner">
 								<h3 th:text="${pagamentosPendentes}">0</h3>
 								<p>Pagamentos pendentes</p>
+								<small>por regularizar</small>
 							</div>
-							<div class="icon"><i class="fas fa-euro-sign"></i></div>
+							<div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
 						</div>
 					</div>
 				</div>
 
 				<div class="row">
-					<div class="col-12">
+					<div class="col-lg-8">
 						<div class="card">
-							<div class="card-header">
-								<h3 class="card-title">Visão operacional e financeira</h3>
+							<div class="card-header bg-primary text-white">
+								<h3 class="card-title">Estadias em curso</h3>
+							</div>
+							<div class="card-body p-0">
+								<table class="table table-striped mb-0">
+									<thead>
+									<tr>
+										<th>Animal</th>
+										<th>Alojamento</th>
+										<th>Entrada</th>
+										<th>Saída prevista</th>
+										<th>Estado</th>
+									</tr>
+									</thead>
+									<tbody>
+									<tr th:each="estadia : ${estadiasDashboard}">
+										<td>
+											<strong th:text="${estadia.animal}">Animal</strong>
+											<div class="text-muted small" th:text="${estadia.especie}">Espécie</div>
+										</td>
+										<td th:text="${estadia.alojamento}">A-01</td>
+										<td th:text="${#temporals.format(estadia.dataEntrada, 'dd/MM/yyyy')}">01/05/2026</td>
+										<td th:text="${#temporals.format(estadia.dataSaidaPrevista, 'dd/MM/yyyy')}">05/05/2026</td>
+										<td>
+											<span th:if="${estadia.checkoutHoje}" class="badge badge-warning">CHECK-OUT HOJE</span>
+											<span th:unless="${estadia.checkoutHoje}" class="badge badge-success">EM CURSO</span>
+										</td>
+									</tr>
+									<tr th:if="${#lists.isEmpty(estadiasDashboard)}">
+										<td colspan="5" class="text-muted">Não existem estadias em curso.</td>
+									</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="card">
+							<div class="card-header bg-primary text-white">
+								<h3 class="card-title">Resumo rápido</h3>
 							</div>
 							<div class="card-body">
-								<p><strong>Faturação registada:</strong> <span th:text="${faturacaoTotal}">0</span></p>
-								<a th:href="@{/relatorios}" class="btn btn-primary">
-									<i class="fas fa-chart-bar mr-2"></i>Abrir relatórios
-								</a>
+								<div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+									<span>Faturação registada</span>
+									<strong th:text="${faturacaoTotal}">0</strong>
+								</div>
+								<div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+									<span>Alojamentos ocupados</span>
+									<strong th:text="${alojamentosOcupados}">0</strong>
+								</div>
+								<div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+									<span>Alojamentos disponíveis</span>
+									<strong th:text="${alojamentosDisponiveis}">0</strong>
+								</div>
+								<div class="d-flex justify-content-between">
+									<span>Reservas futuras</span>
+									<strong th:text="${reservasFuturas}">0</strong>
+								</div>
 							</div>
 						</div>
 					</div>

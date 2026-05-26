@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -13,7 +14,6 @@ import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Tutor;
 import pt.hotel.animais.model.enums.Especie;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.repository.AlojamentoRepository;
 import pt.hotel.animais.repository.AnimalRepository;
 import pt.hotel.animais.repository.ReservaRepository;
@@ -34,6 +34,7 @@ import static org.hamcrest.Matchers.containsString;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Transactional
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class ReservaRenderingControllerTest {
 
@@ -90,18 +91,18 @@ class ReservaRenderingControllerTest {
 
     @Test
     @WithMockUser(username = "recepcao", roles = {"FUNCIONARIO_RECEPCAO"})
-    void buscarDisponibilidadeDeveRenderizarResultadosELinkParaNovaReserva() throws Exception {
-        Alojamento alojamento = criarAlojamento("Busca-CAN-1");
+    void procurarDisponibilidadeDeveRenderizarResultadosELinkParaNovaReserva() throws Exception {
+        Alojamento alojamento = criarAlojamento("Procura-CAN-1");
         LocalDate dataInicio = LocalDate.now().plusDays(40);
         LocalDate dataFim = dataInicio.plusDays(3);
 
-        mockMvc.perform(post("/reservas/buscar-disponibilidade")
+        mockMvc.perform(post("/reservas/procurar-disponibilidade")
                 .with(csrf())
                 .param("dataInicio", dataInicio.toString())
                 .param("dataFim", dataFim.toString()))
             .andExpect(status().isOk())
             .andExpect(view().name("reservas/index"))
-            .andExpect(content().string(containsString("Busca-CAN-1")))
+            .andExpect(content().string(containsString("Procura-CAN-1")))
             .andExpect(content().string(containsString("alojamentoId=" + alojamento.getId())))
             .andExpect(content().string(containsString("dataInicio=" + dataInicio)))
             .andExpect(content().string(containsString("dataFim=" + dataFim)));
@@ -134,7 +135,7 @@ class ReservaRenderingControllerTest {
     private Alojamento criarAlojamento(String identificacao) {
         Alojamento alojamento = new Alojamento();
         alojamento.setIdentificacao(identificacao);
-        alojamento.setTipo(TipoAlojamento.CANINO);
+        alojamento.setTipo("CANINO");
         alojamento.setCapacidade(1);
         alojamento.setEstadoLimpeza(EstadoLimpeza.CONCLUIDO);
         return alojamentoRepository.save(alojamento);

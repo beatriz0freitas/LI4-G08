@@ -92,7 +92,7 @@ class RelatorioServiceTest {
         byte[] pdf = service.gerarPdf(filtro());
 
         assertThat(pdf).isNotEmpty();
-        assertThat(new String(pdf)).contains("Relatório operacional");
+        assertThat(new String(pdf)).contains("Relatorio operacional");
         assertThat(new String(pdf)).contains("2026-05-01");
     }
 
@@ -134,7 +134,8 @@ class RelatorioServiceTest {
         when(reservaRepository.countInPeriod(any(), any())).thenReturn(8L);
         when(pagamentoRepository.sumValorPorPeriodo(any(), any())).thenReturn(new BigDecimal("120.00"));
         when(pagamentoRepository.countPendentesPorPeriodo(any(), any())).thenReturn(2L);
-        when(pagamentoRepository.sumValorPorMetodo(any(), any())).thenReturn(List.of());
+        when(pagamentoRepository.sumValorPorMetodo(any(), any()))
+            .thenReturn(List.<Object[]>of(new Object[] {MetodoPagamento.NUMERARIO, new BigDecimal("50.00")}));
         when(servicoExtraRepository.sumCustoPorPeriodo(any(), any())).thenReturn(new BigDecimal("25.00"));
     }
 

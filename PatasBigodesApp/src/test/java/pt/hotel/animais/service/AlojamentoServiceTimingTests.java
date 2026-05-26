@@ -7,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.repository.AlojamentoRepository;
 
 import java.util.stream.IntStream;
@@ -29,7 +28,7 @@ public class AlojamentoServiceTimingTests {
         IntStream.rangeClosed(1, 100).forEach(i -> {
             Alojamento a = new Alojamento();
             a.setIdentificacao("B-" + i);
-            a.setTipo(TipoAlojamento.CANINO);
+            a.setTipo("CANINO");
             a.setCapacidade(1);
             a.setEstadoLimpeza(EstadoLimpeza.CONCLUIDO);
             alojamentoRepository.save(a);

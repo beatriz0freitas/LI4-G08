@@ -12,7 +12,6 @@ import pt.hotel.animais.model.Tutor;
 import pt.hotel.animais.model.enums.Especie;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
 import pt.hotel.animais.model.enums.EstadoReserva;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.repository.ReservaRepository;
 
 import java.math.BigDecimal;
@@ -39,14 +38,14 @@ class ReservaServiceCancelTest {
     private IAnimalService animalService;
 
     @Mock
-    private IAlojamentoService alojamentoService;
+    private IAvailabilityDomainService availabilityDomainService;
 
     @InjectMocks
     private ReservaService reservaService;
 
     @Test
     void cancelarDeveMarcarReservaComoCancelada() {
-        assertThat(alojamentoService).isNotNull();
+        assertThat(availabilityDomainService).isNotNull();
         assertThat(tutorService).isNotNull();
         assertThat(animalService).isNotNull();
 
@@ -62,7 +61,7 @@ class ReservaServiceCancelTest {
 
     @Test
     void cancelarDeveRejeitarReservaJaCancelada() {
-        assertThat(alojamentoService).isNotNull();
+        assertThat(availabilityDomainService).isNotNull();
         assertThat(tutorService).isNotNull();
         assertThat(animalService).isNotNull();
 
@@ -70,6 +69,18 @@ class ReservaServiceCancelTest {
         when(reservaRepository.findWithDetalhesById(11L)).thenReturn(Optional.of(reserva));
 
         assertThatThrownBy(() -> reservaService.cancelar(11L))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("não pode ser cancelada");
+
+        verify(reservaRepository, never()).save(any());
+    }
+
+    @Test
+    void cancelarDeveRejeitarReservaConfirmada() {
+        Reserva reserva = criarReserva(12L, EstadoReserva.CONFIRMADA);
+        when(reservaRepository.findWithDetalhesById(12L)).thenReturn(Optional.of(reserva));
+
+        assertThatThrownBy(() -> reservaService.cancelar(12L))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("não pode ser cancelada");
 
@@ -93,7 +104,7 @@ class ReservaServiceCancelTest {
         animal.setDataNascimento(LocalDate.now().minusYears(2));
         animal.setPeso(new BigDecimal("10.0"));
 
-        Alojamento alojamento = new Alojamento(3L, "Box Cancel", TipoAlojamento.CANINO, 1, EstadoLimpeza.CONCLUIDO, null);
+        Alojamento alojamento = new Alojamento(3L, "Box Cancel", "CANINO", 1, EstadoLimpeza.CONCLUIDO, null);
 
         Reserva reserva = new Reserva();
         reserva.setId(id);

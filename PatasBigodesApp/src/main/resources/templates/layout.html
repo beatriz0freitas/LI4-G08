@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="pt">
-<head th:insert="fragments/head :: head"></head>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt" th:fragment="page(title)">
+<head th:insert="~{fragments/head :: head}"></head>
 <body class="hold-transition dark-mode sidebar-mini layout-fixed">
 	<div class="wrapper">
 		<!-- Main Header -->
-		<th:block th:insert="fragments/navbar :: navbar"></th:block>
+		<th:block th:insert="~{fragments/navbar :: navbar}"></th:block>
 
 		<!-- Left Sidebar -->
-		<th:block th:insert="fragments/sidebar :: sidebar"></th:block>
+		<th:block th:insert="~{fragments/sidebar :: sidebar}"></th:block>
 
 		<!-- Content Wrapper -->
 		<div class="content-wrapper">
@@ -16,7 +16,7 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1 class="m-0" th:text="${pageTitle != null ? pageTitle : 'Página'}">Título</h1>
+							<h1 class="m-0" th:text="${pageTitle != null ? pageTitle : (title != null ? title : 'Página')}">Título</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
@@ -31,14 +31,13 @@
 			<!-- Main content -->
 			<section class="content">
 				<div class="container-fluid">
-					<!-- Page Content (to be replaced by specific page) -->
-					<th:block th:include="this :: body-content"></th:block>
+					<th:block th:replace="~{::content}"></th:block>
 				</div>
 			</section>
 		</div>
 
 		<!-- Footer -->
-		<th:block th:insert="fragments/footer :: footer"></th:block>
+		<th:block th:insert="~{fragments/footer :: footer}"></th:block>
 	</div>
 
 	<!-- AdminLTE JS -->

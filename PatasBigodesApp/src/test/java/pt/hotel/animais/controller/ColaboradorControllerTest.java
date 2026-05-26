@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -35,12 +36,20 @@ class ColaboradorControllerTest {
     @Test
     @WithMockUser(roles = "DIRETOR")
     void listarDeveRenderizarColaboradores() throws Exception {
-        when(colaboradorService.listarTodos()).thenReturn(List.of(new Colaborador()));
+        Colaborador colaborador = new Colaborador();
+        colaborador.setNome("Ana Limpeza");
+        colaborador.setUsername("ana.limpeza");
+        colaborador.setEmail("ana@hotel.local");
+        colaborador.setTipoColaborador(TipoColaborador.RESPONSAVEL_LIMPEZA);
+        colaborador.setAtivo(true);
+        when(colaboradorService.listarTodos()).thenReturn(List.of(colaborador));
 
         mockMvc.perform(get("/colaboradores"))
             .andExpect(status().isOk())
             .andExpect(view().name("colaboradores/list"))
-            .andExpect(model().attributeExists("colaboradores"));
+            .andExpect(model().attributeExists("colaboradores"))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Responsável Limpeza")))
+            .andExpect(content().string(org.hamcrest.Matchers.not(org.hamcrest.Matchers.containsString("RESPONSAVEL_LIMPEZA"))));
     }
 
     @Test

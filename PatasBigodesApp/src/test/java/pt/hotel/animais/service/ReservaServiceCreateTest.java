@@ -13,7 +13,6 @@ import pt.hotel.animais.model.Tutor;
 import pt.hotel.animais.model.enums.Especie;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
 import pt.hotel.animais.model.enums.EstadoReserva;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.repository.ReservaRepository;
 
 import java.lang.reflect.Field;
@@ -40,7 +39,7 @@ class ReservaServiceCreateTest {
     private IAnimalService animalService;
 
     @Mock
-    private IAlojamentoService alojamentoService;
+    private IAvailabilityDomainService availabilityDomainService;
 
     @InjectMocks
     private ReservaService reservaService;
@@ -54,9 +53,13 @@ class ReservaServiceCreateTest {
 
         when(tutorService.obter(1L)).thenReturn(tutor);
         when(animalService.obter(2L)).thenReturn(animal);
-        when(alojamentoService.obter(3L)).thenReturn(alojamento);
         when(reservaRepository.countActiveInPeriod(3L, form.getDataInicio(), form.getDataFim())).thenReturn(0L);
-        when(alojamentoService.estaDisponivel(3L, form.getDataInicio(), form.getDataFim(), Especie.CAO)).thenReturn(true);
+        when(availabilityDomainService.validarDisponivelParaReservaComLock(
+            3L,
+            form.getDataInicio(),
+            form.getDataFim(),
+            Especie.CAO
+        )).thenReturn(alojamento);
         when(reservaRepository.save(any(Reserva.class))).thenAnswer(invocation -> {
             Reserva reserva = invocation.getArgument(0);
             reserva.setId(99L);
@@ -128,7 +131,7 @@ class ReservaServiceCreateTest {
         Alojamento alojamento = new Alojamento();
         definirCampo(alojamento, "id", id);
         definirCampo(alojamento, "identificacao", "Box " + id);
-        definirCampo(alojamento, "tipo", TipoAlojamento.CANINO);
+        definirCampo(alojamento, "tipo", "CANINO");
         definirCampo(alojamento, "capacidade", 2);
         definirCampo(alojamento, "estadoLimpeza", EstadoLimpeza.CONCLUIDO);
         return alojamento;

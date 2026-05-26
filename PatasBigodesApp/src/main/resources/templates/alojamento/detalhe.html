@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt">
+<head th:insert="fragments/head :: head"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+	<div class="wrapper">
+		<th:block th:insert="fragments/navbar :: navbar"></th:block>
+		<th:block th:insert="fragments/sidebar :: sidebar"></th:block>
+
+		<div class="content-wrapper">
+			<div class="content-header">
+				<div class="container-fluid">
+					<div class="row mb-2 align-items-center">
+						<div class="col-sm-6">
+							<h1 class="m-0">Detalhe do Alojamento</h1>
+						</div>
+						<div class="col-sm-6">
+							<ol class="breadcrumb float-sm-right">
+								<li class="breadcrumb-item"><a th:href="@{/}">Início</a></li>
+								<li class="breadcrumb-item"><a th:href="@{/alojamentos}">Alojamentos</a></li>
+								<li class="breadcrumb-item active" th:text="${alojamento.identificacao}">Alojamento</li>
+							</ol>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<section class="content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-lg-8">
+							<div class="card">
+								<div class="card-header bg-info">
+									<h3 class="card-title">
+										<i class="fas fa-cube mr-2"></i>
+										<span th:text="${alojamento.identificacao}">Alojamento</span>
+									</h3>
+								</div>
+								<div class="card-body">
+									<dl class="row mb-0">
+										<dt class="col-sm-4">Identificação</dt>
+										<dd class="col-sm-8" th:text="${alojamento.identificacao}">Alojamento</dd>
+
+										<dt class="col-sm-4">Tipo</dt>
+										<dd class="col-sm-8" th:text="${alojamento.tipo != null ? alojamento.tipo.label : 'Por definir'}">Tipo</dd>
+
+										<dt class="col-sm-4">Capacidade</dt>
+										<dd class="col-sm-8" th:text="${alojamento.capacidade != null ? alojamento.capacidade + ' lugar(es)' : 'Por definir'}">Capacidade</dd>
+
+										<dt class="col-sm-4">Estado de limpeza</dt>
+										<dd class="col-sm-8">
+											<span th:if="${alojamento.estadoLimpeza != null and alojamento.estadoLimpeza.toString() == 'CONCLUIDO'}" class="badge badge-success">
+												<i class="fas fa-check-circle mr-1"></i>Limpo
+											</span>
+											<span th:if="${alojamento.estadoLimpeza != null and alojamento.estadoLimpeza.toString() == 'PENDENTE'}" class="badge badge-warning">
+												<i class="fas fa-clock mr-1"></i>Pendente Limpeza
+											</span>
+											<span th:if="${alojamento.estadoLimpeza == null}" class="text-muted">Por definir</span>
+										</dd>
+									</dl>
+								</div>
+							</div>
+						</div>
+
+						<div class="col-lg-4">
+							<div class="card">
+								<div class="card-header">
+									<h3 class="card-title">Ações</h3>
+								</div>
+								<div class="card-body">
+									<a th:href="@{/alojamentos}" class="btn btn-secondary btn-block">
+										<i class="fas fa-arrow-left mr-2"></i>Voltar à lista
+									</a>
+									<a th:href="@{/reservas/disponibilidade}" class="btn btn-primary btn-block">
+										<i class="fas fa-calendar-check mr-2"></i>Consultar disponibilidade
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<th:block th:insert="fragments/footer :: footer"></th:block>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+</html>

@@ -14,6 +14,12 @@ import java.util.List;
 public interface ServicoExtraRepository extends JpaRepository<ServicoExtra, Long> {
     List<ServicoExtra> findByEstadiaId(Long estadiaId);
 
+    /**
+     * Soma de custos de serviços extra para uma estadia.
+     */
+    @Query("SELECT COALESCE(SUM(s.custo), 0) FROM ServicoExtra s WHERE s.estadia.id = :estadiaId")
+    BigDecimal sumCustoByEstadiaId(@Param("estadiaId") Long estadiaId);
+
     @Query("""
         SELECT COALESCE(SUM(s.custo), 0)
         FROM ServicoExtra s

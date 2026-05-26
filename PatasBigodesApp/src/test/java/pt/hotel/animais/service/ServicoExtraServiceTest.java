@@ -11,6 +11,7 @@ import pt.hotel.animais.dto.ServicoExtraDto;
 import pt.hotel.animais.dto.ServicoExtraFormDto;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.ServicoExtra;
+import pt.hotel.animais.model.TipoServicoExtra;
 import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.repository.ServicoExtraRepository;
@@ -37,6 +38,9 @@ class ServicoExtraServiceTest {
     @Mock
     private IPagamentoService pagamentoService;
 
+    @Mock
+    private TipoServicoExtraService tipoServicoExtraService;
+
     @InjectMocks
     private ServicoExtraService service;
 
@@ -45,14 +49,23 @@ class ServicoExtraServiceTest {
         Estadia estadia = criarEstadia(1L, EstadoEstadia.EM_CURSO);
         ServicoExtraFormDto form = criarForm(1L, "Banho", new BigDecimal("15.00"));
 
+        TipoServicoExtra tipoServico = new TipoServicoExtra("Banho", "Banho do animal");
+        try {
+            var tipoIdField = tipoServico.getClass().getDeclaredField("id");
+            tipoIdField.setAccessible(true);
+            tipoIdField.set(tipoServico, 200L);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        tipoServico.setAtivo(true);
+
         when(estadiaRepository.findById(1L)).thenReturn(Optional.of(estadia));
+        when(tipoServicoExtraService.obterPorNome("Banho")).thenReturn(Optional.of(tipoServico));
         when(servicoExtraRepository.save(any(ServicoExtra.class))).thenAnswer(inv -> {
             ServicoExtra se = inv.getArgument(0);
             se.setId(5L);
             return se;
         });
-        when(pagamentoService.calcularExtras(estadia)).thenReturn(BigDecimal.ZERO);
-
         ServicoExtraDto resultado = service.register(form, 2L);
 
         assertThat(resultado.getId()).isEqualTo(5L);
@@ -77,6 +90,20 @@ class ServicoExtraServiceTest {
     }
 
     @Test
+    void registerDeveRejeitarCustoNegativo() {
+        Estadia estadia = criarEstadia(1L, EstadoEstadia.EM_CURSO);
+        ServicoExtraFormDto form = criarForm(1L, "Passeio", new BigDecimal("-1.00"));
+
+        when(estadiaRepository.findById(1L)).thenReturn(Optional.of(estadia));
+
+        assertThatThrownBy(() -> service.register(form, 1L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("não pode ser negativo");
+
+        verify(servicoExtraRepository, never()).save(any());
+    }
+
+    @Test
     void registerDeveLancarExcecaoSeEstadiaNaoExistir() {
         ServicoExtraFormDto form = criarForm(99L, "Tosa", new BigDecimal("20.00"));
         when(estadiaRepository.findById(99L)).thenReturn(Optional.empty());
@@ -93,14 +120,23 @@ class ServicoExtraServiceTest {
         Estadia estadia = criarEstadia(1L, EstadoEstadia.EM_CURSO);
         ServicoExtraFormDto form = criarForm(1L, "Consulta", new BigDecimal("30.00"));
 
+        TipoServicoExtra tipoServico = new TipoServicoExtra("Consulta", "Consulta veterinária");
+        try {
+            var tipoIdField = tipoServico.getClass().getDeclaredField("id");
+            tipoIdField.setAccessible(true);
+            tipoIdField.set(tipoServico, 201L);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        tipoServico.setAtivo(true);
+
         when(estadiaRepository.findById(1L)).thenReturn(Optional.of(estadia));
+        when(tipoServicoExtraService.obterPorNome("Consulta")).thenReturn(Optional.of(tipoServico));
         when(servicoExtraRepository.save(any(ServicoExtra.class))).thenAnswer(inv -> {
             ServicoExtra se = inv.getArgument(0);
             se.setId(6L);
             return se;
         });
-        when(pagamentoService.calcularExtras(estadia)).thenThrow(new RuntimeException("erro simulado"));
-
         ServicoExtraDto resultado = service.register(form, 1L);
 
         assertThat(resultado.getId()).isEqualTo(6L);
@@ -148,7 +184,17 @@ class ServicoExtraServiceTest {
         ServicoExtra se = new ServicoExtra();
         se.setId(id);
         se.setEstadia(estadia);
-        se.setTipo("Tipo " + id);
+        
+        TipoServicoExtra tipo = new TipoServicoExtra("Tipo " + id, "Descrição");
+        try {
+            var tipoIdField = tipo.getClass().getDeclaredField("id");
+            tipoIdField.setAccessible(true);
+            tipoIdField.set(tipo, id * 100L);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        
+        se.setTipoServicoExtra(tipo);
         se.setCusto(new BigDecimal("10.00"));
         se.setDataHora(LocalDateTime.now());
         return se;

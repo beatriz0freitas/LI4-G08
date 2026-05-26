@@ -5,20 +5,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import pt.hotel.animais.config.SecurityConfig;
 import pt.hotel.animais.dto.AlteracaoEstadoSaudeDto;
+import pt.hotel.animais.dto.FichaClinicaDto;
 import pt.hotel.animais.dto.IntervencaoClinicaDto;
-import pt.hotel.animais.model.enums.TipoServicoExtra;
+import pt.hotel.animais.model.Animal;
+import pt.hotel.animais.model.Tutor;
+import pt.hotel.animais.model.enums.Especie;
+import pt.hotel.animais.model.enums.EstadoSaude;
 import pt.hotel.animais.service.IAlteracaoEstadoSaudeService;
+import pt.hotel.animais.service.IClinicaService;
 import pt.hotel.animais.service.IIntervencaoClinicaService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -44,12 +49,28 @@ class ClinicaControllerTest {
     @MockBean
     private IAlteracaoEstadoSaudeService alteracaoEstadoSaudeService;
 
+    @MockBean
+    private IClinicaService clinicaService;
+
     @Test
     @WithMockUser(roles = {"MEDICO_VETERINARIO"})
     void indexDeveRenderizarPaginaDaClinica() throws Exception {
+        when(clinicaService.listarAnimais()).thenReturn(List.of());
+
         mvc.perform(get("/clinica"))
             .andExpect(status().isOk())
             .andExpect(view().name("clinica/index"));
+    }
+
+    @Test
+    @WithMockUser(roles = {"MEDICO_VETERINARIO"})
+    void detalheAnimalDeveRenderizarFichaClinica() throws Exception {
+        Animal animal = animal(7L);
+        when(clinicaService.obterFichaAnimal(7L)).thenReturn(new FichaClinicaDto(animal, null, List.of()));
+
+        mvc.perform(get("/clinica/animais/7"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("clinica/detalhe"));
     }
 
     @Test
@@ -62,7 +83,8 @@ class ClinicaControllerTest {
         dto.setCusto(new BigDecimal("20.00"));
         dto.setDataHora(LocalDateTime.now());
 
-        when(intervencaoClinicaService.register(any())).thenReturn(dto);
+        when(intervencaoClinicaService.register(any(), eq(9L))).thenReturn(dto);
+        when(clinicaService.obterAnimalIdPorEstadia(1L)).thenReturn(Optional.of(7L));
 
         mvc.perform(post("/clinica/intervencoes/create")
                 .with(csrf())
@@ -71,9 +93,9 @@ class ClinicaControllerTest {
                 .param("custo", "20.00")
                 .param("dataHora", LocalDateTime.now().toString()))
             .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("/clinica/intervencoes?estadiaId=1"));
+            .andExpect(redirectedUrl("/clinica/animais/7"));
 
-        verify(intervencaoClinicaService).register(any());
+        verify(intervencaoClinicaService).register(any(), eq(9L));
     }
 
     @Test
@@ -87,6 +109,7 @@ class ClinicaControllerTest {
         dto.setDataHora(LocalDateTime.now());
 
         when(alteracaoEstadoSaudeService.register(any())).thenReturn(dto);
+        when(clinicaService.obterAnimalIdPorEstadia(1L)).thenReturn(Optional.of(7L));
 
         mvc.perform(post("/clinica/alteracoes/create")
                 .with(csrf())
@@ -95,8 +118,24 @@ class ClinicaControllerTest {
                 .param("severidade", "BAIXA")
                 .param("dataHora", LocalDateTime.now().toString()))
             .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("/clinica/alteracoes?estadiaId=1"));
+            .andExpect(redirectedUrl("/clinica/animais/7"));
 
         verify(alteracaoEstadoSaudeService).register(any());
+    }
+
+    private Animal animal(Long id) {
+        Tutor tutor = new Tutor();
+        tutor.setId(3L);
+        tutor.setNome("Ana Silva");
+        Animal animal = new Animal();
+        animal.setId(id);
+        animal.setTutor(tutor);
+        animal.setNome("Simba");
+        animal.setEspecie(Especie.CAO);
+        animal.setRaca("Labrador");
+        animal.setDataNascimento(LocalDate.of(2021, 1, 1));
+        animal.setPeso(new BigDecimal("32.00"));
+        animal.setEstadoSaude(EstadoSaude.NORMAL);
+        return animal;
     }
 }

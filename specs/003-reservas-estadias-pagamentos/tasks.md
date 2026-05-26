@@ -10,7 +10,7 @@
 
 ## Mapeamento de User Stories
 
-- US1 -> US-06 (Criar, confirmar e gerir reservas)
+- US1 -> US-06 (Criar e gerir reservas)
 - US2 -> US-12 (Consultar disponibilidade)
 - US3 -> US-07 (Registar check-in/check-out)
 - US4 -> US-10 (Pagamento da estadia no check-in)
@@ -39,6 +39,10 @@
 - [x] T006 [P] Criar/atualizar enums de domínio em `PatasBigodesApp/src/main/java/pt/hotel/animais/model/enums/`
 - [x] T007 Criar entidade `Estadia` em `PatasBigodesApp/src/main/java/pt/hotel/animais/model/Estadia.java`
 - [x] T008 Criar entidade `Pagamento` em `PatasBigodesApp/src/main/java/pt/hotel/animais/model/Pagamento.java`
+- [x] T005A Criar migration de schema para catálogos LAC-03 em `PatasBigodesApp/src/main/resources/db/migration/V8__create_tipos_alojamento_servicos_extra.sql`
+- [x] T005B Criar migration de seed para tipos de alojamento e serviços extra em `PatasBigodesApp/src/main/resources/db/migration/V9__seed_tipos_alojamento_servicos_extra.sql`
+- [x] T008A Criar entidade `TipoAlojamentoTarifa` em `PatasBigodesApp/src/main/java/pt/hotel/animais/model/TipoAlojamentoTarifa.java`
+- [x] T008B Criar entidade `TipoServicoExtra` em `PatasBigodesApp/src/main/java/pt/hotel/animais/model/TipoServicoExtra.java`
 - [x] T009 [P] Criar `EstadiaRepository` em `PatasBigodesApp/src/main/java/pt/hotel/animais/repository/EstadiaRepository.java`
 - [x] T010 [P] Criar `PagamentoRepository` em `PatasBigodesApp/src/main/java/pt/hotel/animais/repository/PagamentoRepository.java`
 - [x] T011 Implementar validações de invariantes RD no serviço base em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IRegraDominioService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/RegraDominioService.java`
@@ -60,15 +64,15 @@
 - [x] T014 [P] [US1] Criar teste de serviço para cancelamento e não-reativação em `PatasBigodesApp/src/test/java/pt/hotel/animais/service/ReservaServiceCancelTest.java`
 - [x] T015 [P] [US1] Criar teste de integração do contrato `POST /reservas` em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/ReservaCreateIntegrationTest.java`
 - [x] T016 [P] [US1] Criar teste de integração do contrato `POST /reservas/{id}/cancelar` em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/ReservaCancelIntegrationTest.java`
-- [x] T061 [P] [US1] Criar teste de integração do contrato `POST /reservas/{id}/confirmar` em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/ReservaConfirmIntegrationTest.java`
+- [x] T061 [P] [US1] Criar teste de integração que garante que `POST /reservas/{id}/confirmar` não altera estado, porque a confirmação ocorre apenas no check-in, em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/ReservaConfirmIntegrationTest.java`
 
 ### Implementation for User Story 1
 
 - [x] T017 [US1] Implementar validação de criação de reserva (RF-07, RD-01) em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IReservaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ReservaService.java`
-- [x] T062 [US1] Implementar confirmação explícita de reserva (RF-07) em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IReservaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ReservaService.java`
+- [x] T062 [US1] Implementar confirmação de reserva apenas no fluxo de check-in (RF-07/RD-02) em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IReservaService.java`, `ReservaService.java` e `EstadiaService.java`
 - [x] T018 [US1] Implementar cancelamento de reserva sem reativação (RD-06) em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IReservaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ReservaService.java`
 - [x] T019 [US1] Implementar endpoint `POST /reservas` em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`
-- [x] T063 [US1] Implementar endpoint `POST /reservas/{id}/confirmar` em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`
+- [x] T063 [US1] Bloquear confirmação administrativa via `POST /reservas/{id}/confirmar`, redirecionando para o detalhe sem alterar estado, em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`
 - [x] T020 [US1] Implementar endpoint `POST /reservas/{id}/cancelar` em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`
 - [x] T021 [US1] Implementar formulário e feedback de criação/cancelamento em `PatasBigodesApp/src/main/resources/templates/reservas/form.html`
 
@@ -107,12 +111,13 @@
 
 - [x] T027 [P] [US3] Criar teste de serviço para check-in condicionado a reserva em `PatasBigodesApp/src/test/java/pt/hotel/animais/service/CheckInServiceTest.java`
 - [x] T028 [P] [US3] Criar teste de serviço para bloqueio de check-out sem check-in em `PatasBigodesApp/src/test/java/pt/hotel/animais/service/CheckOutSequenceServiceTest.java`
+- [x] T028A [P] [US3] Criar teste de serviço para bloquear check-in duplicado quando o animal já tem estadia `EM_CURSO` em `PatasBigodesApp/src/test/java/pt/hotel/animais/service/EstadiaServiceTest.java`
 - [x] T029 [P] [US3] Criar teste de integração do contrato `POST /estadias/check-in` em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/CheckInIntegrationTest.java`
 - [x] T030 [P] [US3] Criar teste de integração do contrato `POST /estadias/{id}/check-out` em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/CheckOutIntegrationTest.java`
 
 ### Implementation for User Story 3
 
-- [x] T031 [US3] Implementar fluxo de check-in e criação de estadia em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
+- [x] T031 [US3] Implementar fluxo de check-in e criação de estadia, incluindo bloqueio de dupla estadia ativa por animal (RD-07), em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java`, `EstadiaService.java`, `AnimalRepository.java` e `EstadiaRepository.java`
 - [x] T032 [US3] Implementar fluxo de check-out e fecho de estadia em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
 - [x] T033 [US3] Implementar transições de estado do alojamento em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IAlojamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/AlojamentoService.java`
 - [x] T034 [US3] Implementar endpoints de check-in/check-out em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/EstadiaController.java`
@@ -138,6 +143,9 @@
 - [x] T038 [US4] Implementar cálculo de pagamento base em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
 - [x] T039 [US4] Implementar persistência de pagamento `CHECK_IN` em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
 - [x] T040 [US4] Integrar pagamento de check-in no fluxo de check-in em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
+- [x] T040A [US4] Substituir tarifa fixa por consulta a `TipoAlojamentoTarifaService` no cálculo de pagamento base.
+- [x] T040B [US4] Atualizar interface de check-in para recolher método de pagamento obrigatório.
+- [x] T040C [US4] Remover método de pagamento por defeito no controller e testar rejeição de check-in sem método.
 
 **Checkpoint**: US4 funcional e testável de forma independente.
 
@@ -156,15 +164,20 @@
 
 ### Implementation for User Story 5
 
-- [ ] T043 [US5] Implementar cálculo de faturação complementar no check-out em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
-- [ ] T044 [US5] Implementar persistência de pagamento `CHECK_OUT` em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
-- [ ] T045 [US5] Integrar cobrança complementar no fecho de estadia em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
-
-### Implementation status update
-
-- [x] T043 [US5] Implementar cálculo de faturação complementar no check-out em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java` (placeholder: 0.00)
+- [x] T043 [US5] Implementar cálculo de faturação complementar no check-out em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`, agregando serviços extra, intervenções clínicas e dias adicionais.
 - [x] T044 [US5] Implementar persistência de pagamento `CHECK_OUT` em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
 - [x] T045 [US5] Integrar cobrança complementar no fecho de estadia em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
+- [x] T045A [US5] Atualizar interface de check-out para recolher método de pagamento obrigatório.
+- [x] T045B [US5] Atualizar testes de controller/service para a assinatura com método de pagamento.
+
+### Gestão administrativa 
+
+- [x] T070 [P] Criar repositório e serviço para tarifas de tipo de alojamento em `TipoAlojamentoTarifaRepository` e `TipoAlojamentoTarifaService`.
+- [x] T071 [P] Criar repositório e serviço para catálogo de tipos de serviços extra em `TipoServicoExtraRepository` e `TipoServicoExtraService`.
+- [x] T072 Criar controller e templates de gestão de tipos de alojamento/tarifas em `TipoAlojamentoTarifaController` e `templates/admin/tarifas/`.
+- [x] T073 Criar controller e templates de gestão de serviços extra em `TipoServicoExtraController` e `templates/admin/tipos-servicos-extra/`.
+- [x] T074 Remover dependência do enum `TipoAlojamento` no domínio aplicacional e representar o tipo como valor configurável.
+- [x] T075 [P] [US4] Criar testes unitários para regras do catálogo `TipoAlojamentoTarifaService`.
 
 **Checkpoint**: US5 funcional e testável de forma independente.
 
@@ -234,7 +247,7 @@
 - [x] T059 Executar suite completa de testes da feature em `PatasBigodesApp/src/test/java/pt/hotel/animais/` (41/41 testes passaram com BUILD SUCCESS)
 - [ ] T060 Consolidar correções finais de performance e logs em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/`
 - [ ] T064 [P] Implementar eventos de auditoria para operações críticas em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/`
-- [ ] T065 [P] Criar testes de auditoria para criar/confirmar/cancelar reserva em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/ReservaAuditIntegrationTest.java`
+- [ ] T065 [P] Criar testes de auditoria para criar/cancelar reserva e confirmar no check-in em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/ReservaAuditIntegrationTest.java`
 - [ ] T066 [P] Criar testes de auditoria para check-in/check-out/pagamentos em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/OperacaoAuditIntegrationTest.java`
 - [ ] T067 [P] Criar testes de autorização por perfil em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/AuthorizationIntegrationTest.java`
 - [ ] T068 [P] Criar testes de confidencialidade de dados em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/ConfidencialidadeIntegrationTest.java`

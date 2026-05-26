@@ -2,6 +2,11 @@
 <html lang="pt" xmlns:th="http://www.thymeleaf.org">
 <head>
 	<th:block th:replace="fragments/head :: head"></th:block>
+	<style>
+		.limpeza-table tbody tr:hover {
+			background-color: #fff3cd;
+		}
+	</style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -13,7 +18,7 @@
 			<div class="container-fluid">
 				<div class="row mb-2">
 					<div class="col-sm-6">
-						<h1>Limpeza de Alojamentos</h1>
+						<h1>Alojamentos pendentes de Limpeza</h1>
 					</div>
 				</div>
 			</div>
@@ -24,22 +29,29 @@
 				<div class="alert alert-success" th:if="${msgSucesso}" th:text="${msgSucesso}"></div>
 				<div class="alert alert-danger" th:if="${msgErro}" th:text="${msgErro}"></div>
 
+				<div class="callout callout-warning">
+					<i class="fas fa-exclamation-triangle mr-2"></i>
+					<strong th:text="${(totalPendentesLimpeza != null ? totalPendentesLimpeza : 0) + ' alojamentos pendentes de limpeza'}">0 alojamentos pendentes de limpeza</strong>
+				</div>
+
 				<div class="card">
-					<div class="card-header">
-						<h3 class="card-title">Alojamentos pendentes</h3>
+					<div class="card-header bg-warning">
+						<h3 class="card-title">Alojamentos pendentes de Limpeza</h3>
 					</div>
 					<div class="card-body table-responsive p-0">
-						<table class="table table-hover text-nowrap mb-0">
+						<table class="table limpeza-table text-nowrap mb-0">
 							<thead>
 							<tr>
-								<th>Identificação</th>
+								<th>Alojamento</th>
+								<th>Tipo</th>
 								<th>Estado de Limpeza</th>
 								<th>Ação</th>
 							</tr>
 							</thead>
 							<tbody>
 							<tr th:each="alojamento : ${alojamentosPendentes}">
-								<td th:text="${alojamento.identificacao}">01</td>
+								<td><strong th:text="${alojamento.identificacao}">01</strong></td>
+								<td th:text="${alojamento.tipo}">CANINO</td>
 								<td>
 									<span class="badge badge-warning" th:text="${alojamento.estadoLimpeza}">PENDENTE</span>
 								</td>
@@ -53,7 +65,7 @@
 								</td>
 							</tr>
 							<tr th:if="${#lists.isEmpty(alojamentosPendentes)}">
-								<td colspan="3" class="text-center text-muted py-4">Não existem alojamentos pendentes de limpeza.</td>
+								<td colspan="4" class="text-center text-muted py-4">Não existem alojamentos pendentes de limpeza.</td>
 							</tr>
 							</tbody>
 						</table>

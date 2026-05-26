@@ -101,7 +101,7 @@ Como funcionário de receção, quero consultar o histórico de cada animal, par
 - **RF-04**: O sistema DEVE permitir o registo de animais com dados obrigatórios: nome, espécie (Cão ou Gato), raça, data de nascimento, peso, estado de saúde atual, necessidades alimentares e medicação em curso.
 - **RF-04**: O sistema DEVE garantir que cada animal está associado a pelo menos um tutor no momento do registo (relação obrigatória).
 - **RF-04**: O sistema DEVE permitir a consulta de dados de tutores e animais por utilizadores autorizados (receção, diretor, médico veterinário).
-- **RF-06**: O sistema DEVE determinar a disponibilidade de cada box em tempo real com base em três condições cumulativas: (1) inexistência de reserva confirmada para o período; (2) inexistência de estadia ativa no período; (3) estado de limpeza registado como "CONCLUÍDO".
+- **RF-06**: O sistema DEVE determinar a disponibilidade de cada box em tempo real com base em três condições cumulativas: (1) inexistência de reserva ativa ou confirmada para o período; (2) inexistência de estadia ativa no período; (3) estado de limpeza registado como "CONCLUÍDO".
 - **RF-06**: O sistema DEVE impedir automaticamente a marcação de uma box como disponível se qualquer uma das três condições deixar de se verificar.
 - **RF-06**: O sistema DEVE impedir a criação de reservas que violem o controlo de disponibilidade e apresentar alternativas válidas.
 - **RF-07**: O sistema DEVE permitir a criação de reservas, registando: período (data início e data fim), box, animal, tutor e estado inicial "ATIVA".
@@ -121,7 +121,7 @@ Como funcionário de receção, quero consultar o histórico de cada animal, par
 
 - **Tutor**: Representa o proprietário/responsável do animal. Atributos: `id`, `nome`, `nif`, `contacto`, `email`, `dataRegisto`.
 - **Animal**: Representa um animal sob cuidado do hotel. Atributos: `id`, `nome`, `especie` (enum: CAO, GATO), `raca`, `dataNascimento`, `peso`, `estadoSaude` (enum: NORMAL, ALTERADO, CRITICO), `necessidadesAlimentares`, `medicacaoCurso`, `dataRegisto`.
-- **Reserva**: Representa uma alocação de box para um período. Atributos: `id`, `dataInicio`, `dataFim`, `alojamento` (box), `animal`, `tutor`, `estado` (enum: ATIVA, CANCELADA, CONCLUIDA), `dataCriacao`.
+- **Reserva**: Representa uma alocação de box para um período. Atributos: `id`, `dataInicio`, `dataFim`, `alojamento` (box), `animal`, `tutor`, `estado` (enum: ATIVA, CONFIRMADA, CANCELADA, CONCLUIDA), `dataCriacao`.
 - **Alojamento** (Box): Representa uma box/quarto do hotel. Atributos: `id`, `identificacao`, `tipo` (enum: CANINO, FELINO), `capacidade`, `estadoLimpeza` (enum: PENDENTE, CONCLUIDO).
 - Relações:
   - `Tutor 1:* Animal` (um tutor pode ter múltiplos animais)

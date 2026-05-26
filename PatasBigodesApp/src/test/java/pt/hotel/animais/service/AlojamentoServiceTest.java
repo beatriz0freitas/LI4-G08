@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.enums.Especie;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.repository.AlojamentoRepository;
 
 import java.time.LocalDate;
@@ -27,12 +26,15 @@ class AlojamentoServiceTest {
     @Mock
     private AlojamentoRepository alojamentoRepository;
 
+    @Mock
+    private IAvailabilityDomainService availabilityDomainService;
+
     @InjectMocks
     private AlojamentoService alojamentoService;
 
     @Test
     void contarAlojamentosDisponiveisDeveContarConcluidos() {
-        when(alojamentoRepository.countByEstadoLimpeza(EstadoLimpeza.CONCLUIDO)).thenReturn(2L);
+        when(alojamentoRepository.countDisponiveisOperacionais()).thenReturn(2L);
 
         long resultado = alojamentoService.contarAlojamentosDisponiveis();
 
@@ -120,14 +122,15 @@ class AlojamentoServiceTest {
     }
 
     @Test
-    void estaDisponivelComEspecieRetornaFalsoSeTipoIncompativel() {
-        Alojamento alojamento = new Alojamento(1L, "Box 1", TipoAlojamento.FELINO, 1, EstadoLimpeza.CONCLUIDO, null);
-        when(alojamentoRepository.findById(1L)).thenReturn(Optional.of(alojamento));
+    void estaDisponivelComEspecieDeveDelegarRegraCentralizada() {
+        LocalDate dataInicio = LocalDate.now();
+        LocalDate dataFim = dataInicio.plusDays(2);
+        when(availabilityDomainService.estaDisponivel(1L, dataInicio, dataFim, Especie.CAO)).thenReturn(false);
 
         boolean resultado = alojamentoService.estaDisponivel(
-                1L, LocalDate.now(), LocalDate.now().plusDays(2), Especie.CAO);
+                1L, dataInicio, dataFim, Especie.CAO);
 
         assertThat(resultado).isFalse();
-        verify(alojamentoRepository, never()).countConflictingReservas(any(), any(), any());
+        verify(availabilityDomainService).estaDisponivel(1L, dataInicio, dataFim, Especie.CAO);
     }
 }

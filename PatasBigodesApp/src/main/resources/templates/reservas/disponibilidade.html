@@ -34,13 +34,13 @@
 						</button>
 					</div>
 
-					<!-- Card de busca -->
+					<!-- Card de procura -->
 					<div class="card card-primary">
 						<div class="card-header">
-							<h3 class="card-title">Buscar Alojamentos Disponíveis</h3>
+							<h3 class="card-title">Procurar Alojamentos Disponíveis</h3>
 						</div>
 
-						<form th:action="@{/reservas/buscar-disponibilidade}" method="post" class="form-horizontal">
+						<form th:action="@{/reservas/procurar-disponibilidade}" method="post" class="form-horizontal">
 							<div class="card-body">
 								<!-- Data de Início -->
 								<div class="form-group row">
@@ -76,7 +76,7 @@
 							<!-- Botões de ação -->
 							<div class="card-footer">
 								<button type="submit" class="btn btn-success">
-									<i class="fas fa-search mr-2"></i> Buscar Disponibilidade
+									<i class="fas fa-search mr-2"></i> Procurar Disponibilidade
 								</button>
 								<a th:href="@{/reservas}" class="btn btn-secondary">
 									<i class="fas fa-times mr-2"></i> Cancelar
@@ -94,7 +94,7 @@
 							<ol>
 								<li>Introduza a data de início do alojamento pretendido</li>
 								<li>Introduza a data de fim do alojamento</li>
-								<li>Clique em "Buscar Disponibilidade"</li>
+								<li>Clique em "Procurar Disponibilidade"</li>
 								<li>Selecione um alojamento disponível da lista de resultados</li>
 								<li>Crie a reserva fornecendo os dados do tutor e animal</li>
 							</ol>

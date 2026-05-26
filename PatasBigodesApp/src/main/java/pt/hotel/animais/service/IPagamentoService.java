@@ -12,9 +12,13 @@ public interface IPagamentoService {
 
     Pagamento registrarPagamento(PagamentoDto dto);
 
-    Pagamento registrarPagamentoCheckOut(Long estadiaId, BigDecimal valor, MetodoPagamento metodoPagamento);
+    /**
+     * Registar pagamento de check-out com cobrança complementar automática.
+     * A cobrança é calculada automaticamente pelo serviço.
+     */
+    Pagamento registrarPagamentoCheckOut(Long estadiaId, MetodoPagamento metodoPagamento);
 
-    BigDecimal calcularExtras(Estadia estadia);
+    BigDecimal calcularCobrancaComplementar(Estadia estadia);
 
     BigDecimal faturacaoTotal();
 

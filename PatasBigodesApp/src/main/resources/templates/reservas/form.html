@@ -230,7 +230,7 @@
 														</div>
 														<div th:if="${tipoAlojamentoEsperado != null}" class="alert alert-secondary">
 															<i class="fas fa-filter mr-1"></i>
-															A mostrar apenas alojamentos <strong th:text="${tipoAlojamentoEsperado.label}">adequados</strong> limpos e livres no período selecionado.
+															A mostrar apenas alojamentos <strong th:text="${tipoAlojamentoEsperado}">adequados</strong> limpos e livres no período selecionado.
 														</div>
 
 														<div th:if="${tipoAlojamentoEsperado != null && #lists.isEmpty(disponibilidades)}" class="alert alert-warning">

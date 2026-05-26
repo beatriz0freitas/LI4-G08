@@ -8,12 +8,26 @@ import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.Pagamento;
 import pt.hotel.animais.model.enums.EstadoPagamento;
 import pt.hotel.animais.model.enums.MetodoPagamento;
+import pt.hotel.animais.model.enums.MomentoPagamento;
 import pt.hotel.animais.repository.EstadiaRepository;
+import pt.hotel.animais.repository.IntervencaoClinicaRepository;
 import pt.hotel.animais.repository.PagamentoRepository;
+import pt.hotel.animais.repository.ServicoExtraRepository;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
+import java.time.LocalDateTime;
 
+/**
+ * Serviço de gestão de pagamentos.
+ * Implementa as regras de cálculo de pagamentos no check-in e check-out.
+ * 
+ * - Check-in: valor base = dias estimados × tarifa ativa do tipo de alojamento (de BD)
+ * - Check-out: cálculo de diferença se dias reais > estimados + serviços extra + intervenções clínicas
+ * - Método de pagamento é obrigatório (não é permitido NAO_DEFINIDO)
+ * - Custos negativos são rejeitados na validação das entidades
+ */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -21,16 +35,38 @@ public class PagamentoService implements IPagamentoService {
 
     private final PagamentoRepository pagamentoRepository;
     private final EstadiaRepository estadiaRepository;
+    private final ServicoExtraRepository servicoExtraRepository;
+    private final IntervencaoClinicaRepository intervencaoClinicaRepository;
+    private final TipoAlojamentoTarifaService tipoAlojamentoTarifaService;
 
+    /**
+     * Calcula o valor base da estadia no check-in.
+     * Fórmula: dias estimados × tarifa ativa do tipo de alojamento (de BD)
+     */
     public BigDecimal calcularValorBase(Estadia estadia) {
-        // Placeholder: calcula dias * tarifa fixa (10.00 EUR)
+        if (estadia == null || estadia.getReserva() == null || estadia.getReserva().getAlojamento() == null) {
+            throw new IllegalArgumentException("Estadia, reserva ou alojamento não encontrados");
+        }
+
         var inicio = estadia.getDataInicio();
-        var fim = estadia.getDataFim() != null ? estadia.getDataFim() : inicio.plusDays(1);
-        long dias = Math.max(1, Duration.between(inicio, fim).toDays());
-        return BigDecimal.valueOf(dias).multiply(BigDecimal.valueOf(10.00));
+        var dataFim = estadia.getReserva().getDataFim().atTime(23, 59, 59);
+        
+        long diasEstimados = Math.max(1, Duration.between(inicio, dataFim).toDays());
+        
+        BigDecimal tarifa = tipoAlojamentoTarifaService.obterValorTarifa(estadia.getReserva().getAlojamento().getTipo());
+        
+        return BigDecimal.valueOf(diasEstimados).multiply(tarifa).setScale(2, RoundingMode.HALF_UP);
     }
 
+    /**
+     * Regista um pagamento (genérico para check-in ou check-out).
+     * Valida que o método de pagamento é um dos 3 métodos reais (não NAO_DEFINIDO).
+     */
     public Pagamento registrarPagamento(PagamentoDto dto) {
+        if (dto.getMetodoPagamento() == null) {
+            throw new IllegalArgumentException("Método de pagamento é obrigatório");
+        }
+
         Estadia estadia = estadiaRepository.findById(dto.getEstadiaId())
                 .orElseThrow(() -> new IllegalArgumentException("Estadia não encontrada"));
 
@@ -44,23 +80,77 @@ public class PagamentoService implements IPagamentoService {
         return pagamentoRepository.save(pagamento);
     }
 
-    public Pagamento registrarPagamentoCheckOut(Long estadiaId, java.math.BigDecimal valor, MetodoPagamento metodoPagamento) {
+    /**
+     * Calcula a cobrança complementar no check-out.
+     * Inclui: (1) diferença de dias se reais > estimados (2) serviços extra (3) intervenções clínicas
+     * 
+     * Fórmula: (dias reais - dias estimados) × tarifa + soma(extras) + soma(clínica)
+     * Nunca pode resultar em cobrado menos que o estimado (se dias reais <= estimados, cobra-se apenas extras + clínica)
+     */
+    public BigDecimal calcularCobrancaComplementar(Estadia estadia) {
+        if (estadia == null || estadia.getId() == null) {
+            throw new IllegalArgumentException("Estadia inválida");
+        }
+
+        BigDecimal total = BigDecimal.ZERO;
+
+        // 1. Calcular diferença de dias se dias reais > dias estimados
+        LocalDateTime dataInicio = estadia.getDataInicio();
+        LocalDateTime dataFim = estadia.getDataFim();
+        LocalDateTime dataFimReserva = estadia.getReserva().getDataFim().atTime(23, 59, 59);
+
+        if (dataFim != null && dataFim.isAfter(dataFimReserva)) {
+            long diasEstimados = Math.max(1, Duration.between(dataInicio, dataFimReserva).toDays());
+            long diasReais = Math.max(1, Duration.between(dataInicio, dataFim).toDays());
+            
+            if (diasReais > diasEstimados) {
+                long diasDiferenca = diasReais - diasEstimados;
+                BigDecimal tarifa = tipoAlojamentoTarifaService.obterValorTarifa(estadia.getReserva().getAlojamento().getTipo());
+                total = total.add(BigDecimal.valueOf(diasDiferenca).multiply(tarifa).setScale(2, RoundingMode.HALF_UP));
+            }
+        }
+
+        // 2. Somar serviços extra
+        BigDecimal somaExtras = servicoExtraRepository.sumCustoByEstadiaId(estadia.getId());
+        if (somaExtras != null) {
+            total = total.add(somaExtras);
+        }
+
+        // 3. Somar intervenções clínicas
+        BigDecimal somaClinica = intervencaoClinicaRepository.sumCustoByEstadiaId(estadia.getId());
+        if (somaClinica != null) {
+            total = total.add(somaClinica);
+        }
+
+        return total.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Regista o pagamento de check-out com a cobrança complementar calculada.
+     * Método de pagamento é obrigatório (não é permitido NAO_DEFINIDO).
+     * 
+     * @param estadiaId ID da estadia
+     * @param metodoPagamento método de pagamento real (NUMERARIO, CARTAO_DEBITO, CARTAO_CREDITO)
+     * @return pagamento registado
+     */
+    public Pagamento registrarPagamentoCheckOut(Long estadiaId, MetodoPagamento metodoPagamento) {
+        if (metodoPagamento == null) {
+            throw new IllegalArgumentException("Método de pagamento é obrigatório no check-out");
+        }
+
         Estadia estadia = estadiaRepository.findById(estadiaId)
                 .orElseThrow(() -> new IllegalArgumentException("Estadia não encontrada"));
 
+        BigDecimal valorComplementar = calcularCobrancaComplementar(estadia);
+
         Pagamento pagamento = new Pagamento();
         pagamento.setEstadia(estadia);
-        pagamento.setValor(valor);
-        pagamento.setMetodoPagamento(metodoPagamento == null ? MetodoPagamento.NAO_DEFINIDO : metodoPagamento);
-        pagamento.setMomentoPagamento(pt.hotel.animais.model.enums.MomentoPagamento.CHECK_OUT);
+        pagamento.setValor(valorComplementar);
+        pagamento.setMetodoPagamento(metodoPagamento);
+        pagamento.setMomentoPagamento(MomentoPagamento.CHECK_OUT);
         pagamento.setEstadoPagamento(EstadoPagamento.LIQUIDADO);
 
         return pagamentoRepository.save(pagamento);
-    }
-
-    public java.math.BigDecimal calcularExtras(Estadia estadia) {
-        // Placeholder: soma fictícia de extras (0.00)
-        return java.math.BigDecimal.ZERO;
     }
 
     /**

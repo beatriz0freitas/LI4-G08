@@ -56,7 +56,7 @@
 								<select id="tipoColaborador" th:field="*{tipoColaborador}" class="form-control"
 										th:classappend="${#fields.hasErrors('tipoColaborador')} ? 'is-invalid' : ''">
 									<option value="">Selecionar</option>
-									<option th:each="tipo : ${tiposColaborador}" th:value="${tipo}" th:text="${tipo}"></option>
+									<option th:each="tipo : ${tiposColaborador}" th:value="${tipo.name()}" th:text="${tipo.getDescricao()}"></option>
 								</select>
 								<div class="invalid-feedback" th:if="${#fields.hasErrors('tipoColaborador')}" th:errors="*{tipoColaborador}"></div>
 							</div>

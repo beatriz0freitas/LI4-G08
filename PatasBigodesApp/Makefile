@@ -1,7 +1,14 @@
 .DEFAULT_GOAL := help
 
-# Java 21 (necessário para Spring Boot 3.x; ajusta o caminho se instalado noutra localização)
-JAVA_HOME ?= /usr/lib/jvm/jdk-21.0.2+13
+# Java 21 (necessário para Spring Boot 3.x)
+# Primeiro tenta o caminho Linux usado pela equipa; se não existir, deteta no macOS.
+LINUX_JAVA_HOME ?= /usr/lib/jvm/jdk-21.0.2+13
+JAVA_HOME ?= $(shell \
+	if [ -d "$(LINUX_JAVA_HOME)" ]; then \
+		echo "$(LINUX_JAVA_HOME)"; \
+	elif [ -x /usr/libexec/java_home ]; then \
+		/usr/libexec/java_home -v 21 2>/dev/null || /usr/libexec/java_home 2>/dev/null; \
+	fi)
 export JAVA_HOME
 
 DB_HOST ?= localhost
@@ -186,8 +193,7 @@ db-up:
 	docker compose up -d db
 
 db-reset-test:
-	docker compose rm -sf db-tests
-	docker compose up -d --wait db-tests
+	docker compose up -d --wait --force-recreate db-tests
 
 db-stop:
 	docker compose stop db

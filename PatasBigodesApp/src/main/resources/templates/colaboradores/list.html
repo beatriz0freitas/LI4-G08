@@ -45,7 +45,7 @@
 								<td th:text="${colaborador.nome}">Nome</td>
 								<td th:text="${colaborador.username}">username</td>
 								<td th:text="${colaborador.email}">email</td>
-								<td th:text="${colaborador.tipoColaborador}">DIRETOR</td>
+								<td th:text="${colaborador.tipoColaborador != null ? colaborador.tipoColaborador.getDescricao() : '-'}">Diretor</td>
 								<td>
 									<span th:if="${colaborador.ativo}" class="badge badge-success">Ativo</span>
 									<span th:unless="${colaborador.ativo}" class="badge badge-secondary">Inativo</span>

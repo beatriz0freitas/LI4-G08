@@ -285,6 +285,7 @@ enum EstadoLimpeza {
 
 enum EstadoReserva {
   ATIVA
+  CONFIRMADA
   CANCELADA
   CONCLUIDA
 }

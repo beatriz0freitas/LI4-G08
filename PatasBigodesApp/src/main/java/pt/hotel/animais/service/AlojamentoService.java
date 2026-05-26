@@ -2,11 +2,11 @@ package pt.hotel.animais.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pt.hotel.animais.dto.DisponibilidadeAlojamentoDto;
 import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.enums.Especie;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.repository.AlojamentoRepository;
 
 import java.time.LocalDate;
@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class AlojamentoService implements IAlojamentoService {
 
     private final AlojamentoRepository alojamentoRepository;
+    private final IAvailabilityDomainService availabilityDomainService;
 
     public List<Alojamento> listarTodos() {
         return alojamentoRepository.findAllByOrderByIdentificacaoAsc();
@@ -27,7 +28,7 @@ public class AlojamentoService implements IAlojamentoService {
      * Conta os alojamentos disponíveis para receção.
      */
     public long contarAlojamentosDisponiveis() {
-        return alojamentoRepository.countByEstadoLimpeza(EstadoLimpeza.CONCLUIDO);
+        return alojamentoRepository.countDisponiveisOperacionais();
     }
 
     /**
@@ -36,12 +37,15 @@ public class AlojamentoService implements IAlojamentoService {
     public long contarAlojamentosPendentesLimpeza() {
         return alojamentoRepository.countByEstadoLimpeza(EstadoLimpeza.PENDENTE);
     }
+
+    public long contarAlojamentosComReservasAtivas() {
+        return alojamentoRepository.countAlojamentosComReservasAtivas();
+    }
     
     /**
      * Procura alojamentos disponíveis para um período específico.
-     * Um alojamento é considerado disponível se:
-     * 1. O estado de limpeza é CONCLUIDO
-     * 2. Não tem reservas ativas que se sobreponham com o período
+     * Um alojamento é considerado disponível se estiver limpo, sem reserva
+     * sobreposta e sem estadia ativa.
      */
     public List<DisponibilidadeAlojamentoDto> consultarDisponibilidade(LocalDate dataInicio, LocalDate dataFim) {
         // Validação básica
@@ -66,7 +70,7 @@ public class AlojamentoService implements IAlojamentoService {
             throw new IllegalArgumentException("Datas de entrada inválidas: dataInicio deve ser anterior a dataFim");
         }
 
-        TipoAlojamento tipo = TipoAlojamento.fromEspecie(especie);
+        String tipo = TipoAlojamentoPolicy.fromEspecie(especie);
         List<Alojamento> alojamentosDisponiveis = alojamentoRepository.findAvailableForPeriodAndTipo(dataInicio, dataFim, tipo);
 
         return alojamentosDisponiveis.stream()
@@ -78,33 +82,14 @@ public class AlojamentoService implements IAlojamentoService {
      * Verifica se um alojamento específico está disponível para um período.
      */
     public boolean estaDisponivel(Long alojamentoId, LocalDate dataInicio, LocalDate dataFim) {
-        // Obtém o alojamento
-        Alojamento alojamento = alojamentoRepository.findById(alojamentoId)
-            .orElseThrow(() -> new IllegalArgumentException("Alojamento não encontrado"));
-        
-        // Verifica se está limpo
-        if (alojamento.getEstadoLimpeza() != EstadoLimpeza.CONCLUIDO) {
-            return false;
-        }
-        
-        // Verifica conflitos de reserva
-        long conflitos = alojamentoRepository.countConflictingReservas(alojamentoId, dataInicio, dataFim);
-        return conflitos == 0;
+        return availabilityDomainService.estaDisponivel(alojamentoId, dataInicio, dataFim);
     }
 
     /**
      * Verifica disponibilidade e compatibilidade com a espécie do animal.
      */
     public boolean estaDisponivel(Long alojamentoId, LocalDate dataInicio, LocalDate dataFim, Especie especie) {
-        Alojamento alojamento = alojamentoRepository.findById(alojamentoId)
-            .orElseThrow(() -> new IllegalArgumentException("Alojamento não encontrado"));
-
-        TipoAlojamento tipoEsperado = TipoAlojamento.fromEspecie(especie);
-        if (alojamento.getTipo() != tipoEsperado) {
-            return false;
-        }
-
-        return estaDisponivel(alojamentoId, dataInicio, dataFim);
+        return availabilityDomainService.estaDisponivel(alojamentoId, dataInicio, dataFim, especie);
     }
     
     /**
@@ -118,6 +103,7 @@ public class AlojamentoService implements IAlojamentoService {
     /**
      * Marca um alojamento como pendente de limpeza após check-out.
      */
+    @Transactional
     public void marcarPendenteLimpeza(Long alojamentoId) {
         Alojamento alojamento = alojamentoRepository.findById(alojamentoId)
             .orElseThrow(() -> new IllegalArgumentException("Alojamento não encontrado"));

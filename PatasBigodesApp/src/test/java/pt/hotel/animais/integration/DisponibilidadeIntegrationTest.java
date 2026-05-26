@@ -11,7 +11,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import pt.hotel.animais.config.SecurityConfig;
 import pt.hotel.animais.controller.ReservaController;
 import pt.hotel.animais.dto.DisponibilidadeAlojamentoDto;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.service.IAlojamentoService;
 import pt.hotel.animais.service.IAnimalService;
@@ -71,19 +70,19 @@ class DisponibilidadeIntegrationTest {
 
     @Test
     @WithMockUser(username = "10", roles = {"FUNCIONARIO_RECEPCAO"})
-    void postBuscarDisponibilidadeDeveRenderizarResultados() throws Exception {
+    void postProcurarDisponibilidadeDeveRenderizarResultados() throws Exception {
         assertMocksInjected();
 
         LocalDate dataInicio = LocalDate.now().plusDays(14);
         LocalDate dataFim = dataInicio.plusDays(2);
-        DisponibilidadeAlojamentoDto dto = new DisponibilidadeAlojamentoDto(5L, "Box A1", TipoAlojamento.CANINO, 2);
+        DisponibilidadeAlojamentoDto dto = new DisponibilidadeAlojamentoDto(5L, "Box A1", "CANINO", 2);
         dto.setDataInicio(dataInicio);
         dto.setDataFim(dataFim);
         dto.setDisponivel(true);
 
         when(alojamentoService.consultarDisponibilidade(eq(dataInicio), eq(dataFim))).thenReturn(List.of(dto));
 
-        mockMvc.perform(post("/reservas/buscar-disponibilidade")
+        mockMvc.perform(post("/reservas/procurar-disponibilidade")
                 .with(csrf())
                 .param("dataInicio", dataInicio.toString())
                 .param("dataFim", dataFim.toString()))

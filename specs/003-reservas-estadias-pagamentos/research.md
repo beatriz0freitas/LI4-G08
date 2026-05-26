@@ -24,6 +24,30 @@
 
 **Alternatives considered**: Pagamento único no final da estadia; estado implícito sem enum dedicado. Rejeitado por incompatibilidade com US-10/US-11 e menor rastreabilidade financeira.
 
+## 3.1. Fonte da tarifa de alojamento
+
+**Decision**: Usar catálogo persistente `TipoAlojamentoTarifa`, com `tipoAlojamento` textual, `tarifaDiaria` e estado ativo/inativo. O enum Java `TipoAlojamento` deixa de ser fonte de verdade.
+
+**Rationale**: uma tarifa fixa ou enum rígido não permite gerir preços reais por tipo. A direção precisa de criar, editar, desativar e reativar tipos e tarifas sem alteração de código.
+
+**Alternatives considered**: Tarifa fixa global; tarifa no próprio alojamento; enum Java com preços hardcoded. Rejeitadas por reduzirem configurabilidade e por dificultarem evolução de preços/tipos.
+
+## 3.2. Catálogo de serviços extra
+
+**Decision**: Persistir `TipoServicoExtra` como catálogo gerido pela direção e referenciar esse catálogo em `ServicoExtra`.
+
+**Rationale**: Serviços extra são faturáveis no check-out e devem ter validação de existência/estado ativo. Persistir o tipo como texto livre aumenta risco de erros e relatórios inconsistentes.
+
+**Alternatives considered**: Manter enum Java; manter texto livre em `ServicoExtra`. Rejeitadas por exigirem alteração de código para novos serviços ou por não garantirem integridade semântica.
+
+## 3.3. Cálculo da cobrança complementar
+
+**Decision**: Calcular a cobrança de check-out como soma de serviços extra, intervenções clínicas faturáveis e dias reais adicionais face à reserva. Dias já cobertos pelo pagamento de check-in não são cobrados novamente.
+
+**Rationale**: Esta decisão preserva RD-04: check-in cobre a base estimada, check-out cobre apenas diferença/complementos.
+
+**Alternatives considered**: Recalcular toda a estadia no check-out e subtrair pagamentos existentes; cobrar apenas extras sem dias adicionais; cobrar sempre um valor fixo. Rejeitadas por maior risco de dupla cobrança ou por não refletirem permanências superiores ao reservado.
+
 ## 4. Consultas de direção (dashboard e histórico)
 
 **Decision**: Tratar dashboard operacional e histórico financeiro como fluxos de leitura independentes dos fluxos transacionais de receção. O dashboard mantém um par `IDashboardService`/`DashboardService` próprio, mas esse serviço atua apenas como orquestrador e consome métricas expostas pelas interfaces dos serviços de domínio (`IReservaService`, `IEstadiaService`, `IPagamentoService`, `IAlojamentoService`). O histórico deve usar consultas paginadas com filtros por cliente, animal, estado e intervalo temporal, preservando os parâmetros entre páginas.

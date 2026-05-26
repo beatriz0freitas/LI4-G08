@@ -49,12 +49,12 @@ public class TutorService implements ITutorService {
     }
     
     /**
-     * Procura tutores pelo nome (busca parcial).
+     * Procura tutores pelo nome (procura parcial).
      */
     @Transactional(readOnly = true)
     public List<Tutor> procurarPorNome(String nome) {
         if (nome == null || nome.trim().isEmpty()) {
-            throw new IllegalArgumentException("Nome deve ser fornecido para busca");
+            throw new IllegalArgumentException("Nome deve ser fornecido para procura");
         }
         return tutorRepository.findByNomeContainingIgnoreCase(nome);
     }

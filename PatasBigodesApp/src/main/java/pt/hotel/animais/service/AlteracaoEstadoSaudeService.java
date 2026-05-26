@@ -1,6 +1,7 @@
 package pt.hotel.animais.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -10,18 +11,24 @@ import pt.hotel.animais.dto.AlteracaoEstadoSaudeDto;
 import pt.hotel.animais.dto.AlteracaoEstadoSaudeFormDto;
 import pt.hotel.animais.model.AlteracaoEstadoSaude;
 import pt.hotel.animais.model.Estadia;
+import pt.hotel.animais.model.enums.EstadoSaude;
+import pt.hotel.animais.model.enums.PrioridadePlano;
 import pt.hotel.animais.repository.AlteracaoEstadoSaudeRepository;
 import pt.hotel.animais.repository.EstadiaRepository;
+import pt.hotel.animais.repository.PlanoCuidadosRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AlteracaoEstadoSaudeService implements IAlteracaoEstadoSaudeService {
 
     private final AlteracaoEstadoSaudeRepository repository;
     private final EstadiaRepository estadiaRepository;
+    private final PlanoCuidadosRepository planoCuidadosRepository;
+    private final IPlanoCuidadosService planoCuidadosService;
 
     @Transactional
     public AlteracaoEstadoSaudeDto register(AlteracaoEstadoSaudeFormDto form) {
@@ -33,7 +40,7 @@ public class AlteracaoEstadoSaudeService implements IAlteracaoEstadoSaudeService
         a.setDescricao(form.getDescricao());
         if (form.getSeveridade() != null) {
             try {
-                a.setSeveridade(pt.hotel.animais.model.enums.EstadoSaude.valueOf(form.getSeveridade().toUpperCase()));
+                a.setSeveridade(EstadoSaude.valueOf(form.getSeveridade().toUpperCase()));
             } catch (IllegalArgumentException ex) {
                 throw new IllegalArgumentException("Severidade inválida: " + form.getSeveridade());
             }
@@ -41,6 +48,24 @@ public class AlteracaoEstadoSaudeService implements IAlteracaoEstadoSaudeService
         a.setDataHora(form.getDataHora());
 
         AlteracaoEstadoSaude saved = repository.save(a);
+
+        // Hook de escalação automática de prioridade quando severidade é CRITICO
+        if (a.getSeveridade() == EstadoSaude.CRITICO) {
+            try {
+                planoCuidadosRepository.findByEstadiaId(estadia.getId()).ifPresent(plano -> {
+                    try {
+                        log.info("Escalando prioridade do plano {} para CRITICO", plano.getId());
+                        planoCuidadosService.atualizarPrioridade(plano.getId(), PrioridadePlano.CRITICO, 
+                                                                 a.getAutorId() != null ? a.getAutorId() : 1L);
+                    } catch (Exception e) {
+                        log.error("Erro ao escalizar prioridade de plano na mudança de saúde CRITICA: {}", e.getMessage());
+                    }
+                });
+            } catch (Exception e) {
+                log.error("Erro ao executar hook de prioridade: {}", e.getMessage());
+            }
+        }
+
         return toDto(saved);
     }
 

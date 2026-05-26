@@ -12,11 +12,11 @@ import pt.hotel.animais.dto.ReservaFormDto;
 import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.Tutor;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.service.IAlojamentoService;
 import pt.hotel.animais.service.IAnimalService;
 import pt.hotel.animais.service.IReservaService;
 import pt.hotel.animais.service.ITutorService;
+import pt.hotel.animais.service.TipoAlojamentoPolicy;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -36,8 +36,6 @@ public class ReservaController {
     private final IAlojamentoService alojamentoService;
     private final ITutorService tutorService;
     private final IAnimalService animalService;
-    private final pt.hotel.animais.repository.EstadiaRepository estadiaRepository;
-    private final pt.hotel.animais.service.IPagamentoService pagamentoService;
     
     /**
      * GET /reservas - Lista de reservas (geralmente com filtros).
@@ -67,10 +65,10 @@ public class ReservaController {
     }
     
     /**
-     * POST /reservas/buscar-disponibilidade - Busca alojamentos disponíveis.
+     * POST /reservas/procurar-disponibilidade - Procura alojamentos disponíveis.
      */
-    @PostMapping("/buscar-disponibilidade")
-    public String buscarDisponibilidade(
+    @PostMapping("/procurar-disponibilidade")
+    public String procurarDisponibilidade(
         @RequestParam("dataInicio") LocalDate dataInicio,
         @RequestParam("dataFim") LocalDate dataFim,
         RedirectAttributes redirectAttributes,
@@ -199,13 +197,9 @@ public class ReservaController {
             model.addAttribute("breadcrumb", "Detalhes da Reserva");
             model.addAttribute("activePage", "reservas");
 
-            // mostrar extras se existir estadia associada
-            estadiaRepository.findByReservaId(id).ifPresent(estadia -> {
-                try {
-                    var extras = pagamentoService.calcularExtras(estadia);
-                    model.addAttribute("extrasTotal", extras);
-                    model.addAttribute("estadiaId", estadia.getId());
-                } catch (Exception ignored) {}
+            reservaService.obterDetalheFinanceiro(id).ifPresent(detalheFinanceiro -> {
+                model.addAttribute("extrasTotal", detalheFinanceiro.getExtrasTotal());
+                model.addAttribute("estadiaId", detalheFinanceiro.getEstadiaId());
             });
             
             return "reservas/confirmacao";
@@ -243,18 +237,15 @@ public class ReservaController {
         RedirectAttributes redirectAttributes,
         Model model
     ) {
-        try {
-            reservaService.concluir(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Reserva concluída com sucesso");
-            return "redirect:/reservas";
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "redirect:/reservas/" + id;
-        }
+        redirectAttributes.addFlashAttribute(
+            "errorMessage",
+            "A reserva só pode ser concluída automaticamente após o check-out da estadia associada"
+        );
+        return "redirect:/reservas/" + id;
     }
 
     /**
-     * POST /reservas/{id}/confirmar - Alias para concluir/confirmar reserva
+     * POST /reservas/{id}/confirmar - A confirmação ocorre apenas no check-in.
      */
     @PostMapping("/{id}/confirmar")
     public String confirmar(
@@ -262,21 +253,18 @@ public class ReservaController {
         RedirectAttributes redirectAttributes,
         Model model
     ) {
-        try {
-            reservaService.concluir(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Reserva confirmada com sucesso");
-            return "redirect:/reservas";
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "redirect:/reservas/" + id;
-        }
+        redirectAttributes.addFlashAttribute(
+            "errorMessage",
+            "A reserva só fica confirmada durante o check-in"
+        );
+        return "redirect:/reservas/" + id;
     }
 
     private void prepararFormularioReserva(ReservaFormDto reservaForm, Model model) {
         List<Tutor> tutores = tutorService.listarTodos();
         List<Animal> animaisTutor = new ArrayList<>();
         List<DisponibilidadeAlojamentoDto> disponibilidades = new ArrayList<>();
-        TipoAlojamento tipoAlojamentoEsperado = null;
+        String tipoAlojamentoEsperado = null;
 
         if (reservaForm.getTutorId() != null) {
             try {
@@ -300,7 +288,7 @@ public class ReservaController {
                     reservaForm.setAnimalId(null);
                     reservaForm.setAlojamentoId(null);
                 } else {
-                    tipoAlojamentoEsperado = TipoAlojamento.fromEspecie(animalSelecionado.getEspecie());
+                    tipoAlojamentoEsperado = TipoAlojamentoPolicy.fromEspecie(animalSelecionado.getEspecie());
                 }
             } catch (IllegalArgumentException e) {
                 model.addAttribute("warningMessage", "Animal não encontrado. Selecione outro animal.");
