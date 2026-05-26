@@ -93,7 +93,7 @@ Implementar a base funcional para tutores, animais e reservas.
 - `Tutor` (id, nome, nif, contacto, email)
 - `Animal` (id, nome, especie, raca, estadoSaude)
 - `Reserva` (id, dataInicio, dataFim, estado)
-- Enums: `Especie` (CAO, GATO), `EstadoSaude` (NORMAL, ALTERADO, CRITICO), `EstadoReserva` (ATIVA, CANCELADA, CONCLUIDA)
+- Enums: `Especie` (CAO, GATO), `EstadoSaude` (NORMAL, ALTERADO, CRITICO), `EstadoReserva` (ATIVA, CONFIRMADA, CANCELADA, CONCLUIDA)
 
 **Controllers**: `TutorAnimalController`, `ReservaController`
 

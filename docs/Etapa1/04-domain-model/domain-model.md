@@ -61,7 +61,7 @@ Este modelo descreve os principais conceitos do domínio do hotel de animais.
 | `EstadoSaude` | `NORMAL`, `ALTERADO`, `CRITICO` | US-16, US-24 |
 | `TipoAlojamento` | `CANINO`, `FELINO` | US-12, RD-08 |
 | `EstadoLimpeza` | `PENDENTE`, `CONCLUIDO` | RD-01, US-21 |
-| `EstadoReserva` | `ATIVA`, `CANCELADA`, `CONCLUIDA` | US-06, RD-06 |
+| `EstadoReserva` | `ATIVA`, `CONFIRMADA`, `CANCELADA`, `CONCLUIDA` | US-06, RD-06 |
 | `EstadoEstadia` | `EM_CURSO`, `TERMINADA` | US-07, RD-03 |
 | `EstadoPagamento` | `LIQUIDADO`, `PENDENTE` | RF-10 |
 | `MetodoPagamento` | `NAO_DEFINIDO`, `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO` | RF-10 |

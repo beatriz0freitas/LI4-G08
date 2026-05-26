@@ -14,7 +14,7 @@ Este modelo cobre o ciclo operacional de Fase 3: criação/cancelamento de reser
 - `id`
 - `dataInicio`
 - `dataFim`
-- `estado` (`ATIVA`, `CANCELADA`, `CONCLUIDA`)
+- `estado` (`ATIVA`, `CONFIRMADA`, `CANCELADA`, `CONCLUIDA`)
 - `dataHoraConfirmacao` (opcional)
 - `dataCriacao`
 - `animalId`
@@ -24,7 +24,10 @@ Este modelo cobre o ciclo operacional de Fase 3: criação/cancelamento de reser
 **Validation rules**:
 - `dataInicio < dataFim`.
 - Confirmação operacional de reserva deve registar timestamp e utilizador responsável.
+- A confirmação move a reserva de `ATIVA` para `CONFIRMADA` apenas durante o check-in.
 - Só reservas com estado `ATIVA` podem ser canceladas.
+- O check-in confirma automaticamente uma reserva `ATIVA` antes de criar a `Estadia`; reservas `CONFIRMADA` já têm check-in associado e não podem iniciar nova estadia.
+- A conclusão da reserva (`CONCLUIDA`) só ocorre após o check-out da estadia associada.
 - Reserva `CANCELADA` não pode regressar a `ATIVA` (RD-06).
 - Reserva sobreposta para a mesma box é inválida quando conflita com disponibilidade (RD-01).
 
@@ -40,7 +43,7 @@ Este modelo cobre o ciclo operacional de Fase 3: criação/cancelamento de reser
 - `estado` (`EM_CURSO`, `TERMINADA`)
 
 **Validation rules**:
-- Check-in só é permitido com reserva confirmada/ativa (RD-02).
+- Check-in só é permitido com reserva ativa (RD-02); a reserva fica confirmada dentro da mesma transação.
 - Check-out só é permitido após check-in para a mesma estadia (RD-03).
 - Não pode existir mais do que uma estadia `EM_CURSO` por animal (RD-07).
 

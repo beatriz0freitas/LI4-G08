@@ -10,7 +10,7 @@
 
 ## Mapeamento de User Stories
 
-- US1 -> US-06 (Criar, confirmar e gerir reservas)
+- US1 -> US-06 (Criar e gerir reservas)
 - US2 -> US-12 (Consultar disponibilidade)
 - US3 -> US-07 (Registar check-in/check-out)
 - US4 -> US-10 (Pagamento da estadia no check-in)
@@ -64,15 +64,15 @@
 - [x] T014 [P] [US1] Criar teste de serviço para cancelamento e não-reativação em `PatasBigodesApp/src/test/java/pt/hotel/animais/service/ReservaServiceCancelTest.java`
 - [x] T015 [P] [US1] Criar teste de integração do contrato `POST /reservas` em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/ReservaCreateIntegrationTest.java`
 - [x] T016 [P] [US1] Criar teste de integração do contrato `POST /reservas/{id}/cancelar` em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/ReservaCancelIntegrationTest.java`
-- [x] T061 [P] [US1] Criar teste de integração do contrato `POST /reservas/{id}/confirmar` em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/ReservaConfirmIntegrationTest.java`
+- [x] T061 [P] [US1] Criar teste de integração que garante que `POST /reservas/{id}/confirmar` não altera estado, porque a confirmação ocorre apenas no check-in, em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/ReservaConfirmIntegrationTest.java`
 
 ### Implementation for User Story 1
 
 - [x] T017 [US1] Implementar validação de criação de reserva (RF-07, RD-01) em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IReservaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ReservaService.java`
-- [x] T062 [US1] Implementar confirmação explícita de reserva (RF-07) em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IReservaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ReservaService.java`
+- [x] T062 [US1] Implementar confirmação de reserva apenas no fluxo de check-in (RF-07/RD-02) em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IReservaService.java`, `ReservaService.java` e `EstadiaService.java`
 - [x] T018 [US1] Implementar cancelamento de reserva sem reativação (RD-06) em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IReservaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ReservaService.java`
 - [x] T019 [US1] Implementar endpoint `POST /reservas` em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`
-- [x] T063 [US1] Implementar endpoint `POST /reservas/{id}/confirmar` em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`
+- [x] T063 [US1] Bloquear confirmação administrativa via `POST /reservas/{id}/confirmar`, redirecionando para o detalhe sem alterar estado, em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`
 - [x] T020 [US1] Implementar endpoint `POST /reservas/{id}/cancelar` em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`
 - [x] T021 [US1] Implementar formulário e feedback de criação/cancelamento em `PatasBigodesApp/src/main/resources/templates/reservas/form.html`
 
@@ -246,7 +246,7 @@
 - [x] T059 Executar suite completa de testes da feature em `PatasBigodesApp/src/test/java/pt/hotel/animais/` (41/41 testes passaram com BUILD SUCCESS)
 - [ ] T060 Consolidar correções finais de performance e logs em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/`
 - [ ] T064 [P] Implementar eventos de auditoria para operações críticas em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/`
-- [ ] T065 [P] Criar testes de auditoria para criar/confirmar/cancelar reserva em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/ReservaAuditIntegrationTest.java`
+- [ ] T065 [P] Criar testes de auditoria para criar/cancelar reserva e confirmar no check-in em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/ReservaAuditIntegrationTest.java`
 - [ ] T066 [P] Criar testes de auditoria para check-in/check-out/pagamentos em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/OperacaoAuditIntegrationTest.java`
 - [ ] T067 [P] Criar testes de autorização por perfil em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/AuthorizationIntegrationTest.java`
 - [ ] T068 [P] Criar testes de confidencialidade de dados em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/ConfidencialidadeIntegrationTest.java`
