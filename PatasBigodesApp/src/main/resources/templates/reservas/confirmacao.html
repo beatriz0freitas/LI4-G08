@@ -36,7 +36,7 @@
 									<div class="mb-2"><strong>ID:</strong> <span th:text="${reserva.id}">ID</span></div>
 									<div class="mb-2"><strong>Estado:</strong> 
 										<span class="badge"
-											  th:classappend="${reserva.estado.toString() == 'ATIVA' ? 'badge-success' : (reserva.estado.toString() == 'CANCELADA' ? 'badge-danger' : 'badge-secondary')}"
+											  th:classappend="${reserva.estado.toString() == 'ATIVA' ? 'badge-warning' : (reserva.estado.toString() == 'CONFIRMADA' ? 'badge-success' : (reserva.estado.toString() == 'CANCELADA' ? 'badge-danger' : 'badge-secondary'))}"
 											  th:text="${reserva.estado.label}">Estado</span>
 									</div>
 									<div class="mb-2"><strong>Data de Início:</strong> <span th:text="${#temporals.format(reserva.dataInicio, 'dd/MM/yyyy')}">Data</span></div>
@@ -63,14 +63,12 @@
 									<h3 class="card-title">Ações</h3>
 								</div>
 								<div class="card-body">
-									<form th:if="${reserva.isAtiva()}" th:action="@{/reservas/{id}/cancelar(id=${reserva.id})}" method="post" class="d-inline">
+									<a th:if="${reserva.podeFazerCheckIn()}" th:href="@{/estadias(reservaId=${reserva.id})}" class="btn btn-success btn-block mb-2">
+										<i class="fas fa-right-to-bracket mr-2"></i>Registar Check-in
+									</a>
+									<form th:if="${reserva.podeSerCancelada()}" th:action="@{/reservas/{id}/cancelar(id=${reserva.id})}" method="post" class="d-inline">
 										<button type="submit" class="btn btn-danger btn-block mb-2" onclick="return confirm('Tem a certeza que deseja cancelar?')">
 											<i class="fas fa-times mr-2"></i>Cancelar Reserva
-										</button>
-									</form>
-									<form th:if="${reserva.isAtiva()}" th:action="@{/reservas/{id}/concluir(id=${reserva.id})}" method="post" class="d-inline">
-										<button type="submit" class="btn btn-success btn-block">
-											<i class="fas fa-check mr-2"></i>Concluir Reserva
 										</button>
 									</form>
 								</div>

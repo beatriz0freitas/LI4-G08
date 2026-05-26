@@ -46,8 +46,10 @@ class EstadiaServiceTest {
     @Test
     void abrirEstadiaPorReservaDeveCriarEstadiaEmCurso() {
         Reserva reserva = criarReserva(10L, EstadoReserva.ATIVA);
+        Reserva confirmada = criarReserva(10L, EstadoReserva.CONFIRMADA);
 
         when(reservaService.obter(10L)).thenReturn(reserva);
+        when(reservaService.confirmar(10L)).thenReturn(confirmada);
         when(estadiaRepository.save(any(Estadia.class))).thenAnswer(inv -> {
             Estadia e = inv.getArgument(0);
             e.setId(1L);
@@ -59,15 +61,18 @@ class EstadiaServiceTest {
 
         assertThat(resultado.getEstado()).isEqualTo(EstadoEstadia.EM_CURSO);
         assertThat(resultado.getDataInicio()).isNotNull();
-        assertThat(resultado.getReserva()).isSameAs(reserva);
-        verify(reservaService).concluir(10L);
+        assertThat(resultado.getReserva()).isSameAs(confirmada);
+        verify(reservaService).confirmar(10L);
+        verify(reservaService, never()).concluir(10L);
         verify(pagamentoService).registrarPagamento(any());
     }
 
     @Test
     void abrirEstadiaPorReservaDeveRegistarPagamentoComCamposCorretos() {
         Reserva reserva = criarReserva(10L, EstadoReserva.ATIVA);
+        Reserva confirmada = criarReserva(10L, EstadoReserva.CONFIRMADA);
         when(reservaService.obter(10L)).thenReturn(reserva);
+        when(reservaService.confirmar(10L)).thenReturn(confirmada);
         when(estadiaRepository.save(any(Estadia.class))).thenAnswer(inv -> {
             Estadia e = inv.getArgument(0);
             e.setId(5L);
@@ -77,6 +82,7 @@ class EstadiaServiceTest {
 
         estadiaService.abrirEstadiaPorReserva(10L, MetodoPagamento.CARTAO_CREDITO);
 
+        verify(reservaService).confirmar(10L);
         ArgumentCaptor<PagamentoDto> captor = ArgumentCaptor.forClass(PagamentoDto.class);
         verify(pagamentoService).registrarPagamento(captor.capture());
         PagamentoDto dto = captor.getValue();
@@ -88,7 +94,7 @@ class EstadiaServiceTest {
 
     @Test
     void abrirEstadiaPorReservaDeveRejeitarReservaNaoAtiva() {
-        Reserva reserva = criarReserva(20L, EstadoReserva.CANCELADA);
+        Reserva reserva = criarReserva(20L, EstadoReserva.CONFIRMADA);
         when(reservaService.obter(20L)).thenReturn(reserva);
 
         assertThatThrownBy(() -> estadiaService.abrirEstadiaPorReserva(20L, MetodoPagamento.NUMERARIO))
@@ -96,6 +102,7 @@ class EstadiaServiceTest {
                 .hasMessageContaining("check-in");
 
         verify(estadiaRepository, never()).save(any());
+        verify(reservaService, never()).confirmar(20L);
     }
 
     @Test
@@ -121,6 +128,7 @@ class EstadiaServiceTest {
         assertThat(resultado.getDataFim()).isNotNull();
         verify(pagamentoService).registrarPagamentoCheckOut(eq(5L), eq(MetodoPagamento.NUMERARIO));
         verify(alojamentoService).marcarPendenteLimpeza(1L);
+        verify(reservaService).concluir(10L);
     }
 
     @Test

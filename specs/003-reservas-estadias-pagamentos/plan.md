@@ -18,7 +18,7 @@ Implementar o ciclo operacional de receção para reservas, check-in/check-out e
 **Target Platform**: Aplicação web server-side (Linux/Docker), execução via Maven/Makefile  
 **Project Type**: Web application MVC monolítica  
 **Performance Goals**: Leituras < 2s; escritas < 3s; atualização de dashboard até 60s (RNF-01 + RF-01)  
-**Constraints**: Sem overbooking; check-in exige reserva confirmada; check-out exige check-in prévio; reserva cancelada não reativa; uma estadia ativa por animal; registo obrigatório de método/estado de pagamento; pagamento base depende de tarifa ativa por tipo de alojamento; pagamento de saída agrega extras, clínica e dias adicionais; operações críticas auditáveis  
+**Constraints**: Sem overbooking; check-in exige reserva `ATIVA` e confirma automaticamente a reserva; reserva `CONFIRMADA` já iniciou estadia e não pode ser cancelada; check-out exige check-in prévio; reserva cancelada não reativa; uma estadia ativa por animal; registo obrigatório de método/estado de pagamento; pagamento base depende de tarifa ativa por tipo de alojamento; pagamento de saída agrega extras, clínica e dias adicionais; operações críticas auditáveis  
 **Scale/Scope**: Fluxo operacional da receção e direção para Fase 3, com evolução posterior em Fase 4/5
 
 ## Constitution Check

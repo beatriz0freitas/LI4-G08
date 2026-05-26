@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class AlojamentoService implements IAlojamentoService {
 
     private final AlojamentoRepository alojamentoRepository;
+    private final IAvailabilityDomainService availabilityDomainService;
 
     public List<Alojamento> listarTodos() {
         return alojamentoRepository.findAllByOrderByIdentificacaoAsc();
@@ -26,7 +27,7 @@ public class AlojamentoService implements IAlojamentoService {
      * Conta os alojamentos disponíveis para receção.
      */
     public long contarAlojamentosDisponiveis() {
-        return alojamentoRepository.countByEstadoLimpeza(EstadoLimpeza.CONCLUIDO);
+        return alojamentoRepository.countDisponiveisOperacionais();
     }
 
     /**
@@ -42,9 +43,8 @@ public class AlojamentoService implements IAlojamentoService {
     
     /**
      * Procura alojamentos disponíveis para um período específico.
-     * Um alojamento é considerado disponível se:
-     * 1. O estado de limpeza é CONCLUIDO
-     * 2. Não tem reservas ativas que se sobreponham com o período
+     * Um alojamento é considerado disponível se estiver limpo, sem reserva
+     * sobreposta e sem estadia ativa.
      */
     public List<DisponibilidadeAlojamentoDto> consultarDisponibilidade(LocalDate dataInicio, LocalDate dataFim) {
         // Validação básica
@@ -81,33 +81,14 @@ public class AlojamentoService implements IAlojamentoService {
      * Verifica se um alojamento específico está disponível para um período.
      */
     public boolean estaDisponivel(Long alojamentoId, LocalDate dataInicio, LocalDate dataFim) {
-        // Obtém o alojamento
-        Alojamento alojamento = alojamentoRepository.findById(alojamentoId)
-            .orElseThrow(() -> new IllegalArgumentException("Alojamento não encontrado"));
-        
-        // Verifica se está limpo
-        if (alojamento.getEstadoLimpeza() != EstadoLimpeza.CONCLUIDO) {
-            return false;
-        }
-        
-        // Verifica conflitos de reserva
-        long conflitos = alojamentoRepository.countConflictingReservas(alojamentoId, dataInicio, dataFim);
-        return conflitos == 0;
+        return availabilityDomainService.estaDisponivel(alojamentoId, dataInicio, dataFim);
     }
 
     /**
      * Verifica disponibilidade e compatibilidade com a espécie do animal.
      */
     public boolean estaDisponivel(Long alojamentoId, LocalDate dataInicio, LocalDate dataFim, Especie especie) {
-        Alojamento alojamento = alojamentoRepository.findById(alojamentoId)
-            .orElseThrow(() -> new IllegalArgumentException("Alojamento não encontrado"));
-
-        String tipoEsperado = TipoAlojamentoPolicy.fromEspecie(especie);
-        if (!tipoEsperado.equals(alojamento.getTipo())) {
-            return false;
-        }
-
-        return estaDisponivel(alojamentoId, dataInicio, dataFim);
+        return availabilityDomainService.estaDisponivel(alojamentoId, dataInicio, dataFim, especie);
     }
     
     /**

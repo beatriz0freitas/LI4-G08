@@ -30,8 +30,8 @@ public class EstadiaService implements IEstadiaService {
     private final IAlojamentoService alojamentoService;
 
     /**
-     * Abre uma estadia a partir de uma reserva confirmada.
-     * Cria estadia, marca reserva como concluída e regista pagamento base.
+     * Abre uma estadia a partir de uma reserva ativa.
+     * Confirma a reserva, cria estadia e regista pagamento base na mesma transação.
      */
     public Estadia abrirEstadiaPorReserva(Long reservaId, MetodoPagamento metodoPagamento) {
         if (metodoPagamento == null) {
@@ -40,17 +40,16 @@ public class EstadiaService implements IEstadiaService {
 
         Reserva reserva = reservaService.obter(reservaId);
 
-        if (!reserva.isAtiva()) {
+        if (!reserva.podeFazerCheckIn()) {
             throw new IllegalArgumentException("Reserva não está em estado válido para check-in");
         }
+
+        reserva = reservaService.confirmar(reservaId);
 
         Estadia estadia = new Estadia();
         estadia.setReserva(reserva);
         estadia.setDataInicio(LocalDateTime.now());
         estadia.setEstado(EstadoEstadia.EM_CURSO);
-
-        // Marcar reserva como concluída para evitar reuso
-        reservaService.concluir(reservaId);
 
         Estadia saved = estadiaRepository.save(estadia);
 
@@ -112,6 +111,10 @@ public class EstadiaService implements IEstadiaService {
         // Passo 6: Marcar como TERMINADA (último passo para garantir integridade)
         estadia.setEstado(EstadoEstadia.TERMINADA);
         Estadia saved = estadiaRepository.save(estadia);
+
+        if (reserva != null) {
+            reservaService.concluir(reserva.getId());
+        }
 
         return saved;
     }

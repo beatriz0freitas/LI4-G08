@@ -20,6 +20,8 @@ public interface IReservaService {
 
     Reserva cancelar(Long id);
 
+    Reserva confirmar(Long id);
+
     Reserva concluir(Long id);
 
     long contarReservasAtivas();

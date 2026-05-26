@@ -38,14 +38,14 @@ class ReservaServiceCancelTest {
     private IAnimalService animalService;
 
     @Mock
-    private IAlojamentoService alojamentoService;
+    private IAvailabilityDomainService availabilityDomainService;
 
     @InjectMocks
     private ReservaService reservaService;
 
     @Test
     void cancelarDeveMarcarReservaComoCancelada() {
-        assertThat(alojamentoService).isNotNull();
+        assertThat(availabilityDomainService).isNotNull();
         assertThat(tutorService).isNotNull();
         assertThat(animalService).isNotNull();
 
@@ -61,7 +61,7 @@ class ReservaServiceCancelTest {
 
     @Test
     void cancelarDeveRejeitarReservaJaCancelada() {
-        assertThat(alojamentoService).isNotNull();
+        assertThat(availabilityDomainService).isNotNull();
         assertThat(tutorService).isNotNull();
         assertThat(animalService).isNotNull();
 
@@ -69,6 +69,18 @@ class ReservaServiceCancelTest {
         when(reservaRepository.findWithDetalhesById(11L)).thenReturn(Optional.of(reserva));
 
         assertThatThrownBy(() -> reservaService.cancelar(11L))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("não pode ser cancelada");
+
+        verify(reservaRepository, never()).save(any());
+    }
+
+    @Test
+    void cancelarDeveRejeitarReservaConfirmada() {
+        Reserva reserva = criarReserva(12L, EstadoReserva.CONFIRMADA);
+        when(reservaRepository.findWithDetalhesById(12L)).thenReturn(Optional.of(reserva));
+
+        assertThatThrownBy(() -> reservaService.cancelar(12L))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("não pode ser cancelada");
 

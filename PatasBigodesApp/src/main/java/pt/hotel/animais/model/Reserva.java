@@ -56,6 +56,14 @@ public class Reserva {
     public boolean isAtiva() {
         return estado == EstadoReserva.ATIVA;
     }
+
+    public boolean isConfirmada() {
+        return estado == EstadoReserva.CONFIRMADA;
+    }
+
+    public boolean podeFazerCheckIn() {
+        return estado == EstadoReserva.ATIVA;
+    }
     
     /**
      * Verifica se a reserva pode ser cancelada.

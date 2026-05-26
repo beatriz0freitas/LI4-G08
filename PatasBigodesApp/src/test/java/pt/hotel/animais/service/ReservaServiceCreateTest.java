@@ -39,7 +39,7 @@ class ReservaServiceCreateTest {
     private IAnimalService animalService;
 
     @Mock
-    private IAlojamentoService alojamentoService;
+    private IAvailabilityDomainService availabilityDomainService;
 
     @InjectMocks
     private ReservaService reservaService;
@@ -53,9 +53,13 @@ class ReservaServiceCreateTest {
 
         when(tutorService.obter(1L)).thenReturn(tutor);
         when(animalService.obter(2L)).thenReturn(animal);
-        when(alojamentoService.obter(3L)).thenReturn(alojamento);
         when(reservaRepository.countActiveInPeriod(3L, form.getDataInicio(), form.getDataFim())).thenReturn(0L);
-        when(alojamentoService.estaDisponivel(3L, form.getDataInicio(), form.getDataFim(), Especie.CAO)).thenReturn(true);
+        when(availabilityDomainService.validarDisponivelParaReservaComLock(
+            3L,
+            form.getDataInicio(),
+            form.getDataFim(),
+            Especie.CAO
+        )).thenReturn(alojamento);
         when(reservaRepository.save(any(Reserva.class))).thenAnswer(invocation -> {
             Reserva reserva = invocation.getArgument(0);
             reserva.setId(99L);

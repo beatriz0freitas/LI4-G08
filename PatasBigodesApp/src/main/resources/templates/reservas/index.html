@@ -105,17 +105,17 @@
 												</td>
 												<td>
 													<span class="badge"
-														  th:classappend="${reserva.estado.toString() == 'ATIVA' ? 'badge-success' : (reserva.estado.toString() == 'CANCELADA' ? 'badge-danger' : 'badge-secondary')}"
+														  th:classappend="${reserva.estado.toString() == 'ATIVA' ? 'badge-warning' : (reserva.estado.toString() == 'CONFIRMADA' ? 'badge-success' : (reserva.estado.toString() == 'CANCELADA' ? 'badge-danger' : 'badge-secondary'))}"
 														  th:text="${reserva.estado.label}">Estado</span>
 												</td>
 												<td>
 													<a th:href="@{/reservas/{id}(id=${reserva.id})}" class="btn btn-sm btn-info" title="Ver detalhes">
 														<i class="fas fa-eye"></i>
 													</a>
-														<a th:if="${reserva.isAtiva()}" th:href="@{/estadias(reservaId=${reserva.id})}" class="btn btn-sm btn-success" title="Check-in">
-																<i class="fas fa-right-to-bracket"></i>
-														</a>
-													<form th:if="${reserva.isAtiva()}" th:action="@{/reservas/{id}/cancelar(id=${reserva.id})}" method="post" class="d-inline" onsubmit="return confirm('Tem a certeza que deseja cancelar?')">
+													<a th:if="${reserva.podeFazerCheckIn()}" th:href="@{/estadias(reservaId=${reserva.id})}" class="btn btn-sm btn-success" title="Check-in">
+														<i class="fas fa-right-to-bracket"></i>
+													</a>
+													<form th:if="${reserva.podeSerCancelada()}" th:action="@{/reservas/{id}/cancelar(id=${reserva.id})}" method="post" class="d-inline" onsubmit="return confirm('Tem a certeza que deseja cancelar?')">
 														<button type="submit" class="btn btn-sm btn-danger" title="Cancelar reserva">
 															<i class="fas fa-times"></i>
 														</button>

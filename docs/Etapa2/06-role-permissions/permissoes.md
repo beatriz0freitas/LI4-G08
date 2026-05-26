@@ -27,7 +27,7 @@ O controlo de acesso deve ser aplicado nos controllers Spring MVC com `@PreAutho
 | Registo de novo colaborador | `/colaboradores/novo` | Sim | Não | Não | Não | Não | RF-02, US-03 |
 | Consulta de alojamentos/disponibilidade | `/alojamentos`, `/reservas/disponibilidade` | Sim | Sim | Não | Não | Não | RF-01, UC-02 |
 | Tutores e animais | `/tutores`, `/tutores/novo`, `/tutores/{id}`, `/tutores/{id}/editar`, `/animais` | Sim | Sim | Não | Não | Não | UC-03 |
-| Reservas | `/reservas`, `/reservas/novo`, `/reservas/{id}`, `/reservas/{id}/cancelar`, `/reservas/{id}/confirmar` | Sim | Sim | Não | Não | Não | UC-04, UC-05 |
+| Reservas | `/reservas`, `/reservas/novo`, `/reservas/{id}`, `/reservas/{id}/cancelar` | Sim | Sim | Não | Não | Não | UC-04, UC-05 |
 | Check-in e check-out | `/estadias`, `/estadias/check-in`, `/estadias/check-out` | Sim | Sim | Não | Não | Não | UC-06, UC-07, RF-09 |
 | Pagamentos | `/pagamentos` | Sim | Sim | Não | Não | Não | RF-10, UC-08 |
 | Plano de cuidados | `/plano-cuidados` | Sim | Sim | Sim | Sim | Não | UC-06, UC-09, UC-11 |
