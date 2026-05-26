@@ -10,11 +10,16 @@ import pt.hotel.animais.dto.IntervencaoClinicaDto;
 import pt.hotel.animais.dto.IntervencaoClinicaFormDto;
 import pt.hotel.animais.model.IntervencaoClinica;
 import pt.hotel.animais.model.Estadia;
+import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.repository.IntervencaoClinicaRepository;
 import pt.hotel.animais.repository.EstadiaRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 @RequiredArgsConstructor
@@ -24,19 +29,65 @@ public class IntervencaoClinicaService implements IIntervencaoClinicaService {
     private final EstadiaRepository estadiaRepository;
 
     @Transactional
-    public IntervencaoClinicaDto register(IntervencaoClinicaFormDto form) {
+    public IntervencaoClinicaDto register(IntervencaoClinicaFormDto form, Long autorId) {
+        validarFormulario(form);
+        validarMedicoResponsavel(autorId);
+
         Estadia estadia = estadiaRepository.findById(form.getEstadiaId())
                 .orElseThrow(() -> new IllegalArgumentException("Estadia não encontrada"));
 
+        if (estadia.getEstado() != EstadoEstadia.EM_CURSO) {
+            throw new IllegalArgumentException("Só é possível registar intervenções clínicas durante estadias em curso");
+        }
+
         IntervencaoClinica ic = new IntervencaoClinica();
         ic.setEstadia(estadia);
-        ic.setDescricao(form.getDescricao());
+        ic.setDescricao(form.getDescricao().trim());
         ic.setCusto(form.getCusto());
         ic.setDataHora(form.getDataHora());
-        // medicoId/autor should be set from security context in controller
+        ic.setMedicoId(autorId);
 
         IntervencaoClinica saved = intervencaoClinicaRepository.save(ic);
         return toDto(saved);
+    }
+
+    private void validarFormulario(IntervencaoClinicaFormDto form) {
+        if (form == null) {
+            throw new IllegalArgumentException("Dados da intervenção clínica são obrigatórios");
+        }
+        if (form.getEstadiaId() == null) {
+            throw new IllegalArgumentException("Estadia da intervenção clínica é obrigatória");
+        }
+        if (form.getDescricao() == null || form.getDescricao().isBlank()) {
+            throw new IllegalArgumentException("Descrição da intervenção clínica é obrigatória");
+        }
+        validarCusto(form.getCusto());
+        if (form.getDataHora() == null) {
+            throw new IllegalArgumentException("Data/hora da intervenção clínica é obrigatória");
+        }
+    }
+
+    private void validarMedicoResponsavel(Long autorId) {
+        if (autorId == null) {
+            throw new IllegalArgumentException("Médico responsável pela intervenção clínica é obrigatório");
+        }
+        validarAutorizacaoVeterinaria();
+    }
+
+    private void validarCusto(BigDecimal custo) {
+        if (custo == null) {
+            throw new IllegalArgumentException("Custo da intervenção clínica é obrigatório");
+        }
+        if (custo.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Custo da intervenção clínica não pode ser negativo");
+        }
+    }
+
+    private void validarAutorizacaoVeterinaria() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getAuthorities().stream().noneMatch(a -> "ROLE_MEDICO_VETERINARIO".equals(a.getAuthority()))) {
+            throw new IllegalArgumentException("Apenas médico veterinário pode registar intervenções clínicas");
+        }
     }
 
     @Transactional(readOnly = true)

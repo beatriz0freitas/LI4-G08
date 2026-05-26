@@ -11,9 +11,11 @@ import pt.hotel.animais.dto.ServicoExtraDto;
 import pt.hotel.animais.model.ServicoExtra;
 import pt.hotel.animais.model.TipoServicoExtra;
 import pt.hotel.animais.model.Estadia;
+import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.repository.ServicoExtraRepository;
 import pt.hotel.animais.repository.EstadiaRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,15 +37,17 @@ public class ServicoExtraService implements IServicoExtraService {
         Estadia estadia = estadiaRepository.findById(req.getEstadiaId())
                 .orElseThrow(() -> new IllegalArgumentException("Estadia não encontrada"));
 
-        if (estadia.getEstado() != pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO) {
+        if (estadia.getEstado() != EstadoEstadia.EM_CURSO) {
             throw new IllegalArgumentException("Só é possível registar serviços extra para estadias em curso");
         }
+
+        validarCusto(req.getCusto());
 
         // Carregar tipo de serviço pelo nome
         TipoServicoExtra tipo = tipoServicoExtraService.obterPorNome(req.getTipo())
                 .orElseThrow(() -> new IllegalArgumentException("Tipo de serviço não encontrado: " + req.getTipo()));
 
-        if (!tipo.getAtivo()) {
+        if (!Boolean.TRUE.equals(tipo.getAtivo())) {
             throw new IllegalArgumentException("Tipo de serviço inativo: " + req.getTipo());
         }
 
@@ -57,6 +61,15 @@ public class ServicoExtraService implements IServicoExtraService {
         ServicoExtra saved = servicoExtraRepository.save(se);
 
         return toDto(saved);
+    }
+
+    private void validarCusto(BigDecimal custo) {
+        if (custo == null) {
+            throw new IllegalArgumentException("Custo do serviço extra é obrigatório");
+        }
+        if (custo.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Custo do serviço extra não pode ser negativo");
+        }
     }
 
     @Transactional(readOnly = true)

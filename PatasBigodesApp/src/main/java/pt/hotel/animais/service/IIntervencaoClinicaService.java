@@ -6,7 +6,7 @@ import pt.hotel.animais.dto.IntervencaoClinicaDto;
 import pt.hotel.animais.dto.IntervencaoClinicaFormDto;
 
 public interface IIntervencaoClinicaService {
-    IntervencaoClinicaDto register(IntervencaoClinicaFormDto form);
+    IntervencaoClinicaDto register(IntervencaoClinicaFormDto form, Long autorId);
 
     Page<IntervencaoClinicaDto> listByEstadia(Long estadiaId, Pageable pageable);
 }

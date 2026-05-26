@@ -2,7 +2,6 @@ package pt.hotel.animais.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pt.hotel.animais.dto.DisponibilidadeAlojamentoDto;
 import pt.hotel.animais.model.Alojamento;
@@ -104,7 +103,7 @@ public class AlojamentoService implements IAlojamentoService {
     /**
      * Marca um alojamento como pendente de limpeza após check-out.
      */
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void marcarPendenteLimpeza(Long alojamentoId) {
         Alojamento alojamento = alojamentoRepository.findById(alojamentoId)
             .orElseThrow(() -> new IllegalArgumentException("Alojamento não encontrado"));
