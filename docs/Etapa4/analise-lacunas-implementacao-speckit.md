@@ -89,7 +89,11 @@ Também cria risco de regressões, porque uma funcionalidade pode estar codifica
 
 ### LAC-02 - Plano de cuidados definido mas não implementado
 
-**Problema atual**
+**Estado após correção**
+
+Mitigada em 26/05/2026 do ponto de vista de implementação e testes. `PlanoCuidadosServiceTest` valida criação de plano, consulta, listagem por animal, adição e conclusão de tarefas, atualização de prioridade, instruções e encerramento do plano. A rastreabilidade de `RF-11` foi atualizada em `docs/Etapa4/02-test-cases/casos-teste.md`.
+
+**Problema identificado originalmente**
 
 A spec de cuidados prevê a gestão de planos de cuidados, mas o serviço respetivo ainda não existe funcionalmente. Em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PlanoCuidadosService.java`, o método implementado lança `UnsupportedOperationException("Not implemented yet")`.
 
@@ -131,7 +135,7 @@ Também enfraquece a rastreabilidade de `US-14` e `RF-11`, porque a aplicação 
 
 ### LAC-03 - Check-out sem cobrança complementar real
 
-**Problema atual**
+**Problema identificado originalmente**
 
 O fluxo de check-out existe, mas a cobrança complementar não está implementada de forma completa. O serviço de pagamento calcula a estadia base com uma tarifa fixa e os extras devolvem atualmente `BigDecimal.ZERO`.
 
@@ -584,6 +588,26 @@ Além disso, se o agrupamento não for aplicado, relatórios por período, colab
 - Requisitos afetados: `FR-001`, `FR-003` e critérios de aceitação de exportação/agrupamento.
 
 ### LAC-15 - Testes verdes mas pouco representativos dos fluxos críticos
+
+**Estado após correção**
+
+Mitigada em 26/05/2026. Foram acrescentados testes de serviço e integração para tornar os fluxos críticos mais representativos, incluindo o fluxo completo de reserva até relatório.
+
+Evidência principal:
+
+- `CheckInServiceTest`: valida criação de estadia, pagamento de check-in, transição da reserva para `CONFIRMADA` e cenários negativos;
+- `CheckOutSequenceServiceTest`: valida check-out, pagamento final, reserva `CONCLUIDA`, estadia `TERMINADA` e cenários negativos;
+- `PlanoCuidadosServiceTest`: valida regras de criação, consulta, tarefas, prioridade e encerramento de plano de cuidados;
+- `FluxoOperacionalEndToEndIntegrationTest`: valida reserva, check-in, registo de cuidado, serviço extra, intervenção clínica, check-out, pagamento final, limpeza e relatório no mesmo fluxo integrado;
+- migrações `V10__allow_reserva_confirmada_estado.sql` e `V11__allow_servico_extra_catalog_type_only.sql`: corrigem inconsistências de schema descobertas pelos testes end-to-end.
+
+Validação executada:
+
+```bash
+mvn test -Dtest=CheckInServiceTest,CheckOutSequenceServiceTest,CheckInIntegrationTest,CheckOutIntegrationTest,PlanoCuidadosServiceTest,FluxoOperacionalEndToEndIntegrationTest
+```
+
+Resultado: `38` testes executados, `0` falhas, `0` erros.
 
 **Problema atual**
 

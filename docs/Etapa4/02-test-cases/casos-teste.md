@@ -43,6 +43,7 @@
 | TC-03.4 | Exportação CSV contém cabeçalho e dados do relatório | Unit | `RelatorioServiceTest.gerarCsvDeveConterCabecalhoEDadosDoRelatorio` |
 | TC-03.5 | Exportação PDF devolve bytes não vazios com conteúdo esperado | Unit | `RelatorioServiceTest.gerarPdfDeveRetornarBytesNaoVazios` |
 | TC-03.6 | `filtroMesAtual` devolve período do 1º dia até hoje | Unit | `RelatorioServiceTest.filtroMesAtualDeveRetornarPrimeiroDiaDeMesAteDia` |
+| TC-03.7 | Relatório reflete dados de fluxo operacional completo com reservas, estadias, faturação e serviços extra | Integration E2E | `FluxoOperacionalEndToEndIntegrationTest.fluxoCompletoReservaAteRelatorioDevePersistirEfeitosDoDominio` |
 
 ---
 
@@ -102,6 +103,7 @@
 | TC-07.7 | Concluir reserva não ativa lança exceção | Unit | `ReservaServiceUnitTest.concluirDeveRejeitarReservaNaoAtiva` |
 | TC-07.8 | Listar reservas por tutor delega no repositório | Unit | `ReservaServiceUnitTest.procurarPorTutorDeveDelegarNoRepositorio` |
 | TC-07.9 | Contar reservas ativas delega no repositório | Unit | `ReservaServiceUnitTest.contarReservasAtivasDeveDelegarNoRepositorio` |
+| TC-07.10 | Reserva criada entra no fluxo operacional completo até conclusão no check-out | Integration E2E | `FluxoOperacionalEndToEndIntegrationTest.fluxoCompletoReservaAteRelatorioDevePersistirEfeitosDoDominio` |
 
 ---
 
@@ -115,6 +117,7 @@
 | TC-08.4 | POST check-in com erro redireciona para /reservas com flash de erro | Web | `EstadiaControllerTest.checkInComErroDeveRedirecionarParaReservas` |
 | TC-08.5 | Calcular valor base de estadia (1 dia) | Unit | `PagamentoServiceTest.calcularValorBaseParaEstadiaDe1Dia` |
 | TC-08.6 | Calcular valor base de estadia (2 dias) | Unit | `PagamentoServiceTest.calcularValorBaseParaEstadiaDe2Dias` |
+| TC-08.7 | Check-in no fluxo completo confirma reserva, cria estadia e regista pagamento inicial | Integration E2E | `FluxoOperacionalEndToEndIntegrationTest.fluxoCompletoReservaAteRelatorioDevePersistirEfeitosDoDominio` |
 
 ---
 
@@ -128,6 +131,7 @@
 | TC-09.4 | POST check-out válido redireciona para /historico com flash de sucesso | Web | `EstadiaControllerTest.checkOutValidoDeveRedirecionarParaHistorico` |
 | TC-09.5 | POST check-out com erro redireciona para /historico com flash de erro | Web | `EstadiaControllerTest.checkOutComErroDeveRedirecionarParaHistoricoComErro` |
 | TC-09.6 | Calcular extras de estadia agrega serviços extra | Unit | `PagamentoServiceTest.calcularExtrasDeveAgregarServicosExtra` |
+| TC-09.7 | Check-out no fluxo completo termina estadia, conclui reserva, regista pagamento final e coloca alojamento pendente de limpeza | Integration E2E | `FluxoOperacionalEndToEndIntegrationTest.fluxoCompletoReservaAteRelatorioDevePersistirEfeitosDoDominio` |
 
 ---
 
@@ -141,6 +145,7 @@
 | TC-10.4 | Registar pagamento check-out sem método lança exceção | Unit | `PagamentoServiceTest.registrarPagamentoCheckOutSemMetodoDeveFalhar` |
 | TC-10.5 | POST /pagamentos válido redireciona com sucesso | Web | `PagamentoControllerTest.registrarValidoDeveRedirecionarParaHistorico` |
 | TC-10.6 | POST /pagamentos com erro adiciona flash de erro | Web | `PagamentoControllerTest.registrarComErroDeveAdicionarMensagemFlash` |
+| TC-10.7 | Pagamento final inclui serviço extra e intervenção clínica registados durante a estadia | Integration E2E | `FluxoOperacionalEndToEndIntegrationTest.fluxoCompletoReservaAteRelatorioDevePersistirEfeitosDoDominio` |
 
 ---
 
@@ -149,8 +154,11 @@
 | ID | Descrição | Tipo | Teste automatizado |
 |----|-----------|------|--------------------|
 | TC-11.1 | GET /plano-cuidados renderiza página | Web | `PlanoCuidadosControllerTest` |
-
-> Nota: `PlanoCuidadosService` está marcado como "Not implemented yet" — funcionalidade pendente.
+| TC-11.2 | Criar plano associa animal e estadia com prioridade inicial | Unit | `PlanoCuidadosServiceTest.criarPlanoDeveAssociarAnimalEEstadiaComPrioridadeRotina` |
+| TC-11.3 | Criar plano duplicado para estadia lança exceção | Unit | `PlanoCuidadosServiceTest.criarPlanoDeveLancarExcecaoSeJaExistePlanoParaEstadia` |
+| TC-11.4 | Adicionar tarefa a plano ativo persiste tarefa | Unit | `PlanoCuidadosServiceTest.adicionarTarefaDeveAssociarAoPlanoERetornarDto` |
+| TC-11.5 | Marcar tarefa como concluída regista autor e estado | Unit | `PlanoCuidadosServiceTest.marcarTarefaConcluidaDeveDefinirConcluidaEAutor` |
+| TC-11.6 | Encerrar plano define estado inativo e data de fim | Unit | `PlanoCuidadosServiceTest.encerrarPlanoDeveDefinirAtivoFalsoEDataFim` |
 
 ---
 
@@ -162,6 +170,8 @@
 | TC-12.2 | Criar registo para estadia terminada lança exceção | Unit | `RegistoCuidadoServiceTest.createDeveRejeitarEstadiaTerminada` |
 | TC-12.3 | Criar registo para estadia inexistente lança exceção | Unit | `RegistoCuidadoServiceTest.createDeveLancarExcecaoSeEstadiaNaoExistir` |
 | TC-12.4 | Listar cuidados por estadia devolve página com registos | Unit | `RegistoCuidadoServiceTest.listByEstadiaDeveRetornarPaginaComRegistos` |
+| TC-12.5 | Registo de cuidado é persistido durante o fluxo completo de estadia | Integration E2E | `FluxoOperacionalEndToEndIntegrationTest.fluxoCompletoReservaAteRelatorioDevePersistirEfeitosDoDominio` |
+| TC-12.6 | Registo de cuidado é rejeitado após check-out | Integration E2E | `FluxoOperacionalEndToEndIntegrationTest.fluxoCompletoDeveBloquearOperacoesClinicasECuidadosDepoisDoCheckOut` |
 
 ---
 
@@ -183,6 +193,8 @@
 |----|-----------|------|--------------------|
 | TC-14.1 | Histórico com estadiaId agrega intervenções clínicas | Unit | `HistoricoServiceTest.consultarComEstadiaIdAgregaTodosOsTipos` |
 | TC-14.2 | GET /clinica renderiza página clínica | Web | `ClinicaControllerTest` |
+| TC-14.3 | Intervenção clínica é persistida durante o fluxo completo de estadia | Integration E2E | `FluxoOperacionalEndToEndIntegrationTest.fluxoCompletoReservaAteRelatorioDevePersistirEfeitosDoDominio` |
+| TC-14.4 | Intervenção clínica é rejeitada após check-out | Integration E2E | `FluxoOperacionalEndToEndIntegrationTest.fluxoCompletoDeveBloquearOperacoesClinicasECuidadosDepoisDoCheckOut` |
 
 ---
 
@@ -195,6 +207,7 @@
 | TC-15.3 | Contar pendentes delega no repositório | Unit | `AlojamentoServiceTest.contarAlojamentosPendentesLimpezaDeveDelegarParaRepositorio` |
 | TC-15.4 | GET /limpeza lista alojamentos pendentes | Integration | `LimpezaControllerTest` (requer Docker) |
 | TC-15.5 | POST /limpeza/{id}/limpo atualiza estado | Integration | `LimpezaControllerTest` (requer Docker) |
+| TC-15.6 | Check-out coloca alojamento pendente e limpeza volta a marcar como concluído | Integration E2E | `FluxoOperacionalEndToEndIntegrationTest.fluxoCompletoReservaAteRelatorioDevePersistirEfeitosDoDominio` |
 
 ---
 
@@ -218,6 +231,8 @@
 | TC-17.3 | Registar serviço extra para estadia inexistente lança exceção | Unit | `ServicoExtraServiceTest.registerDeveLancarExcecaoSeEstadiaNaoExistir` |
 | TC-17.4 | Erro em calcularExtras não impede registo do serviço | Unit | `ServicoExtraServiceTest.registerNaoFalhaSeCalcularExtrasFalhar` |
 | TC-17.5 | Listar serviços por estadia devolve página com resultados | Unit | `ServicoExtraServiceTest.listByEstadiaDeveRetornarPaginaComServicos` |
+| TC-17.6 | Serviço extra é persistido e incluído no pagamento final no fluxo completo | Integration E2E | `FluxoOperacionalEndToEndIntegrationTest.fluxoCompletoReservaAteRelatorioDevePersistirEfeitosDoDominio` |
+| TC-17.7 | Serviço extra é rejeitado após check-out | Integration E2E | `FluxoOperacionalEndToEndIntegrationTest.fluxoCompletoDeveBloquearOperacoesClinicasECuidadosDepoisDoCheckOut` |
 
 ---
 
@@ -227,22 +242,22 @@
 |----|--------|-----------|
 | RF-01 | 2 | ✅ |
 | RF-02 | 8 | ✅ |
-| RF-03 | 6 | ✅ |
+| RF-03 | 7 | ✅ |
 | RF-04 | 11 | ✅ |
 | RF-05 | 5 | ✅ |
 | RF-06 | 6 | ✅ |
-| RF-07 | 9 | ✅ |
-| RF-08 | 6 | ✅ |
-| RF-09 | 6 | ✅ |
-| RF-10 | 6 | ✅ |
-| RF-11 | 1 | ⚠️ parcial |
-| RF-12 | 4 | ✅ |
+| RF-07 | 10 | ✅ |
+| RF-08 | 7 | ✅ |
+| RF-09 | 7 | ✅ |
+| RF-10 | 7 | ✅ |
+| RF-11 | 6 | ✅ |
+| RF-12 | 6 | ✅ |
 | RF-13 | 5 | ✅ |
-| RF-14 | 2 | ✅ |
-| RF-15 | 5 | ✅ |
+| RF-14 | 4 | ✅ |
+| RF-15 | 6 | ✅ |
 | RF-16 | 4 | ✅ |
-| RF-17 | 5 | ✅ |
-| **Total** | **91** | **16/17 ✅** |
+| RF-17 | 7 | ✅ |
+| **Total** | **108** | **17/17 ✅** |
 
 ---
 
@@ -254,9 +269,9 @@ Esta secção resume a satisfação dos requisitos da SRS com base nos testes au
 
 | Grupo | Estado | Evidência |
 |-------|--------|-----------|
-| RF-01 a RF-10 | Verificado | Casos TC-01.1 a TC-10.6 |
-| RF-11 | Parcial | Existe teste de controller; serviço de plano de cuidados ainda pendente |
-| RF-12 a RF-17 | Verificado | Casos TC-12.1 a TC-17.5 |
+| RF-01 a RF-10 | Verificado | Casos TC-01.1 a TC-10.7 |
+| RF-11 | Verificado | Casos TC-11.1 a TC-11.6 |
+| RF-12 a RF-17 | Verificado | Casos TC-12.1 a TC-17.7 |
 
 ### Regras de Domínio
 
