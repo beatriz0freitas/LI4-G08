@@ -19,6 +19,7 @@ import pt.hotel.animais.model.IntervencaoClinica;
 import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.repository.IntervencaoClinicaRepository;
+import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -40,6 +41,9 @@ class IntervencaoClinicaServiceTest {
 
     @Mock
     private EstadiaRepository estadiaRepository;
+
+    @Mock
+    private AuditoriaOperacaoService auditoriaOperacaoService;
 
     @InjectMocks
     private IntervencaoClinicaService service;

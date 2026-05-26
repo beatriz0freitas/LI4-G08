@@ -14,6 +14,7 @@ import pt.hotel.animais.model.RegistoCuidado;
 import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.repository.RegistoCuidadoRepository;
+import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,6 +33,9 @@ class RegistoCuidadoServiceTest {
 
     @Mock
     private EstadiaRepository estadiaRepository;
+
+    @Mock
+    private AuditoriaOperacaoService auditoriaOperacaoService;
 
     @InjectMocks
     private RegistoCuidadoService registoCuidadoService;

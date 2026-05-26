@@ -14,9 +14,12 @@ import pt.hotel.animais.model.enums.MetodoPagamento;
 import pt.hotel.animais.model.enums.MomentoPagamento;
 import pt.hotel.animais.repository.AnimalRepository;
 import pt.hotel.animais.repository.EstadiaRepository;
+import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -33,6 +36,7 @@ public class EstadiaService implements IEstadiaService {
     private final IPagamentoService pagamentoService;
     private final IAlojamentoService alojamentoService;
     private final AnimalRepository animalRepository;
+    private final AuditoriaOperacaoService auditoriaOperacaoService;
 
     /**
      * Abre uma estadia a partir de uma reserva ativa.
@@ -77,6 +81,14 @@ public class EstadiaService implements IEstadiaService {
         pagamentoDto.setEstadoPagamento(EstadoPagamento.LIQUIDADO);
 
         pagamentoService.registrarPagamento(pagamentoDto);
+
+        auditoriaOperacaoService.registarSucesso(
+            "CHECK_IN",
+            "Estadia",
+            saved.getId(),
+            "CREATE",
+            detalhesCheckIn(saved, metodoPagamento, valorBase)
+        );
 
         return saved;
     }
@@ -130,6 +142,14 @@ public class EstadiaService implements IEstadiaService {
             alojamentoService.marcarPendenteLimpeza(reserva.getAlojamento().getId());
         }
 
+        auditoriaOperacaoService.registarSucesso(
+            "CHECK_OUT",
+            "Estadia",
+            saved.getId(),
+            "UPDATE",
+            detalhesCheckOut(saved, metodoPagamento)
+        );
+
         return saved;
     }
 
@@ -173,5 +193,25 @@ public class EstadiaService implements IEstadiaService {
     @Transactional(readOnly = true)
     public long contarEstadiasEmCurso() {
         return estadiaRepository.countByEstado(EstadoEstadia.EM_CURSO);
+    }
+
+    private Map<String, Object> detalhesCheckIn(Estadia estadia,
+                                                MetodoPagamento metodoPagamento,
+                                                BigDecimal valorBase) {
+        Map<String, Object> detalhes = new LinkedHashMap<>();
+        detalhes.put("reservaId", estadia.getReserva() != null ? estadia.getReserva().getId() : null);
+        detalhes.put("metodoPagamento", metodoPagamento != null ? metodoPagamento.name() : null);
+        detalhes.put("valorBase", valorBase != null ? valorBase.toPlainString() : null);
+        detalhes.put("estado", estadia.getEstado() != null ? estadia.getEstado().name() : null);
+        return detalhes;
+    }
+
+    private Map<String, Object> detalhesCheckOut(Estadia estadia, MetodoPagamento metodoPagamento) {
+        Map<String, Object> detalhes = new LinkedHashMap<>();
+        detalhes.put("reservaId", estadia.getReserva() != null ? estadia.getReserva().getId() : null);
+        detalhes.put("metodoPagamento", metodoPagamento != null ? metodoPagamento.name() : null);
+        detalhes.put("dataFim", estadia.getDataFim() != null ? estadia.getDataFim().toString() : null);
+        detalhes.put("estado", estadia.getEstado() != null ? estadia.getEstado().name() : null);
+        return detalhes;
     }
 }

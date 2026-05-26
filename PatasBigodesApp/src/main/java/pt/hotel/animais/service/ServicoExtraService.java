@@ -14,9 +14,12 @@ import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.repository.ServicoExtraRepository;
 import pt.hotel.animais.repository.EstadiaRepository;
+import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +31,7 @@ public class ServicoExtraService implements IServicoExtraService {
     private final EstadiaRepository estadiaRepository;
     private final IPagamentoService pagamentoService;
     private final TipoServicoExtraService tipoServicoExtraService;
+    private final AuditoriaOperacaoService auditoriaOperacaoService;
 
     /**
      * Registar um serviço extra para uma estadia em curso.
@@ -59,6 +63,14 @@ public class ServicoExtraService implements IServicoExtraService {
         se.setAutorId(autorId);
 
         ServicoExtra saved = servicoExtraRepository.save(se);
+        auditoriaOperacaoService.registarSucesso(
+            autorId,
+            "SERVICO_EXTRA",
+            "ServicoExtra",
+            saved.getId(),
+            "CREATE",
+            detalhesServicoExtra(saved)
+        );
 
         return toDto(saved);
     }
@@ -94,5 +106,15 @@ public class ServicoExtraService implements IServicoExtraService {
         d.setCusto(s.getCusto());
         d.setDataHora(s.getDataHora());
         return d;
+    }
+
+    private Map<String, Object> detalhesServicoExtra(ServicoExtra servicoExtra) {
+        Map<String, Object> detalhes = new LinkedHashMap<>();
+        detalhes.put("estadiaId", servicoExtra.getEstadia() != null ? servicoExtra.getEstadia().getId() : null);
+        detalhes.put("tipo", servicoExtra.getTipoServicoExtra() != null ? servicoExtra.getTipoServicoExtra().getNome() : null);
+        detalhes.put("custo", servicoExtra.getCusto() != null ? servicoExtra.getCusto().toPlainString() : null);
+        detalhes.put("dataHora", servicoExtra.getDataHora() != null ? servicoExtra.getDataHora().toString() : null);
+        detalhes.put("autorId", servicoExtra.getAutorId());
+        return detalhes;
     }
 }
