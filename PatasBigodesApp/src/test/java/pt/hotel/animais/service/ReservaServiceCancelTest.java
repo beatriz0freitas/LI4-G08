@@ -38,14 +38,14 @@ class ReservaServiceCancelTest {
     private IAnimalService animalService;
 
     @Mock
-    private IAlojamentoService alojamentoService;
+    private IAvailabilityDomainService availabilityDomainService;
 
     @InjectMocks
     private ReservaService reservaService;
 
     @Test
     void cancelarDeveMarcarReservaComoCancelada() {
-        assertThat(alojamentoService).isNotNull();
+        assertThat(availabilityDomainService).isNotNull();
         assertThat(tutorService).isNotNull();
         assertThat(animalService).isNotNull();
 
@@ -61,7 +61,7 @@ class ReservaServiceCancelTest {
 
     @Test
     void cancelarDeveRejeitarReservaJaCancelada() {
-        assertThat(alojamentoService).isNotNull();
+        assertThat(availabilityDomainService).isNotNull();
         assertThat(tutorService).isNotNull();
         assertThat(animalService).isNotNull();
 

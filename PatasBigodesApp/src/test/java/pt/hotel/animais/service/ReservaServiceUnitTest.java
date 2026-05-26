@@ -29,7 +29,7 @@ class ReservaServiceUnitTest {
     @Mock
     private IAnimalService animalService;
     @Mock
-    private IAlojamentoService alojamentoService;
+    private IAvailabilityDomainService availabilityDomainService;
 
     @InjectMocks
     private ReservaService service;

@@ -27,7 +27,7 @@ public class ReservaService implements IReservaService {
     private final ReservaRepository reservaRepository;
     private final ITutorService tutorService;
     private final IAnimalService animalService;
-    private final IAlojamentoService alojamentoService;
+    private final IAvailabilityDomainService availabilityDomainService;
     
     /**
      * Cria uma nova reserva com validações rigorosas.
@@ -50,9 +50,6 @@ public class ReservaService implements IReservaService {
             throw new IllegalArgumentException("O animal não pertence ao tutor especificado");
         }
         
-        // Valida que alojamento existe e está disponível
-        Alojamento alojamento = alojamentoService.obter(formDto.getAlojamentoId());
-        
         // Valida as datas
         if (formDto.getDataInicio() == null || formDto.getDataFim() == null) {
             throw new IllegalArgumentException("Datas de entrada obrigatórias");
@@ -62,7 +59,7 @@ public class ReservaService implements IReservaService {
             throw new IllegalArgumentException("Data de início deve ser anterior a data de fim");
         }
         
-        // Verifica overbooking: não há reservas ativas que se sobreponham
+        // Verifica overbooking antes do lock para devolver erro explícito de reserva sobreposta.
         long conflitos = reservaRepository.countActiveInPeriod(
             formDto.getAlojamentoId(),
             formDto.getDataInicio(),
@@ -75,17 +72,13 @@ public class ReservaService implements IReservaService {
             );
         }
         
-        // Verifica se o alojamento está limpo, livre e adequado à espécie do animal
-        if (!alojamentoService.estaDisponivel(
+        // Valida a regra completa de disponibilidade com lock pessimista no alojamento.
+        Alojamento alojamento = availabilityDomainService.validarDisponivelParaReservaComLock(
             formDto.getAlojamentoId(),
             formDto.getDataInicio(),
             formDto.getDataFim(),
             animal.getEspecie()
-        )) {
-            throw new IllegalArgumentException(
-                "O alojamento não está disponível ou não é adequado à espécie do animal"
-            );
-        }
+        );
         
         // Cria a reserva
         Reserva reserva = new Reserva();

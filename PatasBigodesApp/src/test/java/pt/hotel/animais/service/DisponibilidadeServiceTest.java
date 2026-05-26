@@ -27,6 +27,9 @@ class DisponibilidadeServiceTest {
     @Mock
     private AlojamentoRepository alojamentoRepository;
 
+    @Mock
+    private IAvailabilityDomainService availabilityDomainService;
+
     @InjectMocks
     private AlojamentoService alojamentoService;
 
@@ -72,8 +75,7 @@ class DisponibilidadeServiceTest {
         LocalDate dataInicio = LocalDate.now().plusDays(7);
         LocalDate dataFim = dataInicio.plusDays(2);
 
-        when(alojamentoRepository.findById(3L)).thenReturn(Optional.of(alojamento));
-        when(alojamentoRepository.countConflictingReservas(3L, dataInicio, dataFim)).thenReturn(1L);
+        when(availabilityDomainService.estaDisponivel(3L, dataInicio, dataFim, Especie.CAO)).thenReturn(false);
 
         boolean disponivel = alojamentoService.estaDisponivel(3L, dataInicio, dataFim, Especie.CAO);
 

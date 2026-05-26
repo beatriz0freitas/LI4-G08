@@ -193,8 +193,7 @@ db-up:
 	docker compose up -d db
 
 db-reset-test:
-	docker compose rm -sf db-tests
-	docker compose up -d --wait db-tests
+	docker compose up -d --wait --force-recreate db-tests
 
 db-stop:
 	docker compose stop db

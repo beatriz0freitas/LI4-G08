@@ -34,6 +34,9 @@
 - Q: O que entra na cobrança de check-out? → A: O check-out cobra apenas valores complementares: serviços extra, intervenções clínicas faturáveis e eventuais dias reais que ultrapassem o período reservado já pago no check-in.
 - Q: Como são geridos tipos de serviços extra? → A: Os tipos de serviços extra são catálogo de base de dados (`TipoServicoExtra`), gerido pela direção e referenciado por cada `ServicoExtra`.
 - Q: O check-in/check-out pode omitir método de pagamento? → A: Não. As interfaces de check-in e check-out devem exigir método real (`NUMERARIO`, `CARTAO_DEBITO` ou `CARTAO_CREDITO`) para registar pagamento liquidado.
+- Q: Qual deverá ser a estratégia de validação de disponibilidade para evitar variações entre caminhos de código? → A: Validação em dois níveis: queries otimizadas no Repository excluem estadias ativas e reservas sobrepostas; serviço de domínio (`AvailabilityDomainService`) centraliza regra completa de RF-06/RD-01 (sem reserva, sem estadia, limpeza concluída).
+- Q: Como deverá o sistema proceder em cenários de concorrência? → A: Transação explícita com lock pessimista (`@Lock(LockModeType.PESSIMISTIC_WRITE)`) no Alojamento durante validação e reserva, garantindo consistência ACID e impedindo overbooking.
+- Q: Como sincronizar Estadia e Alojamento sem inconsistência? → A: Transação atómica no `EstadiaService.registarCheckOut()` que atualiza tanto a Estadia (EM_CURSO → TERMINADA) como o Alojamento (OCUPADO → PENDENTE_LIMPEZA) na mesma transação; falha reverte ambas.
 
 ---
 
@@ -154,7 +157,7 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 
 - **RF-01 - Dashboard operacional**: O sistema deve disponibilizar um dashboard acessível ao perfil de diretor contendo, no mínimo, taxa de ocupação atual, número de estadias ativas, número de reservas futuras e valor total de faturação diária/mensal, com atualização automática (evento relevante ou máximo de 60 segundos). A implementação deve manter `IDashboardService`/`DashboardService`, mas esse serviço deve apenas orquestrar métricas expostas pelas interfaces dos serviços de domínio, sem aceder diretamente aos repositórios.
 - **RF-05 - Histórico de estadias e pagamentos**: O sistema deve manter um histórico completo das estadias e pagamentos de cada animal, consultável pela receção e pela direção, com paginação e filtragem por cliente, animal, estado e intervalo temporal.
-- **RF-06 - Controlo de disponibilidade de boxes**: O sistema deve determinar disponibilidade em tempo real por três condições cumulativas: sem reserva confirmada no período, sem estadia ativa no período e limpeza concluída; deve impedir reservas inválidas e sugerir alternativas.
+- **RF-06 - Controlo de disponibilidade de boxes**: O sistema deve determinar disponibilidade em tempo real por três condições cumulativas: sem reserva confirmada no período, sem estadia ativa no período e limpeza concluída; deve impedir reservas inválidas e sugerir alternativas. A validação ocorre em dois níveis: (i) queries otimizadas no `AlojamentoRepository` excluem estadias ativas e reservas sobrepostas; (ii) `AvailabilityDomainService` centraliza a regra completa com lock pessimista na transação de criação de reserva para garantir consistência em ambiente concorrente.
 - **RF-07 - Gestão de reservas**: O sistema deve permitir criação, confirmação e cancelamento de reservas, com registo de período, box e animal associados.
 - **RF-08 - Check-in e pagamento de estadia**: O sistema deve suportar check-in, registar data de entrada e box atribuída, e processar pagamento da estadia no mesmo momento, usando a tarifa diária ativa do tipo de alojamento.
 - **RF-09 - Check-out e faturação complementar**: O sistema deve suportar check-out, registar data de saída e calcular/processar pagamento de serviços extra, intervenções veterinárias acumuladas e dias adicionais face ao período reservado.
@@ -163,9 +166,9 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 
 ### Domain Requirements
 
-- **RD-01 - Disponibilidade de alojamento**: Um alojamento só é considerado disponível se não existir reserva ou estadia ativa no período e se a limpeza estiver marcada como concluída.
+- **RD-01 - Disponibilidade de alojamento**: Um alojamento só é considerado disponível se não existir reserva ou estadia ativa no período e se a limpeza estiver marcada como concluída. Esta regra é validada centralmente por `AvailabilityDomainService` com lock pessimista durante criação de reserva, impedindo overbooking mesmo em cenários de alta concorrência.
 - **RD-02 - Check-in condicionado a reserva**: Um animal só pode realizar check-in com reserva confirmada associada.
-- **RD-03 - Sequência de check-in/check-out**: O check-out só pode ocorrer após check-in registado para a mesma estadia.
+- **RD-03 - Sequência de check-in/check-out**: O check-out só pode ocorrer após check-in registado para a mesma estadia. Check-out atualiza atomicamente Estadia (EM_CURSO → TERMINADA) e Alojamento (OCUPADO → PENDENTE_LIMPEZA) na mesma transação, garantindo consistência.
 - **RD-04 - Pagamento no check-in e check-out**: O check-in cobre exclusivamente a estadia base estimada pelo período reservado e tarifa ativa do tipo de alojamento; extras, intervenções veterinárias e dias adicionais são cobrados no check-out.
 - **RD-06 - Cancelamento de reservas**: Uma reserva cancelada não pode ser reativada; deve ser criada nova reserva.
 - **RD-07 - Exclusividade de estadia**: Um animal não pode ter duas estadias em curso em simultâneo.
@@ -311,6 +314,46 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 | US-05 | RF-05 | ✓ Coberto |
 | US-02 | RF-01 | ✓ Coberto |
 | Gestão de tarifas e catálogos | RF-18, RF-08, RF-09, RD-04 | ✓ Coberto |
+
+---
+
+## Edge Cases & Failure Handling
+
+### Concorrência e Overbooking 
+
+**Problema**: Em ambiente concorrente, dois ou mais utilizadores podem tentar criar reservas para o mesmo alojamento no mesmo período simultaneamente, resultando em overbooking.
+
+**Solução Implementada**:
+1. **Lock Pessimista**: `AlojamentoRepository.findDisponiveisParaPeriodo(...)` e `AvailabilityDomainService.validarDisponibilidade(...)` utilizam `@Lock(LockModeType.PESSIMISTIC_WRITE)` sobre a entidade `Alojamento` durante a transação de criação de reserva. Isto garante que apenas uma transação por vez consegue validar e reservar um alojamento.
+2. **Queries com Filtro de Estadia Ativa**: Todas as queries de disponibilidade excluem explicitamente alojamentos com estadia em estado `EM_CURSO`, complementando o filtro de reserva.
+3. **Transação Atómica**: Validação + inserção de `Reserva` ocorrem na mesma transação, impedindo race conditions.
+
+**Comportamento em Falha**:
+- Se a transação falhar por timeout ou conflict durante lock, a exceção `OptimisticLockException` ou `PessimisticLockException` é apanhada em `ReservaController`, e o utilizador recebe feedback ("Alojamento já foi ocupado por outro utilizador; tente novamente") com sugestão de datas alternativas.
+
+### Sincronização de Estados (Check-out)
+
+**Problema**: Se check-out atualizar apenas `Estadia` mas falhar antes de atualizar `Alojamento`, o alojamento fica ocupado enquanto a estadia já terminou.
+
+**Solução Implementada**:
+- `EstadiaService.registarCheckOut()` executa uma transação atómica que:
+  1. Valida existência de check-in prévio (RD-03).
+  2. Atualiza `Estadia.estado` = `TERMINADA` e `Estadia.checkOut` = data/hora atual.
+  3. Atualiza `Alojamento.estado` = `PENDENTE_LIMPEZA`.
+  4. Registam-se ambas as alterações no mesmo `flush()` da transação.
+  5. Se falha em qualquer passo, toda a transação é revertida.
+
+**Comportamento em Falha**:
+- Se a transação falha, o utilizador é notificado de erro transitório e é incentivado a retentatar. Ambas as entidades permanecem no estado anterior.
+
+### Pagamento Sem Método Definido
+
+**Problema**: Anteriormente, pagamentos podiam ser criados com `MetodoPagamento.NAO_DEFINIDO`, deixando a auditoria incerta.
+
+**Solução Implementada**:
+- Campos `metodoPagamento` e `estadoPagamento` em `Pagamento` são obrigatórios (`@NotNull`).
+- Controllers (`ReservaController.checkin()`, `EstadiaController.checkout()`) validam que método é um de: `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO`.
+- Se não fornecido, operação é rejeitada com mensagem clara e formulário é re-apresentado.
 
 ---
 
