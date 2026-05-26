@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.enums.Especie;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.repository.AlojamentoRepository;
 
 import java.time.LocalDate;
@@ -121,7 +120,7 @@ class AlojamentoServiceTest {
 
     @Test
     void estaDisponivelComEspecieRetornaFalsoSeTipoIncompativel() {
-        Alojamento alojamento = new Alojamento(1L, "Box 1", TipoAlojamento.FELINO, 1, EstadoLimpeza.CONCLUIDO, null);
+        Alojamento alojamento = new Alojamento(1L, "Box 1", "FELINO", 1, EstadoLimpeza.CONCLUIDO, null);
         when(alojamentoRepository.findById(1L)).thenReturn(Optional.of(alojamento));
 
         boolean resultado = alojamentoService.estaDisponivel(

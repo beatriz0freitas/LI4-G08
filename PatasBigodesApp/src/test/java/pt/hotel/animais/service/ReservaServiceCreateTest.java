@@ -13,7 +13,6 @@ import pt.hotel.animais.model.Tutor;
 import pt.hotel.animais.model.enums.Especie;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
 import pt.hotel.animais.model.enums.EstadoReserva;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.repository.ReservaRepository;
 
 import java.lang.reflect.Field;
@@ -128,7 +127,7 @@ class ReservaServiceCreateTest {
         Alojamento alojamento = new Alojamento();
         definirCampo(alojamento, "id", id);
         definirCampo(alojamento, "identificacao", "Box " + id);
-        definirCampo(alojamento, "tipo", TipoAlojamento.CANINO);
+        definirCampo(alojamento, "tipo", "CANINO");
         definirCampo(alojamento, "capacidade", 2);
         definirCampo(alojamento, "estadoLimpeza", EstadoLimpeza.CONCLUIDO);
         return alojamento;

@@ -31,6 +31,7 @@ public class CheckInServiceTest {
     void abrirEstadiaPorReserva_fails_for_invalid_reserva() {
         // Act & Assert
         Assertions.assertThrows(IllegalArgumentException.class, 
-            () -> estadiaService.abrirEstadiaPorReserva(9999L));
+            () -> estadiaService.abrirEstadiaPorReserva(9999L, 
+                pt.hotel.animais.model.enums.MetodoPagamento.NUMERARIO));
     }
 }

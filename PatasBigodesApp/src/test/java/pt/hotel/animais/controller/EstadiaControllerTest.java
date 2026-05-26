@@ -56,7 +56,7 @@ class EstadiaControllerTest {
         Estadia e = new Estadia();
         e.setId(1L);
         when(estadiaRepository.findById(1L)).thenReturn(Optional.of(e));
-        when(pagamentoService.calcularExtras(any())).thenReturn(new BigDecimal("25.00"));
+        when(pagamentoService.calcularCobrancaComplementar(any())).thenReturn(new BigDecimal("25.00"));
 
         mockMvc.perform(get("/estadias").param("estadiaId", "1"))
                 .andExpect(status().isOk())
@@ -69,11 +69,12 @@ class EstadiaControllerTest {
     void checkInValidoDeveRedirecionarParaEstadiasComSucesso() throws Exception {
         Estadia e = new Estadia();
         e.setId(5L);
-        when(estadiaService.abrirEstadiaPorReserva(10L)).thenReturn(e);
+        when(estadiaService.abrirEstadiaPorReserva(10L, pt.hotel.animais.model.enums.MetodoPagamento.NUMERARIO)).thenReturn(e);
 
         mockMvc.perform(post("/estadias/check-in")
                         .with(csrf())
-                        .param("reservaId", "10"))
+                        .param("reservaId", "10")
+                        .param("metodoPagamento", "NUMERARIO"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/estadias"))
                 .andExpect(flash().attributeExists("successMessage"));
@@ -82,12 +83,13 @@ class EstadiaControllerTest {
     @Test
     @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
     void checkInComErroDeveRedirecionarParaReservas() throws Exception {
-        when(estadiaService.abrirEstadiaPorReserva(99L))
+        when(estadiaService.abrirEstadiaPorReserva(99L, pt.hotel.animais.model.enums.MetodoPagamento.NUMERARIO))
                 .thenThrow(new IllegalArgumentException("Reserva não encontrada"));
 
         mockMvc.perform(post("/estadias/check-in")
                         .with(csrf())
-                        .param("reservaId", "99"))
+                        .param("reservaId", "99")
+                        .param("metodoPagamento", "NUMERARIO"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/reservas"))
                 .andExpect(flash().attributeExists("errorMessage"));
@@ -98,11 +100,12 @@ class EstadiaControllerTest {
     void checkOutValidoDeveRedirecionarParaHistorico() throws Exception {
         Estadia e = new Estadia();
         e.setId(3L);
-        when(estadiaService.checkOut(3L)).thenReturn(e);
+        when(estadiaService.checkOut(3L, pt.hotel.animais.model.enums.MetodoPagamento.NUMERARIO)).thenReturn(e);
 
         mockMvc.perform(post("/estadias/check-out")
                         .with(csrf())
-                        .param("estadiaId", "3"))
+                        .param("estadiaId", "3")
+                        .param("metodoPagamento", "NUMERARIO"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/historico"))
                 .andExpect(flash().attributeExists("successMessage"));
@@ -111,12 +114,13 @@ class EstadiaControllerTest {
     @Test
     @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
     void checkOutComErroDeveRedirecionarParaHistoricoComErro() throws Exception {
-        when(estadiaService.checkOut(99L))
+        when(estadiaService.checkOut(99L, pt.hotel.animais.model.enums.MetodoPagamento.NUMERARIO))
                 .thenThrow(new IllegalArgumentException("Estadia já terminada"));
 
         mockMvc.perform(post("/estadias/check-out")
                         .with(csrf())
-                        .param("estadiaId", "99"))
+                        .param("estadiaId", "99")
+                        .param("metodoPagamento", "NUMERARIO"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/historico"))
                 .andExpect(flash().attributeExists("errorMessage"));
