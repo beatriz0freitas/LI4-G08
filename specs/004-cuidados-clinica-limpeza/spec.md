@@ -18,6 +18,11 @@ Completar a rastreabilidade da operação diária e do acompanhamento clínico d
 - **Q: Plano vinculado à Estadia ou ao Animal?** → **A:** Duplo vínculo: animal mantém histórico persistente de cuidados recorrentes; cada estadia herda/cria cópia ajustável do plano do animal.
 - **Q: Estados/ciclos de vida do plano durante a estadia?** → **A:** Plano com priorização (ROTINA, URGENTE, CRÍTICO) que muda conforme alterações de saúde (US-16); encerra automaticamente pós-check-out.
 
+### Session 2026-05-26
+
+- **Q: Em que condições uma intervenção clínica pode ser registada?** → **A:** Apenas durante uma estadia ativa, com veterinário responsável obrigatório e custo não negativo.
+- **Q: Registos de cuidado e serviços extra seguem as mesmas validações base?** → **A:** Sim. Só podem ser registados durante uma estadia ativa; o `RegistoCuidado` exige autor autenticado autorizado e o `ServicoExtra` exige também custo não negativo.
+
 ## Mapeamento a artefactos existentes
 - Use Cases: [UC-09 - Registar Cuidados Diarios](docs/Etapa1/03-use-cases/UC-09.md#L1), [UC-10 - Registar Servico Extra](docs/Etapa1/03-use-cases/UC-10.md#L1), [UC-11 - Gerir Historial Clinico](docs/Etapa1/03-use-cases/UC-11.md#L1)
 - User Stories: US-14, US-15, US-16, US-17, US-18, US-22, US-23 (ver rastreabilidade em [docs/Etapa1/01-user-stories/user-stories.md](docs/Etapa1/01-user-stories/user-stories.md#L1))
@@ -50,6 +55,7 @@ Independent Test: Criar `RegistoCuidado` associado a `Estadia` e verificar visib
 Acceptance Scenarios:
 1. Dado um animal em estadia activa, quando o cuidador submete um formulário de cuidado com "descricao" e "dataHora", então o sistema cria um `RegistoCuidado` ligado à `Estadia` e o retorna com id gerado.
 2. Dado um cuidado registado, quando um director visualiza a estadia, então o registo aparece ordenado por `dataHora` descendente.
+3. Quando o `RegistoCuidado` é submetido fora de uma estadia ativa, então a operação é rejeitada.
 
 ### US-18 - Registar serviço extra (Prioridade: P1)
 Descrição: Recepção ou cuidador regista um `ServicoExtra` (BANHO, PASSEIO, OUTRO) durante a estadia incluindo custo e momento.
@@ -58,13 +64,16 @@ Independent Test: Criar `ServicoExtra` e validar impacto no resumo financeiro da
 Acceptance Scenarios:
 1. Dado uma estadia em curso, quando se regista um `ServicoExtra` com `tipo` e `custo`, então o serviço é persistido e aparece na secção "extras" da estadia.
 2. Após check-out, a soma de `ServicoExtra` é incluída no cálculo final do pagamento.
+3. Quando o serviço extra é registado fora de uma estadia ativa ou com custo negativo, então a operação é rejeitada.
 
 ### US-23 - Registar intervenção clínica (Prioridade: P2)
 Descrição: Médico veterinário regista uma `IntervencaoClinica` com descrição, custo e nota clínica associada à estadia/animal.
 Porque P2: Importante para historial médico, menos frequente que cuidados diários mas crítico para segurança.
 Independent Test: Persistir `IntervencaoClinica` e verificar que aparece no historial clínico acessível por `UC-11`.
 Acceptance Scenarios:
-1. Médico autenticado cria intervenção; sistema grava autor e timestamp; intervenção aparece na ficha clínica do animal.
+1. Dado um animal em estadia ativa, quando um veterinário autenticado regista uma intervenção com descrição, custo válido e data/hora, então o sistema grava autor e timestamp e associa a intervenção à estadia em curso.
+2. Quando um utilizador sem perfil `VETERINARIO` tenta registar uma intervenção clínica, então a operação é recusada.
+3. Quando o custo é negativo ou a estadia não está ativa, então a intervenção não é criada.
 
 ### US-17 - Notas operacionais em reserva (Prioridade: P2)
 Descrição: Recepção adiciona `Nota` à `Reserva` (instruções especiais, alergias, observações).
@@ -88,18 +97,22 @@ Acceptance Scenarios:
 
 ### Edge Cases
 - Tentativa de registar um `RegistoCuidado` para uma estadia terminada deve ser rejeitada (400 Bad Request).
+- Tentativa de registar um `RegistoCuidado` fora de uma estadia ativa deve ser rejeitada (400 Bad Request).
 - Serviços extra com custo negativo devem ser rejeitados.
+- Serviços extra fora de uma estadia ativa devem ser rejeitados.
 - Intervenções clínicas requerem autorização de perfil `VETERINARIO`.
+- Intervenções clínicas fora de uma estadia ativa devem ser rejeitadas.
+- Intervenções clínicas com custo negativo devem ser rejeitadas.
 
 ## Requirements
 Todos os requisitos abaixo usam os identificadores canónicos do repositório.
 
 ### Requisitos Funcionais
 - **RF-11**: O sistema deve disponibilizar o plano de cuidados de cada animal em estadia, consultável por qualquer cuidador.
-- **RF-12**: O sistema deve permitir o registo de cada cuidado prestado a um animal em estadia, incluindo tipo de cuidado, data e hora, identificação do cuidador responsável e observações adicionais.
+- **RF-12**: O sistema deve permitir o registo de cada cuidado prestado a um animal em estadia, incluindo tipo de cuidado, data e hora, identificação do cuidador responsável e observações adicionais. O registo só é permitido durante uma estadia ativa.
 - **RF-13**: O sistema deve permitir o registo de alterações ao estado de saúde de cada animal e disponibilizar uma lista dos animais com alterações recentes, consultável pelo médico veterinário.
-- **RF-14**: O sistema deve permitir ao médico veterinário consultar o historial clínico de cada animal e registar intervenções, prescrições e o custo associado.
-- **RF-17**: O sistema deve permitir registar um serviço extra com custo durante a estadia e associá-lo automaticamente à reserva em curso, para inclusão na faturação do check-out.
+- **RF-14**: O sistema deve permitir ao médico veterinário consultar o historial clínico de cada animal e registar intervenções, prescrições e o custo associado. O registo de intervenções clínicas só é permitido durante uma estadia ativa, com validação do perfil `VETERINARIO` e custo não negativo.
+- **RF-17**: O sistema deve permitir registar um serviço extra com custo durante a estadia e associá-lo automaticamente à reserva em curso, para inclusão na faturação do check-out. O registo só é permitido durante uma estadia ativa e com custo não negativo.
 - **RF-05**: O sistema deve manter o histórico de estadias e pagamentos consultável, para suportar a consulta consolidada do historial operacional e financeiro.
 
 ### Requisitos Não-Funcionais
@@ -109,7 +122,7 @@ Todos os requisitos abaixo usam os identificadores canónicos do repositório.
 
 ### Requisitos de Domínio
 - **RD-04**: O pagamento no check-in cobre exclusivamente o valor da estadia; os serviços extra e as intervenções veterinárias são cobrados no check-out.
-- **RD-09**: O custo de um serviço extra ou de uma intervenção veterinária deve ser registado no momento da sua ocorrência e associado à reserva em curso, não podendo ser alterado após o check-out.
+- **RD-09**: O custo de um serviço extra ou de uma intervenção veterinária deve ser registado no momento da sua ocorrência e associado à reserva em curso, não podendo ser alterado após o check-out. O `RegistoCuidado` e o `ServicoExtra` só podem ser criados durante uma estadia ativa. A intervenção veterinária só pode ser criada enquanto existir uma estadia ativa e por um utilizador com perfil `VETERINARIO`.
 - **RD-10**: O plano de cuidados é originário da combinação: histórico de cuidados recorrentes do animal + instruções da reserva (notas US-17) + ajustes manuais durante a estadia. O plano é dinâmico e pode ser modificado, com todas as alterações auditadas (autor, timestamp). A prioridade do plano (ROTINA/URGENTE/CRITICO) muda conforme alterações de saúde registadas (US-16). O plano encerra automaticamente no check-out.
 
 ## Key Entities (Resumo de domínio)
@@ -125,9 +138,9 @@ Todos os requisitos abaixo usam os identificadores canónicos do repositório.
 - `TarefaCuidado` (id, planoCuidadosId, tipo: String {ALIMENTACAO_MANHA, ALIMENTACAO_TARDE, MEDICACAO_12H, PASSEIO, LIMPEZA, OUTRO}, descricao, periodicidade: Enum {UNICA, DIARIA, SEMANAL}, dataHora, concluida: Boolean, autorConclusao: UUID)
 
 ### Outras entidades (já documentadas)
-- `RegistoCuidado` (id, estadiaId, descricao, dataHora, autorId) — anotações livres sobre cuidados realizados
-- `ServicoExtra` (id, estadiaId, tipo: Enum {BANHO, PASSEIO, OUTRO}, custo, dataHora, autorId)
-- `IntervencaoClinica` (id, estadiaId, descricao, custo, dataHora, medicoId)
+- `RegistoCuidado` (id, estadiaId, descricao, dataHora, autorId) — anotações livres sobre cuidados realizados; apenas para estadia ativa
+- `ServicoExtra` (id, estadiaId, tipo: Enum {BANHO, PASSEIO, OUTRO}, custo, dataHora, autorId) — apenas para estadia ativa e com custo não negativo
+- `IntervencaoClinica` (id, estadiaId, descricao, custo, dataHora, medicoId) — apenas para estadia ativa, com custo não negativo e autor com perfil `VETERINARIO`
 - `Nota` (id, reservaId, descricao, autorId, dataHora)
 - `AlteracaoEstadoSaude` (id, estadiaId, descricao, severidade: Enum {ROTINA, URGENTE, CRITICO}, dataHora, autorId) — dispara mudança de prioridade do plano
 
@@ -147,6 +160,8 @@ Todos os requisitos abaixo usam os identificadores canónicos do repositório.
 - **SC-003**: Historial clínico filtrável por animal/estadia/data com resposta paginada e ordenada; 95% das queries de leitura retornam em <1s num dataset de teste (1000 registos).
 - **SC-004**: Autor e timestamp auditáveis para 100% dos registos criados (logs/DB).
 - **SC-005**: Controlo de acesso: apenas perfis designados conseguem criar intervenções clínicas (teste de autorização automatizado).
+- **SC-005A**: Intervenções clínicas fora de estadia ativa ou com custo negativo são sempre rejeitadas.
+- **SC-005B**: Registos de cuidado e serviços extra fora de estadia ativa são sempre rejeitados; serviços extra com custo negativo também são rejeitados.
 - **SC-006**: Cada funcionalidade P1 tem pelo menos 1 teste unitário na camada de serviço e 1 teste de integração executável no controller correspondente.
 - **SC-007**: Existe pelo menos 1 teste de sistema end-to-end que cubra plano de cuidados, registo de cuidado e consulta do historial sem dependências manuais externas.
 

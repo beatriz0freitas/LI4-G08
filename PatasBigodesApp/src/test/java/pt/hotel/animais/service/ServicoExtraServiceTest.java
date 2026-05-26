@@ -90,6 +90,20 @@ class ServicoExtraServiceTest {
     }
 
     @Test
+    void registerDeveRejeitarCustoNegativo() {
+        Estadia estadia = criarEstadia(1L, EstadoEstadia.EM_CURSO);
+        ServicoExtraFormDto form = criarForm(1L, "Passeio", new BigDecimal("-1.00"));
+
+        when(estadiaRepository.findById(1L)).thenReturn(Optional.of(estadia));
+
+        assertThatThrownBy(() -> service.register(form, 1L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("não pode ser negativo");
+
+        verify(servicoExtraRepository, never()).save(any());
+    }
+
+    @Test
     void registerDeveLancarExcecaoSeEstadiaNaoExistir() {
         ServicoExtraFormDto form = criarForm(99L, "Tosa", new BigDecimal("20.00"));
         when(estadiaRepository.findById(99L)).thenReturn(Optional.empty());

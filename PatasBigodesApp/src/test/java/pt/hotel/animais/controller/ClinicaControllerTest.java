@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -82,7 +83,7 @@ class ClinicaControllerTest {
         dto.setCusto(new BigDecimal("20.00"));
         dto.setDataHora(LocalDateTime.now());
 
-        when(intervencaoClinicaService.register(any())).thenReturn(dto);
+        when(intervencaoClinicaService.register(any(), eq(9L))).thenReturn(dto);
         when(clinicaService.obterAnimalIdPorEstadia(1L)).thenReturn(Optional.of(7L));
 
         mvc.perform(post("/clinica/intervencoes/create")
@@ -94,7 +95,7 @@ class ClinicaControllerTest {
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/clinica/animais/7"));
 
-        verify(intervencaoClinicaService).register(any());
+        verify(intervencaoClinicaService).register(any(), eq(9L));
     }
 
     @Test
