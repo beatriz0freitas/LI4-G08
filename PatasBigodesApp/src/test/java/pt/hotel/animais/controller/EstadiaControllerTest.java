@@ -7,12 +7,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import pt.hotel.animais.model.Alojamento;
+import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Estadia;
+import pt.hotel.animais.model.Reserva;
+import pt.hotel.animais.model.Tutor;
 import pt.hotel.animais.repository.EstadiaRepository;
+import pt.hotel.animais.repository.ReservaRepository;
 import pt.hotel.animais.service.IEstadiaService;
 import pt.hotel.animais.service.IPagamentoService;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -39,6 +46,9 @@ class EstadiaControllerTest {
     private EstadiaRepository estadiaRepository;
 
     @MockBean
+    private ReservaRepository reservaRepository;
+
+    @MockBean
     private IPagamentoService pagamentoService;
 
     @Test
@@ -55,13 +65,28 @@ class EstadiaControllerTest {
     void operacoesComEstadiaIdDeveAdicionarExtrasAoModelo() throws Exception {
         Estadia e = new Estadia();
         e.setId(1L);
-        when(estadiaRepository.findById(1L)).thenReturn(Optional.of(e));
+        e.setDataInicio(LocalDateTime.now());
+        e.setReserva(criarReservaComDetalhes());
+        when(estadiaRepository.findByIdComDetalhes(1L)).thenReturn(Optional.of(e));
         when(pagamentoService.calcularCobrancaComplementar(any())).thenReturn(new BigDecimal("25.00"));
 
         mockMvc.perform(get("/estadias").param("estadiaId", "1"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("estadias/checkin-checkout"))
-                .andExpect(model().attributeExists("extrasTotal"));
+                .andExpect(model().attributeExists("estadiaSelecionada", "valorCheckOut"));
+    }
+
+    @Test
+    @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
+    void operacoesComReservaIdDeveAdicionarReservaEValorAoModelo() throws Exception {
+        Reserva reserva = criarReservaComDetalhes();
+        when(reservaRepository.findWithDetalhesById(10L)).thenReturn(Optional.of(reserva));
+        when(pagamentoService.calcularValorBase(any())).thenReturn(new BigDecimal("45.00"));
+
+        mockMvc.perform(get("/estadias").param("reservaId", "10"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("estadias/checkin-checkout"))
+                .andExpect(model().attributeExists("reservaSelecionada", "valorCheckIn"));
     }
 
     @Test
@@ -124,5 +149,26 @@ class EstadiaControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/historico"))
                 .andExpect(flash().attributeExists("errorMessage"));
+    }
+
+    private Reserva criarReservaComDetalhes() {
+        Tutor tutor = new Tutor();
+        tutor.setNome("Ana Silva");
+
+        Animal animal = new Animal();
+        animal.setNome("Boby");
+
+        Alojamento alojamento = new Alojamento();
+        alojamento.setIdentificacao("A1");
+        alojamento.setTipo("CANINO");
+
+        Reserva reserva = new Reserva();
+        reserva.setId(10L);
+        reserva.setTutor(tutor);
+        reserva.setAnimal(animal);
+        reserva.setAlojamento(alojamento);
+        reserva.setDataInicio(LocalDate.now());
+        reserva.setDataFim(LocalDate.now().plusDays(3));
+        return reserva;
     }
 }
