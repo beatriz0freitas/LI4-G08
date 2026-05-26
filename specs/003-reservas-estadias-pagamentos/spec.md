@@ -37,6 +37,9 @@
 - Q: Qual deverá ser a estratégia de validação de disponibilidade para evitar variações entre caminhos de código? → A: Validação em dois níveis: queries otimizadas no Repository excluem estadias ativas e reservas sobrepostas; serviço de domínio (`AvailabilityDomainService`) centraliza regra completa de RF-06/RD-01 (sem reserva, sem estadia, limpeza concluída).
 - Q: Como deverá o sistema proceder em cenários de concorrência? → A: Transação explícita com lock pessimista (`@Lock(LockModeType.PESSIMISTIC_WRITE)`) no Alojamento durante validação e reserva, garantindo consistência ACID e impedindo overbooking.
 - Q: Como sincronizar Estadia e Alojamento sem inconsistência? → A: Transação atómica no `EstadiaService.registarCheckOut()` que atualiza tanto a Estadia (EM_CURSO → TERMINADA) como o Alojamento (OCUPADO → PENDENTE_LIMPEZA) na mesma transação; falha reverte ambas.
+- Q: Como distinguir confirmação e conclusão da reserva? → A: A confirmação é um evento próprio que move a reserva para `CONFIRMADA`; a conclusão só ocorre após o check-out da estadia associada, nunca no endpoint de confirmação.
+
+- Q: No check-in, a reserva passa a `CONFIRMADA`? → A: Sim. Durante o processo de check-in, se existir uma reserva associada em estado `ATIVA`, o sistema altera esse estado para `CONFIRMADA` como parte da mesma transação antes de criar a `Estadia`.
 
 ---
 
@@ -52,8 +55,8 @@ Como funcionário de receção, quero criar, confirmar e gerir reservas com cont
 
 **Acceptance Scenarios**:
 
-1. **Given** tutor e animal já registados e uma box disponível no período, **When** o funcionário cria a reserva, **Then** a reserva fica ativa e a box fica indisponível para reservas sobrepostas.
-2. **Given** uma reserva recém-criada, **When** o funcionário confirma a reserva, **Then** o sistema regista o evento de confirmação e mantém o alojamento indisponível no período reservado.
+1. **Given** tutor e animal já registados e uma box disponível no período, **When** o funcionário cria a reserva, **Then** a reserva fica em estado `ATIVA` e aguarda confirmação.
+2. **Given** uma reserva recém-criada, **When** o funcionário confirma a reserva, **Then** o sistema altera o estado para `CONFIRMADA` e mantém o alojamento indisponível no período reservado.
 3. **Given** uma reserva ativa/confirmada, **When** o funcionário executa cancelamento, **Then** a reserva muda para CANCELADA e não pode ser reativada (deve ser criada nova reserva).
 
 ---
@@ -83,7 +86,7 @@ Como funcionário de receção, quero registar o check-in e check-out de cada an
 
 **Acceptance Scenarios**:
 
-1. **Given** reserva confirmada, **When** o check-in é registado, **Then** a estadia entra em EM_CURSO e a box passa a OCUPADO.
+1. **Given** reserva ATIVA ou CONFIRMADA, **When** o check-in é registado, **Then** o sistema altera a reserva para `CONFIRMADA` (se necessário), regista a `Estadia` em `EM_CURSO` e a box passa a `OCUPADO`.
 2. **Given** estadia EM_CURSO, **When** o check-out é registado, **Then** a estadia termina e a box passa a PENDENTE_LIMPEZA.
 3. **Given** ausência de check-in anterior, **When** é tentado check-out, **Then** a operação é recusada (RD-03).
 
@@ -158,7 +161,7 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 - **RF-01 - Dashboard operacional**: O sistema deve disponibilizar um dashboard acessível ao perfil de diretor contendo, no mínimo, taxa de ocupação atual, número de estadias ativas, número de reservas futuras e valor total de faturação diária/mensal, com atualização automática (evento relevante ou máximo de 60 segundos). A implementação deve manter `IDashboardService`/`DashboardService`, mas esse serviço deve apenas orquestrar métricas expostas pelas interfaces dos serviços de domínio, sem aceder diretamente aos repositórios.
 - **RF-05 - Histórico de estadias e pagamentos**: O sistema deve manter um histórico completo das estadias e pagamentos de cada animal, consultável pela receção e pela direção, com paginação e filtragem por cliente, animal, estado e intervalo temporal.
 - **RF-06 - Controlo de disponibilidade de boxes**: O sistema deve determinar disponibilidade em tempo real por três condições cumulativas: sem reserva confirmada no período, sem estadia ativa no período e limpeza concluída; deve impedir reservas inválidas e sugerir alternativas. A validação ocorre em dois níveis: (i) queries otimizadas no `AlojamentoRepository` excluem estadias ativas e reservas sobrepostas; (ii) `AvailabilityDomainService` centraliza a regra completa com lock pessimista na transação de criação de reserva para garantir consistência em ambiente concorrente.
-- **RF-07 - Gestão de reservas**: O sistema deve permitir criação, confirmação e cancelamento de reservas, com registo de período, box e animal associados.
+- **RF-07 - Gestão de reservas**: O sistema deve permitir criação, confirmação, cancelamento e conclusão de reservas, com registo de período, box e animal associados. A criação coloca a reserva em `ATIVA`, a confirmação altera o estado para `CONFIRMADA`, o cancelamento para `CANCELADA` e a conclusão só ocorre após o check-out da estadia associada, passando para `CONCLUIDA`.
 - **RF-08 - Check-in e pagamento de estadia**: O sistema deve suportar check-in, registar data de entrada e box atribuída, e processar pagamento da estadia no mesmo momento, usando a tarifa diária ativa do tipo de alojamento.
 - **RF-09 - Check-out e faturação complementar**: O sistema deve suportar check-out, registar data de saída e calcular/processar pagamento de serviços extra, intervenções veterinárias acumuladas e dias adicionais face ao período reservado.
 - **RF-10 - Registo de pagamentos**: O sistema deve registar pagamentos de check-in e check-out com valor, método (numerário, cartão de débito, cartão de crédito) e estado (liquidado ou pendente), garantindo rastreabilidade.
@@ -167,8 +170,8 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 ### Domain Requirements
 
 - **RD-01 - Disponibilidade de alojamento**: Um alojamento só é considerado disponível se não existir reserva ou estadia ativa no período e se a limpeza estiver marcada como concluída. Esta regra é validada centralmente por `AvailabilityDomainService` com lock pessimista durante criação de reserva, impedindo overbooking mesmo em cenários de alta concorrência.
-- **RD-02 - Check-in condicionado a reserva**: Um animal só pode realizar check-in com reserva confirmada associada.
-- **RD-03 - Sequência de check-in/check-out**: O check-out só pode ocorrer após check-in registado para a mesma estadia. Check-out atualiza atomicamente Estadia (EM_CURSO → TERMINADA) e Alojamento (OCUPADO → PENDENTE_LIMPEZA) na mesma transação, garantindo consistência.
+- **RD-02 - Check-in e confirmação automática**: O check-in valida a existência de uma reserva associada; se existir uma reserva em estado `ATIVA`, o processo de check-in altera esse estado para `CONFIRMADA` como parte da mesma transação antes de criar a `Estadia`. O check-in sem reserva não é permitido nesta fase.
+- **RD-03 - Sequência de check-in/check-out**: O check-out só pode ocorrer após check-in registado para a mesma estadia. Check-out atualiza atomicamente Estadia (EM_CURSO → TERMINADA) e Alojamento (OCUPADO → PENDENTE_LIMPEZA) na mesma transação, garantindo consistência; no mesmo ciclo transacional, a reserva associada passa a `CONCLUIDA`.
 - **RD-04 - Pagamento no check-in e check-out**: O check-in cobre exclusivamente a estadia base estimada pelo período reservado e tarifa ativa do tipo de alojamento; extras, intervenções veterinárias e dias adicionais são cobrados no check-out.
 - **RD-06 - Cancelamento de reservas**: Uma reserva cancelada não pode ser reativada; deve ser criada nova reserva.
 - **RD-07 - Exclusividade de estadia**: Um animal não pode ter duas estadias em curso em simultâneo.
@@ -187,6 +190,7 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 - Cada fluxo funcional deve ter, no mínimo, um teste de caminho feliz e um teste de regra de negócio/erro (ex.: indisponibilidade de box, check-out sem check-in, pagamento sem método).
 - As regras de domínio críticas (RD-01, RD-02, RD-03, RD-04, RD-06, RD-07, RD-09) devem ter testes dedicados na camada de serviço.
 - Deve existir pelo menos um teste de integração por caso de uso principal (UC-04, UC-05, UC-06, UC-07, UC-08), cobrindo persistência e transições de estado.
+- Devem existir testes explícitos das transições `ATIVA -> CONFIRMADA`, `CONFIRMADA -> CANCELADA` e `CONFIRMADA -> CONCLUIDA`, incluindo o caso negativo de tentativa de conclusão no endpoint de confirmação.
 - Devem existir testes explícitos de autorização por perfil para operações críticas (reserva, check-in/out, pagamentos, dashboard e histórico), incluindo cenários de acesso negado.
 - Devem existir testes de confidencialidade para garantir que dados pessoais e clínicos sensíveis não são expostos em respostas indevidas ou ecrãs sem permissão.
 - Devem existir testes de desempenho para validar SC-001, SC-002 e SC-006 em condições normais de utilização.
@@ -201,7 +205,7 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 
 ### Key Entities
 
-- **Reserva**: Ligação entre Tutor, Animal, Alojamento e período (dataInicio, dataFim). Estados: ATIVA, CANCELADA, CONCLUIDA. Uma reserva pode desencadear no máximo uma Estadia (RD-06).
+- **Reserva**: Ligação entre Tutor, Animal, Alojamento e período (dataInicio, dataFim). Estados: ATIVA, CONFIRMADA, CANCELADA, CONCLUIDA. `ATIVA` representa a reserva criada ainda em validação operacional; `CONFIRMADA` significa que a reserva está validada para check-in; `CONCLUIDA` significa que a estadia associada terminou e o ciclo foi fechado. Uma reserva pode desencadear no máximo uma Estadia (RD-06).
 - **Estadia**: Documento de hospedagem com referência a uma Reserva. Estados: EM_CURSO, TERMINADA. Inclui checkIn (data/hora) e checkOut (data/hora). Máximo uma Estadia por Animal em qualquer período (RD-07).
 - **Pagamento**: Registo de transação com valor, `metodoPagamento` (`MetodoPagamento`), `momentoPagamento` (`MomentoPagamento`), `estadoPagamento` (`EstadoPagamento`) e referência a Estadia. Máximo dois pagamentos por Estadia (um CHECK_IN obrigatório, um CHECK_OUT complementar). O método de pagamento é sempre um método real, sem valor indefinido.
 - **Alojamento**: Entidade existente (Fase 1), mas agora com ciclo de estado expandido: DISPONIVEL → OCUPADO → PENDENTE_LIMPEZA → CONCLUIDO → DISPONIVEL.
