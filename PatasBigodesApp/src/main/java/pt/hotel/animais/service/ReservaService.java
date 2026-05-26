@@ -3,16 +3,19 @@ package pt.hotel.animais.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pt.hotel.animais.dto.ReservaDetalheFinanceiroDto;
 import pt.hotel.animais.dto.ReservaFormDto;
 import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.Tutor;
 import pt.hotel.animais.model.enums.EstadoReserva;
+import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.repository.ReservaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Serviço para gerenciar reservas.
@@ -28,6 +31,8 @@ public class ReservaService implements IReservaService {
     private final ITutorService tutorService;
     private final IAnimalService animalService;
     private final IAvailabilityDomainService availabilityDomainService;
+    private final EstadiaRepository estadiaRepository;
+    private final IPagamentoService pagamentoService;
     
     /**
      * Cria uma nova reserva com validações rigorosas.
@@ -99,6 +104,15 @@ public class ReservaService implements IReservaService {
     public Reserva obter(Long id) {
         return reservaRepository.findWithDetalhesById(id)
             .orElseThrow(() -> new IllegalArgumentException("Reserva com ID " + id + " não encontrada"));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<ReservaDetalheFinanceiroDto> obterDetalheFinanceiro(Long id) {
+        return estadiaRepository.findByReservaId(id)
+            .map(estadia -> new ReservaDetalheFinanceiroDto(
+                estadia.getId(),
+                pagamentoService.calcularCobrancaComplementar(estadia)
+            ));
     }
     
     /**

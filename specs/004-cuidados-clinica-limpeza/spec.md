@@ -184,6 +184,10 @@ Todos os requisitos abaixo usam os identificadores canónicos do repositório.
 - Depende das interfaces `IEstadiaService`/`IReservaService` e das implementações `EstadiaService`/`ReservaService` existentes para validações de estado (ver [docs/Etapa2/01-architecture/architecture.md](docs/Etapa2/01-architecture/architecture.md#L1)).
 - Requer decisões de implementação sobre DTOs e mapeamento (seguindo [ADR-06](../../docs/Etapa2/04-architecture-decisions/ADR-06-isolamento-apresentacao-dtos.md#L1)).
 
+## Architecture & Service Boundary
+- Os controladores desta feature, incluindo os de histórico e operação clínica, devem delegar a execução a serviços de aplicação e não podem aceder diretamente a repositórios.
+- A consulta consolidada do historial, os registos de cuidado, os serviços extra e as intervenções clínicas devem ser encapsulados em serviços de aplicação dedicados, que concentram as regras de negócio e a composição de queries.
+
 ## Testes de Aceitação Propostos
 - Teste de integração: `RegistoCuidadoIntegrationTest` que cria reserva→check-in→registo de cuidado→valida visualização no historial.
 - Teste de contrato: `ServicoExtraBillingTest` que regista vários extras e valida soma no cálculo de check-out.
@@ -191,8 +195,8 @@ Todos os requisitos abaixo usam os identificadores canónicos do repositório.
 
 ## Entregáveis & Plano de Implementação (alto nível)
 1. Criar entidades JPA e migrations (V5) para `RegistoCuidado`, `ServicoExtra`, `IntervencaoClinica`, `Nota`.
-2. Repositórios e serviços com operações CRUD e buscas filtradas (paginação).
-3. Controllers e DTOs (segurança via perfis, validações de input).
+2. Repositórios e serviços com operações CRUD e buscas filtradas (paginação), garantindo que a lógica de negócio e a composição de consultas ficam na camada de serviço.
+3. Controllers e DTOs (segurança via perfis, validações de input), sem acesso direto a repositórios.
 4. Templates/Views para recepção/cuidador/veterinario (seguindo mockups em Etapa2/05-ui-interface-mockup).
 5. Testes unitários, de integração e de sistema; atualizar documentação e rastreabilidade (spec, tasks, research).
 

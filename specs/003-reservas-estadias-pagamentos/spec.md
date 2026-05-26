@@ -171,6 +171,12 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 - **RF-10 - Registo de pagamentos**: O sistema deve registar pagamentos de check-in e check-out com valor, método (numerário, cartão de débito, cartão de crédito) e estado (liquidado ou pendente), garantindo rastreabilidade.
 - **RF-18 - Gestão de tipos e tarifas**: O sistema deve permitir à direção gerir tipos de alojamento com tarifa diária e tipos de serviços extra, incluindo criação, edição, ativação e desativação.
 
+### Architecture & Service Boundary
+
+- Os controladores MVC desta feature (`ReservaController`, `EstadiaController`, `PagamentoController` e equivalentes) não podem aceder diretamente a repositórios; devem limitar-se a receber input, validar DTO/formulário, delegar a execução a serviços de aplicação e devolver a resposta web apropriada.
+- Os fluxos compostos e as regras de negócio associadas a reserva, check-in, check-out, faturação e histórico consolidado devem viver em serviços de aplicação dedicados, que podem orquestrar outros serviços e repositórios de forma encapsulada.
+- Os testes de controlador devem verificar apenas routing, validação de input e autorização; toda a lógica de negócio e composição transacional deve ter testes próprios na camada de serviço.
+
 ### Domain Requirements
 
 - **RD-01 - Disponibilidade de alojamento**: Um alojamento só é considerado disponível se não existir reserva ou estadia ativa no período e se a limpeza estiver marcada como concluída. Esta regra é validada centralmente por `AvailabilityDomainService` com lock pessimista durante criação de reserva, impedindo overbooking mesmo em cenários de alta concorrência.
@@ -193,6 +199,7 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 - A conclusão desta feature exige testes automatizados sobre todas as funcionalidades P1 deste documento (US-06, US-12, US-07, US-10, US-11).
 - Cada fluxo funcional deve ter, no mínimo, um teste de caminho feliz e um teste de regra de negócio/erro (ex.: indisponibilidade de box, check-out sem check-in, pagamento sem método).
 - As regras de domínio críticas (RD-01, RD-02, RD-03, RD-04, RD-06, RD-07, RD-09) devem ter testes dedicados na camada de serviço.
+- Os controladores desta feature não devem conter regras de negócio; os testes de controlador devem ser limitados a routing, validação e autorização, enquanto a lógica de aplicação deve ser coberta por testes de serviço.
 - Deve existir pelo menos um teste de integração por caso de uso principal (UC-04, UC-05, UC-06, UC-07, UC-08), cobrindo persistência e transições de estado.
 - Devem existir testes explícitos das transições `ATIVA -> CONFIRMADA` no check-in, `ATIVA -> CANCELADA` no cancelamento e `CONFIRMADA -> CONCLUIDA` no check-out, incluindo o caso negativo de tentativa de cancelamento de reserva `CONFIRMADA`.
 - Devem existir testes explícitos para falha de limpeza no check-out, garantindo que o fecho da estadia e o pagamento complementar não são desfeitos e que o alojamento fica registado como pendente de limpeza.

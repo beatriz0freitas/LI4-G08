@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.hotel.animais.dto.PagamentoDto;
+import pt.hotel.animais.dto.ResumoCheckInDto;
+import pt.hotel.animais.dto.ResumoCheckOutDto;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.enums.EstadoPagamento;
@@ -15,6 +17,7 @@ import pt.hotel.animais.repository.EstadiaRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 /**
  * Serviço para gestão do ciclo de vida da estadia.
@@ -128,6 +131,40 @@ public class EstadiaService implements IEstadiaService {
         }
 
         return saved;
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<ResumoCheckInDto> obterResumoCheckIn(Long reservaId) {
+        if (reservaId == null) {
+            return Optional.empty();
+        }
+
+        try {
+            Reserva reserva = reservaService.obter(reservaId);
+            Estadia estadiaPrevista = new Estadia();
+            estadiaPrevista.setReserva(reserva);
+            estadiaPrevista.setDataInicio(LocalDateTime.now());
+
+            return Optional.of(new ResumoCheckInDto(
+                reserva,
+                pagamentoService.calcularValorBase(estadiaPrevista)
+            ));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<ResumoCheckOutDto> obterResumoCheckOut(Long estadiaId) {
+        if (estadiaId == null) {
+            return Optional.empty();
+        }
+
+        return estadiaRepository.findByIdComDetalhes(estadiaId)
+            .map(estadia -> new ResumoCheckOutDto(
+                estadia,
+                pagamentoService.calcularCobrancaComplementar(estadia)
+            ));
     }
 
     /**
