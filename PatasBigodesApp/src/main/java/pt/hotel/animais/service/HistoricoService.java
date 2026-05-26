@@ -60,7 +60,8 @@ public class HistoricoService implements IHistoricoService {
                 h.setTipo("SERVICO_EXTRA");
                 h.setId(e.getId());
                 h.setEstadiaId(e.getEstadia() != null ? e.getEstadia().getId() : null);
-                h.setDescricao(e.getTipo() + " - " + e.getCusto());
+                String nomeServico = (e.getTipoServicoExtra() != null) ? e.getTipoServicoExtra().getNome() : "Tipo não definido";
+                h.setDescricao(nomeServico + " - €" + e.getCusto());
                 h.setDataHora(e.getDataHora());
                 return h;
             }).collect(Collectors.toList()));

@@ -12,11 +12,11 @@ import pt.hotel.animais.dto.ReservaFormDto;
 import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.Tutor;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.service.IAlojamentoService;
 import pt.hotel.animais.service.IAnimalService;
 import pt.hotel.animais.service.IReservaService;
 import pt.hotel.animais.service.ITutorService;
+import pt.hotel.animais.service.TipoAlojamentoPolicy;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -202,7 +202,7 @@ public class ReservaController {
             // mostrar extras se existir estadia associada
             estadiaRepository.findByReservaId(id).ifPresent(estadia -> {
                 try {
-                    var extras = pagamentoService.calcularExtras(estadia);
+                    var extras = pagamentoService.calcularCobrancaComplementar(estadia);
                     model.addAttribute("extrasTotal", extras);
                     model.addAttribute("estadiaId", estadia.getId());
                 } catch (Exception ignored) {}
@@ -276,7 +276,7 @@ public class ReservaController {
         List<Tutor> tutores = tutorService.listarTodos();
         List<Animal> animaisTutor = new ArrayList<>();
         List<DisponibilidadeAlojamentoDto> disponibilidades = new ArrayList<>();
-        TipoAlojamento tipoAlojamentoEsperado = null;
+        String tipoAlojamentoEsperado = null;
 
         if (reservaForm.getTutorId() != null) {
             try {
@@ -300,7 +300,7 @@ public class ReservaController {
                     reservaForm.setAnimalId(null);
                     reservaForm.setAlojamentoId(null);
                 } else {
-                    tipoAlojamentoEsperado = TipoAlojamento.fromEspecie(animalSelecionado.getEspecie());
+                    tipoAlojamentoEsperado = TipoAlojamentoPolicy.fromEspecie(animalSelecionado.getEspecie());
                 }
             } catch (IllegalArgumentException e) {
                 model.addAttribute("warningMessage", "Animal não encontrado. Selecione outro animal.");

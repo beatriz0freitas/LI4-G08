@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import pt.hotel.animais.dto.RelatorioFiltroFormDto;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.service.IRelatorioService;
 
 import java.nio.charset.StandardCharsets;
@@ -111,7 +110,7 @@ public class RelatorioController {
     }
 
     private void prepararModel(Model model) {
-        model.addAttribute("tiposAlojamento", TipoAlojamento.values());
+        model.addAttribute("tiposAlojamento", java.util.List.of("CANINO", "FELINO"));
         model.addAttribute("gruposRelatorio", RelatorioFiltroFormDto.GrupoRelatorio.values());
         model.addAttribute("pageTitle", "Relatórios");
         model.addAttribute("activePage", "relatorios");

@@ -29,7 +29,7 @@ public class EstadiaController {
         if (estadiaId != null) {
             estadiaRepository.findById(estadiaId).ifPresent(e -> {
                 try {
-                    var extras = pagamentoService.calcularExtras(e);
+                    var extras = pagamentoService.calcularCobrancaComplementar(e);
                     model.addAttribute("extrasTotal", extras);
                 } catch (Exception ignored) { }
             });
@@ -39,9 +39,13 @@ public class EstadiaController {
     }
 
     @PostMapping("/check-in")
-    public String checkIn(@RequestParam("reservaId") Long reservaId, RedirectAttributes redirectAttributes) {
+    public String checkIn(@RequestParam("reservaId") Long reservaId, 
+                          @RequestParam(value = "metodoPagamento", defaultValue = "NUMERARIO") String metodoPagamentoStr,
+                          RedirectAttributes redirectAttributes) {
         try {
-            Estadia estadia = estadiaService.abrirEstadiaPorReserva(reservaId);
+            pt.hotel.animais.model.enums.MetodoPagamento metodoPagamento = 
+                pt.hotel.animais.model.enums.MetodoPagamento.valueOf(metodoPagamentoStr);
+            Estadia estadia = estadiaService.abrirEstadiaPorReserva(reservaId, metodoPagamento);
             redirectAttributes.addFlashAttribute("successMessage", "Check-in registado: " + estadia.getId());
             return "redirect:/estadias";
         } catch (IllegalArgumentException e) {
@@ -51,9 +55,13 @@ public class EstadiaController {
     }
 
     @PostMapping("/check-out")
-    public String checkOut(@RequestParam("estadiaId") Long estadiaId, RedirectAttributes redirectAttributes) {
+    public String checkOut(@RequestParam("estadiaId") Long estadiaId,
+                           @RequestParam(value = "metodoPagamento", defaultValue = "NUMERARIO") String metodoPagamentoStr,
+                           RedirectAttributes redirectAttributes) {
         try {
-            Estadia estadia = estadiaService.checkOut(estadiaId);
+            pt.hotel.animais.model.enums.MetodoPagamento metodoPagamento = 
+                pt.hotel.animais.model.enums.MetodoPagamento.valueOf(metodoPagamentoStr);
+            Estadia estadia = estadiaService.checkOut(estadiaId, metodoPagamento);
             redirectAttributes.addFlashAttribute("successMessage", "Check-out registado: " + estadia.getId());
             return "redirect:/historico";
         } catch (IllegalArgumentException e) {

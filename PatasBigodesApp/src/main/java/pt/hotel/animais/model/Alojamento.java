@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,9 +18,8 @@ public class Alojamento {
     @Column(nullable = false, unique = true)
     private String identificacao;
     
-    @Enumerated(EnumType.STRING)
-    @Column(length = 20)
-    private TipoAlojamento tipo;
+    @Column(length = 50, nullable = false)
+    private String tipo;
     
     @Column
     private Integer capacidade;
@@ -36,7 +34,7 @@ public class Alojamento {
     public Alojamento() {
     }
 
-    public Alojamento(Long id, String identificacao, TipoAlojamento tipo, Integer capacidade, EstadoLimpeza estadoLimpeza, List<Reserva> reservas) {
+    public Alojamento(Long id, String identificacao, String tipo, Integer capacidade, EstadoLimpeza estadoLimpeza, List<Reserva> reservas) {
         this.id = id;
         this.identificacao = identificacao;
         this.tipo = tipo;

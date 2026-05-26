@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,14 +14,14 @@ public interface AlojamentoRepository extends JpaRepository<Alojamento, Long> {
 
     List<Alojamento> findByEstadoLimpezaAndTipoOrderByIdentificacaoAsc(
         EstadoLimpeza estadoLimpeza,
-        TipoAlojamento tipo
+        String tipo
     );
 
     List<Alojamento> findAllByOrderByIdentificacaoAsc();
 
     long countByEstadoLimpeza(EstadoLimpeza estadoLimpeza);
 
-    long countByTipo(TipoAlojamento tipo);
+    long countByTipo(String tipo);
 
     @Query("SELECT COUNT(DISTINCT r.alojamento.id) FROM Reserva r " +
            "WHERE r.estado = pt.hotel.animais.model.enums.EstadoReserva.ATIVA")
@@ -59,7 +58,7 @@ public interface AlojamentoRepository extends JpaRepository<Alojamento, Long> {
     List<Alojamento> findAvailableForPeriodAndTipo(
         @Param("dataInicio") LocalDate dataInicio,
         @Param("dataFim") LocalDate dataFim,
-        @Param("tipo") TipoAlojamento tipo
+        @Param("tipo") String tipo
     );
     
     /**
