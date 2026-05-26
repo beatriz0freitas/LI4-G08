@@ -8,12 +8,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.ArgumentCaptor;
 import pt.hotel.animais.dto.PagamentoDto;
 import pt.hotel.animais.model.Alojamento;
+import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.model.enums.EstadoReserva;
 import pt.hotel.animais.model.enums.MetodoPagamento;
 import pt.hotel.animais.model.enums.MomentoPagamento;
+import pt.hotel.animais.repository.AnimalRepository;
 import pt.hotel.animais.repository.EstadiaRepository;
 
 import java.math.BigDecimal;
@@ -40,6 +42,9 @@ class EstadiaServiceTest {
     @Mock
     private IAlojamentoService alojamentoService;
 
+    @Mock
+    private AnimalRepository animalRepository;
+
     @InjectMocks
     private EstadiaService estadiaService;
 
@@ -49,6 +54,7 @@ class EstadiaServiceTest {
         Reserva confirmada = criarReserva(10L, EstadoReserva.CONFIRMADA);
 
         when(reservaService.obter(10L)).thenReturn(reserva);
+        when(animalRepository.findByIdForUpdate(reserva.getAnimal().getId())).thenReturn(Optional.of(reserva.getAnimal()));
         when(reservaService.confirmar(10L)).thenReturn(confirmada);
         when(estadiaRepository.save(any(Estadia.class))).thenAnswer(inv -> {
             Estadia e = inv.getArgument(0);
@@ -72,6 +78,7 @@ class EstadiaServiceTest {
         Reserva reserva = criarReserva(10L, EstadoReserva.ATIVA);
         Reserva confirmada = criarReserva(10L, EstadoReserva.CONFIRMADA);
         when(reservaService.obter(10L)).thenReturn(reserva);
+        when(animalRepository.findByIdForUpdate(reserva.getAnimal().getId())).thenReturn(Optional.of(reserva.getAnimal()));
         when(reservaService.confirmar(10L)).thenReturn(confirmada);
         when(estadiaRepository.save(any(Estadia.class))).thenAnswer(inv -> {
             Estadia e = inv.getArgument(0);
@@ -103,6 +110,26 @@ class EstadiaServiceTest {
 
         verify(estadiaRepository, never()).save(any());
         verify(reservaService, never()).confirmar(20L);
+    }
+
+    @Test
+    void abrirEstadiaPorReservaDeveRejeitarAnimalComEstadiaEmCurso() {
+        Reserva reserva = criarReserva(30L, EstadoReserva.ATIVA);
+        Estadia estadiaExistente = criarEstadia(99L, EstadoEstadia.EM_CURSO);
+
+        when(reservaService.obter(30L)).thenReturn(reserva);
+        when(animalRepository.findByIdForUpdate(reserva.getAnimal().getId())).thenReturn(Optional.of(reserva.getAnimal()));
+        when(estadiaRepository.findEmCursoPorAnimal(reserva.getAnimal().getId()))
+            .thenReturn(Optional.of(estadiaExistente));
+
+        assertThatThrownBy(() -> estadiaService.abrirEstadiaPorReserva(30L, MetodoPagamento.NUMERARIO))
+            .isInstanceOf(EstadiaExistenteException.class)
+            .hasMessageContaining("já tem uma estadia em curso");
+
+        verify(animalRepository).findByIdForUpdate(reserva.getAnimal().getId());
+        verify(reservaService, never()).confirmar(30L);
+        verify(estadiaRepository, never()).save(any());
+        verify(pagamentoService, never()).registrarPagamento(any());
     }
 
     @Test
@@ -204,6 +231,9 @@ class EstadiaServiceTest {
         Reserva reserva = new Reserva();
         reserva.setId(id);
         reserva.setEstado(estado);
+        Animal animal = new Animal();
+        animal.setId(id + 100L);
+        reserva.setAnimal(animal);
         return reserva;
     }
 

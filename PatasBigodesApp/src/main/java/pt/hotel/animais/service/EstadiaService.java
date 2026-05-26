@@ -10,6 +10,7 @@ import pt.hotel.animais.model.enums.EstadoPagamento;
 import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.model.enums.MetodoPagamento;
 import pt.hotel.animais.model.enums.MomentoPagamento;
+import pt.hotel.animais.repository.AnimalRepository;
 import pt.hotel.animais.repository.EstadiaRepository;
 
 import java.math.BigDecimal;
@@ -28,6 +29,7 @@ public class EstadiaService implements IEstadiaService {
     private final IReservaService reservaService;
     private final IPagamentoService pagamentoService;
     private final IAlojamentoService alojamentoService;
+    private final AnimalRepository animalRepository;
 
     /**
      * Abre uma estadia a partir de uma reserva ativa.
@@ -43,6 +45,15 @@ public class EstadiaService implements IEstadiaService {
         if (!reserva.podeFazerCheckIn()) {
             throw new IllegalArgumentException("Reserva não está em estado válido para check-in");
         }
+
+        Long animalId = reserva.getAnimal().getId();
+        animalRepository.findByIdForUpdate(animalId)
+            .orElseThrow(() -> new IllegalArgumentException("Animal não encontrado"));
+        estadiaRepository.findEmCursoPorAnimal(animalId).ifPresent(estadiaExistente -> {
+            throw new EstadiaExistenteException(
+                "O animal já tem uma estadia em curso. Termine a estadia atual antes de registar novo check-in."
+            );
+        });
 
         reserva = reservaService.confirmar(reservaId);
 
