@@ -21,46 +21,40 @@ import java.time.LocalDate;
 public class HistoricoController {
 
     private final IHistoricoService historicoService;
-    private final pt.hotel.animais.repository.RegistoCuidadoRepository registoCuidadoRepository;
-    private final pt.hotel.animais.repository.ServicoExtraRepository servicoExtraRepository;
-    private final pt.hotel.animais.repository.IntervencaoClinicaRepository intervencaoClinicaRepository;
-    private final pt.hotel.animais.repository.NotaRepository notaRepository;
 
-    public HistoricoController(IHistoricoService historicoService,
-                               pt.hotel.animais.repository.RegistoCuidadoRepository registoCuidadoRepository,
-                               pt.hotel.animais.repository.ServicoExtraRepository servicoExtraRepository,
-                               pt.hotel.animais.repository.IntervencaoClinicaRepository intervencaoClinicaRepository,
-                               pt.hotel.animais.repository.NotaRepository notaRepository) {
+    public HistoricoController(IHistoricoService historicoService) {
         this.historicoService = historicoService;
-        this.registoCuidadoRepository = registoCuidadoRepository;
-        this.servicoExtraRepository = servicoExtraRepository;
-        this.intervencaoClinicaRepository = intervencaoClinicaRepository;
-        this.notaRepository = notaRepository;
     }
 
     @GetMapping("/eventos")
     public String verEventos(
+        @RequestParam(required = false) Long clienteId,
         @RequestParam(required = false) Long animalId,
         @RequestParam(required = false) Long estadiaId,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+        @RequestParam(required = false) String tipoEvento,
         @PageableDefault(size = 10, sort = "dataHora", direction = Sort.Direction.DESC) Pageable pageable,
         Model model
     ) {
         pt.hotel.animais.dto.HistoricoFiltroDto filtro = new pt.hotel.animais.dto.HistoricoFiltroDto();
+        filtro.setClienteId(clienteId);
         filtro.setAnimalId(animalId);
         filtro.setEstadiaId(estadiaId);
         filtro.setDataInicio(dataInicio);
         filtro.setDataFim(dataFim);
+        filtro.setTipoEvento(tipoEvento);
 
-        var page = historicoService.consultar(filtro, pageable, registoCuidadoRepository, servicoExtraRepository, intervencaoClinicaRepository, notaRepository);
+        var page = historicoService.consultar(filtro, pageable);
 
         model.addAttribute("historicoPage", page);
         model.addAttribute("itens", page.getContent());
+        model.addAttribute("clienteId", clienteId);
         model.addAttribute("animalId", animalId);
         model.addAttribute("estadiaId", estadiaId);
         model.addAttribute("dataInicio", dataInicio);
         model.addAttribute("dataFim", dataFim);
+        model.addAttribute("tipoEvento", tipoEvento);
         model.addAttribute("pageSize", pageable.getPageSize());
         model.addAttribute("activePage", "historico-eventos");
         model.addAttribute("pageTitle", "Histórico Consolidado");

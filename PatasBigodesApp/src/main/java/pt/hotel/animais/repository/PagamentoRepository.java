@@ -13,6 +13,8 @@ import java.util.List;
 @Repository
 public interface PagamentoRepository extends JpaRepository<Pagamento, Long> {
 
+	List<Pagamento> findByEstadiaId(Long estadiaId);
+
 	/**
 	 * Soma o valor total dos pagamentos.
 	 */

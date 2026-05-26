@@ -7,6 +7,45 @@
 <body>
 <div class="container">
     <h1>Histórico Consolidado</h1>
+    <form method="get" th:action="@{/historico/eventos}" class="row g-2 mb-3">
+        <div class="col">
+            <label for="clienteId" class="form-label">Cliente</label>
+            <input id="clienteId" name="clienteId" type="number" class="form-control" th:value="${clienteId}">
+        </div>
+        <div class="col">
+            <label for="animalId" class="form-label">Animal</label>
+            <input id="animalId" name="animalId" type="number" class="form-control" th:value="${animalId}">
+        </div>
+        <div class="col">
+            <label for="estadiaId" class="form-label">Estadia</label>
+            <input id="estadiaId" name="estadiaId" type="number" class="form-control" th:value="${estadiaId}">
+        </div>
+        <div class="col">
+            <label for="dataInicio" class="form-label">Início</label>
+            <input id="dataInicio" name="dataInicio" type="date" class="form-control" th:value="${dataInicio}">
+        </div>
+        <div class="col">
+            <label for="dataFim" class="form-label">Fim</label>
+            <input id="dataFim" name="dataFim" type="date" class="form-control" th:value="${dataFim}">
+        </div>
+        <div class="col">
+            <label for="tipoEvento" class="form-label">Tipo</label>
+            <select id="tipoEvento" name="tipoEvento" class="form-select">
+                <option value="" th:selected="${tipoEvento == null || tipoEvento == ''}">Todos</option>
+                <option value="RESERVA" th:selected="${tipoEvento == 'RESERVA'}">Reserva</option>
+                <option value="ESTADIA" th:selected="${tipoEvento == 'ESTADIA'}">Estadia</option>
+                <option value="REGISTO_CUIDADO" th:selected="${tipoEvento == 'REGISTO_CUIDADO'}">Cuidado</option>
+                <option value="SERVICO_EXTRA" th:selected="${tipoEvento == 'SERVICO_EXTRA'}">Serviço extra</option>
+                <option value="INTERVENCAO_CLINICA" th:selected="${tipoEvento == 'INTERVENCAO_CLINICA'}">Intervenção clínica</option>
+                <option value="ALTERACAO_ESTADO_SAUDE" th:selected="${tipoEvento == 'ALTERACAO_ESTADO_SAUDE'}">Alteração saúde</option>
+                <option value="NOTA" th:selected="${tipoEvento == 'NOTA'}">Nota</option>
+                <option value="PAGAMENTO" th:selected="${tipoEvento == 'PAGAMENTO'}">Pagamento</option>
+            </select>
+        </div>
+        <div class="col-auto align-self-end">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+    </form>
     <table class="table">
         <thead>
             <tr><th>Tipo</th><th>DataHora</th><th>Descrição</th></tr>
