@@ -162,3 +162,13 @@ Resumo para esta feature:
 - Q: Qual é o ámbito completo de operações a auditar? → A: Auditoria Completa: todas as operações críticas (criar/editar/cancelar reserva, check-in, check-out, pagamento, cuidados, intervenção clínica, limpeza, gestão de colaboradores).
 - Q: Qual é o formato de armazenamento e estrutura de auditoria? → A: Tabela dedicada `AuditoriaEvento` com campos: `id`, `timestamp`, `utilizador`, `operacao`, `entidade`, `entityId`, `acao`, `detalhes` (JSON), `resultado`.
 - Q: Qual é a política de retenção e acesso a auditoria? → A: Retenção de 12 meses, acesso restrito a administradores (`DIRETOR`), com filtros por data, utilizador e operação.
+
+### Estado de Implementação 2026-05-26
+
+- A tabela `auditoria_evento` está definida por migração Flyway e mapeada pela entidade `AuditoriaEvento`.
+- O contrato `IAuditoriaService` e a implementação `AuditoriaService` estão ativos para registo, consulta e limpeza de eventos.
+- As rotas `GET /auditoria` e `GET /auditoria/exportar/csv` estão funcionais e protegidas para `DIRETOR`.
+- A retenção de 12 meses está operacional em `AuditoriaSchedulerJob`, executado diariamente às 03h00.
+- A auditoria foi integrada em colaboradores, reservas existentes, estadias, pagamentos, cuidados, intervenção clínica, serviços extra e limpeza.
+- A operação `EDITAR_RESERVA` permanece pendente porque o fluxo de edição de reserva ainda não existe na aplicação atual.
+- A validação focada de auditoria passou; a suite global `mvn -q test` depende de ligação MySQL/Flyway indisponível neste ambiente de sandbox.
