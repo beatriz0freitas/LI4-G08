@@ -58,6 +58,7 @@ As user stories de referência são as definidas em [user-stories.md](../../docs
 - **FR-008 (map: RF-01)**: Os dados do dashboard/relatórios devem refletir eventos relevantes (check-in, check-out, criação/cancelamento de reserva, registo de pagamento) com latência máxima de 60 segundos ou por ação explícita de atualização.
 - **FR-009 (map: RF-10, RF-17)**: Os relatórios financeiros devem manter rastreabilidade de pagamentos e serviços extra agregados por período, método, estado e estadia/reserva quando aplicável.
 - **FR-010**: Validações de formulário devem regressar à mesma página com mensagens claras.
+- **FR-011 *(novo, LAC-13)***: O sistema deve manter tabela de auditoria `AuditoriaEvento` com registo de todas as operações críticas: criar/editar/cancelar reserva, check-in, check-out, registo/alteração de pagamento, cuidados, intervenção clínica, limpeza e gestão de colaboradores. Cada evento deve registar `timestamp`, utilizador autenticado, operação, entidade, ID da entidade, ação, detalhes em JSON e resultado (sucesso/falha).
 
 ### Rotas MVC Previstas
 
@@ -82,16 +83,19 @@ As user stories de referência são as definidas em [user-stories.md](../../docs
 - **ServicoExtra**: `id`, `tipoServico`, `custo`, `dataHora`, `estadiaId`/`reservaId`.
 - **FiltroRelatorio**: `dataInicio`, `dataFim`, `tipoAlojamento`, `incluirServicosExtra`, `agruparPor`.
 - **RelatorioResumo**: métricas agregadas, filtros aplicados, `geradoEm`, `geradoPor`.
+- **AuditoriaEvento** *(novo, LAC-13)*: `id`, `timestamp`, `utilizadorId` (FK para `Colaborador`), `operacao` (string: "CRIAR_RESERVA", "CHECK_IN", "PAGAMENTO", etc.), `entidade` (string: "Reserva", "Estadia", "Pagamento", etc.), `entityId` (Long, ID da entidade afetada), `acao` (string: "CREATE", "UPDATE", "DELETE"), `detalhes` (JSON com campos alterados ou contexto), `resultado` (string: "SUCESSO", "FALHA"), `motivoFalha` (string, opcional).
 
 ## Success Criteria *(mandatory)*
 
-- **SC-001**: O `DIRETOR` consegue gerar um relatório mensal através da interface web e visualizar métricas operacionais e financeiras.
+- **SC-001**: O `DIRETOR` consegue gerar um relatório mensal em até 5 segundos através da interface web e visualizar métricas operacionais e financeiras (taxa de ocupação %, estadias ativas, reservas, faturação total, pagamentos pendentes).
 - **SC-002**: A exportação CSV/PDF contém os filtros aplicados, cabeçalhos estáveis e sumário das métricas principais.
 - **SC-003**: Apenas o `DIRETOR` consegue abrir, submeter e concluir a criação/edição/desativação de colaboradores.
 - **SC-004**: Um colaborador novo criado pelo `DIRETOR` aparece imediatamente na lista de colaboradores.
 - **SC-005**: O formulário de colaborador apresenta `tipoColaborador` como lista fechada baseada na enum `TipoColaborador`.
 - **SC-006**: Perfis sem permissão não conseguem aceder a relatórios financeiros nem páginas de colaboradores.
-- **SC-007**: 95% das consultas interativas de relatório para períodos até 3 meses respondem em até 2 segundos; períodos até 12 meses devem responder em até 5 segundos ou apresentar estado de processamento.
+- **SC-007**: 95% das consultas interativas de relatório para períodos até 3 meses respondem em até 2 segundos (com índices em `timestamp`, `estado`; dataset até 12 meses; sem cache aplicacional); períodos até 12 meses devem responder em até 5 segundos ou apresentar estado de processamento.
+- **SC-008 *(novo, LAC-13)***: Cada operação crítica (criar/editar/cancelar reserva, check-in, check-out, pagamento, cuidados, clínica, limpeza, colaborador) registada com sucesso cria um evento em `AuditoriaEvento` com utilizador, operação, entidade, entityId, acao e resultado.
+- **SC-009 *(novo, LAC-13)***: O `DIRETOR` consegue consultar a auditoria filtrada por data, utilizador autenticado e operação, com resultados retendo 12 meses históricos.
 
 ## RBAC
 
@@ -110,8 +114,8 @@ Resumo para esta feature:
 - Palavras-passe devem ser armazenadas apenas como hash BCrypt.
 - Desativar colaborador é operação lógica; não deve apagar histórico associado.
 - Pagamentos e serviços extra já faturados não devem ser alterados depois do check-out, conforme regras de imutabilidade associadas a RD-09.
-- Alterações administrativas e geração de relatórios devem ser auditáveis através da auditoria do Spring Boot Actuator (`AuditEventRepository`/`AuditApplicationEvent`), pelo menos com data, utilizador autenticado, tipo de operação e detalhe mínimo da entidade afetada.
-- Não deve existir um serviço próprio de auditoria para esta feature; a aplicação deve configurar e usar o mecanismo de auditoria disponibilizado pelo Spring Boot.
+- Auditoria (vide secção "Clarifications" abaixo): todas as operações críticas (criar/editar/cancelar reserva, check-in, check-out, pagamento, cuidados, intervenção clínica, limpeza, gestão de colaboradores) devem ser auditadas em tabela relacional dedicada `AuditoriaEvento`, com retenção de 12 meses e acesso restrito a administradores.
+- Não deve existir um serviço próprio de auditoria isolado; a auditoria deve ser implementada de forma centralizada em `AuditoriaService` ou interceptor transacional.
 
 ## Documentação Técnica
 
@@ -148,3 +152,13 @@ Resumo para esta feature:
 - Test B: autenticar como `DIRETOR`, abrir `/colaboradores/novo`, criar colaborador com `tipoColaborador = CUIDADOR` e confirmar presença na lista.
 - Test C: autenticar como `FUNCIONARIO_RECEPCAO` e confirmar que `/colaboradores` e `/relatorios` não ficam acessíveis.
 - Test D: submeter colaborador com `tipoColaborador` inválido e confirmar erro de validação na página, sem criação de registo.
+
+## Clarifications
+
+### Session 2026-05-26
+
+**LAC-13 – Auditoria incompleta para operações críticas (resolvida)**
+
+- Q: Qual é o ámbito completo de operações a auditar? → A: Auditoria Completa: todas as operações críticas (criar/editar/cancelar reserva, check-in, check-out, pagamento, cuidados, intervenção clínica, limpeza, gestão de colaboradores).
+- Q: Qual é o formato de armazenamento e estrutura de auditoria? → A: Tabela dedicada `AuditoriaEvento` com campos: `id`, `timestamp`, `utilizador`, `operacao`, `entidade`, `entityId`, `acao`, `detalhes` (JSON), `resultado`.
+- Q: Qual é a política de retenção e acesso a auditoria? → A: Retenção de 12 meses, acesso restrito a administradores (`DIRETOR`), com filtros por data, utilizador e operação.
