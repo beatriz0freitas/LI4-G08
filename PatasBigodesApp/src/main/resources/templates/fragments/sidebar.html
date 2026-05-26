@@ -14,8 +14,8 @@
 							<p>Início</p>
 						</a>
 					</li>
-					<li class="nav-item has-treeview" sec:authorize="hasRole('DIRETOR')" th:classappend="${activePage == 'dashboard' or activePage == 'relatorios' or activePage == 'colaboradores'} ? ' menu-open' : ''">
-						<a href="#" class="nav-link" th:classappend="${activePage == 'dashboard' or activePage == 'relatorios' or activePage == 'colaboradores'} ? ' active' : ''">
+					<li class="nav-item has-treeview" sec:authorize="hasRole('DIRETOR')" th:classappend="${activePage == 'dashboard' or activePage == 'relatorios' or activePage == 'colaboradores' or activePage == 'tarifas' or activePage == 'tipos-servicos-extra'} ? ' menu-open' : ''">
+						<a href="#" class="nav-link" th:classappend="${activePage == 'dashboard' or activePage == 'relatorios' or activePage == 'colaboradores' or activePage == 'tarifas' or activePage == 'tipos-servicos-extra'} ? ' active' : ''">
 							<i class="nav-icon fas fa-briefcase"></i>
 							<p>Direção<i class="right fas fa-angle-left"></i></p>
 						</a>
@@ -36,6 +36,18 @@
 								<a th:href="@{/colaboradores}" class="nav-link" th:classappend="${activePage == 'colaboradores'} ? ' active' : ''">
 									<i class="far fa-circle nav-icon"></i>
 									<p>Colaboradores</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a th:href="@{/admin/tarifas}" class="nav-link" th:classappend="${activePage == 'tarifas'} ? ' active' : ''">
+									<i class="far fa-circle nav-icon"></i>
+									<p>Tipos de alojamento</p>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a th:href="@{/admin/tipos-servicos-extra}" class="nav-link" th:classappend="${activePage == 'tipos-servicos-extra'} ? ' active' : ''">
+									<i class="far fa-circle nav-icon"></i>
+									<p>Serviços extra</p>
 								</a>
 							</li>
 						</ul>

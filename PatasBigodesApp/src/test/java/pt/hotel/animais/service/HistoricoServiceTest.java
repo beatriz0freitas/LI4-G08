@@ -15,6 +15,7 @@ import pt.hotel.animais.model.Nota;
 import pt.hotel.animais.model.RegistoCuidado;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.ServicoExtra;
+import pt.hotel.animais.model.TipoServicoExtra;
 import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.repository.IntervencaoClinicaRepository;
@@ -263,7 +264,17 @@ class HistoricoServiceTest {
         ServicoExtra se = new ServicoExtra();
         se.setId(id);
         se.setEstadia(estadia);
-        se.setTipo("Serviço " + id);
+        
+        TipoServicoExtra tipo = new TipoServicoExtra("Serviço " + id, "Descrição do serviço");
+        try {
+            var tipoIdField = tipo.getClass().getDeclaredField("id");
+            tipoIdField.setAccessible(true);
+            tipoIdField.set(tipo, id * 100L);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        
+        se.setTipoServicoExtra(tipo);
         se.setCusto(new BigDecimal("10.00"));
         se.setDataHora(LocalDateTime.now().minusHours(id));
         return se;

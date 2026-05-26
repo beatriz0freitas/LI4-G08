@@ -17,7 +17,6 @@ import pt.hotel.animais.model.enums.Especie;
 import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
 import pt.hotel.animais.model.enums.EstadoReserva;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -112,7 +111,7 @@ class HistoricoRepositoryIntegrationTest {
         alojamento.setIdentificacao(identificacao);
         alojamento.setCapacidade(2);
         alojamento.setEstadoLimpeza(EstadoLimpeza.CONCLUIDO);
-        alojamento.setTipo(TipoAlojamento.CANINO);
+        alojamento.setTipo("CANINO");
         return alojamentoRepository.save(alojamento);
     }
 

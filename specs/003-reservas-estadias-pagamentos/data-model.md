@@ -53,19 +53,85 @@ Este modelo cobre o ciclo operacional de Fase 3: criação/cancelamento de reser
 - `estadiaId`
 - `momentoPagamento` (`CHECK_IN`, `CHECK_OUT`)
 - `valor`
-- `metodoPagamento` (`NAO_DEFINIDO`, `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO`)
+- `metodoPagamento` (`NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO`)
 - `estadoPagamento` (`LIQUIDADO`, `PENDENTE`)
 - `dataHoraRegisto`
 
 **Validation rules**:
-- `valor > 0` para pagamentos registados.
-- `metodoPagamento` e `estadoPagamento` são obrigatórios (RF-10).
-- Pagamento de `CHECK_IN` cobre base da estadia; `CHECK_OUT` cobre extras/intervenções (RD-04).
+- `valor >= 0`; valores negativos são inválidos.
+- `metodoPagamento` e `estadoPagamento` são obrigatórios (RF-10); não é permitido registar pagamentos com método indefinido.
+- Pagamento de `CHECK_IN` cobre base da estadia calculada por dias reservados e tarifa ativa do tipo de alojamento.
+- Pagamento de `CHECK_OUT` cobre serviços extra, intervenções clínicas e dias adicionais face ao período reservado (RD-04).
+
+### TipoAlojamentoTarifa
+
+**Purpose**: Configurar tipos de alojamento e respetiva tarifa diária sem depender de enum fixo na aplicação.
+
+**Attributes**:
+- `id`
+- `tipoAlojamento` (texto único, normalizado em maiúsculas)
+- `tarifaDiaria`
+- `ativo`
+- `dataCriacao`
+
+**Validation rules**:
+- `tipoAlojamento` é obrigatório e único.
+- `tarifaDiaria >= 0`.
+- Apenas tarifas ativas podem ser usadas no cálculo de pagamentos.
+- Um tipo desativado permanece no histórico, mas não deve ser selecionado para novas configurações operacionais.
+
+### TipoServicoExtra
+
+**Purpose**: Catálogo de serviços extra disponíveis para registo durante estadias.
+
+**Attributes**:
+- `id`
+- `nome`
+- `descricao`
+- `ativo`
+- `dataCriacao`
+
+**Validation rules**:
+- `nome` é obrigatório e único.
+- Apenas tipos ativos podem ser usados para novos `ServicoExtra`.
+
+### ServicoExtra
+
+**Purpose**: Registar consumos complementares ocorridos durante uma estadia.
+
+**Attributes**:
+- `id`
+- `estadiaId`
+- `tipoServicoExtraId`
+- `custo`
+- `dataHora`
+- `autorId`
+
+**Validation rules**:
+- Apenas estadias `EM_CURSO` aceitam novos serviços extra.
+- `custo >= 0`.
+- O custo registado é imutável após check-out (RD-09).
+
+### IntervencaoClinica
+
+**Purpose**: Registar intervenções veterinárias associadas a uma estadia e potencialmente faturáveis no check-out.
+
+**Attributes relevantes nesta fase**:
+- `id`
+- `estadiaId`
+- `descricao`
+- `custo`
+- `dataHora`
+- `medicoId`
+
+**Validation rules**:
+- `custo >= 0`.
+- O custo registado é imutável após check-out (RD-09).
 
 ### Enums
 
 - `EstadoPagamento`: `LIQUIDADO`, `PENDENTE`
-- `MetodoPagamento`: `NAO_DEFINIDO`, `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO`
+- `MetodoPagamento`: `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO`
 - `MomentoPagamento`: `CHECK_IN`, `CHECK_OUT`
 
 ### Alojamento
@@ -84,6 +150,8 @@ Este modelo cobre o ciclo operacional de Fase 3: criação/cancelamento de reser
 - `Alojamento`: `DISPONIVEL -> OCUPADO` no check-in.
 - `Alojamento`: `OCUPADO -> PENDENTE_LIMPEZA` no check-out.
 - `Alojamento`: `PENDENTE_LIMPEZA -> DISPONIVEL` após confirmação de limpeza (fluxo da fase anterior).
+- `TipoAlojamentoTarifa`: `ativo=true -> ativo=false -> ativo=true` por ação da direção.
+- `TipoServicoExtra`: `ativo=true -> ativo=false -> ativo=true` por ação da direção.
 
 ## Relationships
 
@@ -91,6 +159,10 @@ Este modelo cobre o ciclo operacional de Fase 3: criação/cancelamento de reser
 - `Estadia 1:1..2 Pagamento` (pagamento base obrigatório no check-in e pagamento complementar opcional no check-out).
 - `Alojamento 1:* Reserva` (sem sobreposição temporal válida).
 - `Animal 1:* Reserva` e `Animal 1:* Estadia` (sem estadias concorrentes ativas).
+- `TipoAlojamentoTarifa 1:* Alojamento` por correspondência textual de `tipo`.
+- `TipoServicoExtra 1:* ServicoExtra`.
+- `Estadia 1:* ServicoExtra`.
+- `Estadia 1:* IntervencaoClinica`.
 
 ## Domain Invariants
 
@@ -100,6 +172,8 @@ Este modelo cobre o ciclo operacional de Fase 3: criação/cancelamento de reser
 - Reserva cancelada não reativa (RD-06).
 - Exclusividade de estadia ativa por animal (RD-07).
 - Custos extra registados na ocorrência e imutáveis após check-out (RD-09).
+- Cálculo do check-in usa tarifa ativa do tipo de alojamento; se não existir tarifa ativa, a operação deve falhar.
+- Cálculo do check-out não volta a cobrar dias já cobertos pelo pagamento base.
 
 ## Traceability
 
@@ -107,4 +181,5 @@ Este modelo cobre o ciclo operacional de Fase 3: criação/cancelamento de reser
 - `RF-08` mapeia abertura de `Estadia` e pagamento de entrada.
 - `RF-09` mapeia fecho de `Estadia` e faturação complementar.
 - `RF-10` mapeia estrutura e rastreabilidade de `Pagamento`.
+- `RF-18` mapeia `TipoAlojamentoTarifa` e `TipoServicoExtra`.
 - `RF-01` e `RF-05` consomem projeções de leitura sobre `Reserva`, `Estadia` e `Pagamento`.

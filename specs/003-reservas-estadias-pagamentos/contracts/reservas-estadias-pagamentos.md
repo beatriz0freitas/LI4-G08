@@ -59,28 +59,28 @@ Definir os contratos de interação da receção para disponibilidade, reservas,
 - **Path**: `/estadias/check-in`
 - **Payload**:
   - `reservaId`
-  - `metodoPagamento`
-  - `estadoPagamento`
+  - `metodoPagamento` obrigatório (`NUMERARIO`, `CARTAO_DEBITO` ou `CARTAO_CREDITO`)
 - **Success**:
   - estadia criada em `EM_CURSO`
   - alojamento marcado `OCUPADO`
-  - pagamento de `CHECK_IN` registado
+  - pagamento de `CHECK_IN` registado como `LIQUIDADO`
 - **Validation**:
   - reserva válida para check-in (RD-02)
+  - método de pagamento explícito obrigatório; não existe método por defeito
 
 ### Registar check-out
 
 - **Method**: `POST`
 - **Path**: `/estadias/{id}/check-out`
 - **Payload**:
-  - `metodoPagamento`
-  - `estadoPagamento`
+  - `metodoPagamento` obrigatório (`NUMERARIO`, `CARTAO_DEBITO` ou `CARTAO_CREDITO`)
 - **Success**:
   - estadia marcada `TERMINADA`
   - alojamento marcado `PENDENTE_LIMPEZA`
   - pagamento complementar de `CHECK_OUT` registado quando aplicável
 - **Validation**:
   - check-in prévio obrigatório (RD-03)
+  - método de pagamento explícito obrigatório; não existe método por defeito
 
 ## Error Cases
 

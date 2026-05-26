@@ -6,7 +6,6 @@ import pt.hotel.animais.dto.DisponibilidadeAlojamentoDto;
 import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.enums.Especie;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.repository.AlojamentoRepository;
 
 import java.time.LocalDate;
@@ -70,7 +69,7 @@ public class AlojamentoService implements IAlojamentoService {
             throw new IllegalArgumentException("Datas de entrada inválidas: dataInicio deve ser anterior a dataFim");
         }
 
-        TipoAlojamento tipo = TipoAlojamento.fromEspecie(especie);
+        String tipo = TipoAlojamentoPolicy.fromEspecie(especie);
         List<Alojamento> alojamentosDisponiveis = alojamentoRepository.findAvailableForPeriodAndTipo(dataInicio, dataFim, tipo);
 
         return alojamentosDisponiveis.stream()
@@ -103,8 +102,8 @@ public class AlojamentoService implements IAlojamentoService {
         Alojamento alojamento = alojamentoRepository.findById(alojamentoId)
             .orElseThrow(() -> new IllegalArgumentException("Alojamento não encontrado"));
 
-        TipoAlojamento tipoEsperado = TipoAlojamento.fromEspecie(especie);
-        if (alojamento.getTipo() != tipoEsperado) {
+        String tipoEsperado = TipoAlojamentoPolicy.fromEspecie(especie);
+        if (!tipoEsperado.equals(alojamento.getTipo())) {
             return false;
         }
 

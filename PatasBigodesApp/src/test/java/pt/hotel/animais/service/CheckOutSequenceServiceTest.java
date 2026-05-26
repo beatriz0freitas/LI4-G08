@@ -31,6 +31,7 @@ public class CheckOutSequenceServiceTest {
     void checkOut_fails_for_invalid_estadia() {
         // Act & Assert
         Assertions.assertThrows(IllegalArgumentException.class,
-            () -> estadiaService.checkOut(9999L));
+            () -> estadiaService.checkOut(9999L, 
+                pt.hotel.animais.model.enums.MetodoPagamento.NUMERARIO));
     }
 }

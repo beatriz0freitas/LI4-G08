@@ -12,7 +12,6 @@ import pt.hotel.animais.model.Tutor;
 import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
 import pt.hotel.animais.model.enums.Especie;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -57,7 +56,7 @@ public class AlojamentoRepositoryIntegrationTest {
         alo1.setIdentificacao("A1");
         alo1.setCapacidade(2);
         alo1.setEstadoLimpeza(EstadoLimpeza.CONCLUIDO);
-        alo1.setTipo(TipoAlojamento.CANINO);
+        alo1.setTipo("CANINO");
         alojamentoRepository.save(alo1);
 
         // alojamento B (limpo) sem reservas
@@ -65,7 +64,7 @@ public class AlojamentoRepositoryIntegrationTest {
         alo2.setIdentificacao("B1");
         alo2.setCapacidade(2);
         alo2.setEstadoLimpeza(EstadoLimpeza.CONCLUIDO);
-        alo2.setTipo(TipoAlojamento.CANINO);
+        alo2.setTipo("CANINO");
         alojamentoRepository.save(alo2);
 
         LocalDate inicio = LocalDate.now().plusDays(1);

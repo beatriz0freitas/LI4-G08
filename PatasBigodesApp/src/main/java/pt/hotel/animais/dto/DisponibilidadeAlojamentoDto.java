@@ -1,7 +1,5 @@
 package pt.hotel.animais.dto;
 
-import pt.hotel.animais.model.enums.TipoAlojamento;
-
 import java.time.LocalDate;
 
 /**
@@ -11,7 +9,7 @@ public class DisponibilidadeAlojamentoDto {
     
     private Long alojamentoId;
     private String identificacao;
-    private TipoAlojamento tipo;
+    private String tipo;
     private Integer capacidade;
     private LocalDate dataInicio;
     private LocalDate dataFim;
@@ -22,7 +20,7 @@ public class DisponibilidadeAlojamentoDto {
     
     public DisponibilidadeAlojamentoDto() {}
     
-    public DisponibilidadeAlojamentoDto(Long alojamentoId, String identificacao, TipoAlojamento tipo, Integer capacidade) {
+    public DisponibilidadeAlojamentoDto(Long alojamentoId, String identificacao, String tipo, Integer capacidade) {
         this.alojamentoId = alojamentoId;
         this.identificacao = identificacao;
         this.tipo = tipo;
@@ -48,16 +46,16 @@ public class DisponibilidadeAlojamentoDto {
         this.identificacao = identificacao;
     }
     
-    public TipoAlojamento getTipo() {
+    public String getTipo() {
         return tipo;
     }
     
-    public void setTipo(TipoAlojamento tipo) {
+    public void setTipo(String tipo) {
         this.tipo = tipo;
     }
 
     public String getTipoLabel() {
-        return tipo != null ? tipo.getLabel() : "";
+        return tipo != null ? tipo : "";
     }
     
     public Integer getCapacidade() {

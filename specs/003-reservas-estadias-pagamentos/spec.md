@@ -7,7 +7,7 @@
 
 **Mapped User Stories**: US-06, US-07, US-10, US-11, US-12, US-05, US-02  
 **Mapped Functional Requirements**: RF-01, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10  
-**Mapped Domain Requirements**: RD-01, RD-02, RD-03, RD-04, RD-06, RD-07, RD-09  
+**Mapped Domain Requirements**: RD-01, RD-02, RD-03, RD-04, RD-06, RD-07, RD-09, RD-12  
 **Mapped Non-Functional Requirements**: RNF-01, RNF-03, RNF-04, RNF-05
 
 **Origem documentária**:
@@ -27,6 +27,13 @@
 - Q: Qual a fonte de verdade para User Stories e Requisitos nesta feature? → A: User Stories em `docs/Etapa1/01-user-stories/user-stories.md` e requisitos em `docs/Etapa1/02-requirements/`.
 - Q: Que nível de detalhe de referências arquiteturais deve constar na spec? → A: Referenciar explicitamente diagramas de sequência, mockups de UI e ADRs relevantes da Etapa 2.
 - Q: Como tratar a prioridade de RD-06 nesta fase? → A: Embora RD-06 esteja definido como Should Have na Etapa 1, nesta feature é tratado como obrigatório operacional para garantir integridade do ciclo de reservas (sem reativação de reservas canceladas).
+
+### Session 2026-05-26
+
+- Q: Qual é a origem da tarifa usada no pagamento base? → A: A tarifa diária é configurada pelo diretor no catálogo `TipoAlojamentoTarifa`, identificado por `tipoAlojamento` textual e ativo/inativo, e não por enum Java fixo.
+- Q: O que entra na cobrança de check-out? → A: O check-out cobra apenas valores complementares: serviços extra, intervenções clínicas faturáveis e eventuais dias reais que ultrapassem o período reservado já pago no check-in.
+- Q: Como são geridos tipos de serviços extra? → A: Os tipos de serviços extra são catálogo de base de dados (`TipoServicoExtra`), gerido pela direção e referenciado por cada `ServicoExtra`.
+- Q: O check-in/check-out pode omitir método de pagamento? → A: Não. As interfaces de check-in e check-out devem exigir método real (`NUMERARIO`, `CARTAO_DEBITO` ou `CARTAO_CREDITO`) para registar pagamento liquidado.
 
 ---
 
@@ -89,7 +96,7 @@ Como funcionário de receção, quero registar o pagamento da estadia no momento
 
 **Acceptance Scenarios**:
 
-1. **Given** check-in em execução, **When** o sistema calcula valor base (dias x tarifa de alojamento), **Then** apresenta montante a liquidar.
+1. **Given** check-in em execução, **When** o sistema calcula valor base (dias reservados x tarifa ativa do tipo de alojamento), **Then** apresenta montante a liquidar.
 2. **Given** escolha de método de pagamento, **When** a operação é confirmada, **Then** é criado registo de pagamento com valor, método e estado.
 
 ---
@@ -105,7 +112,8 @@ Como funcionário de receção, quero registar o check-out de um animal e cobrar
 **Acceptance Scenarios**:
 
 1. **Given** estadia com extras/intervenções, **When** o check-out é iniciado, **Then** o sistema apresenta discriminação de custos complementares.
-2. **Given** confirmação de pagamento no check-out, **When** a operação termina, **Then** o sistema regista pagamento complementar e encerra a estadia.
+2. **Given** estadia terminada após a data reservada, **When** o check-out é calculado, **Then** o sistema adiciona à cobrança complementar apenas os dias adicionais não pagos no check-in.
+3. **Given** confirmação de pagamento no check-out, **When** a operação termina, **Then** o sistema regista pagamento complementar e encerra a estadia.
 
 ---
 
@@ -148,16 +156,17 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 - **RF-05 - Histórico de estadias e pagamentos**: O sistema deve manter um histórico completo das estadias e pagamentos de cada animal, consultável pela receção e pela direção, com paginação e filtragem por cliente, animal, estado e intervalo temporal.
 - **RF-06 - Controlo de disponibilidade de boxes**: O sistema deve determinar disponibilidade em tempo real por três condições cumulativas: sem reserva confirmada no período, sem estadia ativa no período e limpeza concluída; deve impedir reservas inválidas e sugerir alternativas.
 - **RF-07 - Gestão de reservas**: O sistema deve permitir criação, confirmação e cancelamento de reservas, com registo de período, box e animal associados.
-- **RF-08 - Check-in e pagamento de estadia**: O sistema deve suportar check-in, registar data de entrada e box atribuída, e processar pagamento da estadia no mesmo momento.
-- **RF-09 - Check-out e faturação complementar**: O sistema deve suportar check-out, registar data de saída e calcular/processar pagamento de serviços extra e intervenções veterinárias acumulados.
+- **RF-08 - Check-in e pagamento de estadia**: O sistema deve suportar check-in, registar data de entrada e box atribuída, e processar pagamento da estadia no mesmo momento, usando a tarifa diária ativa do tipo de alojamento.
+- **RF-09 - Check-out e faturação complementar**: O sistema deve suportar check-out, registar data de saída e calcular/processar pagamento de serviços extra, intervenções veterinárias acumuladas e dias adicionais face ao período reservado.
 - **RF-10 - Registo de pagamentos**: O sistema deve registar pagamentos de check-in e check-out com valor, método (numerário, cartão de débito, cartão de crédito) e estado (liquidado ou pendente), garantindo rastreabilidade.
+- **RF-18 - Gestão de tipos e tarifas**: O sistema deve permitir à direção gerir tipos de alojamento com tarifa diária e tipos de serviços extra, incluindo criação, edição, ativação e desativação.
 
 ### Domain Requirements
 
 - **RD-01 - Disponibilidade de alojamento**: Um alojamento só é considerado disponível se não existir reserva ou estadia ativa no período e se a limpeza estiver marcada como concluída.
 - **RD-02 - Check-in condicionado a reserva**: Um animal só pode realizar check-in com reserva confirmada associada.
 - **RD-03 - Sequência de check-in/check-out**: O check-out só pode ocorrer após check-in registado para a mesma estadia.
-- **RD-04 - Pagamento no check-in e check-out**: O check-in cobre exclusivamente a estadia base; extras e intervenções veterinárias são cobrados no check-out.
+- **RD-04 - Pagamento no check-in e check-out**: O check-in cobre exclusivamente a estadia base estimada pelo período reservado e tarifa ativa do tipo de alojamento; extras, intervenções veterinárias e dias adicionais são cobrados no check-out.
 - **RD-06 - Cancelamento de reservas**: Uma reserva cancelada não pode ser reativada; deve ser criada nova reserva.
 - **RD-07 - Exclusividade de estadia**: Um animal não pode ter duas estadias em curso em simultâneo.
 - **RD-09 - Registo e imutabilidade de custos extra**: O custo de extra/intervenção deve ser registado na ocorrência e não pode ser alterado após check-out.
@@ -184,15 +193,19 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 ### Enums de Pagamento
 
 - `EstadoPagamento`: `LIQUIDADO`, `PENDENTE`
-- `MetodoPagamento`: `NAO_DEFINIDO`, `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO`
+- `MetodoPagamento`: `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO`
 - `MomentoPagamento`: `CHECK_IN`, `CHECK_OUT`
 
 ### Key Entities
 
 - **Reserva**: Ligação entre Tutor, Animal, Alojamento e período (dataInicio, dataFim). Estados: ATIVA, CANCELADA, CONCLUIDA. Uma reserva pode desencadear no máximo uma Estadia (RD-06).
 - **Estadia**: Documento de hospedagem com referência a uma Reserva. Estados: EM_CURSO, TERMINADA. Inclui checkIn (data/hora) e checkOut (data/hora). Máximo uma Estadia por Animal em qualquer período (RD-07).
-- **Pagamento**: Registo de transação com valor, `metodoPagamento` (`MetodoPagamento`), `momentoPagamento` (`MomentoPagamento`), `estadoPagamento` (`EstadoPagamento`) e referência a Estadia. Máximo dois pagamentos por Estadia (um CHECK_IN obrigatório, um CHECK_OUT opcional).
+- **Pagamento**: Registo de transação com valor, `metodoPagamento` (`MetodoPagamento`), `momentoPagamento` (`MomentoPagamento`), `estadoPagamento` (`EstadoPagamento`) e referência a Estadia. Máximo dois pagamentos por Estadia (um CHECK_IN obrigatório, um CHECK_OUT complementar). O método de pagamento é sempre um método real, sem valor indefinido.
 - **Alojamento**: Entidade existente (Fase 1), mas agora com ciclo de estado expandido: DISPONIVEL → OCUPADO → PENDENTE_LIMPEZA → CONCLUIDO → DISPONIVEL.
+- **TipoAlojamentoTarifa**: Catálogo gerido pela direção com `tipoAlojamento`, `tarifaDiaria`, `ativo` e `dataCriacao`. Substitui enum fixo para permitir tipos configuráveis.
+- **TipoServicoExtra**: Catálogo gerido pela direção com `nome`, `descricao`, `ativo` e `dataCriacao`. Apenas tipos ativos podem ser usados no registo de serviços extra.
+- **ServicoExtra**: Registo de consumo durante a estadia, com referência a `TipoServicoExtra`, custo e data/hora.
+- **IntervencaoClinica**: Registo clínico faturável durante a estadia, com custo considerado no check-out quando aplicável.
 
 ---
 
@@ -205,6 +218,8 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 - **SC-003**: 100% das reservas respeitam as regras de não-overbooking definidas por RF-06 e RD-01.
 - **SC-004**: 100% dos check-outs respeitam sequência obrigatória (RD-03), sem encerramentos sem check-in prévio.
 - **SC-005**: 100% dos pagamentos registam valor, método e estado conforme RF-10.
+- **SC-005A**: 100% dos cálculos de check-in usam tarifa ativa de `TipoAlojamentoTarifa`; ausência de tarifa ativa bloqueia o pagamento base.
+- **SC-005B**: 100% dos check-outs agregam serviços extra, intervenções clínicas e dias adicionais sem voltar a cobrar o período já pago no check-in.
 - **SC-006**: Diretor consegue consultar indicadores e pendentes por período com atualização máxima de 60 segundos (RF-01).
 - **SC-007**: Histórico completo de estadias e pagamentos por animal, cliente ou período está disponível para receção/direção com paginação consistente (RF-05).
 - **SC-008**: Existe pelo menos 1 teste automatizado por funcionalidade P1 desta feature (US-06, US-12, US-07, US-10, US-11).
@@ -226,8 +241,8 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 ## Assumptions
 
 - Tutor e Animal já estão registados (Fase 2 completa).
-- Tarifa base do alojamento está definida no cadastro (Fase 1).
-- Serviços adicionais são registados em paralelo pela equipa de cuidados (será detalhado em Fase 4, mas o pagamento é processado aqui).
+- Tarifa base diária está definida no catálogo de tipos de alojamento e pode ser gerida pela direção.
+- Serviços adicionais são registados em paralelo pela equipa de cuidados com base no catálogo de tipos de serviços extra; o pagamento é processado no check-out.
 - Autenticação e autorização por perfil já estão funcionais (Fase 1: `FUNCIONARIO_RECEPCAO`, `DIRETOR`).
 - Todos os pagamentos são em moeda única (não há conversão).
 - Estadia não pode ter check-out registado sem check-in anterior.
@@ -295,6 +310,7 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 | US-11 | UC-07, UC-08, RF-09, RF-10, RD-03, RD-04, RD-09 | ✓ Coberto |
 | US-05 | RF-05 | ✓ Coberto |
 | US-02 | RF-01 | ✓ Coberto |
+| Gestão de tarifas e catálogos | RF-18, RF-08, RF-09, RD-04 | ✓ Coberto |
 
 ---
 

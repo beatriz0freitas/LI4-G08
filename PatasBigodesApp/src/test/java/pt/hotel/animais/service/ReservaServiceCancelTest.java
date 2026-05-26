@@ -12,7 +12,6 @@ import pt.hotel.animais.model.Tutor;
 import pt.hotel.animais.model.enums.Especie;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
 import pt.hotel.animais.model.enums.EstadoReserva;
-import pt.hotel.animais.model.enums.TipoAlojamento;
 import pt.hotel.animais.repository.ReservaRepository;
 
 import java.math.BigDecimal;
@@ -93,7 +92,7 @@ class ReservaServiceCancelTest {
         animal.setDataNascimento(LocalDate.now().minusYears(2));
         animal.setPeso(new BigDecimal("10.0"));
 
-        Alojamento alojamento = new Alojamento(3L, "Box Cancel", TipoAlojamento.CANINO, 1, EstadoLimpeza.CONCLUIDO, null);
+        Alojamento alojamento = new Alojamento(3L, "Box Cancel", "CANINO", 1, EstadoLimpeza.CONCLUIDO, null);
 
         Reserva reserva = new Reserva();
         reserva.setId(id);
