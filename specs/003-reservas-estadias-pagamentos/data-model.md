@@ -53,13 +53,13 @@ Este modelo cobre o ciclo operacional de Fase 3: criação/cancelamento de reser
 - `estadiaId`
 - `momentoPagamento` (`CHECK_IN`, `CHECK_OUT`)
 - `valor`
-- `metodoPagamento` (`NAO_DEFINIDO`, `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO`)
+- `metodoPagamento` (`NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO`)
 - `estadoPagamento` (`LIQUIDADO`, `PENDENTE`)
 - `dataHoraRegisto`
 
 **Validation rules**:
 - `valor >= 0`; valores negativos são inválidos.
-- `metodoPagamento` e `estadoPagamento` são obrigatórios (RF-10).
+- `metodoPagamento` e `estadoPagamento` são obrigatórios (RF-10); não é permitido registar pagamentos com método indefinido.
 - Pagamento de `CHECK_IN` cobre base da estadia calculada por dias reservados e tarifa ativa do tipo de alojamento.
 - Pagamento de `CHECK_OUT` cobre serviços extra, intervenções clínicas e dias adicionais face ao período reservado (RD-04).
 
@@ -131,7 +131,7 @@ Este modelo cobre o ciclo operacional de Fase 3: criação/cancelamento de reser
 ### Enums
 
 - `EstadoPagamento`: `LIQUIDADO`, `PENDENTE`
-- `MetodoPagamento`: `NAO_DEFINIDO`, `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO`
+- `MetodoPagamento`: `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO`
 - `MomentoPagamento`: `CHECK_IN`, `CHECK_OUT`
 
 ### Alojamento

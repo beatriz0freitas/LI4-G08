@@ -193,14 +193,14 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 ### Enums de Pagamento
 
 - `EstadoPagamento`: `LIQUIDADO`, `PENDENTE`
-- `MetodoPagamento`: `NAO_DEFINIDO`, `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO`
+- `MetodoPagamento`: `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO`
 - `MomentoPagamento`: `CHECK_IN`, `CHECK_OUT`
 
 ### Key Entities
 
 - **Reserva**: Ligação entre Tutor, Animal, Alojamento e período (dataInicio, dataFim). Estados: ATIVA, CANCELADA, CONCLUIDA. Uma reserva pode desencadear no máximo uma Estadia (RD-06).
 - **Estadia**: Documento de hospedagem com referência a uma Reserva. Estados: EM_CURSO, TERMINADA. Inclui checkIn (data/hora) e checkOut (data/hora). Máximo uma Estadia por Animal em qualquer período (RD-07).
-- **Pagamento**: Registo de transação com valor, `metodoPagamento` (`MetodoPagamento`), `momentoPagamento` (`MomentoPagamento`), `estadoPagamento` (`EstadoPagamento`) e referência a Estadia. Máximo dois pagamentos por Estadia (um CHECK_IN obrigatório, um CHECK_OUT complementar).
+- **Pagamento**: Registo de transação com valor, `metodoPagamento` (`MetodoPagamento`), `momentoPagamento` (`MomentoPagamento`), `estadoPagamento` (`EstadoPagamento`) e referência a Estadia. Máximo dois pagamentos por Estadia (um CHECK_IN obrigatório, um CHECK_OUT complementar). O método de pagamento é sempre um método real, sem valor indefinido.
 - **Alojamento**: Entidade existente (Fase 1), mas agora com ciclo de estado expandido: DISPONIVEL → OCUPADO → PENDENTE_LIMPEZA → CONCLUIDO → DISPONIVEL.
 - **TipoAlojamentoTarifa**: Catálogo gerido pela direção com `tipoAlojamento`, `tarifaDiaria`, `ativo` e `dataCriacao`. Substitui enum fixo para permitir tipos configuráveis.
 - **TipoServicoExtra**: Catálogo gerido pela direção com `nome`, `descricao`, `ativo` e `dataCriacao`. Apenas tipos ativos podem ser usados no registo de serviços extra.

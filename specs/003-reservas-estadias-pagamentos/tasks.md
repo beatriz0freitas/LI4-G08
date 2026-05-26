@@ -175,6 +175,7 @@
 - [x] T072 Criar controller e templates de gestão de tipos de alojamento/tarifas em `TipoAlojamentoTarifaController` e `templates/admin/tarifas/`.
 - [x] T073 Criar controller e templates de gestão de serviços extra em `TipoServicoExtraController` e `templates/admin/tipos-servicos-extra/`.
 - [x] T074 Remover dependência do enum `TipoAlojamento` no domínio aplicacional e representar o tipo como valor configurável.
+- [x] T075 [P] [US4] Criar testes unitários para regras do catálogo `TipoAlojamentoTarifaService`.
 
 **Checkpoint**: US5 funcional e testável de forma independente.
 
