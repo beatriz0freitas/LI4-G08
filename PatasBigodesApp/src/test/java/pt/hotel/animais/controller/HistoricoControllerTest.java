@@ -13,10 +13,6 @@ import pt.hotel.animais.config.SecurityConfig;
 import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.enums.EstadoEstadia;
-import pt.hotel.animais.repository.IntervencaoClinicaRepository;
-import pt.hotel.animais.repository.NotaRepository;
-import pt.hotel.animais.repository.RegistoCuidadoRepository;
-import pt.hotel.animais.repository.ServicoExtraRepository;
 import pt.hotel.animais.service.IHistoricoService;
 
 import java.time.LocalDate;
@@ -43,33 +39,25 @@ class HistoricoControllerTest {
     @MockBean
     private IHistoricoService historicoService;
 
-    @MockBean
-    private RegistoCuidadoRepository registoCuidadoRepository;
-
-    @MockBean
-    private ServicoExtraRepository servicoExtraRepository;
-
-    @MockBean
-    private IntervencaoClinicaRepository intervencaoClinicaRepository;
-
-    @MockBean
-    private NotaRepository notaRepository;
-
     @Test
     @WithMockUser(roles = {"DIRETOR"})
     void verEventosDeveRenderizarHistoricoConsolidado() throws Exception {
-        when(historicoService.consultar(any(), any(), eq(registoCuidadoRepository), eq(servicoExtraRepository), eq(intervencaoClinicaRepository), eq(notaRepository)))
+        when(historicoService.consultar(any(), any()))
             .thenReturn(new PageImpl<>(List.of(), PageRequest.of(0, 10), 0));
 
         mvc.perform(get("/historico/eventos")
+                .param("clienteId", "2")
                 .param("animalId", "5")
                 .param("estadiaId", "7")
+                .param("tipoEvento", "SERVICO_EXTRA")
                 .param("dataInicio", LocalDate.now().minusDays(1).toString())
                 .param("dataFim", LocalDate.now().toString()))
             .andExpect(status().isOk())
             .andExpect(view().name("historico/eventos"))
+            .andExpect(model().attribute("clienteId", 2L))
             .andExpect(model().attribute("animalId", 5L))
-            .andExpect(model().attribute("estadiaId", 7L));
+            .andExpect(model().attribute("estadiaId", 7L))
+            .andExpect(model().attribute("tipoEvento", "SERVICO_EXTRA"));
     }
 
     @Test

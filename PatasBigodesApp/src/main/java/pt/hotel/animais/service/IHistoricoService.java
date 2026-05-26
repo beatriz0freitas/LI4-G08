@@ -6,21 +6,13 @@ import pt.hotel.animais.dto.HistoricoFiltroDto;
 import pt.hotel.animais.dto.HistoricoItemDto;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.enums.EstadoEstadia;
-import pt.hotel.animais.repository.IntervencaoClinicaRepository;
-import pt.hotel.animais.repository.NotaRepository;
-import pt.hotel.animais.repository.RegistoCuidadoRepository;
-import pt.hotel.animais.repository.ServicoExtraRepository;
 
 import java.time.LocalDate;
 
 public interface IHistoricoService {
     Page<HistoricoItemDto> consultar(
         HistoricoFiltroDto filtro,
-        Pageable pageable,
-        RegistoCuidadoRepository regRepo,
-        ServicoExtraRepository seRepo,
-        IntervencaoClinicaRepository icRepo,
-        NotaRepository notaRepo
+        Pageable pageable
     );
 
     Page<Estadia> listarHistorico(

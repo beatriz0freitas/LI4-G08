@@ -22,6 +22,7 @@ Completar a rastreabilidade da operação diária e do acompanhamento clínico d
 
 - **Q: Em que condições uma intervenção clínica pode ser registada?** → **A:** Apenas durante uma estadia ativa, com veterinário responsável obrigatório e custo não negativo.
 - **Q: Registos de cuidado e serviços extra seguem as mesmas validações base?** → **A:** Sim. Só podem ser registados durante uma estadia ativa; o `RegistoCuidado` exige autor autenticado autorizado e o `ServicoExtra` exige também custo não negativo.
+- **Q: Que filtros devem ser suportados no histórico consolidado, e como se combinam?** → **A:** Animal, cliente, estadia, intervalo de datas e tipo de evento; combinar todos com AND.
 
 ## Mapeamento a artefactos existentes
 - Use Cases: [UC-09 - Registar Cuidados Diarios](docs/Etapa1/03-use-cases/UC-09.md#L1), [UC-10 - Registar Servico Extra](docs/Etapa1/03-use-cases/UC-10.md#L1), [UC-11 - Gerir Historial Clinico](docs/Etapa1/03-use-cases/UC-11.md#L1)
@@ -81,11 +82,12 @@ Independent Test: Adicionar `Nota` a uma reserva e verificar visibilidade durant
 Mapped to: RF-05 (histórico de operações/consultas).
 
 ### US-22 - Consulta consolidada do historial clínico e operacional (Prioridade: P1)
-Descrição: Veterinário ou director consulta todo o historial (Registos de cuidado, Intervencoes, ServicosExtra, Notas) filtrável por periodo e por estadia/animal.
-Independent Test: Endpoint de consulta devolve lista filtrada por `animalId`, `estadiaId`, `dataInicio`/`dataFim` e tipo de registo.
+Descrição: Veterinário ou director consulta todo o historial (Registos de cuidado, Intervencoes, ServicosExtra, Notas, reservas, estadias e pagamentos quando aplicável) filtrável por animal, cliente, estadia, intervalo de datas e tipo de evento.
+Independent Test: Endpoint de consulta devolve lista filtrada por `animalId`, `clienteId`, `estadiaId`, `dataInicio`/`dataFim` e `tipoEvento`, aplicando todos os filtros ativos com AND.
 Acceptance Scenarios:
-1. Selecção por `animalId` e intervalo devolve apenas registos nesse periodo.
-2. Ordenação por data funciona conforme escolhido (asc/desc).
+1. Selecção por `animalId` e intervalo devolve apenas registos desse animal nesse período.
+2. Selecção por `clienteId` e `tipoEvento` devolve apenas eventos desse cliente desse tipo.
+3. Quando vários filtros são fornecidos, todos têm de coincidir para o registo ser devolvido.
 
 ### US-16 - Registar alterações ao estado de saúde (Priority: P2)
 Descrição: Funcionário/cuidador ou veterinário regista uma alteração do estado de saúde do animal durante a estadia, com descrição e severidade.
@@ -114,6 +116,7 @@ Todos os requisitos abaixo usam os identificadores canónicos do repositório.
 - **RF-14**: O sistema deve permitir ao médico veterinário consultar o historial clínico de cada animal e registar intervenções, prescrições e o custo associado. O registo de intervenções clínicas só é permitido durante uma estadia ativa, com validação do perfil `VETERINARIO` e custo não negativo.
 - **RF-17**: O sistema deve permitir registar um serviço extra com custo durante a estadia e associá-lo automaticamente à reserva em curso, para inclusão na faturação do check-out. O registo só é permitido durante uma estadia ativa e com custo não negativo.
 - **RF-05**: O sistema deve manter o histórico de estadias e pagamentos consultável, para suportar a consulta consolidada do historial operacional e financeiro.
+- **RF-05**: O sistema deve manter o histórico de estadias e pagamentos consultável, para suportar a consulta consolidada do historial operacional e financeiro, com filtros por animal, cliente, estadia, intervalo de datas e tipo de evento, combinados por AND.
 
 ### Requisitos Não-Funcionais
 - **RNF-01**: O sistema deve garantir tempo de resposta inferior a 2 segundos para operações de leitura relevantes, incluindo a consulta de históricos e listas de registos.
