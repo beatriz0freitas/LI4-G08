@@ -159,6 +159,43 @@ class EstadiaServiceTest {
     }
 
     @Test
+    void checkOutDeveFalharSePagamentoComplementarFalhar() {
+        Estadia estadia = criarEstadia(5L, EstadoEstadia.EM_CURSO);
+        estadia.setReserva(criarReservaComAlojamento());
+
+        when(estadiaRepository.findById(5L)).thenReturn(Optional.of(estadia));
+        doThrow(new IllegalStateException("falha no pagamento")).when(pagamentoService)
+            .registrarPagamentoCheckOut(eq(5L), eq(MetodoPagamento.NUMERARIO));
+
+        assertThatThrownBy(() -> estadiaService.checkOut(5L, MetodoPagamento.NUMERARIO))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("falha no pagamento");
+
+        verify(estadiaRepository, never()).save(any());
+        verify(alojamentoService, never()).marcarPendenteLimpeza(any());
+        verify(reservaService, never()).concluir(any());
+    }
+
+    @Test
+    void checkOutDevePropagarFalhaNaLimpeza() {
+        Estadia estadia = criarEstadia(5L, EstadoEstadia.EM_CURSO);
+        estadia.setReserva(criarReservaComAlojamento());
+
+        when(estadiaRepository.findById(5L)).thenReturn(Optional.of(estadia));
+        when(estadiaRepository.save(any(Estadia.class))).thenAnswer(inv -> inv.getArgument(0));
+        doThrow(new IllegalStateException("falha na limpeza")).when(alojamentoService)
+            .marcarPendenteLimpeza(1L);
+
+        assertThatThrownBy(() -> estadiaService.checkOut(5L, MetodoPagamento.NUMERARIO))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("falha na limpeza");
+
+        verify(pagamentoService).registrarPagamentoCheckOut(eq(5L), eq(MetodoPagamento.NUMERARIO));
+        verify(reservaService).concluir(10L);
+        verify(alojamentoService).marcarPendenteLimpeza(1L);
+    }
+
+    @Test
     void checkOutDeveLancarExcecaoSeMetodoPagamentoNulo() {
         Estadia estadia = criarEstadia(5L, EstadoEstadia.EM_CURSO);
         estadia.setReserva(criarReservaComAlojamento());

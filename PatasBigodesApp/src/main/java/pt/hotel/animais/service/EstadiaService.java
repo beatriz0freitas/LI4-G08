@@ -79,17 +79,18 @@ public class EstadiaService implements IEstadiaService {
     }
 
     /**
-     * Check-out transacional ACID: todas as operações numa única transação.
+    * Check-out transacional para pagamento e fecho da estadia.
      * 
-     * Sequência obrigatória (todos os passos devem suceder ou nada é feito):
+    * Sequência obrigatória para o fecho operacional:
      * 1. Validar que método de pagamento é real (obrigatório)
      * 2. Definir dataFim da estadia
      * 3. Calcular cobrança complementar
      * 4. Registar pagamento de check-out
-     * 5. Marcar alojamento para limpeza
-     * 6. Mudar estado para TERMINADA
+    * 5. Mudar estado para TERMINADA
+    * 6. Concluir a reserva associada
+    * 7. Marcar alojamento para limpeza
      * 
-     * Se qualquer passo falhar, a transação é revertida completamente.
+    * Se qualquer passo falhar, a transação é revertida.
      */
     @Transactional
     public Estadia checkOut(Long estadiaId, MetodoPagamento metodoPagamento) {
@@ -111,20 +112,19 @@ public class EstadiaService implements IEstadiaService {
         // O pagamento é registado mesmo que seja zero (para auditoria)
         pagamentoService.registrarPagamentoCheckOut(estadiaId, metodoPagamento);
 
-        // Passo 5: Marcar alojamento para limpeza
-        // Se isto falhar, a exceção propaga e reverte toda a transação
-        var reserva = estadia.getReserva();
-        if (reserva != null && reserva.getAlojamento() != null) {
-            var alojamentoId = reserva.getAlojamento().getId();
-            alojamentoService.marcarPendenteLimpeza(alojamentoId);
-        }
-
-        // Passo 6: Marcar como TERMINADA (último passo para garantir integridade)
+        // Passo 5: Marcar como TERMINADA
         estadia.setEstado(EstadoEstadia.TERMINADA);
         Estadia saved = estadiaRepository.save(estadia);
 
+        // Passo 6: Concluir reserva associada antes da limpeza
+        var reserva = estadia.getReserva();
         if (reserva != null) {
             reservaService.concluir(reserva.getId());
+        }
+
+        // Passo 7: A limpeza é parte da mesma transação
+        if (reserva != null && reserva.getAlojamento() != null) {
+            alojamentoService.marcarPendenteLimpeza(reserva.getAlojamento().getId());
         }
 
         return saved;
