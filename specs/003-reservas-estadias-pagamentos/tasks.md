@@ -111,12 +111,13 @@
 
 - [x] T027 [P] [US3] Criar teste de serviço para check-in condicionado a reserva em `PatasBigodesApp/src/test/java/pt/hotel/animais/service/CheckInServiceTest.java`
 - [x] T028 [P] [US3] Criar teste de serviço para bloqueio de check-out sem check-in em `PatasBigodesApp/src/test/java/pt/hotel/animais/service/CheckOutSequenceServiceTest.java`
+- [x] T028A [P] [US3] Criar teste de serviço para bloquear check-in duplicado quando o animal já tem estadia `EM_CURSO` em `PatasBigodesApp/src/test/java/pt/hotel/animais/service/EstadiaServiceTest.java`
 - [x] T029 [P] [US3] Criar teste de integração do contrato `POST /estadias/check-in` em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/CheckInIntegrationTest.java`
 - [x] T030 [P] [US3] Criar teste de integração do contrato `POST /estadias/{id}/check-out` em `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/CheckOutIntegrationTest.java`
 
 ### Implementation for User Story 3
 
-- [x] T031 [US3] Implementar fluxo de check-in e criação de estadia em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
+- [x] T031 [US3] Implementar fluxo de check-in e criação de estadia, incluindo bloqueio de dupla estadia ativa por animal (RD-07), em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java`, `EstadiaService.java`, `AnimalRepository.java` e `EstadiaRepository.java`
 - [x] T032 [US3] Implementar fluxo de check-out e fecho de estadia em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
 - [x] T033 [US3] Implementar transições de estado do alojamento em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IAlojamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/AlojamentoService.java`
 - [x] T034 [US3] Implementar endpoints de check-in/check-out em `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/EstadiaController.java`

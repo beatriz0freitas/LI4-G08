@@ -63,6 +63,7 @@ Definir os contratos de interação da receção para disponibilidade, reservas,
   - pagamento de `CHECK_IN` registado como `LIQUIDADO`
 - **Validation**:
   - reserva em estado `ATIVA` válida para check-in (RD-02)
+  - animal sem outra estadia em estado `EM_CURSO` (RD-07)
   - método de pagamento explícito obrigatório; não existe método por defeito
 
 ### Registar check-out

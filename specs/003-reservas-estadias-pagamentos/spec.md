@@ -41,6 +41,8 @@
 
 - Q: No check-in, a reserva passa a `CONFIRMADA`? → A: Sim. Durante o processo de check-in, se existir uma reserva associada em estado `ATIVA`, o sistema altera esse estado para `CONFIRMADA` como parte da mesma transação antes de criar a `Estadia`.
 
+- Q: Qual é a definição de 'estadia ativa' e como impedir duplicados? → A: Estadia ativa é a `Estadia` com estado `EM_CURSO`. O sistema deve impedir a criação de uma nova `Estadia` para o mesmo `animalId` enquanto existir uma `Estadia` em `EM_CURSO`.
+
 ---
 
 ## User Scenarios & Testing
@@ -288,6 +290,12 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 - [UC-06: Registar Check-in](../../docs/Etapa2/03-seq-diagrams/UC-06.mmd): fluxo de check-in, criação/ativação da estadia e pagamento base
 - [UC-07: Registar Check-out](../../docs/Etapa2/03-seq-diagrams/UC-07.mmd): fluxo de check-out, atualização de estado e transição para limpeza
 - [UC-08: Processar Faturacao e Pagamento](../../docs/Etapa2/03-seq-diagrams/UC-08.mmd): composição dos pagamentos em check-in/check-out
+
+### Implementation Notes (LAC-08)
+
+- `Estadia` exclusividade: não pode existir mais do que uma `Estadia` com estado `EM_CURSO` por `animalId` (ver `RD-07`).
+- Recomendação técnica: bloquear pessimisticamente o `Animal` durante o check-in, adicionar método de repositório `EstadiaRepository.findEmCursoPorAnimal(animalId): Optional<Estadia>` e validar em `EstadiaService.abrirEstadiaPorReserva()` dentro de transação; em caso de existência, lançar `EstadiaExistenteException` com mensagem clara para a UI.
+- Testes: adicionar caso de integração `TC-07.4 - impedir dupla estadia activa` e testes unitários para `EstadiaService` que simulem concorrência e verifiquem bloqueio atómico.
 
 ### UI Mockups
 
