@@ -43,6 +43,8 @@
 
 - Q: Qual é a definição de 'estadia ativa' e como impedir duplicados? → A: Estadia ativa é a `Estadia` com estado `EM_CURSO`. O sistema deve impedir a criação de uma nova `Estadia` para o mesmo `animalId` enquanto existir uma `Estadia` em `EM_CURSO`.
 
+- Q: O que é obrigatório no check-out? → A: O pagamento complementar é obrigatório e o fecho do check-out é totalmente ACID: se qualquer passo falhar, a operação inteira é revertida, incluindo o estado da estadia, da reserva e do alojamento.
+
 ---
 
 ## User Scenarios & Testing
@@ -173,7 +175,7 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 
 - **RD-01 - Disponibilidade de alojamento**: Um alojamento só é considerado disponível se não existir reserva ou estadia ativa no período e se a limpeza estiver marcada como concluída. Esta regra é validada centralmente por `AvailabilityDomainService` com lock pessimista durante criação de reserva, impedindo overbooking mesmo em cenários de alta concorrência.
 - **RD-02 - Check-in e confirmação automática**: O check-in valida a existência de uma reserva associada em estado `ATIVA`; o processo de check-in altera esse estado para `CONFIRMADA` como parte da mesma transação antes de criar a `Estadia`. O check-in sem reserva ativa não é permitido nesta fase.
-- **RD-03 - Sequência de check-in/check-out**: O check-out só pode ocorrer após check-in registado para a mesma estadia. Check-out atualiza atomicamente Estadia (EM_CURSO → TERMINADA) e Alojamento (OCUPADO → PENDENTE_LIMPEZA) na mesma transação, garantindo consistência; no mesmo ciclo transacional, a reserva associada passa a `CONCLUIDA`.
+- **RD-03 - Sequência de check-in/check-out**: O check-out só pode ocorrer após check-in registado para a mesma estadia. O pagamento complementar é obrigatório e faz parte do fecho da operação; se qualquer passo falhar, o check-out é revertido na totalidade. A atualização da Estadia (EM_CURSO → TERMINADA), da Reserva associada (CONFIRMADA → CONCLUIDA) e do Alojamento para `PENDENTE_LIMPEZA` é atómica.
 - **RD-04 - Pagamento no check-in e check-out**: O check-in cobre exclusivamente a estadia base estimada pelo período reservado e tarifa ativa do tipo de alojamento; extras, intervenções veterinárias e dias adicionais são cobrados no check-out.
 - **RD-06 - Cancelamento de reservas**: Apenas reservas `ATIVA` podem ser canceladas. Uma reserva cancelada não pode ser reativada; deve ser criada nova reserva.
 - **RD-07 - Exclusividade de estadia**: Um animal não pode ter duas estadias em curso em simultâneo.
@@ -193,6 +195,7 @@ Como diretor, quero consultar indicadores de faturação e pagamentos pendentes 
 - As regras de domínio críticas (RD-01, RD-02, RD-03, RD-04, RD-06, RD-07, RD-09) devem ter testes dedicados na camada de serviço.
 - Deve existir pelo menos um teste de integração por caso de uso principal (UC-04, UC-05, UC-06, UC-07, UC-08), cobrindo persistência e transições de estado.
 - Devem existir testes explícitos das transições `ATIVA -> CONFIRMADA` no check-in, `ATIVA -> CANCELADA` no cancelamento e `CONFIRMADA -> CONCLUIDA` no check-out, incluindo o caso negativo de tentativa de cancelamento de reserva `CONFIRMADA`.
+- Devem existir testes explícitos para falha de limpeza no check-out, garantindo que o fecho da estadia e o pagamento complementar não são desfeitos e que o alojamento fica registado como pendente de limpeza.
 - Devem existir testes explícitos de autorização por perfil para operações críticas (reserva, check-in/out, pagamentos, dashboard e histórico), incluindo cenários de acesso negado.
 - Devem existir testes de confidencialidade para garantir que dados pessoais e clínicos sensíveis não são expostos em respostas indevidas ou ecrãs sem permissão.
 - Devem existir testes de desempenho para validar SC-001, SC-002 e SC-006 em condições normais de utilização.
