@@ -7,7 +7,7 @@
 
 ## Summary
 
-Implementar o ciclo operacional de receção para reservas, check-in/check-out e pagamentos, garantindo consistência de estados entre `Reserva`, `Estadia`, `Pagamento` e `Alojamento`, alinhado com US-06, US-07, US-10, US-11, US-12, US-05, US-02 e com os requisitos RF-01, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10, incluindo estratégia de testes automatizados por funcionalidade crítica.
+Implementar o ciclo operacional de receção para reservas, check-in/check-out e pagamentos, catálogo de tipos de alojamento com tarifa diária, catálogo de tipos de serviços extra e cobrança complementar real no check-out, garantindo consistência de estados entre `Reserva`, `Estadia`, `Pagamento` e `Alojamento`, alinhado com US-06, US-07, US-10, US-11, US-12, US-05, US-02 e com os requisitos RF-01, RF-05, RF-06, RF-07, RF-08, RF-09, RF-10, incluindo estratégia de testes automatizados por funcionalidade crítica.
 
 ## Technical Context
 
@@ -18,7 +18,7 @@ Implementar o ciclo operacional de receção para reservas, check-in/check-out e
 **Target Platform**: Aplicação web server-side (Linux/Docker), execução via Maven/Makefile  
 **Project Type**: Web application MVC monolítica  
 **Performance Goals**: Leituras < 2s; escritas < 3s; atualização de dashboard até 60s (RNF-01 + RF-01)  
-**Constraints**: Sem overbooking; check-in exige reserva confirmada; check-out exige check-in prévio; reserva cancelada não reativa; uma estadia ativa por animal; registo obrigatório de método/estado de pagamento; operações críticas auditáveis  
+**Constraints**: Sem overbooking; check-in exige reserva confirmada; check-out exige check-in prévio; reserva cancelada não reativa; uma estadia ativa por animal; registo obrigatório de método/estado de pagamento; pagamento base depende de tarifa ativa por tipo de alojamento; pagamento de saída agrega extras, clínica e dias adicionais; operações críticas auditáveis  
 **Scale/Scope**: Fluxo operacional da receção e direção para Fase 3, com evolução posterior em Fase 4/5
 
 ## Constitution Check
@@ -81,6 +81,9 @@ PatasBigodesApp/
 ### Unknowns identified and resolved
 
 - Estratégia de pagamento em dois momentos (check-in/check-out) e regras de estado: resolvido com RF-10 + RD-04.
+- Origem da tarifa base da estadia: resolvido com `TipoAlojamentoTarifa`, gerido pela direção e persistido em base de dados.
+- Origem dos serviços extra faturáveis: resolvido com catálogo `TipoServicoExtra`, referenciado por `ServicoExtra`.
+- Alcance da cobrança complementar: resolvido como soma de serviços extra, intervenções clínicas e dias reais adicionais face ao período reservado.
 - Regras de transição entre reserva/estadia/alojamento: resolvido com RD-01, RD-02, RD-03, RD-06, RD-07.
 - Cobertura mínima de testes obrigatórios para P1: resolvido com secção de `Validation & Test Requirements` na spec.
 
@@ -92,13 +95,14 @@ PatasBigodesApp/
 
 ### 1. Domain model
 
-- `data-model.md` define entidades `Reserva`, `Estadia`, `Pagamento`, e impacto em `Alojamento`, incluindo atributos, validações e transições de estado.
+- `data-model.md` define entidades `Reserva`, `Estadia`, `Pagamento`, `TipoAlojamentoTarifa`, `TipoServicoExtra`, `ServicoExtra`, e impacto em `Alojamento`, incluindo atributos, validações e transições de estado.
 - As regras transversais de domínio e auditoria devem ser centralizadas num serviço partilhado com interface e implementação (por exemplo, `IRegraDominioService` e `RegraDominioService`) para evitar duplicação de regras entre serviços.
 
 ### 2. Interface contracts
 
 - `contracts/reservas-estadias-pagamentos.md`: contratos dos fluxos de receção (disponibilidade, reserva, confirmação, cancelamento, check-in, check-out, pagamento).
 - `contracts/dashboard-historico.md`: contratos de consulta para direção e receção (indicadores, pendentes, histórico).
+- A implementação deve acrescentar templates administrativos em `templates/admin/tarifas/` e `templates/admin/tipos-servicos-extra/`, acessíveis apenas à direção.
 
 ### 3. Quickstart
 

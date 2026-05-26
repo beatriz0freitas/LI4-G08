@@ -39,6 +39,10 @@
 - [x] T006 [P] Criar/atualizar enums de domínio em `PatasBigodesApp/src/main/java/pt/hotel/animais/model/enums/`
 - [x] T007 Criar entidade `Estadia` em `PatasBigodesApp/src/main/java/pt/hotel/animais/model/Estadia.java`
 - [x] T008 Criar entidade `Pagamento` em `PatasBigodesApp/src/main/java/pt/hotel/animais/model/Pagamento.java`
+- [x] T005A Criar migration de schema para catálogos LAC-03 em `PatasBigodesApp/src/main/resources/db/migration/V8__create_tipos_alojamento_servicos_extra.sql`
+- [x] T005B Criar migration de seed para tipos de alojamento e serviços extra em `PatasBigodesApp/src/main/resources/db/migration/V9__seed_tipos_alojamento_servicos_extra.sql`
+- [x] T008A Criar entidade `TipoAlojamentoTarifa` em `PatasBigodesApp/src/main/java/pt/hotel/animais/model/TipoAlojamentoTarifa.java`
+- [x] T008B Criar entidade `TipoServicoExtra` em `PatasBigodesApp/src/main/java/pt/hotel/animais/model/TipoServicoExtra.java`
 - [x] T009 [P] Criar `EstadiaRepository` em `PatasBigodesApp/src/main/java/pt/hotel/animais/repository/EstadiaRepository.java`
 - [x] T010 [P] Criar `PagamentoRepository` em `PatasBigodesApp/src/main/java/pt/hotel/animais/repository/PagamentoRepository.java`
 - [x] T011 Implementar validações de invariantes RD no serviço base em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IRegraDominioService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/RegraDominioService.java`
@@ -138,6 +142,8 @@
 - [x] T038 [US4] Implementar cálculo de pagamento base em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
 - [x] T039 [US4] Implementar persistência de pagamento `CHECK_IN` em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
 - [x] T040 [US4] Integrar pagamento de check-in no fluxo de check-in em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
+- [x] T040A [US4] Substituir tarifa fixa por consulta a `TipoAlojamentoTarifaService` no cálculo de pagamento base.
+- [x] T040B [US4] Atualizar interface de check-in para recolher método de pagamento obrigatório.
 
 **Checkpoint**: US4 funcional e testável de forma independente.
 
@@ -156,15 +162,19 @@
 
 ### Implementation for User Story 5
 
-- [ ] T043 [US5] Implementar cálculo de faturação complementar no check-out em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
-- [ ] T044 [US5] Implementar persistência de pagamento `CHECK_OUT` em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
-- [ ] T045 [US5] Integrar cobrança complementar no fecho de estadia em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
-
-### Implementation status update
-
-- [x] T043 [US5] Implementar cálculo de faturação complementar no check-out em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java` (placeholder: 0.00)
+- [x] T043 [US5] Implementar cálculo de faturação complementar no check-out em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`, agregando serviços extra, intervenções clínicas e dias adicionais.
 - [x] T044 [US5] Implementar persistência de pagamento `CHECK_OUT` em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
 - [x] T045 [US5] Integrar cobrança complementar no fecho de estadia em `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IEstadiaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/EstadiaService.java`
+- [x] T045A [US5] Atualizar interface de check-out para recolher método de pagamento obrigatório.
+- [x] T045B [US5] Atualizar testes de controller/service para a assinatura com método de pagamento.
+
+### Gestão administrativa 
+
+- [x] T070 [P] Criar repositório e serviço para tarifas de tipo de alojamento em `TipoAlojamentoTarifaRepository` e `TipoAlojamentoTarifaService`.
+- [x] T071 [P] Criar repositório e serviço para catálogo de tipos de serviços extra em `TipoServicoExtraRepository` e `TipoServicoExtraService`.
+- [x] T072 Criar controller e templates de gestão de tipos de alojamento/tarifas em `TipoAlojamentoTarifaController` e `templates/admin/tarifas/`.
+- [x] T073 Criar controller e templates de gestão de serviços extra em `TipoServicoExtraController` e `templates/admin/tipos-servicos-extra/`.
+- [x] T074 Remover dependência do enum `TipoAlojamento` no domínio aplicacional e representar o tipo como valor configurável.
 
 **Checkpoint**: US5 funcional e testável de forma independente.
 
