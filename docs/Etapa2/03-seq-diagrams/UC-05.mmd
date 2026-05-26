@@ -9,7 +9,7 @@ sequenceDiagram
     FuncionarioRececao->>ReservaController: cancelar reserva(id)
     ReservaController->>IReservaService: cancelarReserva(reservaId)
     IReservaService->>ReservaRepository: findById(reservaId)
-    ReservaRepository-->>IReservaService: reserva confirmada
+    ReservaRepository-->>IReservaService: reserva ativa
     IReservaService->>ReservaRepository: updateEstado(CANCELADA)
     IReservaService->>AlojamentoRepository: libertarPeriodo(alojamento)
     ReservaRepository-->>IReservaService: reserva atualizada

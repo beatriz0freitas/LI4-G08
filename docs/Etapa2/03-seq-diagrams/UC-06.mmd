@@ -11,7 +11,8 @@ sequenceDiagram
     FuncionarioRececao->>EstadiaController: localizar reserva e confirmar check-in
     EstadiaController->>IEstadiaService: registarCheckIn(reservaId)
     IEstadiaService->>ReservaRepository: findById(reservaId)
-    ReservaRepository-->>IEstadiaService: reserva confirmada
+    ReservaRepository-->>IEstadiaService: reserva ativa
+    IEstadiaService->>ReservaRepository: updateEstado(CONFIRMADA)
     IEstadiaService->>IPagamentoService: registarPagamentoCheckIn(valor total)
     IPagamentoService-->>IEstadiaService: pagamento liquidado
     IEstadiaService->>EstadiaRepository: save(estadia)

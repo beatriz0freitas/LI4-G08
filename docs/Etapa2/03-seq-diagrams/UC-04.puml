@@ -23,7 +23,7 @@ else alojamento disponivel
   IReservaService -> ReservaRepository : save(reserva)
   IReservaService -> AlojamentoRepository : bloquearPeriodo(alojamento)
   ReservaRepository --> IReservaService : reserva criada
-  IReservaService --> ReservaController : reserva confirmada
+  IReservaService --> ReservaController : reserva ativa criada
   ReservaController --> FuncionarioRececao : mostrar confirmacao
 end
 
