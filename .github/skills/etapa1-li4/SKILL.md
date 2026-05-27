@@ -19,7 +19,7 @@ Etapa 1 do trabalho pratico de LI4 (Laboratorios de Informatica IV) da licenciat
 - Criar ou rever o modelo de dominio em Mermaid.
 
 ## Procedimento
-1. Ler as fontes por ordem: `docs/Etapa0/Enunciado.md`, `docs/Etapa0/tema.md`, `docs/Etapa1/01-user-stories/`, `docs/Etapa1/02-requirements/`, `docs/Etapa1/03-use-cases/` e, se existir, `docs/Etapa1/04-domain-model/`.
+1. Ler as fontes por ordem: `docs/Etapa0/Enunciado.md`, `docs/Etapa0/Tema.md`, `docs/Etapa1/01-user-stories/`, `docs/Etapa1/02-requirements/`, `docs/Etapa1/03-use-cases/` e, se existir, `docs/Etapa1/04-domain-model/`.
 2. Identificar os IDs fonte que suportam o artefacto pedido.
 3. Produzir ou rever apenas o artefacto alvo, mantendo a nomenclatura ja usada no projeto e o vocabulario do dominio do hotel de animais.
 4. Validar o resultado com a [checklist](./references/checklists.md).

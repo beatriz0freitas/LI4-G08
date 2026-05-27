@@ -1,8 +1,8 @@
 # LI4 — Projeto "Patas & Bigodes"
 
-Este repositório contém o projeto LI4 (Laboratórios de Informática IV) sobre com a aplicação PatasBigodesApp — um protótipo de um "hotel de animais" que suporta registo de tutores, gestão de alojamentos, reservas, estadias, cuidados clínicos, serviços extra e faturação. Além do código, o repositório inclui especificações, casos de uso, modelos de domínio e diagramas de suporte para rastreabilidade.
+Este repositório contém o projeto de Laboratórios de Informática IV sobre a aplicação PatasBigodesApp, um protótipo de uma aplicação para um hotel de animais que suporta registo de tutores, gestão de alojamentos, reservas, estadias, cuidados clínicos, serviços extra e faturação. Além do código, o repositório inclui especificações, casos de uso, modelos de domínio e diagramas de suporte para rastreabilidade.
 
-Alunos:
+Contribuidores:
 
 - A106804 — Alice Isabel Faria Soares
 - A106853 — Ana Beatriz Ribeiro Freitas
@@ -23,7 +23,7 @@ Se estiveres a usar o Spec Kit para automatizar especificações e geração de 
 
 ## Comandos `make` (PatasBigodesApp)
 
-Os comandos abaixo são os alvos mais usados no `Makefile` localizado em `PatasBigodesApp/Makefile`. Executa-os a partir da raiz do repositório com `make -C PatasBigodesApp <target>` ou muda para a pasta `PatasBigodesApp/` antes de executar `make`.
+Os comandos abaixo são os alvos mais usados no `Makefile`. Executa-os a partir da raiz do repositório com `make -C PatasBigodesApp <target>` ou muda para a pasta `PatasBigodesApp/` antes de executar `make`.
 
 Nota: os valores de portas e credenciais podem ser parametrizados através de variáveis de ambiente.
 
@@ -67,4 +67,3 @@ Se preferires executar os comandos sem `-C`, muda primeiro para a pasta da aplic
 cd PatasBigodesApp
 make up
 ```
-

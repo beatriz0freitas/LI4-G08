@@ -5,7 +5,7 @@ Manter um fluxo de trabalho consistente entre equipa e LLM ao longo das quatro e
 
 ## Índice do Workspace
 - `AGENTS.md`: regras globais e fluxo base do workspace.
-- `docs/tema.md`: resumo curto do tema selecionado.
+- `docs/Etapa0/Tema.md`: resumo curto do tema selecionado.
 - `docs/Etapa0/Enunciado.md`: enunciado formal e âmbito do trabalho.
 - `docs/Etapa1/`: artefactos de engenharia de requisitos.
 - `docs/Etapa2/`: artefactos de arquitetura e design.
@@ -17,7 +17,7 @@ Manter um fluxo de trabalho consistente entre equipa e LLM ao longo das quatro e
 
 ## Fontes de Verdade
 1. `docs/Etapa0/Enunciado.md`
-2. `docs/Etapa0/tema.md`
+2. `docs/Etapa0/Tema.md`
 3. `docs/Etapa1/01-user-stories/`
 4. `docs/Etapa1/02-requirements/`
 5. `docs/Etapa1/03-use-cases/`

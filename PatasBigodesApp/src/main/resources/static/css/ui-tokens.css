@@ -470,6 +470,101 @@ button:focus {
 	border-radius: var(--ui-radius);
 }
 
+.care-plan-row {
+	row-gap: .2rem;
+}
+
+.care-plan-col {
+	display: flex;
+}
+
+.care-plan-card {
+	width: 100%;
+	overflow: hidden;
+}
+
+.care-plan-card-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1rem;
+	min-height: 72px;
+}
+
+.care-plan-animal {
+	min-width: 0;
+}
+
+.care-plan-animal .card-title {
+	display: inline;
+	margin-right: .35rem;
+	overflow-wrap: anywhere;
+}
+
+.care-plan-species {
+	display: inline-block;
+	color: var(--ui-muted-text);
+	font-size: .78rem;
+	font-weight: 600;
+	vertical-align: baseline;
+}
+
+.care-plan-meta {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: .35rem;
+	flex: 0 0 auto;
+	min-width: 84px;
+}
+
+.care-plan-box {
+	color: var(--ui-muted-text);
+	font-size: .78rem;
+	font-weight: 700;
+	line-height: 1.1;
+}
+
+.care-plan-card-body {
+	display: flex;
+	flex-direction: column;
+	min-height: 205px;
+}
+
+.care-plan-instructions {
+	color: #334155;
+	font-size: .86rem;
+	line-height: 1.35;
+	margin-bottom: 1rem;
+	min-height: 4.9rem;
+}
+
+.care-plan-footer {
+	margin-top: auto;
+}
+
+.care-plan-task-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: .75rem;
+	margin-bottom: .75rem;
+}
+
+.care-plan-open-btn {
+	min-width: 52px;
+}
+
+.care-plan-actions {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: .35rem;
+}
+
+.care-plan-actions .btn {
+	width: 100%;
+}
+
 .summary-ring {
 	--ring-value: 0;
 	width: 150px;
@@ -642,6 +737,9 @@ button:focus {
 	.ui-search-toolbar { flex-direction: column; align-items: stretch; }
 	.plan-hero { padding: 1rem; }
 	.info-grid { grid-template-columns: 1fr; }
+	.care-plan-card-header { min-height: 0; }
+	.care-plan-card-body { min-height: 0; }
+	.care-plan-instructions { min-height: 0; }
 }
 
 @media (max-width: 992px) {
