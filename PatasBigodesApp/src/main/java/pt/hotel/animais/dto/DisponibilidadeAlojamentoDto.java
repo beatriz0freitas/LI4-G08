@@ -15,6 +15,12 @@ public class DisponibilidadeAlojamentoDto {
     private LocalDate dataFim;
     private boolean disponivel;
     private String motivoIndisponibilidade;
+    private String estado;
+    private Long reservaId;
+    private Long estadiaId;
+    private String animalNome;
+    private LocalDate dataReservaInicio;
+    private LocalDate dataReservaFim;
     
     // Constructores
     
@@ -96,5 +102,70 @@ public class DisponibilidadeAlojamentoDto {
     
     public void setMotivoIndisponibilidade(String motivoIndisponibilidade) {
         this.motivoIndisponibilidade = motivoIndisponibilidade;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public String getEstadoLabel() {
+        if (estado == null) {
+            return "";
+        }
+        return switch (estado) {
+            case "LIVRE" -> "Livre";
+            case "OCUPADO" -> "Ocupado";
+            case "RESERVADO" -> "Reservado";
+            case "LIMPEZA" -> "Em Limpeza";
+            default -> estado;
+        };
+    }
+
+    public String getEstadoCss() {
+        return estado != null ? "st-" + estado.toLowerCase() : "";
+    }
+
+    public Long getReservaId() {
+        return reservaId;
+    }
+
+    public void setReservaId(Long reservaId) {
+        this.reservaId = reservaId;
+    }
+
+    public Long getEstadiaId() {
+        return estadiaId;
+    }
+
+    public void setEstadiaId(Long estadiaId) {
+        this.estadiaId = estadiaId;
+    }
+
+    public String getAnimalNome() {
+        return animalNome;
+    }
+
+    public void setAnimalNome(String animalNome) {
+        this.animalNome = animalNome;
+    }
+
+    public LocalDate getDataReservaInicio() {
+        return dataReservaInicio;
+    }
+
+    public void setDataReservaInicio(LocalDate dataReservaInicio) {
+        this.dataReservaInicio = dataReservaInicio;
+    }
+
+    public LocalDate getDataReservaFim() {
+        return dataReservaFim;
+    }
+
+    public void setDataReservaFim(LocalDate dataReservaFim) {
+        this.dataReservaFim = dataReservaFim;
     }
 }

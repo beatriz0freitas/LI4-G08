@@ -79,6 +79,16 @@ class SecurityAuthorizationMvcTest {
     }
 
     @Test
+    @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
+    void rececaoNaoAcedeAConfiguracoesAdministrativas() throws Exception {
+        mockMvc.perform(get("/admin/tarifas"))
+            .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/admin/tipos-servicos-extra"))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
     @WithMockUser(roles = "DIRETOR")
     void diretorAcedeAColaboradoresERelatorios() throws Exception {
         when(colaboradorService.listarTodos()).thenReturn(List.of());

@@ -18,6 +18,13 @@ public class PlanoCuidadosDto {
     private Boolean ativo;
     private String instrucoes;
     private List<TarefaCuidadoDto> tarefas;
+    private String animalNome;
+    private String especieLabel;
+    private String raca;
+    private String tutorNome;
+    private String alojamentoIdentificacao;
+    private String estadoSaude;
+    private String medicacaoCurso;
 
     public PlanoCuidadosDto() {}
 
@@ -51,4 +58,30 @@ public class PlanoCuidadosDto {
     public void setInstrucoes(String instrucoes) { this.instrucoes = instrucoes; }
     public List<TarefaCuidadoDto> getTarefas() { return tarefas; }
     public void setTarefas(List<TarefaCuidadoDto> tarefas) { this.tarefas = tarefas; }
+    public String getAnimalNome() { return animalNome; }
+    public void setAnimalNome(String animalNome) { this.animalNome = animalNome; }
+    public String getEspecieLabel() { return especieLabel; }
+    public void setEspecieLabel(String especieLabel) { this.especieLabel = especieLabel; }
+    public String getRaca() { return raca; }
+    public void setRaca(String raca) { this.raca = raca; }
+    public String getTutorNome() { return tutorNome; }
+    public void setTutorNome(String tutorNome) { this.tutorNome = tutorNome; }
+    public String getAlojamentoIdentificacao() { return alojamentoIdentificacao; }
+    public void setAlojamentoIdentificacao(String alojamentoIdentificacao) { this.alojamentoIdentificacao = alojamentoIdentificacao; }
+    public String getEstadoSaude() { return estadoSaude; }
+    public void setEstadoSaude(String estadoSaude) { this.estadoSaude = estadoSaude; }
+    public String getMedicacaoCurso() { return medicacaoCurso; }
+    public void setMedicacaoCurso(String medicacaoCurso) { this.medicacaoCurso = medicacaoCurso; }
+
+    public long getTotalTarefas() {
+        return tarefas != null ? tarefas.size() : 0;
+    }
+
+    public long getTarefasConcluidas() {
+        return tarefas != null ? tarefas.stream().filter(t -> Boolean.TRUE.equals(t.getConcluida())).count() : 0;
+    }
+
+    public long getTarefasPendentes() {
+        return getTotalTarefas() - getTarefasConcluidas();
+    }
 }

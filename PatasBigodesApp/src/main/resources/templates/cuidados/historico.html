@@ -45,16 +45,16 @@
                             <td th:text="${#temporals.format(plano.dataInicio, 'dd/MM/yyyy HH:mm')}"></td>
                             <td th:text="${#temporals.format(plano.dataFim, 'dd/MM/yyyy HH:mm')}"></td>
                             <td>
-                                <span th:text="${plano.prioridade}" 
-                                      th:class="${'badge ' + (plano.prioridade != null && plano.prioridade.name() == 'CRITICO' ? 'bg-danger' : 
-                                                plano.prioridade != null && plano.prioridade.name() == 'URGENTE' ? 'bg-warning' : 'bg-info')}"></span>
+                                <span th:text="${plano.prioridade}"
+                                      th:class="${'badge ' + (plano.prioridade != null && plano.prioridade.name() == 'CRITICO' ? 'badge-danger' :
+                                                plano.prioridade != null && plano.prioridade.name() == 'URGENTE' ? 'badge-warning' : 'badge-info')}"></span>
                             </td>
                             <td>
                                 <span th:text="${plano.ativo == true ? 'Ativo' : 'Encerrado'}" 
-                                      th:class="${'badge ' + (plano.ativo == true ? 'bg-success' : 'bg-secondary')}"></span>
+                                      th:class="${'badge ' + (plano.ativo == true ? 'badge-success' : 'badge-secondary')}"></span>
                             </td>
                             <td>
-                                <span th:text="${plano.tarefas != null ? plano.tarefas.size() : 0}" class="badge bg-secondary"></span>
+                                <span th:text="${plano.tarefas != null ? plano.tarefas.size() : 0}" class="badge badge-secondary"></span>
                             </td>
                             <td>
                                 <a th:href="@{/plano-cuidados(estadiaId=${plano.estadiaId})}" class="btn btn-sm btn-info">Ver</a>

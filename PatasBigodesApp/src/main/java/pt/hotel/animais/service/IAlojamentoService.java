@@ -20,6 +20,10 @@ public interface IAlojamentoService {
 
     List<DisponibilidadeAlojamentoDto> consultarDisponibilidade(LocalDate dataInicio, LocalDate dataFim, Especie especie);
 
+    List<DisponibilidadeAlojamentoDto> consultarMapaDisponibilidade(LocalDate dataInicio, LocalDate dataFim, String tipo);
+
+    List<String> listarTipos();
+
     boolean estaDisponivel(Long alojamentoId, LocalDate dataInicio, LocalDate dataFim);
 
     boolean estaDisponivel(Long alojamentoId, LocalDate dataInicio, LocalDate dataFim, Especie especie);

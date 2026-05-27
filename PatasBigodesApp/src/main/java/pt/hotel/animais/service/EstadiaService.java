@@ -35,6 +35,7 @@ public class EstadiaService implements IEstadiaService {
     private final IReservaService reservaService;
     private final IPagamentoService pagamentoService;
     private final IAlojamentoService alojamentoService;
+    private final IPlanoCuidadosService planoCuidadosService;
     private final AnimalRepository animalRepository;
     private final AuditoriaOperacaoService auditoriaOperacaoService;
 
@@ -70,6 +71,7 @@ public class EstadiaService implements IEstadiaService {
         estadia.setEstado(EstadoEstadia.EM_CURSO);
 
         Estadia saved = estadiaRepository.save(estadia);
+        planoCuidadosService.obterOuCriarPlanoParaEstadiaAtiva(saved.getId());
 
         // Criar pagamento base no check-in (valor calculado automaticamente)
         BigDecimal valorBase = pagamentoService.calcularValorBase(saved);
@@ -130,6 +132,7 @@ public class EstadiaService implements IEstadiaService {
         // Passo 5: Marcar como TERMINADA
         estadia.setEstado(EstadoEstadia.TERMINADA);
         Estadia saved = estadiaRepository.save(estadia);
+        planoCuidadosService.encerrarPlanoDaEstadia(saved.getId());
 
         // Passo 6: Concluir reserva associada antes da limpeza
         var reserva = estadia.getReserva();

@@ -11,12 +11,12 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1 class="m-0">Alojamentos</h1>
+							<h1 class="m-0">Disponibilidade - Estado Atual</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
 								<li class="breadcrumb-item"><a th:href="@{/}">Início</a></li>
-								<li class="breadcrumb-item active">Alojamentos</li>
+								<li class="breadcrumb-item active">Disponibilidade</li>
 							</ol>
 						</div>
 					</div>
@@ -186,6 +186,9 @@
 		document.getElementById('searchInput').addEventListener('keyup', function() {
 			let input = this.value.toUpperCase();
 			let table = document.getElementById('alojamentosTable');
+			if (!table) {
+				return;
+			}
 			let tr = table.getElementsByTagName('tr');
 			for (let i = 1; i < tr.length; i++) {
 				let td = tr[i].getElementsByTagName('td');

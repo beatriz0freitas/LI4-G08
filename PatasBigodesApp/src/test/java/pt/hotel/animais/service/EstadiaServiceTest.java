@@ -44,6 +44,9 @@ class EstadiaServiceTest {
     private IAlojamentoService alojamentoService;
 
     @Mock
+    private IPlanoCuidadosService planoCuidadosService;
+
+    @Mock
     private AnimalRepository animalRepository;
 
     @Mock
@@ -74,6 +77,7 @@ class EstadiaServiceTest {
         assertThat(resultado.getReserva()).isSameAs(confirmada);
         verify(reservaService).confirmar(10L);
         verify(reservaService, never()).concluir(10L);
+        verify(planoCuidadosService).obterOuCriarPlanoParaEstadiaAtiva(1L);
         verify(pagamentoService).registrarPagamento(any());
     }
 
@@ -160,6 +164,7 @@ class EstadiaServiceTest {
         verify(pagamentoService).registrarPagamentoCheckOut(eq(5L), eq(MetodoPagamento.NUMERARIO));
         verify(alojamentoService).marcarPendenteLimpeza(1L);
         verify(reservaService).concluir(10L);
+        verify(planoCuidadosService).encerrarPlanoDaEstadia(5L);
     }
 
     @Test

@@ -88,6 +88,17 @@ public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
 		JOIN FETCH r.animal a
 		JOIN FETCH r.tutor t
 		JOIN FETCH r.alojamento al
+		WHERE al.id = :alojamentoId
+		  AND e.estado = pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO
+		""")
+	Optional<Estadia> findEmCursoPorAlojamentoComDetalhes(@Param("alojamentoId") Long alojamentoId);
+
+	@Query("""
+		SELECT e FROM Estadia e
+		JOIN FETCH e.reserva r
+		JOIN FETCH r.animal a
+		JOIN FETCH r.tutor t
+		JOIN FETCH r.alojamento al
 		WHERE e.id = :id
 		""")
 	Optional<Estadia> findByIdComDetalhes(@Param("id") Long id);
@@ -114,5 +125,16 @@ public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
 		ORDER BY r.dataFim ASC, e.dataInicio ASC
 		""")
 	List<Estadia> findEstadiasEmCursoDashboard(Pageable pageable);
+
+	@Query("""
+		SELECT e FROM Estadia e
+		JOIN FETCH e.reserva r
+		JOIN FETCH r.animal a
+		JOIN FETCH a.tutor t
+		JOIN FETCH r.alojamento al
+		WHERE e.estado = pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO
+		ORDER BY al.identificacao ASC, a.nome ASC
+		""")
+	List<Estadia> findEstadiasEmCursoComDetalhes();
 
 }
