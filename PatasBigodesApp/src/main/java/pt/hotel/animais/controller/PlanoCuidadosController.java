@@ -202,8 +202,7 @@ public class PlanoCuidadosController {
             return "cuidados/historico";
         } catch (Exception e) {
             log.error("Erro ao listar histórico de planos: {}", e.getMessage());
-            model.addAttribute("error", "Erro ao listar histórico");
-            return "error";
+            return "redirect:/plano-cuidados?error=historico-indisponivel";
         }
     }
 

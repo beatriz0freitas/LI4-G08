@@ -7,7 +7,7 @@
 <body>
 <main th:fragment="content">
     <div class="filter-panel mb-3 d-flex flex-wrap justify-content-between align-items-center">
-        <div>
+        <div class="mr-3 mb-2">
             <span class="section-tag mb-2"><i class="fas fa-notes-medical"></i> Cuidados</span>
             <strong class="d-block text-uppercase text-primary" th:text="${'Turno da ' + turnoAtual}">Turno da manhã</strong>
             <span th:text="${#temporals.format(dataTurno, 'dd/MM/yyyy')}">27/05/2026</span>
@@ -16,12 +16,28 @@
             <span class="mx-2">|</span>
             <strong th:text="${tarefasPendentes + ' cuidados pendentes'}">0 cuidados pendentes</strong>
         </div>
-        <a class="btn btn-outline-primary btn-sm mt-2 mt-sm-0" th:href="@{/estadias}">
+        <div class="mr-3 mb-2 flex-grow-1" style="min-width: 280px; max-width: 420px;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <strong>Progresso do turno</strong>
+                <span class="text-muted small" th:text="${tarefasConcluidas + ' / ' + totalTarefas + ' cuidados'}">0 / 0 cuidados</span>
+            </div>
+            <div class="progress mb-2" style="height: 1.15rem;">
+                <div class="progress-bar bg-success" role="progressbar"
+                     th:style="${'width: ' + percentagemProgresso + '%'}"
+                     th:attr="aria-valuenow=${percentagemProgresso},aria-valuemin=0,aria-valuemax=100"
+                     th:text="${percentagemProgresso + '%'}">0%</div>
+            </div>
+            <div class="d-flex justify-content-between small">
+                <span><strong th:text="${totalAnimais}">0</strong> animais em acompanhamento</span>
+                <span><strong class="text-warning" th:text="${tarefasPendentes}">0</strong> pendentes</span>
+            </div>
+        </div>
+        <a class="btn btn-outline-primary btn-sm" th:href="@{/estadias}">
             <i class="fas fa-bed mr-1"></i> Ver estadias ativas
         </a>
     </div>
     <div class="row">
-        <div class="col-12 col-lg-9">
+        <div class="col-12">
             <div class="row">
                 <div class="col-12" th:if="${planosTurno == null or #lists.isEmpty(planosTurno)}">
                     <div class="card">
@@ -59,30 +75,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-lg-3">
-            <div class="card">
-                <div class="card-header"><h3 class="card-title">Progresso do turno</h3></div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Cuidados concluídos</span>
-                        <strong th:text="${tarefasConcluidas + ' / ' + totalTarefas}">0 / 0</strong>
-                    </div>
-                    <div class="progress mb-3">
-                        <div class="progress-bar bg-success" role="progressbar"
-                             th:style="${'width: ' + percentagemProgresso + '%'}"
-                             th:text="${percentagemProgresso + '%'}">0%</div>
-                    </div>
-                    <div class="d-flex justify-content-between border-top pt-3">
-                        <span>Animais em acompanhamento</span>
-                        <strong th:text="${totalAnimais}">0</strong>
-                    </div>
-                    <div class="d-flex justify-content-between mt-2">
-                        <span>Pendentes</span>
-                        <strong class="text-warning" th:text="${tarefasPendentes}">0</strong>
                     </div>
                 </div>
             </div>

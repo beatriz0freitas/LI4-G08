@@ -112,7 +112,7 @@
 													<a th:href="@{/reservas/{id}(id=${reserva.id})}" class="btn btn-sm btn-info" title="Ver detalhes">
 														<i class="fas fa-eye"></i>
 													</a>
-													<a th:if="${reserva.podeFazerCheckIn()}" th:href="@{/estadias(reservaId=${reserva.id})}" class="btn btn-sm btn-success" title="Check-in">
+													<a th:if="${reserva.podeFazerCheckIn()}" th:href="@{/estadias/check-in(reservaId=${reserva.id},redirectTo=${'/reservas'})}" class="btn btn-sm btn-success" title="Check-in">
 														<i class="fas fa-right-to-bracket"></i>
 													</a>
 													<form th:if="${reserva.podeSerCancelada()}" th:action="@{/reservas/{id}/cancelar(id=${reserva.id})}" method="post" class="d-inline" onsubmit="return confirm('Tem a certeza que deseja cancelar?')">

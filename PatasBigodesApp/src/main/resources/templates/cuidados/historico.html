@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: page(title='Histórico de Planos de Cuidados')}">
+<head>
+    <meta charset="utf-8">
+    <title>Histórico de Planos de Cuidados</title>
+</head>
+<body>
+<main th:fragment="content">
+    <div class="filter-panel mb-3 d-flex flex-wrap justify-content-between align-items-center">
+        <div>
+            <span class="section-tag mb-2"><i class="fas fa-history"></i> Cuidados</span>
+            <strong class="d-block text-uppercase text-primary">Histórico de planos</strong>
+            <span class="text-muted" th:text="${'Animal #' + animalId}">Animal #1</span>
+        </div>
+        <a th:href="@{/plano-cuidados}" class="btn btn-outline-primary btn-sm mt-2 mt-sm-0">
+            <i class="fas fa-layer-group mr-1"></i> Planos do turno
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0">Planos registados</h3>
+            <span class="text-muted small" th:if="${planosPage != null}" th:text="${planosPage.totalElements + ' registos'}">0 registos</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="empty-state m-3" th:if="${planosPage == null or planosPage.empty}">
+                <i class="fas fa-clipboard-list fa-2x text-muted mb-2"></i>
+                <div class="font-weight-bold mb-1">Sem planos registados</div>
+                <div class="text-muted small">Ainda não existem planos de cuidados associados a este animal.</div>
+            </div>
+
+            <div class="table-responsive" th:if="${planosPage != null and !planosPage.empty}">
+                <table class="table table-striped table-hover mb-0">
+                    <thead>
+                    <tr>
+                        <th>Plano</th>
+                        <th>Período</th>
+                        <th>Prioridade</th>
+                        <th>Estado</th>
+                        <th>Progresso</th>
+                        <th class="text-right">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="plano : ${planosPage.content}"
+                        th:with="total=${plano.totalTarefas}, concluidas=${plano.tarefasConcluidas}, pendentes=${plano.tarefasPendentes}, progresso=${total == 0 ? 0 : concluidas * 100 / total}">
+                        <td>
+                            <strong th:text="${plano.animalNome ?: ('Animal #' + plano.animalId)}">Animal</strong>
+                            <div class="small text-muted" th:text="${plano.alojamentoIdentificacao ?: 'Alojamento não definido'}">Box</div>
+                        </td>
+                        <td>
+                            <span th:text="${plano.dataInicio != null ? #temporals.format(plano.dataInicio, 'dd/MM/yyyy HH:mm') : 'Sem início'}">01/01/2026</span>
+                            <span class="text-muted"> a </span>
+                            <span th:text="${plano.dataFim != null ? #temporals.format(plano.dataFim, 'dd/MM/yyyy HH:mm') : 'Em curso'}">Em curso</span>
+                        </td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${plano.prioridade != null and plano.prioridade.name() == 'CRITICO' ? 'badge-danger' : (plano.prioridade != null and plano.prioridade.name() == 'URGENTE' ? 'badge-warning' : 'badge-success')}"
+                                  th:text="${plano.prioridade != null ? plano.prioridade : 'ROTINA'}">ROTINA</span>
+                        </td>
+                        <td>
+                            <span class="badge" th:classappend="${plano.ativo ? 'badge-success' : 'badge-secondary'}" th:text="${plano.ativo ? 'Ativo' : 'Encerrado'}">Ativo</span>
+                        </td>
+                        <td style="min-width: 180px;">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span th:text="${concluidas + ' / ' + total}">0 / 0</span>
+                                <span th:text="${pendentes + ' pendentes'}">0 pendentes</span>
+                            </div>
+                            <div class="progress" style="height: .8rem;">
+                                <div class="progress-bar bg-success" role="progressbar"
+                                     th:style="${'width:' + progresso + '%'}"
+                                     th:attr="aria-valuenow=${progresso},aria-valuemin=0,aria-valuemax=100"
+                                     th:text="${progresso + '%'}">0%</div>
+                            </div>
+                        </td>
+                        <td class="text-right">
+                            <a th:href="@{/plano-cuidados(estadiaId=${plano.estadiaId})}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-eye mr-1"></i>Abrir
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer clearfix" th:if="${planosPage != null and planosPage.totalPages > 1}">
+            <div class="float-left text-muted small" th:text="${'Página ' + (planosPage.number + 1) + ' de ' + planosPage.totalPages}">Página 1 de 1</div>
+            <ul class="pagination pagination-sm m-0 float-right">
+                <li class="page-item" th:classappend="${planosPage.first} ? ' disabled' : ''">
+                    <a class="page-link" th:href="@{/plano-cuidados/animal/{animalId}/historico(animalId=${animalId},page=${planosPage.number - 1})}">Anterior</a>
+                </li>
+                <li class="page-item active">
+                    <span class="page-link" th:text="${planosPage.number + 1}">1</span>
+                </li>
+                <li class="page-item" th:classappend="${planosPage.last} ? ' disabled' : ''">
+                    <a class="page-link" th:href="@{/plano-cuidados/animal/{animalId}/historico(animalId=${animalId},page=${planosPage.number + 1})}">Próxima</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</main>
+</body>
+</html>
