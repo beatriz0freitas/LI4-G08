@@ -14,6 +14,8 @@ import java.util.List;
 public interface ServicoExtraRepository extends JpaRepository<ServicoExtra, Long> {
     List<ServicoExtra> findByEstadiaId(Long estadiaId);
 
+    List<ServicoExtra> findByDataHoraBetweenOrderByDataHoraAsc(LocalDateTime inicio, LocalDateTime fim);
+
     /**
      * Soma de custos de serviços extra para uma estadia.
      */

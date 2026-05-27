@@ -3,11 +3,12 @@
 ## Objetivo
 Este artefacto apresenta o diagrama de classes de design do sistema de gestao de hotel de animais, alinhado com:
 - o modelo de dominio da Etapa 1;
-- a arquitetura definida na Etapa 2 (MVC em camadas com Spring Boot).
+- a arquitetura definida na Etapa 2 (MVC em camadas).
 
 Ficheiros do diagrama:
 - `class-diagram.mmd` (Mermaid)
 - `class-diagram.puml` (PlantUML)
+- `class-diagram-simple.puml` (PlantUML simplificado)
 
 ## Escopo
 O diagrama inclui:
@@ -19,12 +20,11 @@ O diagrama inclui:
 
 ## Decisoes de modelacao
 1. O diagrama e de design tecnico (Etapa 2), por isso acrescenta controllers, services e repositories ao modelo de dominio.
-2. As relacoes entre entidades preservam as cardinalidades definidas na Etapa 1.
+2. As relacoes entre entidades refletem as associacoes JPA implementadas na aplicacao atual.
 3. Os controllers dependem de interfaces de service (`INomeService`), e as classes concretas sao modeladas sem sufixo adicional (`NomeService`).
-4. Os metodos dos services refletem operacoes principais descritas em arquitetura e casos de uso.
-5. Os repositories mostram apenas operacoes relevantes para regras de negocio criticas (disponibilidade, check-in/check-out, pagamentos e historico clinico).
-6. A navegabilidade das associacoes de dominio privilegia quem detem a referencia (por exemplo, `Reserva -> Animal`, `Estadia -> Reserva`, `Nota -> Colaborador`, `RegistoCuidado -> Colaborador`).
-7. As associacoes de dominio diferenciam composicao (`*--`) e agregacao (`o--`) nos dois formatos do diagrama.
+4. As classes de servico e repositories sao representadas ao nivel estrutural para evitar assinaturas desatualizadas face ao codigo.
+5. A navegabilidade das associacoes de dominio privilegia quem detem a referencia JPA (por exemplo, `Reserva -> Animal`, `Estadia -> Reserva`, `Nota -> Reserva`).
+6. As associacoes de dominio diferenciam composicao (`*--`) e agregacao (`o--`) nos dois formatos do diagrama.
 
 ## Rastreabilidade resumida
 - UC-01: autenticacao e autorizacao (`AuthController`, `IColaboradorService`)
@@ -38,5 +38,5 @@ O diagrama inclui:
 - UC-13: relatorios (`RelatorioController`, `IRelatorioService`)
 
 ## Pressupostos
-1. O detalhe de assinaturas de metodos e indicativo e orientado ao design; pode ser refinado na Etapa 3.
-2. O diagrama representa a estrutura estatica principal, nao substitui diagramas de sequencia para fluxos comportamentais.
+1. O diagrama representa a estrutura estatica principal, nao substitui diagramas de sequencia para fluxos comportamentais.
+2. As classes tecnicas externas ao projeto sao omitidas para manter o diagrama centrado nas classes da aplicacao.

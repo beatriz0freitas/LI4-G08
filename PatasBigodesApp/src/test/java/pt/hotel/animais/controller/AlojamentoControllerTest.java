@@ -38,7 +38,7 @@ class AlojamentoControllerTest {
         mockMvc.perform(get("/alojamentos"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("alojamento/listar"))
-                .andExpect(model().attribute("activePage", "alojamentos"))
+                .andExpect(model().attribute("activePage", "disponibilidade"))
                 .andExpect(model().attributeExists("alojamentos"));
     }
 

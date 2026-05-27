@@ -6,9 +6,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pt.hotel.animais.model.Alojamento;
+import pt.hotel.animais.model.Animal;
+import pt.hotel.animais.model.Estadia;
+import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.enums.Especie;
+import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.model.enums.EstadoLimpeza;
 import pt.hotel.animais.repository.AlojamentoRepository;
+import pt.hotel.animais.repository.EstadiaRepository;
+import pt.hotel.animais.repository.ReservaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,6 +34,12 @@ class AlojamentoServiceTest {
 
     @Mock
     private IAvailabilityDomainService availabilityDomainService;
+
+    @Mock
+    private ReservaRepository reservaRepository;
+
+    @Mock
+    private EstadiaRepository estadiaRepository;
 
     @InjectMocks
     private AlojamentoService alojamentoService;
@@ -132,5 +144,53 @@ class AlojamentoServiceTest {
 
         assertThat(resultado).isFalse();
         verify(availabilityDomainService).estaDisponivel(1L, dataInicio, dataFim, Especie.CAO);
+    }
+
+    @Test
+    void consultarMapaDeveExporEstadosOperacionaisEFiltrarTipo() {
+        LocalDate inicio = LocalDate.now();
+        LocalDate fim = inicio.plusDays(2);
+        Alojamento livre = new Alojamento(1L, "C01", "CANIL", 1, EstadoLimpeza.CONCLUIDO, null);
+        Alojamento ocupado = new Alojamento(2L, "C02", "CANIL", 1, EstadoLimpeza.CONCLUIDO, null);
+        Alojamento reservado = new Alojamento(3L, "C03", "CANIL", 1, EstadoLimpeza.CONCLUIDO, null);
+        Alojamento limpeza = new Alojamento(4L, "G01", "GATIL", 1, EstadoLimpeza.PENDENTE, null);
+        when(alojamentoRepository.findAllByOrderByIdentificacaoAsc())
+            .thenReturn(List.of(livre, ocupado, reservado, limpeza));
+
+        Estadia estadia = new Estadia();
+        estadia.setId(20L);
+        estadia.setEstado(EstadoEstadia.EM_CURSO);
+        Reserva reservaOcupada = new Reserva();
+        Animal animalOcupado = new Animal();
+        animalOcupado.setNome("Luna");
+        reservaOcupada.setAnimal(animalOcupado);
+        estadia.setReserva(reservaOcupada);
+        when(estadiaRepository.findEmCursoPorAlojamentoComDetalhes(any(Long.class))).thenAnswer(invocation -> {
+            Long alojamentoId = invocation.getArgument(0);
+            return alojamentoId.equals(2L) ? Optional.of(estadia) : Optional.empty();
+        });
+
+        Reserva reservaFutura = new Reserva();
+        reservaFutura.setId(30L);
+        reservaFutura.setDataInicio(inicio);
+        reservaFutura.setDataFim(fim);
+        Animal animalReservado = new Animal();
+        animalReservado.setNome("Max");
+        reservaFutura.setAnimal(animalReservado);
+        when(reservaRepository.findActiveReservasInPeriodWithDetalhes(any(Long.class), eq(inicio), eq(fim)))
+            .thenAnswer(invocation -> {
+                Long alojamentoId = invocation.getArgument(0);
+                return alojamentoId.equals(3L) ? List.of(reservaFutura) : List.of();
+            });
+
+        var mapa = alojamentoService.consultarMapaDisponibilidade(inicio, fim, null);
+
+        assertThat(mapa).extracting("estado").containsExactly("LIVRE", "OCUPADO", "RESERVADO", "LIMPEZA");
+        assertThat(mapa.get(1).getAnimalNome()).isEqualTo("Luna");
+        assertThat(mapa.get(2).getReservaId()).isEqualTo(30L);
+
+        var filtrado = alojamentoService.consultarMapaDisponibilidade(inicio, fim, "GATIL");
+        assertThat(filtrado).hasSize(1);
+        assertThat(filtrado.get(0).getEstado()).isEqualTo("LIMPEZA");
     }
 }

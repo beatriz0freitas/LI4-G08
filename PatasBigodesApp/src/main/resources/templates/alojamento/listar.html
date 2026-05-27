@@ -11,12 +11,12 @@
 				<div class="container-fluid">
 					<div class="row mb-2">
 						<div class="col-sm-6">
-							<h1 class="m-0">Alojamentos</h1>
+							<h1 class="m-0">Disponibilidade - Estado Atual</h1>
 						</div>
 						<div class="col-sm-6">
 							<ol class="breadcrumb float-sm-right">
 								<li class="breadcrumb-item"><a th:href="@{/}">Início</a></li>
-								<li class="breadcrumb-item active">Alojamentos</li>
+								<li class="breadcrumb-item active">Disponibilidade</li>
 							</ol>
 						</div>
 					</div>
@@ -25,6 +25,11 @@
 
 			<section class="content">
 				<div class="container-fluid">
+					<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+						<span class="section-tag"><i class="fas fa-warehouse"></i> Disponibilidade</span>
+						<div class="small text-muted">Consulta rápida do estado dos alojamentos e da limpeza</div>
+					</div>
+
 					<!-- Mensagens de feedback -->
 					<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
 						<i class="fas fa-exclamation-circle mr-2"></i>
@@ -86,10 +91,10 @@
 						<div class="card-header">
 							<h3 class="card-title">Lista de Alojamentos</h3>
 							<div class="card-tools">
-								<div class="input-group input-group-sm" style="width: 150px;">
-									<input type="text" id="searchInput" class="form-control float-right" placeholder="Pesquisar...">
+								<div class="input-group input-group-sm ui-search-toolbar" style="width: min(320px, 100%);">
+									<input type="search" id="searchInput" class="form-control float-right" placeholder="Pesquisar alojamento, tipo ou estado..." aria-label="Pesquisar alojamentos">
 									<div class="input-group-append">
-										<button type="button" class="btn btn-default">
+										<button type="button" class="btn btn-outline-primary" id="clearSearchButton" aria-label="Limpar pesquisa">
 											<i class="fas fa-search"></i>
 										</button>
 									</div>
@@ -116,6 +121,15 @@
 										</tr>
 									</thead>
 									<tbody>
+										<tr id="alojamentosEmptyRow" class="d-none">
+											<td colspan="6">
+												<div class="empty-state">
+													<i class="fas fa-filter fa-2x text-muted mb-2"></i>
+													<div class="font-weight-bold mb-1">Sem resultados para a pesquisa atual</div>
+													<div class="text-muted small">Tente outro termo ou limpe o filtro para ver todos os alojamentos.</div>
+												</div>
+											</td>
+										</tr>
 										<tr th:each="alojamento : ${alojamentos}">
 											<td>
 												<small th:text="${alojamento.id}">ID</small>
@@ -129,12 +143,12 @@
 											</td>
 											<td>
 												<th:block th:if="${alojamento.estadoLimpeza.toString() == 'CONCLUIDO'}">
-													<span class="badge badge-success">
+														<span class="badge status-success">
 														<i class="fas fa-check-circle mr-1"></i>Limpo
 													</span>
 												</th:block>
 												<th:block th:if="${alojamento.estadoLimpeza.toString() == 'PENDENTE'}">
-													<span class="badge badge-warning">
+														<span class="badge status-warning">
 														<i class="fas fa-clock mr-1"></i>Pendente Limpeza
 													</span>
 												</th:block>
@@ -163,8 +177,8 @@
 								<strong>Estado de Limpeza:</strong>
 							</p>
 							<ul class="mb-3">
-								<li><span class="badge badge-success">Limpo</span> - Alojamento pronto para receber animais e disponível para reservas</li>
-								<li><span class="badge badge-warning">Pendente Limpeza</span> - Alojamento não está disponível para reservas até que a limpeza seja completada</li>
+									<li><span class="badge status-success">Limpo</span> - Alojamento pronto para receber animais e disponível para reservas</li>
+									<li><span class="badge status-warning">Pendente Limpeza</span> - Alojamento não está disponível para reservas até que a limpeza seja completada</li>
 							</ul>
 							<p>
 								<strong>Consulta de Disponibilidade:</strong> Para consultar alojamentos disponíveis e criar reservas, 
@@ -172,6 +186,62 @@
 							</p>
 						</div>
 					</div>
+
+						<script>
+							(function () {
+								const input = document.getElementById('searchInput');
+								const clearButton = document.getElementById('clearSearchButton');
+								const table = document.getElementById('alojamentosTable');
+								const emptyRow = document.getElementById('alojamentosEmptyRow');
+
+								if (!input || !table) {
+									return;
+								}
+
+								const rows = Array.from(table.querySelectorAll('tbody tr')).filter(function (row) {
+									return row.id !== 'alojamentosEmptyRow';
+								});
+
+								const debounce = function (fn, delay) {
+									let timer;
+									return function () {
+										clearTimeout(timer);
+										timer = setTimeout(() => fn.apply(this, arguments), delay);
+									};
+								};
+
+								const applyFilter = function () {
+									const query = input.value.trim().toLowerCase();
+									let visibleCount = 0;
+
+									rows.forEach(function (row) {
+										const cells = Array.from(row.querySelectorAll('td'));
+										const matches = !query || cells.some(function (cell) {
+											return cell.textContent.toLowerCase().includes(query);
+										});
+
+										row.style.display = matches ? '' : 'none';
+										row.classList.toggle('ui-search-match-row', matches && query.length > 0);
+										if (matches) {
+											visibleCount += 1;
+										}
+									});
+
+									if (emptyRow) {
+										emptyRow.classList.toggle('d-none', visibleCount !== 0);
+									}
+								};
+
+								input.addEventListener('input', debounce(applyFilter, 180));
+								if (clearButton) {
+									clearButton.addEventListener('click', function () {
+										input.value = '';
+										applyFilter();
+										input.focus();
+									});
+								}
+							})();
+						</script>
 				</div>
 			</section>
 		</div>
@@ -181,24 +251,5 @@
 	<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-	<script>
-		// Filtro de pesquisa na tabela
-		document.getElementById('searchInput').addEventListener('keyup', function() {
-			let input = this.value.toUpperCase();
-			let table = document.getElementById('alojamentosTable');
-			let tr = table.getElementsByTagName('tr');
-			for (let i = 1; i < tr.length; i++) {
-				let td = tr[i].getElementsByTagName('td');
-				let found = false;
-				for (let j = 0; j < td.length; j++) {
-					if (td[j].textContent.toUpperCase().indexOf(input) > -1) {
-						found = true;
-						break;
-					}
-				}
-				tr[i].style.display = found ? '' : 'none';
-			}
-		});
-	</script>
 </body>
 </html>

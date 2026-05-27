@@ -1,0 +1,30 @@
+@startuml
+title Sistema Patas & Bigodes - Diagrama de Componentes Simplificado
+
+skinparam style strictuml
+skinparam componentStyle uml2
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+left to right direction
+
+actor "Utilizador" as Utilizador
+
+() "I*Service" as IServices
+() "IRepositorioDados" as IRepositories
+
+component "Controllers\npt.hotel.animais.controller" as Controllers
+component "Services\npt.hotel.animais.service" as Services
+component "Repositories\npt.hotel.animais.repository" as Repositories
+database "hotelanimais" as DB
+
+Utilizador --> Controllers
+Services - IServices
+Repositories - IRepositories
+
+Controllers ..> IServices
+Services ..> IRepositories
+Repositories --> DB
+
+@enduml

@@ -37,7 +37,8 @@ public class AuditoriaOperacaoService {
      *
      * @param operacao operação funcional executada
      * @param entidade entidade afetada
-     * @param entityId identificador da entidade afetada
+     * @param entityId identificador da entidade afetada, ou {@code null} para
+     *                 operações sem entidade persistida, como geração de relatório
      * @param acao ação CRUD aproximada
      * @param detalhes contexto adicional em JSON
      */
@@ -55,7 +56,8 @@ public class AuditoriaOperacaoService {
      * @param utilizadorId identificador do colaborador autor, opcional
      * @param operacao operação funcional executada
      * @param entidade entidade afetada
-     * @param entityId identificador da entidade afetada
+     * @param entityId identificador da entidade afetada, ou {@code null} para
+     *                 operações sem entidade persistida, como geração de relatório
      * @param acao ação CRUD aproximada
      * @param detalhes contexto adicional em JSON
      */
@@ -88,7 +90,8 @@ public class AuditoriaOperacaoService {
      *
      * @param operacao operação funcional tentada
      * @param entidade entidade afetada
-     * @param entityId identificador da entidade afetada
+     * @param entityId identificador da entidade afetada, ou {@code null} para
+     *                 operações sem entidade persistida, como geração de relatório
      * @param acao ação CRUD aproximada
      * @param detalhes contexto adicional em JSON
      * @param motivoFalha motivo da falha

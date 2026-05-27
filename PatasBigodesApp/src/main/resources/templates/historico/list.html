@@ -58,6 +58,7 @@
 
         <section class="content">
             <div class="container-fluid">
+                <th:block th:insert="~{fragments/alerts :: alerts}"></th:block>
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
@@ -89,14 +90,18 @@
                                         <td th:text="${estadia.dataFim}">2026-01-05</td>
                                         <td th:text="${estadia.estado}">EM_CURSO</td>
                                         <td>
-                                            <span class="badge badge-info" th:text="${estadia.reserva.alojamento.identificacao}">A1</span>
-                                            <form th:if="${estadia.estado.toString() == 'EM_CURSO'}" th:action="@{/estadias/check-out}" method="post" class="d-inline ml-2" onsubmit="return confirm('Registar check-out para esta estadia?')">
-                                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                                                <input type="hidden" name="estadiaId" th:value="${estadia.id}" />
-                                                <button type="submit" class="btn btn-sm btn-success">
-                                                    <i class="fas fa-right-from-bracket"></i> Check-out
-                                                </button>
-                                            </form>
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge badge-info mr-2" th:text="${estadia.reserva.alojamento.identificacao}">A1</span>
+                                                <a th:href="@{/estadias/{id}(id=${estadia.id})}"
+                                                   class="btn btn-sm btn-outline-primary mr-2" aria-label="Detalhes da estadia">
+                                                    <i class="fas fa-eye mr-1"></i>Detalhes
+                                                </a>
+                                                <a th:if="${estadia.estado.toString() == 'EM_CURSO'}"
+                                                   th:href="@{/estadias/check-out(estadiaId=${estadia.id},redirectTo=${'/historico'})}"
+                                                   class="btn btn-sm btn-warning">
+                                                    <i class="fas fa-right-from-bracket mr-1"></i>Check-out
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                     <tr th:if="${#lists.isEmpty(estadias)}">

@@ -1,114 +1,243 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt">
 <head th:insert="~{fragments/head :: head}"></head>
+<head>
+    <style>
+        .availability-kpi { border-radius: .5rem; color: #fff; padding: 1rem; min-height: 94px; }
+        .availability-kpi strong { display: block; font-size: 2rem; line-height: 1; }
+        .map-box { 
+            background: #fff; 
+            border: 2px solid #d8dee5; 
+            border-radius: .55rem; 
+            cursor: pointer; 
+            min-height: 140px; 
+            padding: 1rem; 
+            transition: all .2s ease; 
+            width: 100%; 
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .map-box:hover { 
+            border-color: #343a40; 
+            box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .15);
+            transform: translateY(-2px);
+        }
+        .map-box:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 .2rem rgba(0, 123, 255, .25);
+        }
+        .map-box.st-livre { border-left: 6px solid #28a745; }
+        .map-box.st-ocupado { border-left: 6px solid #dc3545; }
+        .map-box.st-reservado { border-left: 6px solid #007bff; }
+        .map-box.st-limpeza { border-left: 6px solid #ffc107; }
+        .legend-mark { border-radius: 50%; display: inline-block; height: .8rem; margin-right: .35rem; width: .8rem; }
+        .detail-state { border-radius: 1rem; display: inline-block; font-weight: 600; padding: .25rem .75rem; }
+        .detail-state.st-livre { background: #d4edda; color: #155724; }
+        .detail-state.st-ocupado { background: #f8d7da; color: #721c24; }
+        .detail-state.st-reservado { background: #cce5ff; color: #004085; }
+        .detail-state.st-limpeza { background: #fff3cd; color: #856404; }
+        .modal-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+            justify-content: flex-end;
+        }
+    </style>
+</head>
 <body class="hold-transition sidebar-mini layout-fixed">
-	<div class="wrapper">
-		<th:block th:insert="~{fragments/navbar :: navbar}"></th:block>
-		<th:block th:insert="~{fragments/sidebar :: sidebar}"></th:block>
+<div class="wrapper">
+    <th:block th:insert="~{fragments/navbar :: navbar}"></th:block>
+    <th:block th:insert="~{fragments/sidebar :: sidebar}"></th:block>
+    <div class="content-wrapper">
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6"><h1 class="m-0">Mapa de Disponibilidade</h1></div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Início</a></li>
+                            <li class="breadcrumb-item active">Disponibilidade</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <section class="content">
+            <div class="container-fluid">
+                <th:block th:insert="~{fragments/alerts :: alerts}"></th:block>
+                <form class="card card-outline card-primary mb-3" method="get" th:action="@{/reservas/disponibilidade}">
+                    <div class="card-body py-3">
+                        <div class="form-row align-items-end">
+                            <div class="form-group col-md-3 mb-md-0">
+                                <label for="dataInicio">Entrada</label>
+                                <input id="dataInicio" name="dataInicio" type="date" required class="form-control" th:value="${dataInicio}">
+                            </div>
+                            <div class="form-group col-md-3 mb-md-0">
+                                <label for="dataFim">Saída</label>
+                                <input id="dataFim" name="dataFim" type="date" required class="form-control" th:value="${dataFim}">
+                            </div>
+                            <div class="form-group col-md-6 mb-0">
+                                <label>Tipo de alojamento</label>
+                                <div>
+                                    <button name="tipo" value="" type="submit" class="btn btn-sm mr-1"
+                                            th:classappend="${tipo == null or #strings.isEmpty(tipo)} ? 'btn-primary' : 'btn-outline-primary'">Todos</button>
+                                    <button th:each="tipoDisponivel : ${tiposAlojamento}" name="tipo"
+                                            th:value="${tipoDisponivel}" th:text="${tipoDisponivel}" type="submit"
+                                            class="btn btn-sm mr-1"
+                                            th:classappend="${tipoDisponivel == tipo} ? 'btn-primary' : 'btn-outline-primary'">Tipo</button>
+                                    <button class="btn btn-success btn-sm ml-2" type="submit">
+                                        <i class="fas fa-sync-alt mr-1"></i> Atualizar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="row mb-3">
+                    <div class="col-sm-6 col-lg-3 mb-2"><div class="availability-kpi bg-success"><strong th:text="${totalLivres ?: 0}">0</strong>Livres</div></div>
+                    <div class="col-sm-6 col-lg-3 mb-2"><div class="availability-kpi bg-danger"><strong th:text="${totalOcupados ?: 0}">0</strong>Ocupados</div></div>
+                    <div class="col-sm-6 col-lg-3 mb-2"><div class="availability-kpi bg-primary"><strong th:text="${totalReservados ?: 0}">0</strong>Reservados</div></div>
+                    <div class="col-sm-6 col-lg-3 mb-2"><div class="availability-kpi bg-warning"><strong th:text="${totalLimpeza ?: 0}">0</strong>Em Limpeza</div></div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header"><h3 class="card-title">Alojamentos no período selecionado</h3></div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6 col-sm-4 col-md-3 col-lg-2 mb-3" th:each="alojamento : ${mapaAlojamentos}">
+                                        <button type="button" class="map-box js-map-box" data-toggle="modal" data-target="#alojamentoModal"
+                                                th:classappend="${alojamento.estadoCss}"
+                                                th:data-id="${alojamento.alojamentoId}"
+                                                th:data-identificacao="${alojamento.identificacao}"
+                                                th:data-tipo="${alojamento.tipoLabel}"
+                                                th:data-estado="${alojamento.estadoLabel}"
+                                                th:data-css="${alojamento.estadoCss}"
+                                                th:data-animal="${alojamento.animalNome ?: ''}"
+                                                th:data-motivo="${alojamento.motivoIndisponibilidade ?: ''}"
+                                                th:data-estadia="${alojamento.estadiaId ?: ''}"
+                                                th:data-reserva="${alojamento.reservaId ?: ''}"
+                                                th:data-reserva-inicio="${alojamento.dataReservaInicio ?: ''}"
+                                                th:data-reserva-fim="${alojamento.dataReservaFim ?: ''}"
+                                                th:data-disponivel="${alojamento.disponivel}">
+                                            <strong class="d-block" th:text="${alojamento.identificacao}">Box 01</strong>
+                                            <small class="text-muted d-block mb-2" th:text="${alojamento.tipoLabel}">Canil</small>
+                                            <span class="badge" th:classappend="${alojamento.estado == 'LIVRE' ? 'badge-success' : (alojamento.estado == 'OCUPADO' ? 'badge-danger' : (alojamento.estado == 'RESERVADO' ? 'badge-primary' : 'badge-warning'))}"
+                                                  th:text="${alojamento.estadoLabel}">Livre</span>
+                                        </button>
+                                    </div>
+                                    <div class="col-12 text-center text-muted py-4"
+                                         th:if="${mapaAlojamentos == null or #lists.isEmpty(mapaAlojamentos)}">
+                                        Não existem alojamentos para os filtros selecionados.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer small text-muted">
+                                <span class="mr-3"><i class="legend-mark bg-success"></i>Livre</span>
+                                <span class="mr-3"><i class="legend-mark bg-danger"></i>Ocupado</span>
+                                <span class="mr-3"><i class="legend-mark bg-primary"></i>Reservado</span>
+                                <span><i class="legend-mark bg-warning"></i>Em limpeza</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <th:block th:insert="~{fragments/footer :: footer}"></th:block>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
-		<div class="content-wrapper">
-			<div class="content-header">
-				<div class="container-fluid">
-					<div class="row mb-2">
-						<div class="col-sm-6">
-							<h1 class="m-0">Consultar Disponibilidade</h1>
-						</div>
-						<div class="col-sm-6">
-							<ol class="breadcrumb float-sm-right">
-								<li class="breadcrumb-item"><a th:href="@{/}">Início</a></li>
-								<li class="breadcrumb-item active">Disponibilidade</li>
-							</ol>
-						</div>
-					</div>
-				</div>
-			</div>
+<!-- Modal de Detalhe do Alojamento -->
+<div class="modal fade" id="alojamentoModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title">Detalhe do Alojamento</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h4 id="modal-name" class="mb-2">Box 01</h4>
+                <span id="modal-state" class="detail-state mb-3">Livre</span>
+                <dl class="row mt-3 mb-0">
+                    <dt class="col-5">Tipo</dt><dd class="col-7" id="modal-type">Canil</dd>
+                    <dt class="col-5">Animal</dt><dd class="col-7" id="modal-animal">Sem animal associado</dd>
+                    <dt class="col-5">Contexto</dt><dd class="col-7" id="modal-reason">Disponível para reserva</dd>
+                </dl>
+            </div>
+            <div class="modal-footer d-flex flex-wrap justify-content-end align-items-center">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Fechar</button>
+                <div id="modal-actions" class="modal-actions"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
-			<section class="content">
-				<div class="container-fluid">
-					<!-- Mensagens de erro -->
-					<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-						<i class="fas fa-exclamation-circle mr-2"></i>
-						<span th:text="${errorMessage}">Mensagem de erro</span>
-						<button type="button" class="close" data-dismiss="alert">
-							<span>&times;</span>
-						</button>
-					</div>
+<script th:inline="javascript">
+    document.querySelectorAll('.js-map-box').forEach(function (box) {
+        box.addEventListener('click', function (e) {
+            e.preventDefault();
 
-					<!-- Card de procura -->
-					<div class="card card-primary">
-						<div class="card-header">
-							<h3 class="card-title">Procurar Alojamentos Disponíveis</h3>
-						</div>
+            document.getElementById('modal-name').textContent = box.dataset.identificacao;
+            document.getElementById('modal-type').textContent = box.dataset.tipo;
+            document.getElementById('modal-animal').textContent = box.dataset.animal || 'Sem animal associado';
+            document.getElementById('modal-reason').textContent = box.dataset.motivo || 'Disponível para reserva';
 
-						<form th:action="@{/reservas/procurar-disponibilidade}" method="post" class="form-horizontal">
-							<div class="card-body">
-								<!-- Data de Início -->
-								<div class="form-group row">
-									<label for="dataInicio" class="col-sm-2 col-form-label">Data de Início <span class="text-danger">*</span></label>
-									<div class="col-sm-10">
-										<input type="date" name="dataInicio" id="dataInicio" 
-											   class="form-control"
-											   th:value="${dataInicio}"
-											   required>
-										<small class="form-text text-muted">A partir de quando pretende o alojamento</small>
-									</div>
-								</div>
+            var state = document.getElementById('modal-state');
+            state.textContent = box.dataset.estado;
+            state.className = 'detail-state mb-3 ' + box.dataset.css;
 
-								<!-- Data de Fim -->
-								<div class="form-group row">
-									<label for="dataFim" class="col-sm-2 col-form-label">Data de Fim <span class="text-danger">*</span></label>
-									<div class="col-sm-10">
-										<input type="date" name="dataFim" id="dataFim" 
-											   class="form-control"
-											   th:value="${dataFim}"
-											   required>
-										<small class="form-text text-muted">Até quando é necessário o alojamento</small>
-									</div>
-								</div>
+            var actions = document.getElementById('modal-actions');
+            var dataInicio = /*[[${dataInicio}]]*/ '';
+            var dataFim = /*[[${dataFim}]]*/ '';
+            var csrfParameter = /*[[${_csrf != null ? _csrf.parameterName : ''}]]*/ '';
+            var csrfToken = /*[[${_csrf != null ? _csrf.token : ''}]]*/ '';
+            var estado = box.dataset.estado;
+            var estadiaId = box.dataset.estadia;
+            var reservaId = box.dataset.reserva;
+            var disponivel = box.dataset.disponivel === 'true';
+            var returnUrl = window.location.pathname + window.location.search;
 
-								<!-- Informação importante -->
-								<div class="alert alert-info">
-									<i class="fas fa-info-circle mr-2"></i>
-									<strong>Nota:</strong> Serão apresentados apenas alojamentos que se encontrem limpos e sem reservas ativas no período especificado.
-								</div>
-							</div>
+            var actionsHtml = '';
 
-							<!-- Botões de ação -->
-							<div class="card-footer">
-								<button type="submit" class="btn btn-success">
-									<i class="fas fa-search mr-2"></i> Procurar Disponibilidade
-								</button>
-								<a th:href="@{/reservas}" class="btn btn-secondary">
-									<i class="fas fa-times mr-2"></i> Cancelar
-								</a>
-							</div>
-						</form>
-					</div>
+            function csrfInput() {
+                return csrfParameter && csrfToken
+                    ? '<input type="hidden" name="' + csrfParameter + '" value="' + csrfToken + '">'
+                    : '';
+            }
 
-					<!-- Dicas de Utilização -->
-					<div class="card mt-4">
-						<div class="card-header bg-info">
-							<h3 class="card-title">Como Utilizar</h3>
-						</div>
-						<div class="card-body">
-							<ol>
-								<li>Introduza a data de início do alojamento pretendido</li>
-								<li>Introduza a data de fim do alojamento</li>
-								<li>Clique em "Procurar Disponibilidade"</li>
-								<li>Selecione um alojamento disponível da lista de resultados</li>
-								<li>Crie a reserva fornecendo os dados do tutor e animal</li>
-							</ol>
-						</div>
-					</div>
-				</div>
-			</section>
-		</div>
+            function hiddenReturn() {
+                return '<input type="hidden" name="redirectTo" value="' + returnUrl.replace(/"/g, '&quot;') + '">';
+            }
 
-		<th:block th:insert="~{fragments/footer :: footer}"></th:block>
-	</div>
+            if (estado === 'Reservado' && reservaId) {
+                actionsHtml = '<a class="btn btn-success btn-sm" href="/estadias/check-in?reservaId=' + encodeURIComponent(reservaId) + '&redirectTo=' + encodeURIComponent(returnUrl) + '">Registar check-in</a>' +
+                              '<form class="mb-0" method="post" action="/reservas/' + reservaId + '/cancelar" style="display:inline-block">' +
+                              csrfInput() +
+                              hiddenReturn() +
+                              '<button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm(\'Tem a certeza que deseja cancelar esta reserva?\')">Cancelar reserva</button>' +
+                              '</form>' +
+                              '<a class="btn btn-outline-secondary btn-sm" href="/reservas/' + reservaId + '">Consultar detalhes</a>';
+            }
+            else if (estado === 'Ocupado' && estadiaId) {
+                actionsHtml = '<a class="btn btn-warning btn-sm" href="/estadias/check-out?estadiaId=' + encodeURIComponent(estadiaId) + '&redirectTo=' + encodeURIComponent(returnUrl) + '">Registar check-out</a>' +
+                              (reservaId ? '<a class="btn btn-outline-secondary btn-sm" href="/reservas/' + reservaId + '">Consultar detalhes</a>' : '');
+            }
+            else if (disponivel) {
+                actionsHtml = '<a class="btn btn-success btn-sm" href="/reservas/novo?alojamentoId=' + box.dataset.id + '&dataInicio=' + dataInicio + '&dataFim=' + dataFim + '">Criar reserva</a>';
+            }
 
-	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+            actions.innerHTML = actionsHtml;
+            $('#alojamentoModal').modal('show');
+        });
+    });
+</script>
 </body>
 </html>

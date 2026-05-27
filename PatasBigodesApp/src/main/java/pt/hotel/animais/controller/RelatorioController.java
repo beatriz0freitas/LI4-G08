@@ -70,6 +70,7 @@ public class RelatorioController {
             return "relatorios/list";
         }
         try {
+            validarLimitePeriodo(filtro);
             model.addAttribute("relatorio", relatorioService.gerarRelatorio(filtro));
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
@@ -87,6 +88,12 @@ public class RelatorioController {
     @GetMapping("/exportar/csv")
     public ResponseEntity<byte[]> exportarCsv(@ModelAttribute RelatorioFiltroFormDto filtro) {
         aplicarDefaults(filtro);
+        String erro = validarLimitePeriodoOuRetornarMensagem(filtro);
+        if (erro != null) {
+            return ResponseEntity.badRequest()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(erro.getBytes(StandardCharsets.UTF_8));
+        }
         byte[] conteudo = relatorioService.gerarCsv(filtro).getBytes(StandardCharsets.UTF_8);
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename("relatorio.csv").build().toString())
@@ -103,10 +110,33 @@ public class RelatorioController {
     @GetMapping("/exportar/pdf")
     public ResponseEntity<byte[]> exportarPdf(@ModelAttribute RelatorioFiltroFormDto filtro) {
         aplicarDefaults(filtro);
+        String erro = validarLimitePeriodoOuRetornarMensagem(filtro);
+        if (erro != null) {
+            return ResponseEntity.badRequest()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(erro.getBytes(StandardCharsets.UTF_8));
+        }
         return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename("relatorio.pdf").build().toString())
             .contentType(MediaType.APPLICATION_PDF)
             .body(relatorioService.gerarPdf(filtro));
+    }
+
+    private void validarLimitePeriodo(RelatorioFiltroFormDto filtro) {
+        String erro = validarLimitePeriodoOuRetornarMensagem(filtro);
+        if (erro != null) {
+            throw new IllegalArgumentException(erro);
+        }
+    }
+
+    private String validarLimitePeriodoOuRetornarMensagem(RelatorioFiltroFormDto filtro) {
+        if (filtro.getDataInicio() == null || filtro.getDataFim() == null) {
+            return null;
+        }
+        if (filtro.getDataInicio().plusMonths(3).isBefore(filtro.getDataFim())) {
+            return "Período máximo para exportação imediata é 3 meses. Selecione um intervalo menor ou contacte o suporte para processamento offline.";
+        }
+        return null;
     }
 
     private void prepararModel(Model model) {

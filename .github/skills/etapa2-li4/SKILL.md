@@ -17,7 +17,7 @@ Etapa 2 do trabalho pratico de LI4 (LEI, Universidade do Minho), edicao 2026. Fo
 - Validar arquitetura ou design com apoio de LLM como agente de revisao.
 
 ## Procedimento
-1. Ler as fontes por ordem: `docs/Etapa0/Enunciado.md`, `docs/Etapa0/tema.md`, `docs/Etapa1/01-user-stories/`, `docs/Etapa1/02-requirements/`, `docs/Etapa1/03-use-cases/`, `docs/Etapa1/04-domain-model/` e depois o diretorio relevante de `docs/Etapa2/`.
+1. Ler as fontes por ordem: `docs/Etapa0/Enunciado.md`, `docs/Etapa0/Tema.md`, `docs/Etapa1/01-user-stories/`, `docs/Etapa1/02-requirements/`, `docs/Etapa1/03-use-cases/`, `docs/Etapa1/04-domain-model/` e depois o diretorio relevante de `docs/Etapa2/`.
 2. Identificar os `RF`, `RD`, `RNF`, `UC` e conceitos do modelo de dominio que sustentam o artefacto pedido.
 3. Produzir ou rever apenas a vista arquitetural ou de design alvo, sem misturar numa unica resposta todas as vistas da etapa.
 4. Validar o resultado com a [checklist](./references/checklists.md).

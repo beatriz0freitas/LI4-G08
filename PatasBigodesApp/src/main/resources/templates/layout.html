@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="pt" th:fragment="page(title)">
 <head th:insert="~{fragments/head :: head}"></head>
-<body class="hold-transition dark-mode sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed">
 	<div class="wrapper">
 		<!-- Main Header -->
 		<th:block th:insert="~{fragments/navbar :: navbar}"></th:block>
@@ -31,6 +31,7 @@
 			<!-- Main content -->
 			<section class="content">
 				<div class="container-fluid">
+					<th:block th:insert="~{fragments/alerts :: alerts}"></th:block>
 					<th:block th:replace="~{::content}"></th:block>
 				</div>
 			</section>

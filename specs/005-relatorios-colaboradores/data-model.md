@@ -1,6 +1,6 @@
 # Data Model: Relatórios e Colaboradores (Spec 005)
 
-**Atualizado**: 2026-05-26 (incorpora LAC-13 — Auditoria)
+**Atualizado**: 2026-05-27 (incorpora auditoria própria exclusiva e relatórios)
 
 ## Overview
 Define as entidades e campos usados pela feature de relatórios, gestão de colaboradores e auditoria centralizada. Este ficheiro serve como referência para JPA entities e para as migrações Flyway.
@@ -44,15 +44,15 @@ Define as entidades e campos usados pela feature de relatórios, gestão de cola
   - `utilizadorId: Long` (FK para `Colaborador`, not null; quem executou a operação)
   - `operacao: String` (not null, ex: "CRIAR_RESERVA", "CHECK_IN", "PAGAMENTO", "CRIAR_COLABORADOR", etc.)
   - `entidade: String` (not null, ex: "Reserva", "Estadia", "Pagamento", "Colaborador", etc.)
-  - `entityId: Long` (not null, PK da entidade afetada dentro do seu contexto)
-  - `acao: String` (not null, ex: "CREATE", "UPDATE", "DELETE")
+  - `entityId: Long` (opcional apenas quando o evento não afeta entidade persistida, por exemplo `RELATORIO_GERADO`; caso contrário é a PK da entidade afetada)
+  - `acao: String` (not null, ex: "CREATE", "UPDATE", "DELETE", "READ")
   - `detalhes: String` (JSON, optional, ex: `{"camposAlterados": ["valor", "estado"], "valorAnterior": "...", "valorNovo": "..."}`)
   - `resultado: Enum` (not null, "SUCESSO" ou "FALHA")
   - `motivoFalha: String` (optional, mensagem de erro se resultado=FALHA)
   - **Constraints**: `timestamp` deve corresponder ao `now()` do servidor; não permite datas futuras.
 
 ## Projections / DTOs
-- **RelatorioRequest**: `dataInicio`, `dataFim`, `tipoAlojamento?`, `incluirServicosExtra?`, `agruparPor` (DIA/SEMANA/MES)
+- **RelatorioRequest**: `dataInicio`, `dataFim`, `tipoAlojamento?`, `incluirServicosExtra?`, `agruparPor` (DIA/SEMANA/MES/ALOJAMENTO/COLABORADOR/TIPO_SERVICO)
 - **RelatorioResumoDTO**: `periodoStart`, `periodoEnd`, `ocupacaoPerc`, `estadiasCount`, `reservasCount`, `faturacaoTotal`, `faturacaoPorMetodo` (map), `servicosExtraTotal`
 - **AuditoriaFiltroDTO** *(novo, LAC-13)*: `dataInicio?`, `dataFim?`, `utilizadorId?`, `operacao?`, `entidade?`, `resultado?`
 - **AuditoriaEventoDTO** *(novo, LAC-13)*: `id`, `timestamp`, `utilizador` (nome ou email), `operacao`, `entidade`, `entityId`, `acao`, `detalhes`, `resultado`, `motivoFalha`
@@ -73,6 +73,7 @@ Define as entidades e campos usados pela feature de relatórios, gestão de cola
 - Passwords: armazenar `passwordHash` usando BCrypt; migração de valores em texto plano não permitida.
 - **Auditoria (LAC-13)**:
   - Cada evento deve ter `utilizadorId` (não null); operações sem utilizador autenticado lançam exceção antes de chegar a `AuditoriaService`.
+  - `RELATORIO_GERADO` é persistido com `entityId` nulo, pois representa consulta/geração de um resultado não persistido; filtros ficam em `detalhes`.
   - Campo `detalhes` (JSON) está limitado a 2000 caracteres; schema é livre mas documentado em comentário de código.
   - Retenção: eventos com `timestamp` anterior a 12 meses são removidos por job de limpeza (não há soft delete).
   - Integridade referencial: `utilizadorId` aponta para `Colaborador` existente; validação no serviço.
@@ -88,7 +89,7 @@ Define as entidades e campos usados pela feature de relatórios, gestão de cola
       utilizador_id BIGINT NOT NULL,
       operacao VARCHAR(100) NOT NULL,
       entidade VARCHAR(100) NOT NULL,
-      entity_id BIGINT NOT NULL,
+      entity_id BIGINT,
       acao VARCHAR(50) NOT NULL,
       detalhes TEXT,
       resultado VARCHAR(20) NOT NULL,

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt">
+<head th:insert="~{fragments/head :: head}"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <th:block th:insert="~{fragments/navbar :: navbar}"></th:block>
+    <th:block th:insert="~{fragments/sidebar :: sidebar}"></th:block>
+    <div class="content-wrapper">
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6"><h1 class="m-0">Estadias</h1></div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Início</a></li>
+                            <li class="breadcrumb-item active">Estadias</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <section class="content">
+            <div class="container-fluid">
+                <th:block th:insert="~{fragments/alerts :: alerts}"></th:block>
+                
+                <!-- Filtros -->
+                <div class="filter-panel mb-3">
+                    <div class="card-header">
+                        <h3 class="card-title">Filtros</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="estadiasFiltersForm" class="form-inline flex-wrap" method="get" th:action="@{/estadias/lista}" aria-describedby="estadiasFiltersHint">
+                            <div class="form-group mr-3 mb-2">
+                                <label for="estado" class="mr-2 font-weight-normal">Estado:</label>
+                                <select id="estado" name="estado" class="custom-select">
+                                    <option value="">Todos os estados</option>
+                                    <option value="EM_CURSO"
+                                            th:selected="${filtroEstado != null and filtroEstado == 'EM_CURSO'}">
+                                        Em curso
+                                    </option>
+                                    <option value="TERMINADA"
+                                            th:selected="${filtroEstado != null and filtroEstado == 'TERMINADA'}">
+                                        Terminada
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-group mr-3 mb-2">
+                                <label for="dataInicio" class="mr-2 font-weight-normal">De:</label>
+                                <input id="dataInicio" name="dataInicio" type="date" class="form-control" 
+                                       th:value="${dataInicio}">
+                            </div>
+                            <div class="form-group mr-3 mb-2">
+                                <label for="dataFim" class="mr-2 font-weight-normal">Até:</label>
+                                <input id="dataFim" name="dataFim" type="date" class="form-control" 
+                                       th:value="${dataFim}">
+                            </div>
+                            <button type="submit" class="btn btn-primary mb-2" id="estadiasFilterButton">
+                                <span class="button-label"><i class="fas fa-filter mr-1"></i> Filtrar</span>
+                                <span class="button-loading d-none"><i class="fas fa-spinner fa-spin mr-1"></i>A aplicar...</span>
+                            </button>
+                        </form>
+                        <div id="estadiasFiltersHint" class="small text-muted mt-2">Use os filtros para refinar a lista. O botão mostra feedback enquanto a pesquisa é aplicada.</div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Estadias -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Lista de Estadias</h3>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(estadias)}" class="alert alert-info">
+                            Não existem estadias para os filtros selecionados.
+                        </div>
+                        <table th:unless="${#lists.isEmpty(estadias)}" class="table table-sm table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Animal</th>
+                                    <th>Alojamento</th>
+                                    <th>Check-in</th>
+                                    <th>Check-out</th>
+                                    <th>Duração</th>
+                                    <th>Estado</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="estadia : ${estadias}">
+                                    <td th:text="${estadia.animalNome}">Animal</td>
+                                    <td th:text="${estadia.alojamentoIdentificacao}">Alojamento</td>
+                                    <td th:text="${#temporals.format(estadia.dataInicio, 'dd/MM/yyyy HH:mm')}">Check-in</td>
+                                    <td>
+                                        <span th:if="${estadia.dataFim != null}"
+                                              th:text="${#temporals.format(estadia.dataFim, 'dd/MM/yyyy HH:mm')}">
+                                        </span>
+                                        <span th:unless="${estadia.dataFim != null}" class="text-muted">-</span>
+                                    </td>
+                                    <td th:text="${estadia.duracao}">Duração</td>
+                                    <td>
+                                        <span class="badge"
+                                              th:classappend="${estadia.estadoCss == 'st-ocupado' ? 'status-warning' : 'status-success'}"
+                                              th:text="${estadia.estadoLabel}">
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{/estadias/{id}(id=${estadia.id})}" class="btn btn-sm btn-outline-primary mr-1" title="Consultar detalhes da estadia">
+                                            <i class="fas fa-eye mr-1"></i> Detalhes
+                                        </a>
+                                        <a th:if="${estadia.reservaId != null}" th:href="@{/reservas/{id}(id=${estadia.reservaId})}" class="btn btn-sm btn-outline-primary mr-1" title="Consultar detalhes da reserva">
+                                            <i class="fas fa-calendar-check mr-1"></i> Reserva
+                                        </a>
+                                        <th:block th:if="${estadia.estado.name() == 'EM_CURSO'}">
+                                            <a th:href="@{/estadias/check-out(estadiaId=${estadia.id},redirectTo=${'/estadias/lista'})}" class="btn btn-sm btn-primary" title="Realizar check-out">
+                                                <i class="fas fa-sign-out-alt mr-1"></i> Check-out
+                                            </a>
+                                        </th:block>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer small text-muted">
+                        Total de estadias: <strong th:text="${#lists.size(estadias)}">0</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <th:block th:insert="~{fragments/footer :: footer}"></th:block>
+</div>
+<script>
+    (function () {
+        const form = document.getElementById('estadiasFiltersForm');
+        const button = document.getElementById('estadiasFilterButton');
+
+        if (!form || !button) {
+            return;
+        }
+
+        form.addEventListener('submit', function () {
+            const label = button.querySelector('.button-label');
+            const loading = button.querySelector('.button-loading');
+
+            button.disabled = true;
+            if (label) {
+                label.classList.add('d-none');
+            }
+            if (loading) {
+                loading.classList.remove('d-none');
+            }
+        });
+    })();
+</script>
+</body>
+</html>

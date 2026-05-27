@@ -1,0 +1,54 @@
+@startuml UC-15
+title UC-15 - Gerir Tarifas e Catalogos
+
+autonumber
+actor Diretor
+participant TipoAlojamentoTarifaController
+participant TipoServicoExtraController
+participant TipoAlojamentoTarifaService
+participant TipoServicoExtraService
+participant TipoAlojamentoTarifaRepository
+participant TipoServicoExtraRepository
+
+Diretor -> TipoAlojamentoTarifaController : GET /admin/tarifas
+TipoAlojamentoTarifaController -> TipoAlojamentoTarifaService : listarTodas()
+TipoAlojamentoTarifaService -> TipoAlojamentoTarifaRepository : findAllOrderByTipo()
+TipoAlojamentoTarifaService --> TipoAlojamentoTarifaController : tarifas
+TipoAlojamentoTarifaController --> Diretor : mostrar tarifas
+
+Diretor -> TipoAlojamentoTarifaController : POST /admin/tarifas
+TipoAlojamentoTarifaController -> TipoAlojamentoTarifaService : criar(tipo, tarifaDiaria)
+TipoAlojamentoTarifaService -> TipoAlojamentoTarifaRepository : findByTipoAlojamento(tipo)
+
+alt tipo duplicado ou tarifa negativa
+  TipoAlojamentoTarifaService --> TipoAlojamentoTarifaController : erro
+  TipoAlojamentoTarifaController --> Diretor : mostrar erro
+else dados validos
+  TipoAlojamentoTarifaService -> TipoAlojamentoTarifaRepository : save(tarifa)
+  TipoAlojamentoTarifaService --> TipoAlojamentoTarifaController : TipoAlojamentoTarifa
+  TipoAlojamentoTarifaController --> Diretor : confirmar operacao
+end
+
+opt gerir tipos de servico extra
+  Diretor -> TipoServicoExtraController : GET/POST /admin/tipos-servicos-extra
+  TipoServicoExtraController -> TipoServicoExtraService : listarTodos() / criar() / atualizar()
+  TipoServicoExtraService -> TipoServicoExtraRepository : findAllOrderByNome() / save()
+  TipoServicoExtraService --> TipoServicoExtraController : TipoServicoExtra
+  TipoServicoExtraController --> Diretor : mostrar/confirmar catalogo
+end
+
+opt desativar ou reativar item
+  alt tarifa de alojamento
+    Diretor -> TipoAlojamentoTarifaController : POST /admin/tarifas/{id}/desativar ou /reativar
+    TipoAlojamentoTarifaController -> TipoAlojamentoTarifaService : desativar(id) ou reativar(id)
+    TipoAlojamentoTarifaService -> TipoAlojamentoTarifaRepository : save(ativo/inativo)
+    TipoAlojamentoTarifaController --> Diretor : confirmar alteracao
+  else tipo de servico extra
+    Diretor -> TipoServicoExtraController : POST /admin/tipos-servicos-extra/{id}/desativar ou /reativar
+    TipoServicoExtraController -> TipoServicoExtraService : desativar(id) ou reativar(id)
+    TipoServicoExtraService -> TipoServicoExtraRepository : save(ativo/inativo)
+    TipoServicoExtraController --> Diretor : confirmar alteracao
+  end
+end
+
+@enduml

@@ -26,11 +26,11 @@ Descrever claramente a opcao escolhida.
 
 ## Impacto na arquitetura
 Indicar os artefactos afetados:
-- [architecture.md](../../docs/Etapa2/01-architecture/architecture.md)
-- [components.mmd](../../docs/Etapa2/01-architecture/components.mmd)
-- [deployment.mmd](../../docs/Etapa2/01-architecture/deployment.mmd)
-- [class-diagram.mmd](../../docs/Etapa2/02-class-diagram/class-diagram.mmd)
-- [README.md](../../docs/Etapa2/03-seq-diagrams/README.md)
+- [architecture.md](../../../../docs/Etapa2/01-architecture/architecture.md)
+- [components.mmd](../../../../docs/Etapa2/01-architecture/components.mmd)
+- [deployment.mmd](../../../../docs/Etapa2/01-architecture/deployment.mmd)
+- [class-diagram.mmd](../../../../docs/Etapa2/02-class-diagram/class-diagram.mmd)
+- [README.md](../../../../docs/Etapa2/03-seq-diagrams/README.md)
 
 ## Rastreabilidade
 - RF/RD/RNF/UC relacionados: <lista>

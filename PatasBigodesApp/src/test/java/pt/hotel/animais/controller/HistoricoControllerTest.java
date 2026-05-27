@@ -21,10 +21,13 @@ import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Tutor;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -81,7 +84,7 @@ class HistoricoControllerTest {
         estadia.setReserva(reserva);
 
         when(historicoService.listarHistorico(eq(2L), eq(5L), eq(EstadoEstadia.EM_CURSO), any(), any(), any()))
-            .thenReturn(new PageImpl<>(List.of(estadia), PageRequest.of(0, 10), 1));
+            .thenReturn(new PageImpl<>(List.of(estadia), PageRequest.of(0, 10), 12));
 
         mvc.perform(get("/historico")
                 .param("clienteId", "2")
@@ -90,6 +93,11 @@ class HistoricoControllerTest {
             .andExpect(status().isOk())
             .andExpect(view().name("historico/list"))
             .andExpect(model().attribute("clienteId", 2L))
-            .andExpect(model().attribute("animalId", 5L));
+            .andExpect(model().attribute("animalId", 5L))
+            .andExpect(content().string(containsString("/estadias/check-out?estadiaId=3")))
+            .andExpect(content().string(containsString("Check-out")))
+            .andExpect(content().string(containsString("/estadias/3")))
+            .andExpect(content().string(containsString("/historico?page=1")))
+            .andExpect(content().string(not(containsString("action=\"/estadias/check-out\""))));
     }
 }

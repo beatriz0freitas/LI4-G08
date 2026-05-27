@@ -3,6 +3,7 @@ package pt.hotel.animais.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pt.hotel.animais.dto.EstadiaListDto;
 import pt.hotel.animais.dto.PagamentoDto;
 import pt.hotel.animais.dto.ResumoCheckInDto;
 import pt.hotel.animais.dto.ResumoCheckOutDto;
@@ -17,10 +18,14 @@ import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Serviço para gestão do ciclo de vida da estadia.
@@ -35,6 +40,7 @@ public class EstadiaService implements IEstadiaService {
     private final IReservaService reservaService;
     private final IPagamentoService pagamentoService;
     private final IAlojamentoService alojamentoService;
+    private final IPlanoCuidadosService planoCuidadosService;
     private final AnimalRepository animalRepository;
     private final AuditoriaOperacaoService auditoriaOperacaoService;
 
@@ -70,6 +76,7 @@ public class EstadiaService implements IEstadiaService {
         estadia.setEstado(EstadoEstadia.EM_CURSO);
 
         Estadia saved = estadiaRepository.save(estadia);
+        planoCuidadosService.obterOuCriarPlanoParaEstadiaAtiva(saved.getId());
 
         // Criar pagamento base no check-in (valor calculado automaticamente)
         BigDecimal valorBase = pagamentoService.calcularValorBase(saved);
@@ -130,6 +137,7 @@ public class EstadiaService implements IEstadiaService {
         // Passo 5: Marcar como TERMINADA
         estadia.setEstado(EstadoEstadia.TERMINADA);
         Estadia saved = estadiaRepository.save(estadia);
+        planoCuidadosService.encerrarPlanoDaEstadia(saved.getId());
 
         // Passo 6: Concluir reserva associada antes da limpeza
         var reserva = estadia.getReserva();
@@ -151,6 +159,15 @@ public class EstadiaService implements IEstadiaService {
         );
 
         return saved;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Estadia> obterComDetalhes(Long estadiaId) {
+        if (estadiaId == null) {
+            return Optional.empty();
+        }
+        return estadiaRepository.findByIdComDetalhes(estadiaId);
     }
 
     @Transactional(readOnly = true)
@@ -193,6 +210,64 @@ public class EstadiaService implements IEstadiaService {
     @Transactional(readOnly = true)
     public long contarEstadiasEmCurso() {
         return estadiaRepository.countByEstado(EstadoEstadia.EM_CURSO);
+    }
+
+    /**
+     * Lista estadias com filtros opcionais.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<EstadiaListDto> listarComFiltros(EstadoEstadia estado, LocalDate dataInicio, LocalDate dataFim) {
+        LocalDateTime dataInicioDateTime = dataInicio != null ? dataInicio.atStartOfDay() : null;
+        LocalDateTime dataFimDateTime = dataFim != null ? dataFim.atStartOfDay() : null;
+        
+        List<Estadia> estadias = estadiaRepository.findComFiltros(estado, dataInicioDateTime, dataFimDateTime);
+        
+        return estadias.stream()
+            .map(this::converterParaDto)
+            .collect(Collectors.toList());
+    }
+
+    private EstadiaListDto converterParaDto(Estadia estadia) {
+        String estadoLabel = obterLabelEstado(estadia.getEstado());
+        String estadoCss = obterClassCssEstado(estadia.getEstado());
+        
+        // Calcular duração
+        LocalDateTime fimCalculo = estadia.getDataFim() != null ? estadia.getDataFim() : LocalDateTime.now();
+        long dias = ChronoUnit.DAYS.between(estadia.getDataInicio(), fimCalculo);
+        long horas = ChronoUnit.HOURS.between(estadia.getDataInicio(), fimCalculo) % 24;
+        String duracao = String.format("%d dia(s), %d hora(s)", dias, horas);
+        
+        return new EstadiaListDto(
+            estadia.getId(),
+            estadia.getReserva() != null ? estadia.getReserva().getId() : null,
+            estadia.getReserva() != null && estadia.getReserva().getAnimal() != null ? 
+                estadia.getReserva().getAnimal().getNome() : "-",
+            estadia.getReserva() != null && estadia.getReserva().getAlojamento() != null ? 
+                estadia.getReserva().getAlojamento().getIdentificacao() : "-",
+            estadia.getDataInicio(),
+            estadia.getDataFim(),
+            duracao,
+            estadia.getEstado(),
+            estadoLabel,
+            estadoCss
+        );
+    }
+
+    private String obterLabelEstado(EstadoEstadia estado) {
+        return switch (estado) {
+            case EM_CURSO -> "Em curso";
+            case TERMINADA -> "Terminada";
+            default -> "Desconhecido";
+        };
+    }
+
+    private String obterClassCssEstado(EstadoEstadia estado) {
+        return switch (estado) {
+            case EM_CURSO -> "st-ocupado";
+            case TERMINADA -> "st-livre";
+            default -> "";
+        };
     }
 
     private Map<String, Object> detalhesCheckIn(Estadia estadia,

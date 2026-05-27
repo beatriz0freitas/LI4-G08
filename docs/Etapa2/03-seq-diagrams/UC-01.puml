@@ -2,23 +2,31 @@
 title UC-01 - Autenticar no Sistema
 
 autonumber
-actor Funcionario
+actor Colaborador
 participant AuthController
-participant IColaboradorService
+participant SpringSecurity
+participant ColaboradorUserDetailsService
 participant ColaboradorRepository
 
-Funcionario -> AuthController : submeter credenciais
-AuthController -> IColaboradorService : autenticar(username, password)
-IColaboradorService -> ColaboradorRepository : findByUsername(username)
-ColaboradorRepository --> IColaboradorService : colaborador / vazio
+Colaborador -> AuthController : GET /login
+AuthController --> Colaborador : formulario de login
+Colaborador -> SpringSecurity : POST /login(username, password)
+SpringSecurity -> ColaboradorUserDetailsService : loadUserByUsername(username)
+ColaboradorUserDetailsService -> ColaboradorRepository : findByUsername(username)
 
-alt credenciais validas
-  IColaboradorService -> IColaboradorService : validar password e perfil
-  IColaboradorService --> AuthController : autenticacao bem sucedida
-  AuthController --> Funcionario : mostrar painel do perfil
-else credenciais invalidas
-  IColaboradorService --> AuthController : erro de autenticacao
-  AuthController --> Funcionario : mensagem de erro
+alt colaborador encontrado e ativo
+  ColaboradorRepository --> ColaboradorUserDetailsService : Colaborador
+  ColaboradorUserDetailsService --> SpringSecurity : UserDetails com roles
+  SpringSecurity -> SpringSecurity : validar password BCrypt
+  alt credenciais validas
+    SpringSecurity --> Colaborador : redirecionar para /
+  else password invalida
+    SpringSecurity --> Colaborador : redirecionar para /login?error
+  end
+else colaborador inexistente/inativo
+  ColaboradorRepository --> ColaboradorUserDetailsService : vazio
+  ColaboradorUserDetailsService --> SpringSecurity : UsernameNotFoundException
+  SpringSecurity --> Colaborador : redirecionar para /login?error
 end
 
 @enduml

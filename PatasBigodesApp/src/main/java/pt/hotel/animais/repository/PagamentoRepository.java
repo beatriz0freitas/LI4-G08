@@ -15,6 +15,8 @@ public interface PagamentoRepository extends JpaRepository<Pagamento, Long> {
 
 	List<Pagamento> findByEstadiaId(Long estadiaId);
 
+	List<Pagamento> findByDataCriacaoBetweenOrderByDataCriacaoAsc(LocalDateTime inicio, LocalDateTime fim);
+
 	/**
 	 * Soma o valor total dos pagamentos.
 	 */

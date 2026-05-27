@@ -1,0 +1,38 @@
+@startuml
+title Sistema Patas & Bigodes - Diagrama de Packages Simplificado
+
+skinparam style strictuml
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam defaultFontName Arial
+skinparam nodesep 80
+skinparam ranksep 95
+
+top to bottom direction
+
+package "pt.hotel.animais" {
+  package "config" as Config
+  package "controller" as Controller
+  package "dto" as Dto
+  package "service" as Service
+  package "repository" as Repository
+  package "model" as Model
+}
+
+Controller -[hidden]down-> Service
+Service -[hidden]down-> Repository
+Repository -[hidden]down-> Model
+
+
+Controller ..> Dto
+Controller ..> Service
+Service ..> Repository
+Service ..> Model
+Repository ..> Model
+
+
+Config ..> Service
+
+
+@enduml

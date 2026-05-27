@@ -23,7 +23,7 @@
 
 **⚠️ CHANGES**: Migration agora inclui `PlanoCuidados` e `TarefaCuidado` (novas tabelas por LAC-02)
 
-- [ ] T001 [P] **UPDATE** Flyway migration `PatasBigodesApp/src/main/resources/db/migration/V5__cuidados_clinica_limpeza.sql` with **expanded** DDL including `plano_cuidados`, `tarefa_cuidado`, `registo_cuidado`, `servico_extra`, `intervencao_clinica`, `nota`, `alteracao_estado_saude` tables; foreign keys, indexes (including `idx_pc_animal`, `idx_pc_estadia`, `idx_tc_plano`, `idx_rc_datahora`), and audit columns for all entities
+- [x] T001 [P] **UPDATE** Flyway migration `PatasBigodesApp/src/main/resources/db/migration/V5__cuidados_clinica_limpeza.sql` with **expanded** DDL including `plano_cuidados`, `tarefa_cuidado`, `registo_cuidado`, `servico_extra`, `intervencao_clinica`, `nota`, `alteracao_estado_saude` tables; foreign keys, indexes (including `idx_pc_animal`, `idx_pc_estadia`, `idx_tc_plano`, `idx_rc_datahora`), and audit columns for all entities
 
 ---
 
@@ -35,7 +35,7 @@
 
 **⚠️ CHANGES**: Domain model classes agora incluem `PlanoCuidados`, `TarefaCuidado`, e enums associados (LAC-02)
 
-- [ ] T002 [P] **UPDATE** Create shared domain model classes in `PatasBigodesApp/src/main/java/pt/hotel/animais/model/`:
+- [x] T002 [P] **UPDATE** Create shared domain model classes in `PatasBigodesApp/src/main/java/pt/hotel/animais/model/`:
   - `PlanoCuidados.java` (NOVA — por LAC-02)
   - `TarefaCuidado.java` (NOVA — por LAC-02)
   - `PrioridadePlano.java` (NOVO ENUM)
@@ -47,7 +47,7 @@
   - `Nota.java` (existente)
   - `enums/TipoServicoExtra.java` (existente)
 
-- [ ] T003 [P] **UPDATE** Create repository interfaces in `PatasBigodesApp/src/main/java/pt/hotel/animais/repository/`:
+- [x] T003 [P] **UPDATE** Create repository interfaces in `PatasBigodesApp/src/main/java/pt/hotel/animais/repository/`:
   - `PlanoCuidadosRepository.java` (NOVA — por LAC-02) with methods: `findByEstadiaId()`, `findByAnimalId(Pageable)`, `findUniqueActiveByEstadiaId()`
   - `TarefaCuidadoRepository.java` (NOVA — por LAC-02) with methods: `findByPlanoCuidadosId()`, `findByPlanoCuidadosIdAndConcluida()`
   - `RegistoCuidadoRepository.java` (existente)
@@ -56,7 +56,7 @@
   - `IntervencaoClinicaRepository.java` (existente)
   - `NotaRepository.java` (existente)
 
-- [ ] T004 [P] **UPDATE** Add shared validation and ordering helpers in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/`:
+- [x] T004 [P] **UPDATE** Add shared validation and ordering helpers in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/`:
   - `IRegraDominioService.java` e `RegraDominioService.java` — add new method `validarPlanoCuidadosAtivo(Long planoCuidadosId)` and `mudarPrioridadePlano(Long planoCuidadosId, PrioridadePlano novaPrioridade)` (para integração com US-16)
   - `IHistoricoService.java` e `HistoricoService.java` — update for consolidated history queries com support para `PlanoCuidados` events
 
@@ -70,7 +70,7 @@
 
 **⚠️ CRITICAL**: US-14 depende destas tasks. Deve completar-se **após T002/T003/T004** e **antes de T005/T006/T007**
 
-- [ ] T006a [P] Create service interfaces and implementations in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/`:
+- [x] T006a [P] Create service interfaces and implementations in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/`:
   - `IPlanoCuidadosService.java` com métodos:
     - `criarPlanoParaEstadia(Long estadiaId, Long animalId): PlanoCuidadosDto` — herda histórico do animal, cria cópia ajustável
     - `obterPlanoPorEstadia(Long estadiaId): PlanoCuidadosDto` — fetch plano ativo
@@ -82,7 +82,7 @@
     - `encerrarPlano(Long planoCuidadosId): void` — chamado no check-out
   - `PlanoCuidadosService.java` (implementação com validações e auditoria)
 
-- [ ] T006b [P] Create DTOs in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/`:
+- [x] T006b [P] Create DTOs in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/`:
   - `PlanoCuidadosDto.java` (id, animalId, estadiaId, dataInicio, prioridade, instrucoes, tarefas List)
   - `PlanoCuidadosFormDto.java` (para criar/editar plano — atualmente read-only via herança, mas suporta adicionar instruções)
   - `TarefaCuidadoDto.java` (id, tipo, descricao, periodicidade, dataHora, concluida)
@@ -102,17 +102,17 @@
 
 ### Tests for User Story US-14
 
-- [ ] T005 [P] [US14] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/PlanoCuidadosControllerTest.java` for viewing the care plan of an active stay, including:
+- [x] T005 [P] [US14] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/PlanoCuidadosControllerTest.java` for viewing the care plan of an active stay, including:
   - Cenário: plano com prioridade ROTINA (padrão)
   - Cenário: prioridade muda para CRITICO quando AlteracaoEstadoSaude com severidade CRITICO é criada
   - Cenário: apenas cuidadores/veterinários conseguem visualizar
-  - (skeleton, disabled)
+  - teste executável
 
 ### Implementation for User Story US-14
 
-- [ ] T006 [P] [US14] Extend `IPlanoCuidadosService` e `PlanoCuidadosService` (criadas em T006a) with métodos de consulta e lógica de priorização. Criar `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/PlanoCuidadosResponseDto.java` para formato de resposta (inclui tarefas + instruções + prioridade visual)
+- [x] T006 [P] [US14] Extend `IPlanoCuidadosService` e `PlanoCuidadosService` (criadas em T006a) with métodos de consulta e lógica de priorização. Criar `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/PlanoCuidadosResponseDto.java` para formato de resposta (inclui tarefas + instruções + prioridade visual)
 
-- [ ] T007 [US14] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/PlanoCuidadosController.java` with endpoints:
+- [x] T007 [US14] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/PlanoCuidadosController.java` with endpoints:
   - `GET /cuidados/plano/{estadiaId}` — exibe plano com tarefas e prioridade
   - `POST /cuidados/plano/{planoCuidadosId}/instrucoes` — adiciona notas (dinâmico)
   - Implementar `PatasBigodesApp/src/main/resources/templates/cuidados/plano.html` with:
@@ -133,13 +133,13 @@
 
 ### Tests for User Story US-15
 
-- [ ] T008 [P] [US15] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/RegistoCuidadoControllerTest.java` for create-and-list care records (skeleton, disabled)
+- [x] T008 [P] [US15] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/RegistoCuidadoControllerTest.java` for create-and-list care records
 
 ### Implementation for User Story US-15
 
-- [ ] T009 [P] [US15] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/RegistoCuidadoFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/RegistoCuidadoDto.java`
-- [ ] T010 [US15] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IRegistoCuidadoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/RegistoCuidadoService.java` with active-stay validation, author stamping, and descending ordering
-- [ ] T011 [US15] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/RegistoCuidadoController.java`, `PatasBigodesApp/src/main/resources/templates/cuidados/registos.html`, and the recent-care fragment in `PatasBigodesApp/src/main/resources/templates/animais/detail.html`
+- [x] T009 [P] [US15] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/RegistoCuidadoFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/RegistoCuidadoDto.java`
+- [x] T010 [US15] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IRegistoCuidadoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/RegistoCuidadoService.java` with active-stay validation, author stamping, and descending ordering
+- [x] T011 [US15] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/RegistoCuidadoController.java`, `PatasBigodesApp/src/main/resources/templates/cuidados/registos.html`, and the recent-care fragment in `PatasBigodesApp/src/main/resources/templates/animais/detail.html`
 
 **Checkpoint**: User Story US-15 should now be fully functional and testable independently
 
@@ -153,13 +153,13 @@
 
 ### Tests for User Story US-18
 
-- [ ] T012 [P] [US18] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ServicoExtraControllerTest.java` for registering extras and verifying billing inclusion (skeleton, disabled)
+- [x] T012 [P] [US18] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ServicoExtraControllerTest.java` for registering extras and verifying billing inclusion
 
 ### Implementation for User Story US-18
 
-- [ ] T013 [P] [US18] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/ServicoExtraFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/ServicoExtraDto.java`
-- [ ] T014 [US18] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IServicoExtraService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ServicoExtraService.java` and the billing hook in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
-- [ ] T015 [US18] Extend `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/EstadiaController.java`, `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`, `PatasBigodesApp/src/main/resources/templates/estadias/checkin-checkout.html`, and `PatasBigodesApp/src/main/resources/templates/reservas/index.html` to register extras and show their totals
+- [x] T013 [P] [US18] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/ServicoExtraFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/ServicoExtraDto.java`
+- [x] T014 [US18] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IServicoExtraService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/ServicoExtraService.java` and the billing hook in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
+- [x] T015 [US18] Extend `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/EstadiaController.java`, `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ReservaController.java`, `PatasBigodesApp/src/main/resources/templates/estadias/checkin-checkout.html`, and `PatasBigodesApp/src/main/resources/templates/reservas/index.html` to register extras and show their totals
 
 **Checkpoint**: User Story US-18 should now be fully functional and testable independently
 
@@ -173,13 +173,13 @@
 
 ### Tests for User Story US-22
 
-- [ ] T016 [P] [US22] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/HistoricoControllerTest.java` for filtered history consultation (skeleton, disabled)
+- [x] T016 [P] [US22] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/HistoricoControllerTest.java` for filtered history consultation
 
 ### Implementation for User Story US-22
 
-- [ ] T017 [P] [US22] Add history filter/DTOs in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/HistoricoFiltroDto.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/HistoricoItemDto.java`
-- [ ] T018 [US22] Implement consolidated query logic in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IHistoricoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/HistoricoService.java` with support for PlanoCuidados events
-- [ ] T019 [US22] Extend `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/HistoricoController.java` and `PatasBigodesApp/src/main/resources/templates/historico/list.html` with filters, pagination, and sort order (added consolidated events endpoint and template)
+- [x] T017 [P] [US22] Add history filter/DTOs in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/HistoricoFiltroDto.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/HistoricoItemDto.java`
+- [x] T018 [US22] Implement consolidated query logic in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IHistoricoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/HistoricoService.java` with support for PlanoCuidados events
+- [x] T019 [US22] Extend `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/HistoricoController.java` and `PatasBigodesApp/src/main/resources/templates/historico/list.html` with filters, pagination, and sort order (added consolidated events endpoint and template)
 
 **Checkpoint**: User Story US-22 should now be fully functional and testable independently
 
@@ -195,19 +195,19 @@
 
 ### Tests for User Story US-16
 
-- [ ] T020 [P] [US16] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ClinicaControllerTest.java` for recording health-state changes, including:
+- [x] T020 [P] [US16] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ClinicaControllerTest.java` for recording health-state changes, including:
   - Cenário: criar alteração com severidade CRITICO
   - Cenário: validar que prioridade do plano correspondente muda para CRITICO
-  - (skeleton, disabled)
+  - teste executável
 
 ### Implementation for User Story US-16
 
-- [ ] T021 [P] [US16] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/AlteracaoEstadoSaudeFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/AlteracaoEstadoSaudeDto.java`
-- [ ] T022 [US16] **UPDATE** Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IAlteracaoEstadoSaudeService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/AlteracaoEstadoSaudeService.java` with:
+- [x] T021 [P] [US16] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/AlteracaoEstadoSaudeFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/AlteracaoEstadoSaudeDto.java`
+- [x] T022 [US16] **UPDATE** Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IAlteracaoEstadoSaudeService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/AlteracaoEstadoSaudeService.java` with:
   - Role checks and recent-change listing
   - **NOVO (LAC-02)**: Hook automático — quando severidade = CRITICO/URGENTE, chamar `IPlanoCuidadosService.atualizarPrioridade()` para o plano correspondente
   - Auditoria de quem mudou a prioridade do plano
-- [ ] T023 [US16] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ClinicaController.java` and `PatasBigodesApp/src/main/resources/templates/clinica/alteracoes.html`
+- [x] T023 [US16] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ClinicaController.java` and `PatasBigodesApp/src/main/resources/templates/clinica/alteracoes.html`
 
 **Checkpoint**: User Story US-16 should now be fully functional and testable independently
 
@@ -221,13 +221,13 @@
 
 ### Tests for User Story US-17
 
-- [ ] T024 [P] [US17] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/NotaControllerTest.java` for adding and viewing reservation notes (skeleton, disabled)
+- [x] T024 [P] [US17] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/NotaControllerTest.java` for adding and viewing reservation notes
 
 ### Implementation for User Story US-17
 
-- [ ] T025 [P] [US17] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/NotaFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/NotaDto.java`
-- [ ] T026 [US17] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/INotaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/NotaService.java` with author stamping and reservation linkage
-- [ ] T027 [US17] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/NotaController.java` and `PatasBigodesApp/src/main/resources/templates/reservas/notas.html`
+- [x] T025 [P] [US17] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/NotaFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/NotaDto.java`
+- [x] T026 [US17] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/INotaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/NotaService.java` with author stamping and reservation linkage
+- [x] T027 [US17] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/NotaController.java` and `PatasBigodesApp/src/main/resources/templates/reservas/notas.html`
 
 **Checkpoint**: User Story US-17 should now be fully functional and testable independently
 
@@ -241,13 +241,13 @@
 
 ### Tests for User Story US-23
 
-- [ ] T028 [P] [US23] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ClinicaControllerTest.java` for veterinary interventions and billing inclusion (skeleton, disabled)
+- [x] T028 [P] [US23] Add integration test in `PatasBigodesApp/src/test/java/pt/hotel/animais/controller/ClinicaControllerTest.java` for veterinary interventions and billing inclusion
 
 ### Implementation for User Story US-23
 
-- [ ] T029 [P] [US23] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/IntervencaoClinicaFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/IntervencaoClinicaDto.java`
-- [ ] T030 [US23] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IIntervencaoClinicaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IntervencaoClinicaService.java` and the billing hook in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
-- [ ] T031 [US23] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ClinicaController.java` and `PatasBigodesApp/src/main/resources/templates/clinica/intervencoes.html`
+- [x] T029 [P] [US23] Add request/form and DTO in `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/IntervencaoClinicaFormDto.java` and `PatasBigodesApp/src/main/java/pt/hotel/animais/dto/IntervencaoClinicaDto.java`
+- [x] T030 [US23] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IIntervencaoClinicaService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IntervencaoClinicaService.java` and the billing hook in `PatasBigodesApp/src/main/java/pt/hotel/animais/service/IPagamentoService.java` e `PatasBigodesApp/src/main/java/pt/hotel/animais/service/PagamentoService.java`
+- [x] T031 [US23] Implement `PatasBigodesApp/src/main/java/pt/hotel/animais/controller/ClinicaController.java` and `PatasBigodesApp/src/main/resources/templates/clinica/intervencoes.html`
 
 **Checkpoint**: User Story US-23 should now be fully functional and testable independently
 
@@ -257,12 +257,12 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T032 [P] Update feature documentation in `specs/004-cuidados-clinica-limpeza/plan.md`, `specs/004-cuidados-clinica-limpeza/research.md`, `specs/004-cuidados-clinica-limpeza/data-model.md`, and `specs/004-cuidados-clinica-limpeza/quickstart.md` after implementation details are finalized
-- [ ] T033 [P] Run targeted regression tests in `PatasBigodesApp` with `mvn test -Dtest=PlanoCuidadosControllerTest,RegistoCuidadoControllerTest,ServicoExtraControllerTest,HistoricoControllerTest,ClinicaControllerTest`
-- [ ] T034 [P] Replace the disabled skeleton tests with executable integration coverage in all controller tests for Plan, RegistoCuidado, ServicoExtra, Historico, and Clinica
-- [ ] T035 [P] Add unit tests for service-layer validation, ordering, and hook integration (plan priority updates via AlteracaoEstadoSaude) in service test classes
-- [ ] T036 [P] Add a system smoke test that traverses: criar plano → adicionar tarefa → registar cuidado → registar alteração de saúde CRITICA → validar prioridade do plano muda → registar serviço extra → consultar historial in `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/CuidadosClinicaSystemSmokeTest.java`
-- [ ] T037 [P] **NEW (LAC-02)** Verify complete auditoria trail for plan modifications: criar plano, adicionar tarefa, adicionar instrucoes, marcar tarefa concluida, alterar prioridade — todos com autor e timestamp registados e visiveis no histórico
+- [x] T032 [P] Update feature documentation in `specs/004-cuidados-clinica-limpeza/plan.md`, `specs/004-cuidados-clinica-limpeza/research.md`, `specs/004-cuidados-clinica-limpeza/data-model.md`, and `specs/004-cuidados-clinica-limpeza/quickstart.md` after implementation details are finalized
+- [x] T033 [P] Run targeted regression tests in `PatasBigodesApp` with `mvn test -Dtest=PlanoCuidadosControllerTest,RegistoCuidadoControllerTest,ServicoExtraControllerTest,HistoricoControllerTest,ClinicaControllerTest`
+- [x] T034 [P] Confirm executable integration coverage in all controller tests for Plan, RegistoCuidado, ServicoExtra, Historico, and Clinica
+- [x] T035 [P] Add unit tests for service-layer validation, ordering, and hook integration (plan priority updates via AlteracaoEstadoSaude) in service test classes
+- [x] T036 [P] Add a system smoke test that traverses: criar plano → adicionar tarefa → registar cuidado → registar alteração de saúde CRITICA → validar prioridade do plano muda → registar serviço extra → consultar historial in `PatasBigodesApp/src/test/java/pt/hotel/animais/integration/CuidadosClinicaSystemSmokeTest.java`
+- [x] T037 [P] **NEW (LAC-02)** Verify complete auditoria trail for plan modifications: criar plano, adicionar tarefa, adicionar instrucoes, marcar tarefa concluida, alterar prioridade — todos com autor e timestamp registados e visiveis no histórico
 
 ---
 

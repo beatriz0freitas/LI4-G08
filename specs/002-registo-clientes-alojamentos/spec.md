@@ -2,7 +2,7 @@
 
 **Feature Branch**: `002-registo-clientes-alojamentos`  
 **Created**: 2026-05-05  
-**Status**: Draft  
+**Status**: Implementado e validado em Etapa 4
 **Phase**: Fase 2 do Plano de Implementação Gradual  
 **Mapped Use Cases**: UC-03 (Registar Tutor e Animal), UC-04 (Criar Reserva)  
 **Mapped User Stories**: US-06, US-08, US-09, US-12  

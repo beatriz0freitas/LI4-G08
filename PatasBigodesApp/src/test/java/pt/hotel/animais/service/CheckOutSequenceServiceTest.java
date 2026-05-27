@@ -24,6 +24,7 @@ class CheckOutSequenceServiceTest {
     @Autowired private AnimalRepository animalRepository;
     @Autowired private AlojamentoRepository alojamentoRepository;
     @Autowired private ReservaRepository reservaRepository;
+    @Autowired private PlanoCuidadosRepository planoCuidadosRepository;
 
     @Test
     void sequenciaCheckInCheckOutTerminaEstadiaERegistaDoisPagamentos() {
@@ -34,6 +35,7 @@ class CheckOutSequenceServiceTest {
 
         assertThat(terminada.getEstado()).isEqualTo(EstadoEstadia.TERMINADA);
         assertThat(terminada.getDataFim()).isNotNull();
+        assertThat(planoCuidadosRepository.findByEstadiaId(estadia.getId()).orElseThrow().getAtivo()).isFalse();
 
         var pagamentos = pagamentoRepository.findAll();
         assertThat(pagamentos).hasSize(2);

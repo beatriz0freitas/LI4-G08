@@ -1,72 +1,233 @@
 <!DOCTYPE html>
 <html lang="pt" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-	<th:block th:replace="fragments/head :: head"></th:block>
+	<th:block th:replace="~{fragments/head :: head}"></th:block>
+	<style>
+		.home-top-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 1rem;
+			align-items: stretch;
+		}
+		.quick-grid {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 1rem;
+			align-items: stretch;
+		}
+		.quick-card {
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			min-height: 190px;
+			border: 1px solid var(--ui-border);
+			border-radius: var(--ui-radius);
+			background: #fff;
+			padding: 1rem;
+			box-shadow: var(--ui-shadow);
+			transition: transform .15s ease, box-shadow .15s ease;
+		}
+		.quick-card:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 14px 35px rgba(15, 23, 36, .08);
+		}
+
+		.quick-card .icon {
+			width: 52px;
+			height: 52px;
+			border-radius: .9rem;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.2rem;
+			margin-bottom: .8rem;
+		}
+		.quick-card h3 {
+			font-size: 1.1rem;
+			margin-bottom: .35rem;
+		}
+		.quick-card p {
+			color: var(--ui-muted-text);
+			margin-bottom: .8rem;
+		}
+		.quick-card .card-actions {
+			margin-top: auto;
+			display: flex;
+			flex-wrap: wrap;
+			gap: .5rem;
+		}
+		.workflow {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+			gap: 1rem;
+			align-items: stretch;
+		}
+		.workflow-step {
+			background: #fff;
+			border: 1px solid var(--ui-border);
+			border-radius: var(--ui-radius);
+			padding: 1rem;
+			position: relative;
+			overflow: hidden;
+		}
+		.workflow-step::before {
+			content: '';
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 4px;
+			background: rgba(43, 108, 176, .18);
+		}
+		.workflow-step .number {
+			width: 34px;
+			height: 34px;
+			border-radius: 50%;
+			background: var(--ui-primary);
+			color: #fff;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 800;
+			margin-bottom: .85rem;
+		}
+		.workflow-step h4 {
+			font-size: 1rem;
+			font-weight: 700;
+			margin-bottom: .35rem;
+		}
+		.workflow-step p { color: var(--ui-muted-text); margin-bottom: 0; }
+		.explore-panel {
+			background: var(--ui-surface);
+			border: 1px solid var(--ui-border);
+			border-radius: var(--ui-radius);
+			padding: 1rem 1.15rem;
+		}
+		@media (max-width: 991.98px) {
+			.home-top-grid,
+			.workflow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+			.quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+		}
+		@media (max-width: 575.98px) {
+			.home-top-grid,
+			.workflow { grid-template-columns: 1fr; }
+			.quick-grid { grid-template-columns: 1fr; }
+		}
+	</style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
-	<th:block th:replace="fragments/navbar :: navbar"></th:block>
-	<th:block th:replace="fragments/sidebar :: sidebar"></th:block>
+	<th:block th:replace="~{fragments/navbar :: navbar}"></th:block>
+	<th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
 
 	<div class="content-wrapper">
-		<section class="content-header">
-			<div class="container-fluid">
-				<div class="row mb-2">
-					<div class="col-sm-6">
-						<h1>Início</h1>
-					</div>
-				</div>
-			</div>
-		</section>
-
 		<section class="content">
 			<div class="container-fluid">
-				<div class="row">
-					<div class="col-lg-3 col-md-6" sec:authorize="hasRole('DIRETOR')">
-						<a th:href="@{/dashboard}" class="small-box bg-info text-white text-decoration-none d-block">
-							<div class="inner">
-								<h3>Direção</h3>
-								<p>Dashboard e relatórios</p>
-							</div>
-							<div class="icon"><i class="fas fa-chart-line"></i></div>
+				
+				<div class="home-top-grid mb-4">
+					<div class="quick-card">
+						<div>
+							<span class="section-tag mb-2"><i class="fas fa-home"></i> Início</span>
+							<h2>Ação recomendada</h2>
+							<p>Começa pela disponibilidade para perceber ocupação, reservas e alojamentos prontos.</p>
+						</div>
+						<div class="card-actions" sec:authorize="hasAnyRole('DIRETOR','FUNCIONARIO_RECEPCAO')">
+							<a th:href="@{/reservas/disponibilidade}" class="btn btn-primary"><i class="fas fa-search mr-2"></i>Ver disponibilidade</a>
+							<a th:href="@{/reservas/novo}" class="btn btn-outline-primary"><i class="fas fa-calendar-plus mr-2"></i>Criar reserva</a>
+						</div>
+					</div>
+					<div class="quick-card">
+						<div>
+							<span class="section-tag mb-2"><i class="fas fa-route"></i> Fluxo</span>
+							<h2>Operação diária</h2>
+							<p>Os módulos abaixo estão agrupados por função para reduzires saltos entre páginas.</p>
+						</div>
+						<div class="card-actions">
+							<a th:href="@{/plano-cuidados}" class="btn btn-outline-primary btn-sm">Planos de cuidados</a>
+							<a th:href="@{/historico}" class="btn btn-outline-secondary btn-sm">Histórico</a>
+						</div>
+					</div>
+				</div>
+
+				<div class="explore-panel mb-4">
+					<div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+						<div>
+							<span class="section-tag mb-2"><i class="fas fa-compass"></i> Acesso rápido</span>
+							<h2 class="h4 mb-1">Módulos disponíveis para o teu perfil</h2>
+							<p class="text-muted mb-0">Cada cartão leva-te diretamente para o fluxo certo, sem passos desnecessários.</p>
+						</div>
+						<a th:href="@{/reservas/disponibilidade}" sec:authorize="hasAnyRole('DIRETOR','FUNCIONARIO_RECEPCAO')" class="btn btn-outline-primary mt-3 mt-md-0">
+							<i class="fas fa-search mr-2"></i>Começar pela disponibilidade
 						</a>
 					</div>
 
-					<div class="col-lg-3 col-md-6" sec:authorize="hasAnyRole('DIRETOR','FUNCIONARIO_RECEPCAO')">
-						<a th:href="@{/reservas}" class="small-box bg-success text-white text-decoration-none d-block">
-							<div class="inner">
-								<h3>Receção</h3>
-								<p>Tutores, animais e reservas</p>
+					<div class="quick-grid">
+						<div class="quick-card" sec:authorize="hasRole('DIRETOR')">
+							<div class="icon bg-info text-white"><i class="fas fa-chart-line"></i></div>
+							<h3>Direção</h3>
+							<p>Consulta os indicadores, relatórios e visões de controlo do hotel.</p>
+							<div class="card-actions">
+								<a th:href="@{/dashboard}" class="btn btn-primary btn-sm">Dashboard</a>
+								<a th:href="@{/relatorios}" class="btn btn-outline-primary btn-sm">Relatórios</a>
 							</div>
-							<div class="icon"><i class="fas fa-users"></i></div>
-						</a>
-					</div>
+						</div>
 
-					<div class="col-lg-3 col-md-6" sec:authorize="hasAnyRole('DIRETOR','CUIDADOR','MEDICO_VETERINARIO')">
-						<a th:href="@{/plano-cuidados}" class="small-box bg-warning text-white text-decoration-none d-block">
-							<div class="inner">
-								<h3>Cuidados</h3>
-								<p>Planos e registos</p>
+						<div class="quick-card" sec:authorize="hasAnyRole('DIRETOR','FUNCIONARIO_RECEPCAO')">
+							<div class="icon bg-success text-white"><i class="fas fa-calendar-check"></i></div>
+							<h3>Disponibilidade</h3>
+							<p>Vê rapidamente o estado dos alojamentos e cria reservas sem fricção.</p>
+							<div class="card-actions">
+								<a th:href="@{/reservas/disponibilidade}" class="btn btn-success btn-sm">Consultar</a>
+								<a th:href="@{/reservas/novo}" class="btn btn-outline-success btn-sm">Nova reserva</a>
 							</div>
-							<div class="icon"><i class="fas fa-notes-medical"></i></div>
-						</a>
-					</div>
+						</div>
 
-					<div class="col-lg-3 col-md-6" sec:authorize="hasAnyRole('DIRETOR','FUNCIONARIO_RECEPCAO','RESPONSAVEL_LIMPEZA')">
-						<a th:href="@{/limpeza}" class="small-box bg-secondary text-white text-decoration-none d-block">
-							<div class="inner">
-								<h3>Operação</h3>
-								<p>Alojamentos e limpeza</p>
+						<div class="quick-card" sec:authorize="hasAnyRole('DIRETOR','FUNCIONARIO_RECEPCAO','CUIDADOR','MEDICO_VETERINARIO')">
+							<div class="icon bg-warning text-white"><i class="fas fa-bed"></i></div>
+							<h3>Estadias</h3>
+							<p>Segue os planos de cuidados ativos, tarefas pendentes e históricos por animal.</p>
+							<div class="card-actions">
+								<a th:href="@{/plano-cuidados}" class="btn btn-warning btn-sm">Planos</a>
+								<a th:href="@{/estadias/lista}" class="btn btn-outline-warning btn-sm">Estadias</a>
 							</div>
-							<div class="icon"><i class="fas fa-broom"></i></div>
-						</a>
+						</div>
+
+						<div class="quick-card" sec:authorize="hasAnyRole('DIRETOR','FUNCIONARIO_RECEPCAO')">
+							<div class="icon bg-primary text-white"><i class="fas fa-users"></i></div>
+							<h3>Receção</h3>
+							<p>Centraliza tutores, animais e o ciclo completo de reservas.</p>
+							<div class="card-actions">
+								<a th:href="@{/tutores}" class="btn btn-primary btn-sm">Tutores</a>
+								<a th:href="@{/reservas}" class="btn btn-outline-primary btn-sm">Reservas</a>
+							</div>
+						</div>
+
+						<div class="quick-card" sec:authorize="hasAnyRole('DIRETOR','MEDICO_VETERINARIO')">
+							<div class="icon bg-danger text-white"><i class="fas fa-notes-medical"></i></div>
+							<h3>Clínica</h3>
+							<p>Regista intervenções, alterações de estado e acompanha a evolução clínica.</p>
+							<div class="card-actions">
+								<a th:href="@{/clinica}" class="btn btn-danger btn-sm">Abrir clínica</a>
+								<a th:href="@{/historico/eventos}" class="btn btn-outline-danger btn-sm">Histórico</a>
+							</div>
+						</div>
+
+						<div class="quick-card" sec:authorize="hasAnyRole('DIRETOR','RESPONSAVEL_LIMPEZA')">
+							<div class="icon bg-secondary text-white"><i class="fas fa-broom"></i></div>
+							<h3>Limpeza</h3>
+							<p>Segue os alojamentos pendentes e mantém a operação pronta para novas entradas.</p>
+							<div class="card-actions">
+								<a th:href="@{/limpeza}" class="btn btn-secondary btn-sm">Abrir limpeza</a>
+								<a th:href="@{/alojamentos}" class="btn btn-outline-secondary btn-sm">Alojamentos</a>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</section>
 	</div>
 
-	<th:block th:replace="fragments/footer :: footer"></th:block>
+	<th:block th:replace="~{fragments/footer :: footer}"></th:block>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>

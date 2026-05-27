@@ -70,11 +70,11 @@ class CheckOutIntegrationTest {
     @Test
     @WithMockUser(roles = "DIRETOR")
     void getFormComEstadiaIdValido_exibeResumoCheckOut() throws Exception {
-        Estadia estadia = criarEstadiaEmCurso("INT-CO-03");
+        criarEstadiaEmCurso("INT-CO-03");
 
-        mockMvc.perform(get("/estadias").param("estadiaId", String.valueOf(estadia.getId())))
+        mockMvc.perform(get("/estadias/lista"))
                .andExpect(status().isOk())
-               .andExpect(model().attributeExists("estadiaSelecionada"));
+               .andExpect(model().attributeExists("estadias"));
     }
 
     // ── helpers ──────────────────────────────────────────────────────────────

@@ -1,0 +1,316 @@
+@startuml
+title Sistema Patas & Bigodes - Diagrama de Classes de Domínio
+
+skinparam style strictuml
+skinparam shadowing false
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+
+top to bottom direction
+
+package "Dominio" {
+  package "Auditoria" {
+    class AuditoriaEvento <<entity>> {
+      -id: Long
+      -timestamp: LocalDateTime
+      -utilizador: Colaborador
+      -operacao: String
+      -entidade: String
+      -entityId: Long
+      -acao: String
+      -detalhes: Map<String, Object>
+      -resultado: ResultadoAuditoria
+      -motivoFalha: String
+    }
+  }
+
+  package "Enums" {
+    enum TipoColaborador {
+      DIRETOR
+      FUNCIONARIO_RECEPCAO
+      CUIDADOR
+      MEDICO_VETERINARIO
+      RESPONSAVEL_LIMPEZA
+    }
+
+    enum Especie {
+      CAO
+      GATO
+    }
+
+    enum EstadoSaude {
+      NORMAL
+      ALTERADO
+      CRITICO
+    }
+
+    enum EstadoLimpeza {
+      PENDENTE
+      CONCLUIDO
+    }
+
+    enum EstadoReserva {
+      ATIVA
+      CONFIRMADA
+      CANCELADA
+      CONCLUIDA
+    }
+
+    enum EstadoEstadia {
+      EM_CURSO
+      TERMINADA
+    }
+
+    enum MetodoPagamento {
+      NUMERARIO
+      CARTAO_DEBITO
+      CARTAO_CREDITO
+    }
+
+    enum MomentoPagamento {
+      CHECK_IN
+      CHECK_OUT
+      EXTRAS
+    }
+
+    enum EstadoPagamento {
+      LIQUIDADO
+      PENDENTE
+    }
+
+    enum PrioridadePlano {
+      ROTINA
+      URGENTE
+      CRITICO
+    }
+
+    enum PeriodicidadeTarefa {
+      UNICA
+      DIARIA
+      SEMANAL
+    }
+
+    enum ResultadoAuditoria {
+      SUCESSO
+      FALHA
+    }
+  }
+
+  class Colaborador <<entity>> {
+    -id: Long
+    -username: String
+    -nome: String
+    -email: String
+    -passwordHash: String
+    -tipoColaborador: TipoColaborador
+    -ativo: boolean
+    -dataCriacao: LocalDateTime
+    -ultimoLogin: LocalDateTime
+  }
+
+  class Tutor <<entity>> {
+    -id: Long
+    -nome: String
+    -nif: String
+    -contacto: String
+    -email: String
+    -dataRegisto: LocalDateTime
+    -animais: List<Animal>
+    -reservas: List<Reserva>
+  }
+
+  class Animal <<entity>> {
+    -id: Long
+    -tutor: Tutor
+    -nome: String
+    -especie: Especie
+    -raca: String
+    -dataNascimento: LocalDate
+    -peso: BigDecimal
+    -estadoSaude: EstadoSaude
+    -necessidadesAlimentares: String
+    -medicacaoCurso: String
+    -dataRegisto: LocalDateTime
+    -reservas: List<Reserva>
+  }
+
+  class Alojamento <<entity>> {
+    -id: Long
+    -identificacao: String
+    -tipo: String
+    -capacidade: Integer
+    -estadoLimpeza: EstadoLimpeza
+    -reservas: List<Reserva>
+  }
+
+  class Reserva <<entity>> {
+    -id: Long
+    -tutor: Tutor
+    -animal: Animal
+    -alojamento: Alojamento
+    -dataInicio: LocalDate
+    -dataFim: LocalDate
+    -estado: EstadoReserva
+    -dataCriacao: LocalDateTime
+    +isAtiva(): boolean
+    +isConfirmada(): boolean
+    +podeFazerCheckIn(): boolean
+    +podeSerCancelada(): boolean
+    +temSobreposicao(inicio: LocalDate, fim: LocalDate): boolean
+  }
+
+  class Estadia <<entity>> {
+    -id: Long
+    -reserva: Reserva
+    -dataInicio: LocalDateTime
+    -dataFim: LocalDateTime
+    -estado: EstadoEstadia
+    -dataCriacao: LocalDateTime
+  }
+
+  class Pagamento <<entity>> {
+    -id: Long
+    -estadia: Estadia
+    -valor: BigDecimal
+    -metodoPagamento: MetodoPagamento
+    -momentoPagamento: MomentoPagamento
+    -estadoPagamento: EstadoPagamento
+    -dataCriacao: LocalDateTime
+  }
+
+  class RegistoCuidado <<entity>> {
+    -id: Long
+    -estadia: Estadia
+    -descricao: String
+    -dataHora: LocalDateTime
+    -autorId: Long
+    -createdAt: LocalDateTime
+  }
+
+  class PlanoCuidados <<entity>> {
+    -id: Long
+    -animal: Animal
+    -estadia: Estadia
+    -dataInicio: LocalDateTime
+    -dataFim: LocalDateTime
+    -prioridade: PrioridadePlano
+    -ativo: Boolean
+    -instrucoes: String
+    -tarefas: List<TarefaCuidado>
+    -createdAt: LocalDateTime
+    -createdBy: Long
+    -updatedAt: LocalDateTime
+    -updatedBy: Long
+    +onCreate(): void
+    +onUpdate(): void
+  }
+
+  class TarefaCuidado <<entity>> {
+    -id: Long
+    -planoCuidados: PlanoCuidados
+    -tipo: String
+    -descricao: String
+    -periodicidade: PeriodicidadeTarefa
+    -dataHora: LocalDateTime
+    -concluida: Boolean
+    -autorConclusaoId: Long
+    -createdAt: LocalDateTime
+    -createdBy: Long
+  }
+
+  class Nota <<entity>> {
+    -id: Long
+    -reserva: Reserva
+    -descricao: String
+    -autorId: Long
+    -dataHora: LocalDateTime
+    -createdAt: LocalDateTime
+  }
+
+  class ServicoExtra <<entity>> {
+    -id: Long
+    -estadia: Estadia
+    -tipoServicoExtra: TipoServicoExtra
+    -custo: BigDecimal
+    -dataHora: LocalDateTime
+    -autorId: Long
+    -createdAt: LocalDateTime
+    +validarCusto(): void
+  }
+
+  class TipoServicoExtra <<entity>> {
+    -id: Long
+    -nome: String
+    -descricao: String
+    -ativo: Boolean
+    -dataCriacao: LocalDateTime
+  }
+
+  class IntervencaoClinica <<entity>> {
+    -id: Long
+    -estadia: Estadia
+    -descricao: String
+    -custo: BigDecimal
+    -dataHora: LocalDateTime
+    -medicoId: Long
+    -createdAt: LocalDateTime
+    +validarCusto(): void
+  }
+
+  class AlteracaoEstadoSaude <<entity>> {
+    -id: Long
+    -estadia: Estadia
+    -descricao: String
+    -severidade: EstadoSaude
+    -dataHora: LocalDateTime
+    -autorId: Long
+    -createdAt: LocalDateTime
+  }
+
+  class TipoAlojamentoTarifa <<entity>> {
+    -id: Long
+    -tipoAlojamento: String
+    -tarifaDiaria: BigDecimal
+    -ativo: Boolean
+    -dataCriacao: LocalDateTime
+    +validarTarifa(): void
+  }
+}
+
+' Relações de Associação e Composição do Domínio
+Tutor "1" o-- "0..*" Animal : animais
+Tutor "1" o-- "0..*" Reserva : reservas
+Animal "1" o-- "0..*" Reserva : reservas
+Alojamento "1" o-- "0..*" Reserva : reservas
+Reserva "1" -- "0..1" Estadia : origina
+Estadia "1" o-- "0..*" Pagamento : pagamentos
+Estadia "1" o-- "0..*" RegistoCuidado : registos
+Estadia "1" -- "0..1" PlanoCuidados : plano ativo
+PlanoCuidados "1" *-- "0..*" TarefaCuidado : tarefas
+Reserva "1" o-- "0..*" Nota : notas
+Estadia "1" o-- "0..*" ServicoExtra : servicos
+TipoServicoExtra "1" o-- "0..*" ServicoExtra : classifica
+Estadia "1" o-- "0..*" IntervencaoClinica : intervencoes
+Estadia "1" o-- "0..*" AlteracaoEstadoSaude : alteracoes
+Animal "1" o-- "0..*" PlanoCuidados : historico
+Colaborador "1" o-- "0..*" AuditoriaEvento : utilizador
+Alojamento ..> TipoAlojamentoTarifa : tarifa aplicável
+
+' Dependências de Enums
+Colaborador --> TipoColaborador
+Animal --> Especie
+Animal --> EstadoSaude
+Alojamento --> EstadoLimpeza
+Reserva --> EstadoReserva
+Estadia --> EstadoEstadia
+Pagamento --> MetodoPagamento
+Pagamento --> MomentoPagamento
+Pagamento --> EstadoPagamento
+PlanoCuidados --> PrioridadePlano
+TarefaCuidado --> PeriodicidadeTarefa
+AlteracaoEstadoSaude --> EstadoSaude
+AuditoriaEvento --> ResultadoAuditoria
+
+@enduml

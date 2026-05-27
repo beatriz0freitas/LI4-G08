@@ -18,7 +18,10 @@ import pt.hotel.animais.repository.TutorRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -59,14 +62,40 @@ class TutorAnimalControllerTemplateTest {
 
         mockMvc.perform(get("/tutores/" + tutor.getId()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("tutores/detail"));
+                .andExpect(view().name("tutores/detail"))
+                .andExpect(content().string(containsString("/tutores/" + tutor.getId() + "/animais/novo")))
+                .andExpect(content().string(containsString("/reservas/novo?tutorId=" + tutor.getId())))
+                .andExpect(content().string(containsString("step=passo2")));
 
         mockMvc.perform(get("/animais/" + animal.getId()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("animais/detail"));
+                .andExpect(view().name("animais/detail"))
+                .andExpect(content().string(containsString("/tutores/" + tutor.getId())))
+                .andExpect(content().string(containsString("/reservas/novo?tutorId=" + tutor.getId())))
+                .andExpect(content().string(containsString("animalId=" + animal.getId())))
+                .andExpect(content().string(containsString("step=passo3")));
 
         mockMvc.perform(get("/animais"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("animais/list"));
+
+        mockMvc.perform(get("/tutores/" + tutor.getId() + "/animais/novo"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("animais/form"));
+
+        mockMvc.perform(get("/reservas/novo")
+                        .param("tutorId", tutor.getId().toString())
+                        .param("step", "passo2"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("reservas/form"))
+                .andExpect(model().attribute("activeStep", "passo2"));
+
+        mockMvc.perform(get("/reservas/novo")
+                        .param("tutorId", tutor.getId().toString())
+                        .param("animalId", animal.getId().toString())
+                        .param("step", "passo3"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("reservas/form"))
+                .andExpect(model().attribute("activeStep", "passo3"));
     }
 }

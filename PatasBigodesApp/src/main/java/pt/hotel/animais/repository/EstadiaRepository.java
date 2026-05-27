@@ -2,6 +2,7 @@ package pt.hotel.animais.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.enums.EstadoEstadia;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +23,7 @@ public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
 		JOIN e.reserva r
 		JOIN r.tutor t
 		JOIN r.animal a
+		JOIN r.alojamento al
 		WHERE (:clienteId IS NULL OR t.id = :clienteId)
 		  AND (:animalId IS NULL OR a.id = :animalId)
 		  AND (:estado IS NULL OR e.estado = :estado)
@@ -33,12 +36,14 @@ public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
 		JOIN e.reserva r
 		JOIN r.tutor t
 		JOIN r.animal a
+		JOIN r.alojamento al
 		WHERE (:clienteId IS NULL OR t.id = :clienteId)
 		  AND (:animalId IS NULL OR a.id = :animalId)
 		  AND (:estado IS NULL OR e.estado = :estado)
 		  AND (:dataInicio IS NULL OR e.dataInicio >= :dataInicio)
 		  AND (:dataFim IS NULL OR e.dataFim <= :dataFim)
 		""")
+	@EntityGraph(attributePaths = {"reserva", "reserva.tutor", "reserva.animal", "reserva.alojamento"})
 	Page<Estadia> pesquisarHistorico(
 		@Param("clienteId") Long clienteId,
 		@Param("animalId") Long animalId,
@@ -69,6 +74,8 @@ public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
 		""")
 	long countAlojamentosOcupadosAgora();
 
+	List<Estadia> findByDataCriacaoBetweenOrderByDataCriacaoAsc(LocalDateTime inicio, LocalDateTime fim);
+
 	java.util.Optional<Estadia> findByReservaId(Long reservaId);
 
 	@Query("""
@@ -79,6 +86,17 @@ public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
 		  AND e.estado = pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO
 		""")
 	Optional<Estadia> findEmCursoPorAnimal(@Param("animalId") Long animalId);
+
+	@Query("""
+		SELECT e FROM Estadia e
+		JOIN FETCH e.reserva r
+		JOIN FETCH r.animal a
+		JOIN FETCH r.tutor t
+		JOIN FETCH r.alojamento al
+		WHERE al.id = :alojamentoId
+		  AND e.estado = pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO
+		""")
+	Optional<Estadia> findEmCursoPorAlojamentoComDetalhes(@Param("alojamentoId") Long alojamentoId);
 
 	@Query("""
 		SELECT e FROM Estadia e
@@ -112,5 +130,35 @@ public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
 		ORDER BY r.dataFim ASC, e.dataInicio ASC
 		""")
 	List<Estadia> findEstadiasEmCursoDashboard(Pageable pageable);
+
+	@Query("""
+		SELECT e FROM Estadia e
+		JOIN FETCH e.reserva r
+		JOIN FETCH r.animal a
+		JOIN FETCH a.tutor t
+		JOIN FETCH r.alojamento al
+		WHERE e.estado = pt.hotel.animais.model.enums.EstadoEstadia.EM_CURSO
+		ORDER BY al.identificacao ASC, a.nome ASC
+		""")
+	List<Estadia> findEstadiasEmCursoComDetalhes();
+
+	/**
+	 * Lista estadias com filtros opcionais, ordenadas por data de início DESC.
+	 */
+	@Query("""
+		SELECT e FROM Estadia e
+		JOIN FETCH e.reserva r
+		JOIN FETCH r.animal a
+		JOIN FETCH r.alojamento al
+		WHERE (:estado IS NULL OR e.estado = :estado)
+		  AND (:dataInicio IS NULL OR e.dataInicio >= :dataInicio)
+		  AND (:dataFim IS NULL OR e.dataInicio <= :dataFim)
+		ORDER BY e.dataInicio DESC
+		""")
+	List<Estadia> findComFiltros(
+		@Param("estado") EstadoEstadia estado,
+		@Param("dataInicio") LocalDateTime dataInicio,
+		@Param("dataFim") LocalDateTime dataFim
+	);
 
 }

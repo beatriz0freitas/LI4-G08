@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import pt.hotel.animais.config.SecurityConfig;
@@ -19,6 +20,7 @@ import pt.hotel.animais.service.IPlanoCuidadosService;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -26,6 +28,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -65,6 +68,25 @@ class PlanoCuidadosControllerTest {
         planoDto.setAtivo(true);
         planoDto.setInstrucoes("Sem instruções especiais");
         planoDto.setTarefas(List.of(tarefaDto));
+        planoDto.setAnimalNome("Luna");
+        planoDto.setAlojamentoIdentificacao("Box 01");
+        planoDto.setEstadoSaude("Normal");
+    }
+
+    @Test
+    @WithMockUser(roles = "CUIDADOR")
+    void entradaDePlanoCuidadosDeveApresentarQuadroAgregadoDoTurno() throws Exception {
+        when(planoCuidadosService.listarPlanosAtivosDoTurno()).thenReturn(List.of(planoDto));
+
+        mockMvc.perform(get("/plano-cuidados"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("cuidados/lista-planos"))
+            .andExpect(model().attributeExists("planosTurno"))
+            .andExpect(model().attribute("totalAnimais", 1))
+            .andExpect(model().attribute("tarefasPendentes", 1L))
+            .andExpect(model().attribute("activePage", "plano-cuidados"))
+            .andExpect(content().string(containsString("Progresso do turno")))
+            .andExpect(content().string(containsString("Luna")));
     }
 
     @Test
@@ -76,13 +98,14 @@ class PlanoCuidadosControllerTest {
             .andExpect(status().isOk())
             .andExpect(view().name("cuidados/plano"))
             .andExpect(model().attribute("plano", planoDto))
-            .andExpect(model().attribute("estadiaId", 1L));
+            .andExpect(model().attribute("estadiaId", 1L))
+            .andExpect(model().attribute("activePage", "plano-cuidados"));
     }
 
     @Test
     @WithMockUser(roles = "DIRETOR")
     void criarPlanoDeveRedirecionarParaPlanoDaEstadia() throws Exception {
-        when(planoCuidadosService.criarPlanoParaEstadia(1L, 1L)).thenReturn(planoDto);
+        when(planoCuidadosService.obterOuCriarPlanoParaEstadiaAtiva(1L)).thenReturn(planoDto);
 
         mockMvc.perform(post("/plano-cuidados/criar")
                 .with(csrf())
@@ -91,7 +114,7 @@ class PlanoCuidadosControllerTest {
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/plano-cuidados?estadiaId=1"));
 
-        verify(planoCuidadosService).criarPlanoParaEstadia(1L, 1L);
+        verify(planoCuidadosService).obterOuCriarPlanoParaEstadiaAtiva(1L);
     }
 
     @Test
@@ -154,13 +177,15 @@ class PlanoCuidadosControllerTest {
     @WithMockUser(roles = "CUIDADOR")
     void historicoPlanosDeveRenderizarHistoricoDoAnimal() throws Exception {
         when(planoCuidadosService.listarPlanosDoAnimal(eq(1L), any()))
-            .thenReturn(new PageImpl<>(List.of(planoDto)));
+            .thenReturn(new PageImpl<>(List.of(planoDto), PageRequest.of(0, 10), 11));
 
         mockMvc.perform(get("/plano-cuidados/animal/1/historico").param("page", "0"))
             .andExpect(status().isOk())
             .andExpect(view().name("cuidados/historico"))
             .andExpect(model().attributeExists("planosPage"))
-            .andExpect(model().attribute("animalId", 1L));
+            .andExpect(model().attribute("animalId", 1L))
+            .andExpect(content().string(containsString("/plano-cuidados/animal/1/historico?page=1")))
+            .andExpect(content().string(containsString("Próxima")));
     }
 
     @Test
@@ -170,7 +195,7 @@ class PlanoCuidadosControllerTest {
                 .with(csrf())
                 .param("estadiaId", "1"))
             .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("/estadias?estadiaId=1"));
+            .andExpect(redirectedUrl("/estadias/check-out?estadiaId=1&redirectTo=/estadias/1"));
 
         verify(planoCuidadosService).encerrarPlano(1L);
     }

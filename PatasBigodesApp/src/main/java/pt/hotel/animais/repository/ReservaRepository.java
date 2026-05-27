@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.enums.EstadoReserva;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,6 +58,19 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
         @Param("dataInicio") LocalDate dataInicio,
         @Param("dataFim") LocalDate dataFim
     );
+
+    @Query("SELECT r FROM Reserva r " +
+           "JOIN FETCH r.animal " +
+           "JOIN FETCH r.alojamento " +
+           "WHERE r.alojamento.id = :alojamentoId " +
+           "AND r.estado IN (pt.hotel.animais.model.enums.EstadoReserva.ATIVA, pt.hotel.animais.model.enums.EstadoReserva.CONFIRMADA) " +
+           "AND NOT (r.dataFim < :dataInicio OR r.dataInicio > :dataFim) " +
+           "ORDER BY r.dataInicio ASC")
+    List<Reserva> findActiveReservasInPeriodWithDetalhes(
+        @Param("alojamentoId") Long alojamentoId,
+        @Param("dataInicio") LocalDate dataInicio,
+        @Param("dataFim") LocalDate dataFim
+    );
     
     /**
      * Procura reservas ativas de um animal.
@@ -72,6 +86,13 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
      * Procura reservas de um tutor ordenadas por data de criação decrescente (mais recentes primeiro).
      */
     List<Reserva> findByTutorIdOrderByDataCriacaoDesc(Long tutorId);
+
+       List<Reserva> findByDataCriacaoBetweenOrderByDataCriacaoAsc(LocalDateTime inicio, LocalDateTime fim);
+
+    /**
+     * Procura reservas por estado ordenadas por data de início decrescente.
+     */
+    List<Reserva> findByEstadoOrderByDataInicioDesc(EstadoReserva estado);
 
     /**
      * Conta as reservas num determinado estado.

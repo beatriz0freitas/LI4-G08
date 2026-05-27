@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import pt.hotel.animais.model.PlanoCuidados;
 
 import java.util.Optional;
+import java.util.List;
 
 /**
  * Repositório para PlanoCuidados.
@@ -24,6 +25,13 @@ public interface PlanoCuidadosRepository extends JpaRepository<PlanoCuidados, Lo
      * Fetch plano ativo e único para estadia
      */
     Optional<PlanoCuidados> findUniqueActiveByEstadiaIdAndAtivoTrue(Long estadiaId);
+
+    /**
+     * Planos ativos disponíveis para acompanhamento operacional.
+     */
+    Page<PlanoCuidados> findByAtivoTrueOrderByDataInicioAsc(Pageable pageable);
+
+    List<PlanoCuidados> findByAtivoTrueOrderByDataInicioAsc();
 
     /**
      * Histórico de planos do animal (paginado, ordenado por data de início)

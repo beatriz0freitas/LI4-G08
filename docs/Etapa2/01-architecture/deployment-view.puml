@@ -1,91 +1,54 @@
-@startuml deployment_view
+@startuml
+title Sistema Patas & Bigodes - Diagrama de Implantacao
 
+skinparam style strictuml
+skinparam shadowing false
+skinparam linetype ortho
+skinparam defaultTextAlignment center
+skinparam backgroundColor white
 
 top to bottom direction
-skinparam shadowing true
-skinparam defaultTextAlignment center
-skinparam nodesep 55
-skinparam ranksep 55
 
-skinparam node {
-  BackgroundColor #EAF4FF
-  BorderColor #4A6FA5
-  RoundCorner 16
-}
-
-skinparam artifact {
-  BackgroundColor #FCECC9
-  BorderColor #B08B3E
-  RoundCorner 10
-}
-
-skinparam database {
-  BackgroundColor #DDF2D9
-  BorderColor #5B8A5A
-}
-
-skinparam folder {
-  BackgroundColor #F7F7F7
-  BorderColor #9A9A9A
-}
-
-skinparam note {
-  BackgroundColor #FAFAFA
-  BorderColor #A0A0A0
-}
-
-rectangle "Rede local do hotel" as LAN {
-
-  node "Posto Rececao" as WS_REC {
-    artifact "Browser\nChrome/Firefox/Edge" as B_REC
-  }
-
-  node "Posto Direcao" as WS_DIR {
-    artifact "Browser\nChrome/Firefox/Edge" as B_DIR
-  }
-
-  node "Posto Cuidados" as WS_CUID {
-    artifact "Browser\nChrome/Firefox/Edge" as B_CUID
-  }
-
-  node "Posto Veterinario" as WS_VET {
-    artifact "Browser\nChrome/Firefox/Edge" as B_VET
-  }
-
-  node "Posto Limpeza" as WS_LIMP {
-    artifact "Browser\nChrome/Firefox/Edge" as B_LIMP
-  }
-
-  node "Servidor do Hotel\nLinux/Windows Server ou Host Docker" as HOST {
-
-    node "Aplicacao Web\nJava 21 + Spring Boot 3" as APP {
-      artifact "app.jar\nTomcat integrado\nporta 8080" as JAR
-      artifact "Templates Thymeleaf\n+ ficheiros estaticos" as TPL
+node "Rede local do hotel" as LAN {
+  node "Postos de trabalho" as Workstations {
+    node "Posto Rececao" as PostoRececao {
+      artifact "Browser" as BrowserRececao
     }
 
-    database "MySQL \nbase hotelanimais\nporta 3306 interna" as DB
+    node "Posto Direcao" as PostoDirecao {
+      artifact "Browser" as BrowserDirecao
+    }
+
+    node "Posto Cuidados" as PostoCuidados {
+      artifact "Browser" as BrowserCuidados
+    }
+
+    node "Posto Veterinario" as PostoVeterinario {
+      artifact "Browser" as BrowserVeterinario
+    }
+
+    node "Posto Limpeza" as PostoLimpeza {
+      artifact "Browser" as BrowserLimpeza
+    }
+  }
+
+  node "Servidor / Host Docker" as Host {
+    node "hotelanimais-app" as AppContainer {
+      artifact "app.jar" as AppJar
+      artifact "Recursos da aplicacao web" as WebArtifacts
+    }
+
+    node "hotelanimais-db" as DbContainer {
+      database "hotelanimais" as Db
+    }
   }
 }
 
-B_REC --> APP : HTTP :8080
-B_DIR --> APP : HTTP :8080
-B_CUID --> APP : HTTP :8080
-B_VET --> APP : HTTP :8080
-B_LIMP --> APP : HTTP :8080
-
-APP --> DB : JDBC :3306
-
-note right of APP
-  A interface é renderizada no servidor
-  com Thymeleaf. Os postos precisam
-  apenas de browser.
-end note
-
-note right of DB
-  A base de dados não é acedida
-  diretamente pelos postos de trabalho.
-  Apenas a aplicação comunica por JDBC.
-end note
-
+BrowserRececao --> AppContainer : HTTP:8080
+BrowserDirecao --> AppContainer : HTTP:8080
+BrowserCuidados --> AppContainer : HTTP:8080
+BrowserVeterinario --> AppContainer : HTTP:8080
+BrowserLimpeza --> AppContainer : HTTP:8080
+AppContainer --> DbContainer : :3306
 
 @enduml
