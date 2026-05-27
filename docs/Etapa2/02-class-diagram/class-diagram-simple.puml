@@ -1,0 +1,44 @@
+@startuml
+title Sistema Patas & Bigodes - Diagrama de Classes Simplificado
+
+skinparam style strictuml
+skinparam shadowing false
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+
+top to bottom direction
+
+class Tutor <<entity>>
+class Animal <<entity>>
+class Alojamento <<entity>>
+class Reserva <<entity>>
+class Estadia <<entity>>
+class Pagamento <<entity>>
+class PlanoCuidados <<entity>>
+class TarefaCuidado <<entity>>
+class RegistoCuidado <<entity>>
+class Nota <<entity>>
+class ServicoExtra <<entity>>
+class TipoServicoExtra <<entity>>
+class IntervencaoClinica <<entity>>
+class AlteracaoEstadoSaude <<entity>>
+class Colaborador <<entity>>
+class AuditoriaEvento <<entity>>
+
+Tutor "1" o-- "0..*" Animal
+Tutor "1" o-- "0..*" Reserva
+Animal "1" o-- "0..*" Reserva
+Alojamento "1" o-- "0..*" Reserva
+Reserva "1" -- "0..1" Estadia
+Reserva "1" o-- "0..*" Nota
+Estadia "1" o-- "0..*" Pagamento
+Estadia "1" o-- "0..*" RegistoCuidado
+Estadia "1" -- "0..1" PlanoCuidados
+PlanoCuidados "1" *-- "0..*" TarefaCuidado
+Estadia "1" o-- "0..*" ServicoExtra
+TipoServicoExtra "1" o-- "0..*" ServicoExtra
+Estadia "1" o-- "0..*" IntervencaoClinica
+Estadia "1" o-- "0..*" AlteracaoEstadoSaude
+Colaborador "1" o-- "0..*" AuditoriaEvento
+
+@enduml

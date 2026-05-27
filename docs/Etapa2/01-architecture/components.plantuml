@@ -1,131 +1,153 @@
-@startuml Hotel de Animais — Diagrama de Componentes
+@startuml
+title Sistema Patas & Bigodes - Diagrama de Componentes
 
+skinparam style strictuml
 skinparam componentStyle uml2
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
 skinparam backgroundColor white
 skinparam defaultFontName Arial
-skinparam packageStyle rectangle
-skinparam linetype ortho
+skinparam nodesep 95
+skinparam ranksep 110
 
-interface "HTTP" as HTTP
+left to right direction
 
-package "Spring Security 6" {
-  [SecurityFilterChain\n(BCrypt · Sessão · CSRF)] as SEC
+actor "Utilizador" as Utilizador
+
+() "IColaboradorService" as IColaboradorService
+() "IDashboardService" as IDashboardService
+() "IAlojamentoService" as IAlojamentoService
+() "ITutorService" as ITutorService
+() "IAnimalService" as IAnimalService
+() "IReservaService" as IReservaService
+() "IEstadiaService" as IEstadiaService
+() "IPagamentoService" as IPagamentoService
+() "IRegistoCuidadoService" as IRegistoCuidadoService
+() "IPlanoCuidadosService" as IPlanoCuidadosService
+() "INotaService" as INotaService
+() "IServicoExtraService" as IServicoExtraService
+() "IClinicaService" as IClinicaService
+() "IIntervencaoClinicaService" as IIntervencaoClinicaService
+() "IAlteracaoEstadoSaudeService" as IAlteracaoEstadoSaudeService
+() "ILimpezaService" as ILimpezaService
+() "IHistoricoService" as IHistoricoService
+() "IRelatorioService" as IRelatorioService
+() "IRegraDominioService" as IRegraDominioService
+() "IAvailabilityDomainService" as IAvailabilityDomainService
+() "IAuditoriaService" as IAuditoriaService
+
+package "pt.hotel.animais.controller" as ControllerPkg {
+  component "AuthController" as AuthController
+  component "DashboardController" as DashboardController
+  component "AlojamentoController" as AlojamentoController
+  component "TutorAnimalController" as TutorAnimalController
+  component "AnimalController" as AnimalController
+  component "ReservaController" as ReservaController
+  component "EstadiaController" as EstadiaController
+  component "PagamentoController" as PagamentoController
+  component "RegistoCuidadoController" as RegistoCuidadoController
+  component "PlanoCuidadosController" as PlanoCuidadosController
+  component "NotaController" as NotaController
+  component "ServicoExtraController" as ServicoExtraController
+  component "ClinicaController" as ClinicaController
+  component "LimpezaController" as LimpezaController
+  component "HistoricoController" as HistoricoController
+  component "RelatorioController" as RelatorioController
+  component "ColaboradorController" as ColaboradorController
+  component "TipoAlojamentoTarifaController" as TipoAlojamentoTarifaController
+  component "TipoServicoExtraController" as TipoServicoExtraController
+  component "AuditoriaController" as AuditoriaController
 }
 
-package "Spring MVC — Infraestrutura" {
-  [DispatcherServlet] as DS
-  [HandlerMapping] as HM
-  [ViewResolver\n(Thymeleaf)] as VR
+package "pt.hotel.animais.service" as ServicePkg {
+  component "ColaboradorService" as ColaboradorService
+  component "DashboardService" as DashboardService
+  component "AlojamentoService" as AlojamentoService
+  component "TutorService" as TutorService
+  component "AnimalService" as AnimalService
+  component "ReservaService" as ReservaService
+  component "EstadiaService" as EstadiaService
+  component "PagamentoService" as PagamentoService
+  component "RegistoCuidadoService" as RegistoCuidadoService
+  component "PlanoCuidadosService" as PlanoCuidadosService
+  component "NotaService" as NotaService
+  component "ServicoExtraService" as ServicoExtraService
+  component "ClinicaService" as ClinicaService
+  component "IntervencaoClinicaService" as IntervencaoClinicaService
+  component "AlteracaoEstadoSaudeService" as AlteracaoEstadoSaudeService
+  component "LimpezaService" as LimpezaService
+  component "HistoricoService" as HistoricoService
+  component "RelatorioService" as RelatorioService
+  component "TipoAlojamentoTarifaService" as TipoAlojamentoTarifaService
+  component "TipoServicoExtraService" as TipoServicoExtraService
+  component "RegraDominioService" as RegraDominioService
+  component "AvailabilityDomainService" as AvailabilityDomainService
 }
 
-package "Camada de Apresentação" <<Rectangle>> {
-  [AuthController] as AC
-  [AlojamentoController] as ALC
-  [TutorAnimalController] as TAC
-  [ReservaController] as RC
-  [EstadiaController] as EC
-  [PagamentoController] as PC
-  [ServicoExtraController] as SERC
-  [ClinicaController] as CC
-  [LimpezaController] as LC
-  [RelatorioController] as RLC
-  [ColaboradorController] as COC
+package "pt.hotel.animais.service.auditoria" as AuditoriaServicePkg {
+  component "AuditoriaService" as AuditoriaService
+  component "AuditoriaOperacaoService" as AuditoriaOperacaoService
 }
 
-package "Camada de Aplicação" <<Rectangle>> {
-  [ColaboradorService] as CS
-  [AlojamentoService] as ALS
-  [TutorService] as TS
-  [AnimalService] as ANS
-  [ReservaService] as RS
-  [EstadiaService] as ES
-  [ServicoExtraService] as SES
-  [ClinicaService] as CLS
-  [PagamentoService] as PS
-  [LimpezaService] as LS
-  [RelatorioService] as RLS
+package "pt.hotel.animais.repository" as RepositoryPkg {
+  component "ColaboradorRepository" as ColaboradorRepository
+  component "AlojamentoRepository" as AlojamentoRepository
+  component "TutorRepository" as TutorRepository
+  component "AnimalRepository" as AnimalRepository
+  component "ReservaRepository" as ReservaRepository
+  component "EstadiaRepository" as EstadiaRepository
+  component "PagamentoRepository" as PagamentoRepository
+  component "RegistoCuidadoRepository" as RegistoCuidadoRepository
+  component "PlanoCuidadosRepository" as PlanoCuidadosRepository
+  component "TarefaCuidadoRepository" as TarefaCuidadoRepository
+  component "NotaRepository" as NotaRepository
+  component "ServicoExtraRepository" as ServicoExtraRepository
+  component "TipoServicoExtraRepository" as TipoServicoExtraRepository
+  component "IntervencaoClinicaRepository" as IntervencaoClinicaRepository
+  component "AlteracaoEstadoSaudeRepository" as AlteracaoEstadoSaudeRepository
+  component "TipoAlojamentoTarifaRepository" as TipoAlojamentoTarifaRepository
+  component "AuditoriaRepository" as AuditoriaRepository
 }
 
-package "Camada de Dados" <<Rectangle>> {
-  [ColaboradorRepository] as CR
-  [AlojamentoRepository] as ALR
-  [TutorRepository] as TR
-  [AnimalRepository] as ANR
-  [ReservaRepository] as RR
-  [EstadiaRepository] as ER
-  [ServicoExtraRepository] as SR
-  [ClinicaRepository] as CLR
-  [PagamentoRepository] as PR
-  [RegistoCuidadoRepository] as RCR
-}
+database "hotelanimais" as DB
 
-database "MySQL 8\n(dev/prod/testes integração)" as DB
+Utilizador -[hidden]right-> ControllerPkg
+ControllerPkg -[hidden]right-> ServicePkg
+ServicePkg -[hidden]right-> AuditoriaServicePkg
+AuditoriaServicePkg -[hidden]right-> RepositoryPkg
+RepositoryPkg -[hidden]right-> DB
 
-' Entrada
-HTTP --> SEC
+Utilizador --> AuthController
+Utilizador --> DashboardController
 
-' Security → DispatcherServlet
-SEC --> DS : autorizado
+ColaboradorService - IColaboradorService
+DashboardService - IDashboardService
+AlojamentoService - IAlojamentoService
+TutorService - ITutorService
+AnimalService - IAnimalService
+ReservaService - IReservaService
+EstadiaService - IEstadiaService
+PagamentoService - IPagamentoService
+RegistoCuidadoService - IRegistoCuidadoService
+PlanoCuidadosService - IPlanoCuidadosService
+NotaService - INotaService
+ServicoExtraService - IServicoExtraService
+ClinicaService - IClinicaService
+IntervencaoClinicaService - IIntervencaoClinicaService
+AlteracaoEstadoSaudeService - IAlteracaoEstadoSaudeService
+LimpezaService - ILimpezaService
+HistoricoService - IHistoricoService
+RelatorioService - IRelatorioService
+RegraDominioService - IRegraDominioService
+AvailabilityDomainService - IAvailabilityDomainService
+AuditoriaService - IAuditoriaService
 
-' DispatcherServlet usa HandlerMapping e ViewResolver
-DS ..> HM : <<usa>>
-DS ..> VR : <<usa>>
-
-' HandlerMapping → Controllers (dependência)
-HM ..> AC
-HM ..> ALC
-HM ..> TAC
-HM ..> RC
-HM ..> EC
-HM ..> PC
-HM ..> SERC
-HM ..> CC
-HM ..> LC
-HM ..> RLC
-HM ..> COC
-
-' Controllers → Services
-AC   --> CS
-ALC  --> ALS
-TAC  --> TS
-TAC  --> ANS
-RC   --> RS
-EC   --> ES
-PC   --> PS
-SERC --> SES
-CC   --> CLS
-CC   --> ANS
-LC   --> LS
-RLC  --> RLS
-COC  --> CS
-
-' Services → Repositories
-CS  --> CR
-ALS --> ALR
-TS  --> TR
-ANS --> ANR
-RS  --> RR
-RS  --> ALR
-ES  --> ER
-ES  --> RR
-SES --> SR
-CLS --> CLR
-PS  --> PR
-LS  --> ALR
-RLS --> RR
-RLS --> ER
-RLS --> PR
-
-' Repositories → BD
-CR  --> DB
-ALR --> DB
-TR  --> DB
-ANR --> DB
-RR  --> DB
-ER  --> DB
-SR  --> DB
-CLR --> DB
-PR  --> DB
-RCR --> DB
+ControllerPkg ..> ServicePkg
+ControllerPkg ..> AuditoriaServicePkg
+ServicePkg ..> AuditoriaServicePkg
+ServicePkg ..> RepositoryPkg
+AuditoriaServicePkg ..> RepositoryPkg
+RepositoryPkg --> DB
 
 @enduml

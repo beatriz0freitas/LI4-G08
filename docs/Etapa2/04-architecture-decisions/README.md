@@ -11,6 +11,9 @@ Este diretorio agrega as Decisoes Arquiteturais (ADR) da Etapa 2.
 - [ADR-06 - Isolamento da camada de apresentação através de DTOs](ADR-06-isolamento-apresentacao-dtos.md)
 - [ADR-07 - Utilização de Docker no ambiente de desenvolvimento e testes](ADR-07-docker-desenvolvimento-testes.md)
 - [ADR-08 - Auditoria funcional persistente própria](ADR-08-auditoria-funcional-persistente.md)
+- [ADR-09 - Catálogos persistentes para tarifas e serviços extra](ADR-09-catalogos-parametrizaveis-tarifas-servicos.md)
+- [ADR-10 - Plano de cuidados dinâmico associado a animal e estadia](ADR-10-plano-cuidados-dinamico.md)
+- [ADR-11 - Exportação de relatórios com agregação única e geração PDF/CSV](ADR-11-exportacao-relatorios-pdf-csv-agregacao.md)
 
 ## Convencoes
 - Estado: Proposto | Aceite | Rejeitado | Substituido.

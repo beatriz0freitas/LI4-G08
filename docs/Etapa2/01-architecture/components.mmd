@@ -1,115 +1,134 @@
-%% Diagrama de Componentes — Hotel de Animais
-%% Arquitetura Spring MVC em camadas (Etapa 2)
+%% Diagrama de Componentes - Sistema Patas & Bigodes
+%% Representacao Mermaid aproximada da notacao lollipop UML.
 
-graph TB
+flowchart LR
+    Utilizador([Utilizador])
 
-    subgraph Browser["Browser (Utilizador)"]
-        UI["Interface Web\n(Thymeleaf HTML + Bootstrap 5)"]
+    subgraph Controllers["pt.hotel.animais.controller"]
+        AuthController["<<component>><br/>AuthController"]
+        DashboardController["<<component>><br/>DashboardController"]
+        AlojamentoController["<<component>><br/>AlojamentoController"]
+        TutorAnimalController["<<component>><br/>TutorAnimalController"]
+        AnimalController["<<component>><br/>AnimalController"]
+        ReservaController["<<component>><br/>ReservaController"]
+        EstadiaController["<<component>><br/>EstadiaController"]
+        PagamentoController["<<component>><br/>PagamentoController"]
+        RegistoCuidadoController["<<component>><br/>RegistoCuidadoController"]
+        PlanoCuidadosController["<<component>><br/>PlanoCuidadosController"]
+        NotaController["<<component>><br/>NotaController"]
+        ServicoExtraController["<<component>><br/>ServicoExtraController"]
+        ClinicaController["<<component>><br/>ClinicaController"]
+        LimpezaController["<<component>><br/>LimpezaController"]
+        HistoricoController["<<component>><br/>HistoricoController"]
+        RelatorioController["<<component>><br/>RelatorioController"]
+        ColaboradorController["<<component>><br/>ColaboradorController"]
+        TipoAlojamentoTarifaController["<<component>><br/>TipoAlojamentoTarifaController"]
+        TipoServicoExtraController["<<component>><br/>TipoServicoExtraController"]
+        AuditoriaController["<<component>><br/>AuditoriaController"]
     end
 
-    subgraph SpringBoot["Servidor Spring Boot 3 (Tomcat embarcado)"]
-
-        subgraph Security["Spring Security 6"]
-            SF["SecurityFilterChain\n(BCrypt + Sessão HTTP + CSRF)"]
-        end
-
-        subgraph Controllers["Camada de Apresentação (@Controller)"]
-            AC["AuthController"]
-            ALC["AlojamentoController"]
-            TAC["TutorAnimalController"]
-            RC["ReservaController"]
-            EC["EstadiaController"]
-            PC["PagamentoController"]
-            SEC["ServicoExtraController"]
-            CC["ClinicaController"]
-            LC["LimpezaController"]
-            RLC["RelatorioController"]
-            COC["ColaboradorController"]
-        end
-
-        subgraph Services["Camada de Aplicação (@Service + @Transactional)"]
-            CS["ColaboradorService"]
-            ALS["AlojamentoService"]
-            TS["TutorService"]
-            ANS["AnimalService"]
-            RS["ReservaService"]
-            ES["EstadiaService"]
-            SES["ServicoExtraService"]
-            CLS["ClinicaService"]
-            PS["PagamentoService"]
-            LS["LimpezaService"]
-            RLS["RelatorioService"]
-        end
-
-        subgraph Domain["Camada de Domínio (@Entity + Enums)"]
-            COL["Colaborador"]
-            TUT["Tutor"]
-            ANI["Animal"]
-            ALO["Alojamento"]
-            RES["Reserva"]
-            EST["Estadia"]
-            PAG["Pagamento"]
-            SRV["ServicoExtra"]
-            INT["IntervencaoClinica"]
-            REG["RegistoCuidado"]
-            NOT["Nota"]
-        end
-
-        subgraph Repositories["Camada de Dados (@Repository — Spring Data JPA)"]
-            CR["ColaboradorRepository"]
-            ALR["AlojamentoRepository"]
-            TR["TutorRepository"]
-            ANR["AnimalRepository"]
-            RR["ReservaRepository"]
-            ER["EstadiaRepository"]
-            SR["ServicoExtraRepository"]
-            CLR["ClinicaRepository"]
-            PR["PagamentoRepository"]
-            RCR["RegistoCuidadoRepository"]
-        end
-
+    subgraph Services["pt.hotel.animais.service"]
+        ColaboradorService["<<component>><br/>ColaboradorService"]
+        DashboardService["<<component>><br/>DashboardService"]
+        AlojamentoService["<<component>><br/>AlojamentoService"]
+        TutorService["<<component>><br/>TutorService"]
+        AnimalService["<<component>><br/>AnimalService"]
+        ReservaService["<<component>><br/>ReservaService"]
+        EstadiaService["<<component>><br/>EstadiaService"]
+        PagamentoService["<<component>><br/>PagamentoService"]
+        RegistoCuidadoService["<<component>><br/>RegistoCuidadoService"]
+        PlanoCuidadosService["<<component>><br/>PlanoCuidadosService"]
+        NotaService["<<component>><br/>NotaService"]
+        ServicoExtraService["<<component>><br/>ServicoExtraService"]
+        ClinicaService["<<component>><br/>ClinicaService"]
+        IntervencaoClinicaService["<<component>><br/>IntervencaoClinicaService"]
+        AlteracaoEstadoSaudeService["<<component>><br/>AlteracaoEstadoSaudeService"]
+        LimpezaService["<<component>><br/>LimpezaService"]
+        HistoricoService["<<component>><br/>HistoricoService"]
+        RelatorioService["<<component>><br/>RelatorioService"]
+        TipoAlojamentoTarifaService["<<component>><br/>TipoAlojamentoTarifaService"]
+        TipoServicoExtraService["<<component>><br/>TipoServicoExtraService"]
+        RegraDominioService["<<component>><br/>RegraDominioService"]
+        AvailabilityDomainService["<<component>><br/>AvailabilityDomainService"]
     end
 
-    subgraph Database["Base de Dados"]
-        MySQL["MySQL 8\n(dev/prod/testes integração)"]
+    subgraph AuditoriaServices["pt.hotel.animais.service.auditoria"]
+        AuditoriaService["<<component>><br/>AuditoriaService"]
+        AuditoriaOperacaoService["<<component>><br/>AuditoriaOperacaoService"]
     end
 
-    %% Fluxo de pedido
-    UI -->|HTTP GET/POST| SF
-    SF -->|autorizado| Controllers
-    Controllers --> Services
-    Services --> Domain
-    Services --> Repositories
-    Repositories -->|JPA/Hibernate| MySQL
+    subgraph Repositories["pt.hotel.animais.repository"]
+        ColaboradorRepository["<<component>><br/>ColaboradorRepository"]
+        AlojamentoRepository["<<component>><br/>AlojamentoRepository"]
+        TutorRepository["<<component>><br/>TutorRepository"]
+        AnimalRepository["<<component>><br/>AnimalRepository"]
+        ReservaRepository["<<component>><br/>ReservaRepository"]
+        EstadiaRepository["<<component>><br/>EstadiaRepository"]
+        PagamentoRepository["<<component>><br/>PagamentoRepository"]
+        RegistoCuidadoRepository["<<component>><br/>RegistoCuidadoRepository"]
+        PlanoCuidadosRepository["<<component>><br/>PlanoCuidadosRepository"]
+        TarefaCuidadoRepository["<<component>><br/>TarefaCuidadoRepository"]
+        NotaRepository["<<component>><br/>NotaRepository"]
+        ServicoExtraRepository["<<component>><br/>ServicoExtraRepository"]
+        TipoServicoExtraRepository["<<component>><br/>TipoServicoExtraRepository"]
+        IntervencaoClinicaRepository["<<component>><br/>IntervencaoClinicaRepository"]
+        AlteracaoEstadoSaudeRepository["<<component>><br/>AlteracaoEstadoSaudeRepository"]
+        TipoAlojamentoTarifaRepository["<<component>><br/>TipoAlojamentoTarifaRepository"]
+        AuditoriaRepository["<<component>><br/>AuditoriaRepository"]
+    end
 
-    %% Ligações Controller → Service
-    AC --> CS
-    ALC --> ALS
-    TAC --> TS
-    TAC --> ANS
-    RC --> RS
-    EC --> ES
-    PC --> PS
-    SEC --> SES
-    CC --> CLS
-    CC --> ANS
-    LC --> LS
-    RLC --> RLS
-    COC --> CS
+    IColaboradorService(("IColaboradorService"))
+    IDashboardService(("IDashboardService"))
+    IAlojamentoService(("IAlojamentoService"))
+    ITutorService(("ITutorService"))
+    IAnimalService(("IAnimalService"))
+    IReservaService(("IReservaService"))
+    IEstadiaService(("IEstadiaService"))
+    IPagamentoService(("IPagamentoService"))
+    IRegistoCuidadoService(("IRegistoCuidadoService"))
+    IPlanoCuidadosService(("IPlanoCuidadosService"))
+    INotaService(("INotaService"))
+    IServicoExtraService(("IServicoExtraService"))
+    IClinicaService(("IClinicaService"))
+    IIntervencaoClinicaService(("IIntervencaoClinicaService"))
+    IAlteracaoEstadoSaudeService(("IAlteracaoEstadoSaudeService"))
+    ILimpezaService(("ILimpezaService"))
+    IHistoricoService(("IHistoricoService"))
+    IRelatorioService(("IRelatorioService"))
+    IRegraDominioService(("IRegraDominioService"))
+    IAvailabilityDomainService(("IAvailabilityDomainService"))
+    IAuditoriaService(("IAuditoriaService"))
 
-    %% Ligações Service → Repository (principais)
-    CS --> CR
-    ALS --> ALR
-    TS --> TR
-    ANS --> ANR
-    RS --> RR
-    RS --> ALR
-    ES --> ER
-    ES --> RR
-    SES --> SR
-    CLS --> CLR
-    PS --> PR
-    LS --> ALR
-    RLS --> RR
-    RLS --> ER
-    RLS --> PR
+    DB[("hotelanimais")]
+
+    Utilizador --> AuthController
+    Utilizador --> DashboardController
+
+    ColaboradorService --- IColaboradorService
+    DashboardService --- IDashboardService
+    AlojamentoService --- IAlojamentoService
+    TutorService --- ITutorService
+    AnimalService --- IAnimalService
+    ReservaService --- IReservaService
+    EstadiaService --- IEstadiaService
+    PagamentoService --- IPagamentoService
+    RegistoCuidadoService --- IRegistoCuidadoService
+    PlanoCuidadosService --- IPlanoCuidadosService
+    NotaService --- INotaService
+    ServicoExtraService --- IServicoExtraService
+    ClinicaService --- IClinicaService
+    IntervencaoClinicaService --- IIntervencaoClinicaService
+    AlteracaoEstadoSaudeService --- IAlteracaoEstadoSaudeService
+    LimpezaService --- ILimpezaService
+    HistoricoService --- IHistoricoService
+    RelatorioService --- IRelatorioService
+    RegraDominioService --- IRegraDominioService
+    AvailabilityDomainService --- IAvailabilityDomainService
+    AuditoriaService --- IAuditoriaService
+
+    Controllers -.-> Services
+    Controllers -.-> AuditoriaServices
+    Services -.-> AuditoriaServices
+    Services -.-> Repositories
+    AuditoriaServices -.-> Repositories
+    Repositories --> DB

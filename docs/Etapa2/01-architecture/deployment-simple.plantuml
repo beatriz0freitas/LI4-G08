@@ -1,0 +1,28 @@
+@startuml
+title Sistema Patas & Bigodes - Diagrama de Implantacao Simplificado
+
+skinparam style strictuml
+skinparam shadowing false
+skinparam linetype ortho
+skinparam defaultTextAlignment center
+skinparam nodesep 80
+skinparam ranksep 95
+
+top to bottom direction
+
+node "Postos do hotel" as Workstations {
+  artifact "Browser" as Browser
+}
+
+node "Servidor / Host Docker" as Host {
+  node "hotelanimais-app" as App
+  node "hotelanimais-db" as DbNode {
+    database "hotelanimais" as Db
+    artifact "mysql_data" as Volume
+  }
+}
+
+Browser --> App : :8080
+App --> Db : :3306
+
+@enduml
