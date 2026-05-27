@@ -48,7 +48,7 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-        <!-- Auditoria e endpoints operacionais Spring Boot -->
+        <!-- Monitorização operacional (health/info); auditoria é persistida pela aplicação -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>

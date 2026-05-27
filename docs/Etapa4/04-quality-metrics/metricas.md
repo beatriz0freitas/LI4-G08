@@ -95,7 +95,7 @@ A norma ISO/IEC 25010 define um modelo de qualidade de produto de software com 8
 |--------------------|-----------|-----------|
 | Confidencialidade | Alta | Passwords em BCrypt; acesso condicionado por autenticação |
 | Integridade | Alta | CSRF ativo e validação de entradas |
-| Não repúdio | Média | Eventos de auditoria configurados; sem trilha de auditoria funcional completa testada |
+| Não repúdio | Alta | Auditoria funcional persistida em `AuditoriaEvento`; `AuditoriaServiceTest` e `RelatorioServiceTest` validam também o rasto de relatórios |
 | Responsabilização | Alta | Perfis `DIRETOR`, `FUNCIONARIO_RECEPCAO`, `CUIDADOR`, `MEDICO_VETERINARIO`, `RESPONSAVEL_LIMPEZA` |
 | Autenticidade | Alta | Spring Security com formulário de login e logout |
 

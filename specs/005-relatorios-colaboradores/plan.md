@@ -1,6 +1,6 @@
 # Plano de Implementação — Relatórios e Colaboradores (Spec 005)
 
-**Atualizado**: 2026-05-27 (incorpora LAC-13 — Auditoria + **LAC-14 — PDF Validity & Grouping Integration**)
+**Atualizado**: 2026-05-27 (incorpora LAC-13 — auditoria própria exclusiva + **LAC-14 — PDF Validity & Grouping Integration**)
 
 ## Visão Geral
 
@@ -169,7 +169,7 @@ Objetivo: implementar geração/exportação de relatórios operacionais com PDF
 - Lista de colaboradores reflete alterações imediatamente.
 
 ### Auditoria *(NOVO - LAC-13)*
-- **SC-008**: Cada operação crítica (criar/editar/cancelar reserva, check-in, check-out, pagamento, cuidados, clínica, limpeza, colaborador) registada com sucesso cria um evento em `AuditoriaEvento` com utilizador, operação, entidade, entityId, acao e resultado.
+- **SC-008**: Cada operação crítica (criar/editar/cancelar reserva, check-in, check-out, pagamento, cuidados, clínica, limpeza, relatório, colaborador) registada com sucesso cria um evento em `AuditoriaEvento` com utilizador, operação, entidade, ação e resultado; `entityId` é opcional apenas quando não existe entidade persistida afetada.
 - **SC-009**: O `DIRETOR` consegue consultar a auditoria filtrada por data, utilizador autenticado e operação, com resultados retendo 12 meses históricos.
 - Eventos malformados ou com utilizador nulo não são aceites; lançam exceção ou são registados com resultado=FALHA.
 - Consulta de auditoria responde em tempo real para períodos até 1 mês; períodos maiores podem usar paginação.
@@ -239,7 +239,7 @@ Objetivo: implementar geração/exportação de relatórios operacionais com PDF
 
 ### Dependências Técnicas
 - Maven: plugin Javadoc configurado em `pom.xml`.
-- Spring Boot: versão com suporte a `@EventListener` e `AuditorApplicationEvent` (se usar Spring Boot Actuator; alternativa: publicador manual).
+- Spring Boot: o Actuator fica reservado a monitorização operacional; os eventos funcionais são persistidos exclusivamente por `AuditoriaOperacaoService`/`AuditoriaService`.
 - JPA/Hibernate: converter JSON ou usar biblioteca como Jackson para `detalhes`.
 - BD: suporte a tipo JSON (PostgreSQL `jsonb`, MySQL `json`, H2 `json`).
 - **[LAC-14]** PDFBox: dependência Maven `org.apache.pdfbox:pdfbox:3.0.0` (ou versão mais recente).

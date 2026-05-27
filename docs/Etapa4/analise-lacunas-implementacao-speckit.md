@@ -581,9 +581,9 @@ Também contraria a orientação arquitetural de separar controladores, serviço
 
 **Estado após correção**
 
-Resolvida em termos de fundação, consulta e integração das operações críticas existentes. A auditoria foi consolidada em `AuditoriaEvento`, `IAuditoriaService`/`AuditoriaService`, `AuditoriaController`, job de retenção e integrações com colaboradores, reservas existentes, check-in, check-out, pagamentos, cuidados, serviços extra, intervenções clínicas e limpeza. A única exceção explicitamente mantida é `EDITAR_RESERVA`, porque a aplicação ainda não tem fluxo de edição de reserva.
+Resolvida em termos de fundação, consulta e integração das operações críticas existentes. A auditoria foi consolidada em `AuditoriaEvento`, `IAuditoriaService`/`AuditoriaService`, `AuditoriaController`, job de retenção e integrações com colaboradores, relatórios, reservas existentes, check-in, check-out, pagamentos, cuidados, serviços extra, intervenções clínicas e limpeza. Em 27/05/2026, `RELATORIO_GERADO` deixou de usar o rasto Actuator em memória e passou a ser persistido pelo serviço próprio, com `entityId` nulo por não existir entidade de relatório persistida. A única exceção explicitamente mantida é `EDITAR_RESERVA`, porque a aplicação ainda não tem fluxo de edição de reserva.
 
-Evidência de validação: `AuditoriaServiceTest`, `AuditoriaControllerTest`, `AuditoriaIntegrationTest`, `AuditoriaRepositoryIntegrationTest` e `AuditoriaSchedulerJobTest`.
+Evidência de validação: `AuditoriaServiceTest`, `RelatorioServiceTest`, `AuditoriaControllerTest`, `AuditoriaIntegrationTest`, `AuditoriaRepositoryIntegrationTest`, `AuditoriaSchedulerJobTest` e `HotelAnimaisApplicationTests` com Flyway aplicado até `V13`.
 
 **Problema identificado originalmente**
 
@@ -606,7 +606,7 @@ Isto é relevante para responsabilização, depuração e avaliação de qualida
 
 Clarificação executada com sucesso em sessão de `speckit.clarify`. Respostas consolidadas:
 
-1. **Ámbito**: Auditoria Completa — todas as operações críticas (criar/editar/cancelar reserva, check-in, check-out, pagamento, cuidados, clínica, limpeza, colaboradores).
+1. **Ámbito**: Auditoria Completa — todas as operações críticas (criar/editar/cancelar reserva, check-in, check-out, pagamento, cuidados, clínica, limpeza, relatórios, colaboradores).
 2. **Formato**: Tabela dedicada `AuditoriaEvento` com 10 campos (id, timestamp, utilizadorId, operacao, entidade, entityId, acao, detalhes JSON, resultado, motivoFalha).
 3. **Retenção**: 12 meses, acesso restrito a `DIRETOR`, com filtros por data/utilizador/operação.
 
@@ -621,6 +621,7 @@ Clarificação executada com sucesso em sessão de `speckit.clarify`. Respostas 
 1. `docs/auditoria-interface.md` foi publicado com o contrato de integração.
 2. A fundação de auditoria da spec 005 encontra-se implementada.
 3. A integração com specs 003 e 004 cobre os fluxos existentes; `EDITAR_RESERVA` fica assinalado apenas porque esse fluxo ainda não faz parte da aplicação.
+4. A arquitetura elimina `AuditEventRepository`, `AuditApplicationEvent` e o endpoint `auditevents`; o Actuator permanece apenas para monitorização operacional.
 
 **Spec responsável**
 
