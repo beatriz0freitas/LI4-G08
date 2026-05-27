@@ -10,6 +10,7 @@ public class AuthController {
     @GetMapping("/")
     public String root(Model model) {
         model.addAttribute("activePage", "home");
+        model.addAttribute("pageTitle", "Início");
         return "home/index";
     }
 
