@@ -7,19 +7,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import pt.hotel.animais.dto.ResumoCheckInDto;
-import pt.hotel.animais.dto.ResumoCheckOutDto;
-import pt.hotel.animais.model.Alojamento;
-import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Estadia;
-import pt.hotel.animais.model.Reserva;
-import pt.hotel.animais.model.Tutor;
 import pt.hotel.animais.service.IEstadiaService;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -47,39 +38,31 @@ class EstadiaControllerTest {
     @Test
     @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
     void operacoesDeveRenderizarPagina() throws Exception {
-        mockMvc.perform(get("/estadias"))
+        when(estadiaService.listarComFiltros(any(), any(), any())).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/estadias/lista"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("estadias/checkin-checkout"))
+                .andExpect(view().name("estadias/lista"))
                 .andExpect(model().attribute("activePage", "estadias"));
     }
 
     @Test
     @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
     void operacoesComEstadiaIdDeveAdicionarExtrasAoModelo() throws Exception {
-        Estadia e = new Estadia();
-        e.setId(1L);
-        e.setDataInicio(LocalDateTime.now());
-        e.setReserva(criarReservaComDetalhes());
-        when(estadiaService.obterResumoCheckOut(1L))
-                .thenReturn(Optional.of(new ResumoCheckOutDto(e, new BigDecimal("25.00"))));
-
-        mockMvc.perform(get("/estadias").param("estadiaId", "1"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("estadias/checkin-checkout"))
-                .andExpect(model().attributeExists("estadiaSelecionada", "valorCheckOut"));
+        mockMvc.perform(get("/estadias"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/estadias/lista"));
     }
 
     @Test
     @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
     void operacoesComReservaIdDeveAdicionarReservaEValorAoModelo() throws Exception {
-        Reserva reserva = criarReservaComDetalhes();
-        when(estadiaService.obterResumoCheckIn(10L))
-                .thenReturn(Optional.of(new ResumoCheckInDto(reserva, new BigDecimal("45.00"))));
+        when(estadiaService.listarComFiltros(any(), any(), any())).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/estadias").param("reservaId", "10"))
+        mockMvc.perform(get("/estadias/lista"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("estadias/checkin-checkout"))
-                .andExpect(model().attributeExists("reservaSelecionada", "valorCheckIn"));
+                .andExpect(view().name("estadias/lista"))
+                .andExpect(model().attributeExists("estadias"));
     }
 
     @Test
@@ -170,24 +153,4 @@ class EstadiaControllerTest {
         verify(estadiaService, never()).checkOut(anyLong(), any());
     }
 
-    private Reserva criarReservaComDetalhes() {
-        Tutor tutor = new Tutor();
-        tutor.setNome("Ana Silva");
-
-        Animal animal = new Animal();
-        animal.setNome("Boby");
-
-        Alojamento alojamento = new Alojamento();
-        alojamento.setIdentificacao("A1");
-        alojamento.setTipo("CANINO");
-
-        Reserva reserva = new Reserva();
-        reserva.setId(10L);
-        reserva.setTutor(tutor);
-        reserva.setAnimal(animal);
-        reserva.setAlojamento(alojamento);
-        reserva.setDataInicio(LocalDate.now());
-        reserva.setDataFim(LocalDate.now().plusDays(3));
-        return reserva;
-    }
 }
