@@ -2,15 +2,23 @@ package pt.hotel.animais.controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import pt.hotel.animais.dto.ResumoCheckInDto;
+import pt.hotel.animais.dto.ResumoCheckOutDto;
+import pt.hotel.animais.model.Alojamento;
+import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Estadia;
+import pt.hotel.animais.model.Reserva;
+import pt.hotel.animais.model.Tutor;
 import pt.hotel.animais.service.IEstadiaService;
 
-import java.util.Collections;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -178,7 +186,6 @@ class EstadiaControllerTest {
         reserva.setAlojamento(alojamento);
         reserva.setDataInicio(LocalDate.now());
         reserva.setDataFim(LocalDate.now().plusDays(3));
-        reserva.setEstado(pt.hotel.animais.model.enums.EstadoReserva.ATIVA);
         return reserva;
     }
 }
