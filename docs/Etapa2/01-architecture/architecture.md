@@ -9,7 +9,7 @@
 
 ## 1. Visão Geral
 
-O sistema é uma aplicação web monolítica, organizada segundo o padrão arquitetural **MVC em camadas** (_Layered MVC_), implementada em **Java 21** com **Spring Boot 3.3.5**. A interface é renderizada no servidor com **Thymeleaf** e estilizada com **AdminLTE** e **Bootstrap 4.6**. A persistência é gerida por **Spring Data JPA** sobre uma base de dados relacional **MySQL**, com migrações versionadas por **Flyway**.
+O sistema é uma aplicação web monolítica, organizada segundo o padrão arquitetural **MVC em camadas** (_Layered MVC_), implementada em **Java 21** com **Spring Boot 3.3.5**. A interface é renderizada no servidor com **Thymeleaf** e estilizada com **AdminLTE** e **Bootstrap 4.6**. A persistência é gerida por **Spring Data JPA** sobre uma base de dados relacional **MySQL**, com migrações versionadas por **Flyway**. A exportação PDF de relatórios é produzida no servidor com **Apache PDFBox 3.0.0**.
 
 A escolha do monólito em camadas justifica-se pela dimensão do hotel (até 10 utilizadores simultâneos — RNF-01), pela necessidade de disponibilidade contínua em rede local (RNF-03) e pela exigência de uma implementação incremental controlada nas 3 semanas previstas para a Etapa 3.
 
@@ -402,6 +402,10 @@ As decisões detalhadas encontram-se nos ADRs da pasta `docs/Etapa2/04-architect
 - [ADR-05](../04-architecture-decisions/ADR-05-controlo-acesso-perfil.md) - Autenticação e autorização com controlo de acesso por perfil.
 - [ADR-06](../04-architecture-decisions/ADR-06-isolamento-apresentacao-dtos.md) - Isolamento da camada de apresentação através de DTOs.
 - [ADR-07](../04-architecture-decisions/ADR-07-docker-desenvolvimento-testes.md) - Utilização de Docker no ambiente de desenvolvimento e testes.
+- [ADR-08](../04-architecture-decisions/ADR-08-auditoria-funcional-persistente.md) - Auditoria funcional persistente própria.
+- [ADR-09](../04-architecture-decisions/ADR-09-catalogos-parametrizaveis-tarifas-servicos.md) - Catálogos persistentes para tarifas e serviços extra.
+- [ADR-10](../04-architecture-decisions/ADR-10-plano-cuidados-dinamico.md) - Plano de cuidados dinâmico associado a animal e estadia.
+- [ADR-11](../04-architecture-decisions/ADR-11-exportacao-relatorios-pdf-csv-agregacao.md) - Exportação de relatórios com agregação única e geração PDF/CSV.
 
 | ID | Decisão | Alternativa rejeitada | Justificação |
 |---|---|---|---|
@@ -412,6 +416,10 @@ As decisões detalhadas encontram-se nos ADRs da pasta `docs/Etapa2/04-architect
 | ADR-05 | Autenticação e autorização com controlo de acesso por perfil | Autorização só na interface | O controlo precisa de ser centralizado e consistente em toda a aplicação |
 | ADR-06 | Isolamento da camada de apresentação através de DTOs | Exposição direta de entidades | Reduz acoplamento e evita exposição desnecessária de dados |
 | ADR-07 | Utilização de Docker no ambiente de desenvolvimento e testes | Instalação manual por máquina | Garante ambientes reproduzíveis e reduz diferenças de configuração |
+| ADR-08 | Auditoria funcional persistente própria | Auditoria parcial em memória | Garante histórico consultável e retenção uniforme das operações críticas |
+| ADR-09 | Catálogos persistentes para tarifas e serviços extra | Enumerações ou texto livre | Permite gestão funcional de valores e nomes sem alteração de código |
+| ADR-10 | Plano de cuidados dinâmico associado a animal e estadia | Plano textual na estadia | Permite tarefas, progresso, consulta por turno e histórico por animal |
+| ADR-11 | Exportação de relatórios com agregação única e geração PDF/CSV | Lógica duplicada por formato | Mantém coerência entre vista web, CSV e PDF e limita pedidos síncronos extensos |
 
 ---
 
