@@ -1,7 +1,9 @@
 package pt.hotel.animais.dto;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,6 +22,7 @@ public class RelatorioResumoDto {
     private long pagamentosPendentes;
     private BigDecimal servicosExtraTotal = BigDecimal.ZERO;
     private Map<String, BigDecimal> faturacaoPorMetodo = new LinkedHashMap<>();
+    private List<RelatorioAgrupamentoDto> agrupamentos = new ArrayList<>();
 
     public long getAlojamentosTotal() { return alojamentosTotal; }
     public void setAlojamentosTotal(long alojamentosTotal) { this.alojamentosTotal = alojamentosTotal; }
@@ -39,4 +42,6 @@ public class RelatorioResumoDto {
     public void setServicosExtraTotal(BigDecimal servicosExtraTotal) { this.servicosExtraTotal = servicosExtraTotal; }
     public Map<String, BigDecimal> getFaturacaoPorMetodo() { return faturacaoPorMetodo; }
     public void setFaturacaoPorMetodo(Map<String, BigDecimal> faturacaoPorMetodo) { this.faturacaoPorMetodo = faturacaoPorMetodo; }
+    public List<RelatorioAgrupamentoDto> getAgrupamentos() { return agrupamentos; }
+    public void setAgrupamentos(List<RelatorioAgrupamentoDto> agrupamentos) { this.agrupamentos = agrupamentos; }
 }

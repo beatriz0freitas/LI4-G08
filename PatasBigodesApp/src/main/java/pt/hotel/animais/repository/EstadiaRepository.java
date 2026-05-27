@@ -69,6 +69,8 @@ public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
 		""")
 	long countAlojamentosOcupadosAgora();
 
+	List<Estadia> findByDataCriacaoBetweenOrderByDataCriacaoAsc(LocalDateTime inicio, LocalDateTime fim);
+
 	java.util.Optional<Estadia> findByReservaId(Long reservaId);
 
 	@Query("""
