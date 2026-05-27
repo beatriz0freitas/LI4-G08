@@ -90,7 +90,7 @@
                                     <td th:text="${estadia.alojamentoIdentificacao}">Alojamento</td>
                                     <td th:text="${#temporals.format(estadia.dataInicio, 'dd/MM/yyyy HH:mm')}">Check-in</td>
                                     <td>
-                                        <span th:if="${estadia.dataFim != null}" 
+                                        <span th:if="${estadia.dataFim != null}"
                                               th:text="${#temporals.format(estadia.dataFim, 'dd/MM/yyyy HH:mm')}">
                                         </span>
                                         <span th:unless="${estadia.dataFim != null}" class="text-muted">-</span>
