@@ -52,7 +52,7 @@ Define as entidades e campos usados pela feature de relatórios, gestão de cola
   - **Constraints**: `timestamp` deve corresponder ao `now()` do servidor; não permite datas futuras.
 
 ## Projections / DTOs
-- **RelatorioRequest**: `dataInicio`, `dataFim`, `tipoAlojamento?`, `incluirServicosExtra?`, `agruparPor` (DIA/SEMANA/MES)
+- **RelatorioRequest**: `dataInicio`, `dataFim`, `tipoAlojamento?`, `incluirServicosExtra?`, `agruparPor` (DIA/SEMANA/MES/ALOJAMENTO/COLABORADOR/TIPO_SERVICO)
 - **RelatorioResumoDTO**: `periodoStart`, `periodoEnd`, `ocupacaoPerc`, `estadiasCount`, `reservasCount`, `faturacaoTotal`, `faturacaoPorMetodo` (map), `servicosExtraTotal`
 - **AuditoriaFiltroDTO** *(novo, LAC-13)*: `dataInicio?`, `dataFim?`, `utilizadorId?`, `operacao?`, `entidade?`, `resultado?`
 - **AuditoriaEventoDTO** *(novo, LAC-13)*: `id`, `timestamp`, `utilizador` (nome ou email), `operacao`, `entidade`, `entityId`, `acao`, `detalhes`, `resultado`, `motivoFalha`

@@ -21,15 +21,15 @@ class Animal {
 }
 
 class TipoAlojamentoTarifa {
-  designacao
-  especieCompativel
-  capacidade
+  tipoAlojamento
   tarifaDiaria
   ativo
 }
 
 class Alojamento {
   identificacao
+  tipo
+  capacidade
   estadoLimpeza
 }
 
@@ -71,7 +71,7 @@ class Nota {
 
 class TipoServicoExtra {
   nome
-  precoBase
+  descricao
   ativo
 }
 
@@ -108,9 +108,10 @@ class Colaborador {
   perfil
 }
 
-class RegistoAuditoria {
+class AuditoriaEvento {
+  timestamp
   operacao
-  dataHora
+  entidade
   resultado
 }
 
@@ -170,7 +171,7 @@ class PrioridadePlano {
   <<enumeration>>
   ROTINA
   URGENTE
-  CRITICA
+  CRITICO
 }
 
 class PeriodicidadeTarefa {
@@ -189,6 +190,12 @@ class TipoColaborador {
   RESPONSAVEL_LIMPEZA
 }
 
+class ResultadoAuditoria {
+  <<enumeration>>
+  SUCESSO
+  FALHA
+}
+
 Tutor "1" -- "0..*" Animal : responsavel por
 Tutor "1" -- "0..*" Reserva : solicita
 Animal "1" -- "0..*" Reserva : tem
@@ -197,30 +204,24 @@ Alojamento "1" -- "0..*" Reserva : reservado em
 
 Reserva "1" -- "0..1" Estadia : origina
 Reserva "1" -- "0..*" Nota : contem
-Reserva "1" -- "0..*" TarefaCuidado : agenda
 
+Animal "1" -- "0..*" PlanoCuidados : mantem
 Estadia "1" -- "1" PlanoCuidados : ativa
 PlanoCuidados "1" -- "0..*" TarefaCuidado : organiza
 Estadia "1" -- "0..*" RegistoCuidado : regista
-Estadia "1" -- "0..*" Nota : contem
 Estadia "1" -- "0..*" ServicoExtra : inclui
 Estadia "1" -- "0..*" IntervencaoClinica : inclui
 Estadia "1" -- "0..*" AlteracaoEstadoSaude : regista
 Estadia "1" -- "0..*" Pagamento : gera
 
 TipoServicoExtra "1" -- "0..*" ServicoExtra : tipifica
-TipoServicoExtra "1" -- "0..*" TarefaCuidado : pode agendar
-
-Animal "1" -- "0..*" AlteracaoEstadoSaude : historico
-Animal "1" -- "0..*" IntervencaoClinica : historico
-Animal "1" -- "0..*" RegistoCuidado : historico
 
 Colaborador "1" -- "0..*" Nota : escreve
 Colaborador "1" -- "0..*" RegistoCuidado : regista
 Colaborador "1" -- "0..*" ServicoExtra : regista
 Colaborador "1" -- "0..*" IntervencaoClinica : regista
 Colaborador "1" -- "0..*" AlteracaoEstadoSaude : regista
-Colaborador "1" -- "0..*" RegistoAuditoria : origina
+Colaborador "1" -- "0..*" AuditoriaEvento : origina
 
 Animal ..> Especie : usa
 Animal ..> EstadoSaude : usa
@@ -233,3 +234,4 @@ Pagamento ..> EstadoPagamento : usa
 Pagamento ..> MomentoPagamento : usa
 Pagamento ..> MetodoPagamento : usa
 Colaborador ..> TipoColaborador : usa
+AuditoriaEvento ..> ResultadoAuditoria : usa

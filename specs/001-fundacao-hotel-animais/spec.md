@@ -2,7 +2,7 @@
 
 **Feature Branch**: `[001-fundacao-hotel-animais]`  
 **Created**: 2026-05-04  
-**Status**: Draft  
+**Status**: Implementado e validado em Etapa 4
 **Documentação de Referência**:
 - Tema e Enunciado: [docs/Etapa0/Enunciado.md](../../../docs/Etapa0/Enunciado.md)
 - User Stories: [docs/Etapa1/01-user-stories/user-stories.md](../../../docs/Etapa1/01-user-stories/user-stories.md)

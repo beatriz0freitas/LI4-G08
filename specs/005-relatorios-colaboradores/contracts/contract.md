@@ -10,6 +10,8 @@ Este ficheiro descreve as rotas MVC, templates Thymeleaf e formulários da featu
 - Template: `relatorios/list.html`.
 - Acesso: `DIRETOR`.
 - Parâmetros opcionais: `dataInicio`, `dataFim`, `tipoAlojamento`, `incluirServicosExtra`, `agruparPor`.
+- `agruparPor` aceita: `DIA`, `SEMANA`, `MES`, `ALOJAMENTO`, `COLABORADOR`, `TIPO_SERVICO`.
+- O agrupamento é calculado no serviço e reutilizado pela interface web, CSV e PDF.
 - Resposta: página Thymeleaf com formulário de filtros, métricas agregadas e ações de exportação.
 
 ### `POST /relatorios/gerar`
@@ -19,6 +21,7 @@ Este ficheiro descreve as rotas MVC, templates Thymeleaf e formulários da featu
 - Acesso: `DIRETOR`.
 - Sucesso: `redirect:/relatorios?...` ou renderização do template com resultados.
 - Erro de validação: renderiza `relatorios/list.html` com mensagens.
+- Limite síncrono: períodos superiores a 3 meses devolvem a mensagem "Período máximo para exportação imediata é 3 meses. Selecione um intervalo menor ou contacte o suporte para processamento offline.".
 
 ### `GET /relatorios/exportar/csv`
 
@@ -26,6 +29,7 @@ Este ficheiro descreve as rotas MVC, templates Thymeleaf e formulários da featu
 - Acesso: `DIRETOR`.
 - Parâmetros: mesmos filtros do relatório.
 - Resposta: ficheiro `text/csv`.
+- Períodos superiores a 3 meses devolvem `400 Bad Request` com a mensagem de limite síncrono.
 
 ### `GET /relatorios/exportar/pdf`
 
@@ -33,6 +37,7 @@ Este ficheiro descreve as rotas MVC, templates Thymeleaf e formulários da featu
 - Acesso: `DIRETOR`.
 - Parâmetros: mesmos filtros do relatório.
 - Resposta: ficheiro `application/pdf`.
+- Períodos superiores a 3 meses devolvem `400 Bad Request` com a mensagem de limite síncrono.
 
 ## Colaboradores
 
@@ -85,7 +90,7 @@ Este ficheiro descreve as rotas MVC, templates Thymeleaf e formulários da featu
 - `dataFim: LocalDate`
 - `tipoAlojamento: TipoAlojamento?`
 - `incluirServicosExtra: boolean`
-- `agruparPor: GrupoRelatorio` (`DIA`, `SEMANA`, `MES`)
+- `agruparPor: GrupoRelatorio` (`DIA`, `SEMANA`, `MES`, `ALOJAMENTO`, `COLABORADOR`, `TIPO_SERVICO`)
 
 ### `ColaboradorFormDto`
 

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.enums.EstadoReserva;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,6 +73,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
      * Procura reservas de um tutor ordenadas por data de criação decrescente (mais recentes primeiro).
      */
     List<Reserva> findByTutorIdOrderByDataCriacaoDesc(Long tutorId);
+
+       List<Reserva> findByDataCriacaoBetweenOrderByDataCriacaoAsc(LocalDateTime inicio, LocalDateTime fim);
 
     /**
      * Conta as reservas num determinado estado.

@@ -33,15 +33,15 @@ class Animal {
 }
 
 class TipoAlojamentoTarifa {
-  designacao
-  especieCompativel
-  capacidade
+  tipoAlojamento
   tarifaDiaria
   ativo
 }
 
 class Alojamento {
   identificacao
+  tipo
+  capacidade
   estadoLimpeza
 }
 
@@ -83,7 +83,7 @@ class Nota {
 
 class TipoServicoExtra {
   nome
-  precoBase
+  descricao
   ativo
 }
 
@@ -120,9 +120,10 @@ class Colaborador {
   perfil
 }
 
-class RegistoAuditoria {
+class AuditoriaEvento {
+  timestamp
   operacao
-  dataHora
+  entidade
   resultado
 }
 
@@ -173,7 +174,7 @@ enum MetodoPagamento {
 enum PrioridadePlano {
   ROTINA
   URGENTE
-  CRITICA
+  CRITICO
 }
 
 enum PeriodicidadeTarefa {
@@ -190,6 +191,11 @@ enum TipoColaborador {
   RESPONSAVEL_LIMPEZA
 }
 
+enum ResultadoAuditoria {
+  SUCESSO
+  FALHA
+}
+
 Tutor "1" -down- "0..*" Animal : > responsavel
 Tutor "1" -right- "0..*" Reserva : > solicita
 Animal "1" -right- "0..*" Reserva : > tem
@@ -198,30 +204,24 @@ Alojamento "1" -right- "0..*" Reserva : > reservado
 
 Reserva "1" -right- "0..1" Estadia : > origina
 Reserva "1" -down- "0..*" Nota : > contem
-Reserva "1" -up- "0..*" TarefaCuidado : > agenda
 
+Animal "1" -down- "0..*" PlanoCuidados : > mantem
 Estadia "1" -down- "1" PlanoCuidados : > ativa
 PlanoCuidados "1" -right- "0..*" TarefaCuidado : > organiza
 Estadia "1" -down- "0..*" RegistoCuidado : > regista
-Estadia "1" -right- "0..*" Nota : > contem
 Estadia "1" -right- "0..*" ServicoExtra : > inclui
 Estadia "1" -right- "0..*" IntervencaoClinica : > inclui
 Estadia "1" -right- "0..*" AlteracaoEstadoSaude : > regista
 Estadia "1" -down- "0..*" Pagamento : > gera
 
 TipoServicoExtra "1" -down- "0..*" ServicoExtra : > tipifica
-TipoServicoExtra "1" -right- "0..*" TarefaCuidado : > agenda
-
-Animal "1" -down- "0..*" RegistoCuidado : > historico
-Animal "1" -right- "0..*" IntervencaoClinica : > historico
-Animal "1" -right- "0..*" AlteracaoEstadoSaude : > historico
 
 Colaborador "1" -up- "0..*" Nota : > escreve
 Colaborador "1" -left- "0..*" RegistoCuidado : > regista
 Colaborador "1" -left- "0..*" ServicoExtra : > regista
 Colaborador "1" -left- "0..*" IntervencaoClinica : > regista
 Colaborador "1" -left- "0..*" AlteracaoEstadoSaude : > regista
-Colaborador "1" -down- "0..*" RegistoAuditoria : > origina
+Colaborador "1" -down- "0..*" AuditoriaEvento : > origina
 
 Animal "1" -down- "1" Especie : > usa
 Animal "1" -down- "1" EstadoSaude : > usa
@@ -234,6 +234,7 @@ Pagamento "1" -down- "1" EstadoPagamento : > usa
 Pagamento "1" -down- "1" MomentoPagamento : > usa
 Pagamento "1" -down- "1" MetodoPagamento : > usa
 Colaborador "1" -down- "1" TipoColaborador : > usa
+AuditoriaEvento "1" -down- "1" ResultadoAuditoria : > usa
 
 note right of Alojamento
 Um alojamento só fica disponível
@@ -249,7 +250,7 @@ O pagamento de CHECK_OUT cobre
 valores complementares.
 end note
 
-note bottom of RegistoAuditoria
+note bottom of AuditoriaEvento
 Regista operações críticas:
 reservas, check-in, check-out,
 pagamentos, limpeza, serviços,

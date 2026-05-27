@@ -1,4 +1,4 @@
--- V10__create_auditoria_evento.sql
+-- V12__create_auditoria_evento.sql
 -- Criada: 2026-05-26
 -- Descrição: Tabela centralizada de auditoria para rastreamento de operações críticas
 
