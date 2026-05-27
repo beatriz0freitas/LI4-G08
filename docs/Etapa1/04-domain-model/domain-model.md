@@ -16,7 +16,10 @@ Este modelo descreve os principais conceitos do domínio do hotel de animais.
 | `Reserva` | Compromisso de alojamento num período. | US-06, US-12, RD-06 |
 | `Estadia` | Execução real da reserva durante o período de alojamento. | US-07, US-11, RD-02, RD-03, RD-07 |
 | `Pagamento` | Registo financeiro associado a um momento da estadia. | US-10, US-11, RF-10 |
+| `TipoAlojamentoTarifa` | Catálogo de tarifas diárias por tipo de alojamento, gerido pela direção. | RF-08, RF-10, RD-04, RD-11 |
+| `TipoServicoExtra` | Catálogo controlado de serviços extra faturáveis. | RF-17, RD-09, RD-11 |
 | `ServicoExtra` | Serviço opcional com impacto financeiro prestado durante a estadia. | US-13, US-18, US-19, RD-09 |
+| `PlanoCuidados` | Plano ativo e histórico de cuidados recorrentes e instruções por animal/estadia. | US-14, RF-11, RD-10 |
 | `RegistoCuidado` | Registo operacional de cuidados diários. | US-14, US-15 |
 | `IntervencaoClinica` | Ato clínico ou prescrição veterinária. | US-22, US-23 |
 | `AlteracaoEstadoSaude` | Registo de mudança de estado de saúde. | US-16, US-24 |
@@ -37,7 +40,11 @@ Este modelo descreve os principais conceitos do domínio do hotel de animais.
 | `Reserva` gera `Estadia` | `1 ↔ 0..1` | A reserva pode terminar sem estadia se for cancelada; quando concretizada gera uma única estadia. Origem: US-06, US-07, RD-02, RD-06. |
 | `Reserva` contém `Nota` | `1 ↔ *` | Notas operacionais ficam associadas à reserva. Origem: US-17. |
 | `Estadia` gera `Pagamento` | `1 ↔ 0..2` | A estadia pode ter pagamento de entrada e pagamento de saída. Origem: US-10, US-11, RF-10, RD-04. |
+| `TipoAlojamentoTarifa` define preço de `Alojamento` | `1 ↔ *` | A tarifa ativa do tipo de alojamento é usada no pagamento base do check-in. Origem: RF-08, RF-10, RD-04, RD-11. |
+| `TipoServicoExtra` classifica `ServicoExtra` | `1 ↔ *` | O tipo de serviço extra é controlado por catálogo e evita texto livre inconsistente. Origem: RF-17, RD-09, RD-11. |
 | `Estadia` inclui `ServicoExtra` | `1 ↔ *` | Serviços extra são registados durante a estadia. Origem: US-13, US-18, US-19. |
+| `Animal` possui `PlanoCuidados` | `1 ↔ *` | O animal mantém histórico de planos e cada estadia pode ter uma cópia ajustável. Origem: RF-11, RD-10. |
+| `Estadia` possui `PlanoCuidados` ativo | `1 ↔ 0..1` | O plano de cuidados da estadia agrega tarefas, instruções e prioridade atual. Origem: US-14, RF-11, RD-10. |
 | `Estadia` regista `RegistoCuidado` | `1 ↔ *` | Os cuidados diários são contextualizados pela estadia em curso. Origem: US-14, US-15. |
 | `Estadia` inclui `IntervencaoClinica` | `1 ↔ *` | Intervenções clínicas acontecem no contexto da estadia. Origem: US-22, US-23. |
 | `Estadia` inclui `AlteracaoEstadoSaude` | `1 ↔ *` | Alterações de saúde são registadas durante a estadia. Origem: US-16, US-24. |
@@ -64,15 +71,16 @@ Este modelo descreve os principais conceitos do domínio do hotel de animais.
 | `EstadoReserva` | `ATIVA`, `CONFIRMADA`, `CANCELADA`, `CONCLUIDA` | US-06, RD-06 |
 | `EstadoEstadia` | `EM_CURSO`, `TERMINADA` | US-07, RD-03 |
 | `EstadoPagamento` | `LIQUIDADO`, `PENDENTE` | RF-10 |
-| `MetodoPagamento` | `NAO_DEFINIDO`, `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO` | RF-10 |
+| `MetodoPagamento` | `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO` | RF-10 |
 | `MomentoPagamento` | `CHECK_IN`, `CHECK_OUT` | RD-04 |
-| `TipoServicoExtra` | `BANHO`, `PASSEIO`, `OUTRO` | US-13 |
+| `PrioridadePlano` | `ROTINA`, `URGENTE`, `CRITICO` | RF-11, RD-10 |
 | `TipoColaborador` | `DIRETOR`, `FUNCIONARIO_RECEPCAO`, `CUIDADOR`, `MEDICO_VETERINARIO`, `RESPONSAVEL_LIMPEZA` | UC-01, US-03..US-24 |
 
 ## Pressupostos
 
 1. **`TipoAlojamento`**: os alojamentos são classificados como `CANINO` ou `FELINO` para garantir que a reserva só apresenta unidades compatíveis com a espécie do animal (`CAO` ou `GATO`). Esta decisão substitui a enumeração provisória baseada em formato de box.
-2. **`MetodoPagamento`**: os requisitos registam a necessidade de processar pagamentos (US-10, US-11) mas não enumeram métodos. Adotaram-se `NUMERARIO`, `CARTAO_DEBITO` e `CARTAO_CREDITO` como valores típicos num hotel de animais. A lista deverá ser confirmada com os stakeholders.
+2. **`MetodoPagamento`**: os requisitos registam a necessidade de processar pagamentos (US-10, US-11). Adotaram-se `NUMERARIO`, `CARTAO_DEBITO` e `CARTAO_CREDITO` como valores aceites. Não existe opção `NAO_DEFINIDO`; o método é obrigatório no check-in e no check-out.
 3. **`EstadoSaude`**: US-16 menciona "alterações ao estado de saúde" e US-24 refere "alterações recentes". Os valores `NORMAL`, `ALTERADO` e `CRITICO` são considerados suficientes para cobrir a variação descrita.
 4. **`RegistoCuidado` e `ServicoExtra` separados**: cuidados diários (alimentação, medicação — US-15) são distinguidos dos serviços extra faturáveis (banho, passeio — US-18) por terem natureza e impacto financeiro diferentes.
 5. **Colaborador único**: todos os papéis do sistema (cuidador, receção, etc.) são modelados como uma única entidade `Colaborador` com `TipoColaborador`, pois partilham atributos comuns (autenticação, nome, email) e diferem apenas nas permissões — UC-01, US-03.
+6. **Catálogos financeiros**: as tarifas de alojamento e os tipos de serviço extra são catálogos geridos pela direção, para evitar regras fixas no código e texto livre nos serviços faturáveis.

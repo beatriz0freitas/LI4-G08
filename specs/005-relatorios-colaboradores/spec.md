@@ -2,7 +2,7 @@
 
 **Feature Branch**: `005-relatorios-colaboradores`
 **Created**: 2026-05-24
-**Status**: Draft clarificado
+**Status**: Implementado e validado em Etapa 4
 **Input**: Clarificar o spec 005 para Spring MVC + Thymeleaf, com gestão de colaboradores exclusiva do diretor e `TipoColaborador` como enum.
 
 ## Âmbito
