@@ -1,25 +1,29 @@
 # Traceability Matrix
 
-Este documento liga os use cases UC-01..UC-13 aos services, metodos principais e diagramas de arquitetura.
+Este documento liga os casos de uso as user stories, requisitos e pontos principais de servico. A matriz mantem rastreabilidade funcional sem substituir os contratos Speckit nem os diagramas.
 
-| Use Case | Service / metodo principal | Diagramas de cobertura | Observacoes |
-|---|---|---|---|
-| UC-01 - Autenticar no Sistema | `IColaboradorService.autenticar()` | `class-diagram.mmd`, `UC-01.mmd`, `UC-01.puml`, `components.mmd` | Fluxo de suporte de acesso ao sistema. |
-| UC-02 - Consultar Disponibilidade de Alojamentos | `IAlojamentoService.consultarDisponibilidade()` | `class-diagram.mmd`, `UC-02.mmd`, `UC-02.puml`, `components.mmd` | Base para pesquisa de alojamentos disponiveis. |
-| UC-03 - Registar Tutor e Animal | `ITutorService.registarTutor()` + `IAnimalService.registarAnimal()` | `class-diagram.mmd`, `UC-03.mmd`, `UC-03.puml`, `components.mmd` | Cria a base de clientes e animais. |
-| UC-04 - Criar Reserva | `IReservaService.criarReserva()` | `class-diagram.mmd`, `UC-04.mmd`, `UC-04.puml`, `components.mmd` | Fluxo principal de reservas. |
-| UC-05 - Cancelar Reserva | `IReservaService.cancelarReserva()` | `class-diagram.mmd`, `UC-05.mmd`, `UC-05.puml`, `components.mmd` | Atualiza estado da reserva e disponibilidade. |
-| UC-06 - Registar Check-in | `IEstadiaService.registarCheckIn()` | `class-diagram.mmd`, `UC-06.mmd`, `UC-06.puml`, `components.mmd` | Abre a estadia e atualiza limpeza. |
-| UC-07 - Registar Check-out | `IEstadiaService.registarCheckOut()` | `class-diagram.mmd`, `UC-07.mmd`, `UC-07.puml`, `components.mmd` | Fecha a estadia e valida pendencias. |
-| UC-08 - Processar Faturacao e Pagamento | `IPagamentoService.registarPagamentoCheckIn()` + `IPagamentoService.registarPagamentoCheckOut()` | `class-diagram.mmd`, `UC-08.mmd`, `UC-08.puml`, `components.mmd` | Gera a fatura e regista o pagamento. |
-| UC-09 - Registar Cuidados Diarios | `IEstadiaService.registarCuidadoDiario()` | `class-diagram.mmd`, `UC-09.mmd`, `UC-09.puml`, `components.mmd` | Mantem o historico operacional da estadia. |
-| UC-10 - Registar Servico Extra | `IServicoExtraService.registarServicoExtra()` | `class-diagram.mmd`, `UC-10.mmd`, `UC-10.puml`, `components.mmd` | Pode ser associado a faturacao posterior. |
-| UC-11 - Gerir Historial Clinico | `IClinicaService.registarIntervencaoClinica()` + `IClinicaService.consultarHistorial()` | `class-diagram.mmd`, `UC-11.mmd`, `UC-11.puml`, `components.mmd` | Cobre a logica clinica e rastreabilidade. |
-| UC-12 - Registar Limpeza de Alojamento | `IAlojamentoService.registarLimpezaConcluida()` | `class-diagram.mmd`, `UC-12.mmd`, `UC-12.puml`, `components.mmd` | Atualiza o ciclo operacional do alojamento. |
-| UC-13 - Consultar Dashboard e Gerar Relatorios | `IRelatorioService.gerarDashboard()` + `IRelatorioService.gerarRelatorioPeriodo()` | `class-diagram.mmd`, `UC-13.mmd`, `UC-13.puml`, `components.mmd` | Consolida indicadores e leitura executiva. |
+| Use Case | Atores principais | User Stories cobertas | Requisitos relacionados | Servico/metodo de referencia | Observacoes |
+|---|---|---|---|---|---|
+| UC-01 - Autenticar no Sistema | Todos os colaboradores | Transversal | RNF-04, RNF-06 | `ColaboradorUserDetailsService.loadUserByUsername()` | Garante acesso individual e aplicacao do perfil atribuido. |
+| UC-02 - Consultar Disponibilidade de Alojamentos | Rececao, Diretor | US-01, US-08, US-14 | RF-06, RD-01, RNF-01, RNF-03, RNF-06 | `IAlojamentoService.consultarDisponibilidade()` | Suporta decisao antes da criacao de reservas e aplica disponibilidade centralizada. |
+| UC-03 - Registar Tutor e Animal | Rececao | US-11 | RF-04, RD-05, RD-08, RNF-05 | `ITutorService.registar()` + `IAnimalService.registar()` | Garante dados base de tutor e animal para reservas e historico. |
+| UC-04 - Criar Reserva | Rececao | US-08, US-14 | RF-06, RF-07, RD-01, RD-05 | `IReservaService.criar()` | Cria reserva `ATIVA` apos validacao centralizada de disponibilidade. |
+| UC-05 - Cancelar Reserva | Rececao | US-08 | RF-07, RD-06 | `IReservaService.cancelar()` | Apenas aplicavel a reservas ainda nao convertidas em estadia. |
+| UC-06 - Registar Check-in | Rececao | US-09, US-12, US-16 | RF-08, RF-10, RF-11, RD-02, RD-04, RD-07 | `IEstadiaService.abrirEstadiaPorReserva()` | Abre estadia, confirma reserva, impede duplicacao por animal e regista pagamento base. |
+| UC-07 - Registar Check-out | Rececao | US-09, US-13, US-22 | RF-09, RF-10, RF-15, RD-03, RD-04 | `IEstadiaService.checkOut()` | Fecha estadia, conclui reserva, regista pagamento complementar e coloca alojamento pendente de limpeza. |
+| UC-08 - Processar Pagamento | Rececao | US-12, US-13 | RF-10, RD-04 | `IPagamentoService.registrarPagamento()` + `IPagamentoService.registrarPagamentoCheckOut()` + `IPagamentoService.calcularCobrancaComplementar()` | Caso de uso incluido por check-in e check-out; metodo de pagamento e obrigatorio. |
+| UC-09 - Registar Cuidados e Notas Operacionais | Cuidador, Rececao | US-15, US-16, US-17, US-18, US-19, US-21 | RF-11, RF-12, RF-13, RF-16, RD-10, RNF-02, RNF-09 | `IPlanoCuidadosService.obterPlanoPorEstadia()` + `IRegistoCuidadoService.create()` + `INotaService.create()` + `IAlteracaoEstadoSaudeService.register()` | Cobre continuidade operacional, tarefas do plano, notas de reserva e alteracoes ao estado de saude. |
+| UC-10 - Registar Servico Extra | Cuidador, colaborador autorizado | US-20 | RF-17, RD-09, RD-11 | `IServicoExtraService.register()` | Regista servicos extra de catalogo ativo durante estadia ativa. |
+| UC-11 - Gerir Historial Clinico | Medico Veterinario | US-24, US-25, US-26 | RF-13, RF-14, RF-17, RD-09, RNF-05 | `IHistoricoService.consultar()` + `IIntervencaoClinicaService.register()` | Cobre consulta de historial, alteracoes recentes e intervencoes clinicas faturaveis. |
+| UC-12 - Registar Limpeza de Alojamento | Responsavel pela Limpeza | US-22, US-23 | RF-15, RD-01 | `ILimpezaService.listarAlojamentosPendentes()` + `ILimpezaService.marcarComoLimpo()` | Atualiza estado de limpeza para permitir nova disponibilidade. |
+| UC-13 - Consultar Dashboard e Gerar Relatorios | Diretor | US-01, US-02, US-04, US-05, US-07 | RF-01, RF-03, RF-05, RF-10, RF-17, RF-19, RNF-06, RNF-07, RNF-09 | `IDashboardService` + `IRelatorioService.gerarRelatorio()` + `AuditoriaOperacaoService.registarSucesso()` | Consolida indicadores, agrupamentos, exportacao CSV/PDF e auditoria persistente da geracao. |
+| UC-14 - Gerir Colaboradores e Perfis | Diretor | US-03 | RF-02, RNF-04, RNF-09 | `IColaboradorService.criar()` + `IColaboradorService.atualizar()` + `IColaboradorService.desativar()` | Gere colaboradores, perfis e estado ativo com auditoria. |
+| UC-15 - Gerir Tarifas e Catalogos | Diretor | US-06 | RF-18, RD-11 | `TipoAlojamentoTarifaService` + `TipoServicoExtraService` | Gere tarifas ativas e tipos de servico extra usados por pagamentos e servicos. |
+| UC-16 - Consultar Auditoria | Diretor | US-07 | RF-19, RNF-08, RNF-09 | `IAuditoriaService.consultarPorPeriodo()` + `AuditoriaController.exportarCsv()` | Consulta e exporta eventos persistidos de auditoria. |
 
-## Regras de uso
+## Regras de manutencao
 
-- Cada UC deve ter pelo menos uma ligacao valida a um metodo de service.
+- Cada UC deve ter pelo menos uma ligacao a uma user story, a um requisito e, quando ja implementado, a um servico de referencia.
+- Os fluxos devem manter-se ao nivel de negocio; os metodos acima servem apenas para rastreabilidade com a implementacao.
 - Os fluxos com sequencia obrigatoria devem aparecer tambem em `UC-*.mmd` e `UC-*.puml`.
-- Os diagramas devem manter coerencia com os contracts em `specs/001-arquitetura-projeto/contracts/`.
+- Sempre que forem adicionadas ou removidas user stories, requisitos ou contratos Speckit, esta matriz deve ser atualizada.

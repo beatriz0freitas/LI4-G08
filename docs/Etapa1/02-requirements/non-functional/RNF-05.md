@@ -1,8 +1,9 @@
 # RNF-05 - Confidencialidade dos dados
 
 **Descrição:**
-O sistema deve garantir a confidencialidade dos dados pessoais dos tutores e dos registos clínicos dos animais, em conformidade com o RGPD.
+O sistema deve proteger dados pessoais e clínicos contra acesso indevido, garantindo que apenas utilizadores autorizados podem consultar ou alterar informação sensível e que a exposição desses dados é limitada ao necessário, em conformidade com o RGPD.
 
-**Origem:** US-09, US-22
+
+**Origem:** US-11, US-24
 
 **Prioridade:** Must Have

@@ -9,7 +9,7 @@
 
 ## 1. Âmbito
 
-Este plano cobre os testes automatizados desenvolvidos para o sistema **PatasBigodesApp**, uma aplicação Spring Boot MVC com persistência MySQL, que implementa os requisitos funcionais RF-01 a RF-17 e as regras de domínio RD-01 a RD-09.
+Este plano cobre os testes automatizados desenvolvidos para o sistema **PatasBigodesApp**, uma aplicação Spring Boot MVC com persistência MySQL, que implementa os requisitos funcionais RF-01 a RF-19 aplicáveis e as regras de domínio RD-01 a RD-09.
 
 O objetivo é garantir que:
 - Cada componente funciona isoladamente, através de testes unitários.
@@ -64,6 +64,7 @@ Testam a lógica de negócio sem base de dados, usando Mockito para substituir o
 | `AlojamentoServiceTest` | `AlojamentoService` | 10 |
 | `AlteracaoEstadoSaudeServiceTest` | `AlteracaoEstadoSaudeService` | 7 |
 | `AnimalServiceTest` | `AnimalService` | 8 |
+| `AuditoriaServiceTest` | `AuditoriaService` | 7 |
 | `ColaboradorServiceTest` | `ColaboradorService` | 11 |
 | `DisponibilidadeServiceTest` | `DisponibilidadeService` | 4 |
 | `EstadiaServiceTest` | `EstadiaService` | 10 |
@@ -73,14 +74,14 @@ Testam a lógica de negócio sem base de dados, usando Mockito para substituir o
 | `PagamentoServiceTest` | `PagamentoService` | 8 |
 | `RegistoCuidadoServiceTest` | `RegistoCuidadoService` | 5 |
 | `RegraDominioServiceTest` | `RegraDominioService` | 10 |
-| `RelatorioServiceTest` | `RelatorioService` | 7 |
+| `RelatorioServiceTest` | `RelatorioService` | 9 |
 | `ReservaServiceCancelTest` | `ReservaService` (cancelar) | 2 |
 | `ReservaServiceCreateTest` | `ReservaService` (criar) | 2 |
 | `ReservaServiceUnitTest` | `ReservaService` (restante) | 13 |
 | `ServicoExtraServiceTest` | `ServicoExtraService` | 6 |
 | `TutorServiceTest` | `TutorService` | 11 |
 
-**Total unitários de serviço sem MySQL:** 130 testes.
+**Total unitários de serviço sem MySQL:** 139 testes.
 
 ### 3.2 Testes de Controllers Web
 
@@ -159,7 +160,7 @@ Os testes de aceitação foram definidos a partir dos casos de uso UC-01 a UC-13
 | UC-10 | Serviços extra registados e consultáveis | `ServicoExtraServiceTest`, `ServicoExtraControllerTest` |
 | UC-11 | Histórico clínico e operacional agregados | `HistoricoServiceTest`, `ClinicaControllerTest` |
 | UC-12 | Estado de limpeza atualizado | `AlojamentoServiceTest`, `LimpezaServiceTest` |
-| UC-13 | Relatórios e dashboard agregam métricas operacionais | `RelatorioServiceTest`, `RelatorioControllerTest` |
+| UC-13 | Relatórios e dashboard agregam métricas e registam `RELATORIO_GERADO` na auditoria própria | `RelatorioServiceTest`, `AuditoriaServiceTest`, `RelatorioControllerTest` |
 
 ---
 

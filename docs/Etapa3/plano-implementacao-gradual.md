@@ -189,8 +189,8 @@ Fechar a visão executiva, a administração de perfis e a consolidação dos in
 - Relatórios por período.
 - Migração de Colaborador da memory para base de dados.
 - Gestão de perfis e permissões.
-- Configuração transversal da auditoria Spring Boot Actuator para autenticação e movimentos críticos do projeto.
-- Publicação de eventos auditáveis nos fluxos críticos: colaboradores/permissões, relatórios/exportações, tutores/animais, reservas/estadias, pagamentos/faturação, cuidados/clínica/serviços extra e alojamentos/limpeza.
+- Configuração transversal da auditoria funcional própria persistida em `auditoria_evento`.
+- Registo pelo `AuditoriaOperacaoService` nos fluxos críticos: colaboradores/permissões, relatórios/exportações, tutores/animais, reservas/estadias, pagamentos/faturação, cuidados/clínica/serviços extra e alojamentos/limpeza.
 
 ### Classes e Artefactos Associados
 
@@ -204,7 +204,7 @@ Fechar a visão executiva, a administração de perfis e a consolidação dos in
 
 **Repositories**: `ColaboradorRepository`
 
-**Configuração operacional**: `AuditConfig` com `AuditEventRepository` do Spring Boot Actuator e publicação de `AuditApplicationEvent` nas operações auditáveis, sem serviço próprio de auditoria.
+**Configuração operacional**: `AuditoriaOperacaoService` resolve o colaborador autenticado e delega em `AuditoriaService`, que persiste `AuditoriaEvento`. O Actuator é usado apenas para monitorização (`health`/`info`) e não constitui rasto de auditoria.
 
 ---
 

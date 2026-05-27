@@ -1,7 +1,7 @@
 # RNF-04 - Autenticação e permissões
 
 **Descrição:**
-O acesso ao sistema deve exigir autenticação prévia por credenciais individuais, com controlo de permissões por perfil de utilizador.
+O sistema deve garantir que cada utilizador é autenticado individualmente antes de aceder às funcionalidades protegidas e que as permissões concedidas respeitam o perfil que lhe foi atribuído.
 
 **Origem:** US-03
 

@@ -1,37 +1,48 @@
 package pt.hotel.animais.service;
 
-import org.springframework.boot.actuate.audit.listener.AuditApplicationEvent;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pt.hotel.animais.dto.RelatorioAgrupamentoDto;
 import pt.hotel.animais.dto.RelatorioFiltroFormDto;
 import pt.hotel.animais.dto.RelatorioResumoDto;
+import pt.hotel.animais.model.Estadia;
+import pt.hotel.animais.model.Pagamento;
+import pt.hotel.animais.model.Reserva;
+import pt.hotel.animais.model.ServicoExtra;
 import pt.hotel.animais.model.enums.MetodoPagamento;
 import pt.hotel.animais.repository.AlojamentoRepository;
 import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.repository.PagamentoRepository;
 import pt.hotel.animais.repository.ReservaRepository;
 import pt.hotel.animais.repository.ServicoExtraRepository;
+import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
-import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.io.IOException;
+import java.util.Locale;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
 /**
  * Serviço de aplicação para geração de relatórios operacionais e financeiros.
  *
  * Agrega dados de alojamentos, estadias, reservas, pagamentos e serviços extra.
- * Cada geração publica evento de auditoria com os filtros gerais utilizados, sem
+ * Cada geração regista auditoria persistente com os filtros gerais utilizados, sem
  * expor detalhe financeiro linha a linha.
  */
 @Service
@@ -43,20 +54,20 @@ public class RelatorioService implements IRelatorioService {
     private final ReservaRepository reservaRepository;
     private final PagamentoRepository pagamentoRepository;
     private final ServicoExtraRepository servicoExtraRepository;
-    private final ApplicationEventPublisher eventPublisher;
+    private final AuditoriaOperacaoService auditoriaOperacaoService;
 
     public RelatorioService(AlojamentoRepository alojamentoRepository,
                             EstadiaRepository estadiaRepository,
                             ReservaRepository reservaRepository,
                             PagamentoRepository pagamentoRepository,
                             ServicoExtraRepository servicoExtraRepository,
-                            ApplicationEventPublisher eventPublisher) {
+                            AuditoriaOperacaoService auditoriaOperacaoService) {
         this.alojamentoRepository = alojamentoRepository;
         this.estadiaRepository = estadiaRepository;
         this.reservaRepository = reservaRepository;
         this.pagamentoRepository = pagamentoRepository;
         this.servicoExtraRepository = servicoExtraRepository;
-        this.eventPublisher = eventPublisher;
+        this.auditoriaOperacaoService = auditoriaOperacaoService;
     }
 
     /**
@@ -67,6 +78,7 @@ public class RelatorioService implements IRelatorioService {
      * @throws IllegalArgumentException quando o período é inválido
      */
     @Override
+    @Transactional
     public RelatorioResumoDto gerarRelatorio(RelatorioFiltroFormDto filtro) {
         validarPeriodo(filtro);
         LocalDateTime inicio = filtro.getDataInicio().atStartOfDay();
@@ -89,6 +101,7 @@ public class RelatorioService implements IRelatorioService {
             ? servicoExtraRepository.sumCustoPorPeriodo(inicio, fim)
             : BigDecimal.ZERO);
         resumo.setFaturacaoPorMetodo(faturacaoPorMetodo(inicio, fim));
+        resumo.setAgrupamentos(gerarAgrupamentos(filtro));
         publicarAuditoria(filtro);
         return resumo;
     }
@@ -100,17 +113,28 @@ public class RelatorioService implements IRelatorioService {
      * @return conteúdo CSV com cabeçalhos estáveis
      */
     @Override
+    @Transactional
     public String gerarCsv(RelatorioFiltroFormDto filtro) {
         RelatorioResumoDto resumo = gerarRelatorio(filtro);
-        return "periodo_start,periodo_end,ocupacaoPerc,estadiasCount,reservasCount,faturacaoTotal,pagamentosPendentes,servicosExtraTotal\n"
-            + filtro.getDataInicio() + ","
-            + filtro.getDataFim() + ","
-            + String.format(java.util.Locale.US, "%.2f", resumo.getTaxaOcupacao()) + ","
-            + resumo.getEstadiasCount() + ","
-            + resumo.getReservasCount() + ","
-            + resumo.getFaturacaoTotal() + ","
-            + resumo.getPagamentosPendentes() + ","
-            + resumo.getServicosExtraTotal() + "\n";
+        StringBuilder csv = new StringBuilder();
+        csv.append("periodo_start,periodo_end,ocupacaoPerc,estadiasCount,reservasCount,faturacaoTotal,pagamentosPendentes,servicosExtraTotal\n");
+        csv.append(filtro.getDataInicio()).append(',')
+            .append(filtro.getDataFim()).append(',')
+            .append(String.format(Locale.US, "%.2f", resumo.getTaxaOcupacao())).append(',')
+            .append(resumo.getEstadiasCount()).append(',')
+            .append(resumo.getReservasCount()).append(',')
+            .append(resumo.getFaturacaoTotal()).append(',')
+            .append(resumo.getPagamentosPendentes()).append(',')
+            .append(resumo.getServicosExtraTotal()).append('\n');
+        csv.append("agrupamento,reservas,estadias,faturacaoTotal,servicosExtraTotal\n");
+        for (RelatorioAgrupamentoDto agrupamento : resumo.getAgrupamentos()) {
+            csv.append(agrupamento.getChave()).append(',')
+                .append(agrupamento.getReservas()).append(',')
+                .append(agrupamento.getEstadias()).append(',')
+                .append(agrupamento.getFaturacaoTotal()).append(',')
+                .append(agrupamento.getServicosExtraTotal()).append('\n');
+        }
+        return csv.toString();
     }
 
     /**
@@ -121,6 +145,7 @@ public class RelatorioService implements IRelatorioService {
      */
     @Override
     //NOTA: REVER ISTO
+    @Transactional
     public byte[] gerarPdf(RelatorioFiltroFormDto filtro) {
         RelatorioResumoDto resumo = gerarRelatorio(filtro);
         List<String> linhas = new ArrayList<>();
@@ -136,76 +161,73 @@ public class RelatorioService implements IRelatorioService {
         linhas.add("Serviços extra: " + resumo.getServicosExtraTotal());
         linhas.add("Faturação por método:");
         resumo.getFaturacaoPorMetodo().forEach((metodo, valor) -> linhas.add(" - " + metodo + ": " + valor));
+        linhas.add("Agrupamentos:");
+        for (RelatorioAgrupamentoDto agrupamento : resumo.getAgrupamentos()) {
+            linhas.add(" - " + agrupamento.getChave()
+                + " | reservas=" + agrupamento.getReservas()
+                + " | estadias=" + agrupamento.getEstadias()
+                + " | faturação=" + agrupamento.getFaturacaoTotal()
+                + " | serviços extra=" + agrupamento.getServicosExtraTotal());
+        }
         return construirPdf(linhas);
     }
 
+    @Override
+    public List<RelatorioAgrupamentoDto> gerarAgrupamentos(RelatorioFiltroFormDto filtro) {
+        validarPeriodo(filtro);
+        LocalDateTime inicio = filtro.getDataInicio().atStartOfDay();
+        LocalDateTime fim = filtro.getDataFim().atTime(LocalTime.MAX);
+
+        Map<String, RelatorioAgrupamentoDto> agrupamentos = new LinkedHashMap<>();
+        for (Reserva reserva : reservaRepository.findByDataCriacaoBetweenOrderByDataCriacaoAsc(inicio, fim)) {
+            adicionarReserva(agrupamentos, filtro.getAgruparPor(), reserva);
+        }
+        for (Estadia estadia : estadiaRepository.findByDataCriacaoBetweenOrderByDataCriacaoAsc(inicio, fim)) {
+            adicionarEstadia(agrupamentos, filtro.getAgruparPor(), estadia);
+        }
+        for (Pagamento pagamento : pagamentoRepository.findByDataCriacaoBetweenOrderByDataCriacaoAsc(inicio, fim)) {
+            adicionarPagamento(agrupamentos, filtro.getAgruparPor(), pagamento);
+        }
+        if (filtro.isIncluirServicosExtra()) {
+            for (ServicoExtra servicoExtra : servicoExtraRepository.findByDataHoraBetweenOrderByDataHoraAsc(inicio, fim)) {
+                adicionarServicoExtra(agrupamentos, filtro.getAgruparPor(), servicoExtra);
+            }
+        }
+
+        return agrupamentos.values().stream()
+            .sorted(Comparator.comparing(RelatorioAgrupamentoDto::getChave))
+            .toList();
+    }
+
     private byte[] construirPdf(List<String> linhas) {
-        StringBuilder stream = new StringBuilder();
-        stream.append("BT\r\n");
-        stream.append("/F1 18 Tf\r\n");
-        stream.append("50 790 Td\r\n");
+        try (PDDocument document = new PDDocument()) {
+            PDPage page = new PDPage(PDRectangle.A4);
+            document.addPage(page);
 
-        for (int i = 0; i < linhas.size(); i++) {
-            if (i == 1) {
-                stream.append("/F1 11 Tf\r\n");
+            try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
+                float y = 750f;
+                boolean primeiro = true;
+                for (String linha : linhas) {
+                    contentStream.beginText();
+                    if (primeiro) {
+                        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.TIMES_BOLD), 14);
+                        primeiro = false;
+                    } else {
+                        contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.TIMES_ROMAN), 11);
+                    }
+                    contentStream.newLineAtOffset(50, y);
+                    contentStream.showText(linha);
+                    contentStream.endText();
+                    y -= 15f;
+                }
             }
-            if (i > 0) {
-                stream.append("0 -22 Td\r\n");
-            }
-            stream.append("(").append(escaparPdf(normalizarTextoPdf(linhas.get(i)))).append(") Tj\r\n");
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            document.save(baos);
+            return baos.toByteArray();
+        } catch (IOException e) {
+            throw new IllegalStateException("Erro ao gerar PDF com PDFBox", e);
         }
-        stream.append("ET\r\n");
-
-        byte[] streamBytes = stream.toString().getBytes(StandardCharsets.US_ASCII);
-        List<String> objetos = List.of(
-            "<< /Type /Catalog /Pages 2 0 R >>",
-            "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-            "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
-            "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
-            "<< /Length " + streamBytes.length + " >>\r\nstream\r\n" + stream + "endstream"
-        );
-
-        ByteArrayOutputStream pdf = new ByteArrayOutputStream();
-        escreverPdf(pdf, "%PDF-1.4\r\n%\u00e2\u00e3\u00cf\u00d3\r\n");
-        List<Integer> offsets = new ArrayList<>();
-        for (int i = 0; i < objetos.size(); i++) {
-            offsets.add(pdf.size());
-            escreverPdf(pdf, (i + 1) + " 0 obj\r\n");
-            escreverPdf(pdf, objetos.get(i));
-            escreverPdf(pdf, "\r\nendobj\r\n");
-        }
-
-        int xrefOffset = pdf.size();
-        escreverPdf(pdf, "xref\r\n");
-        escreverPdf(pdf, "0 " + (objetos.size() + 1) + "\r\n");
-        escreverPdf(pdf, "0000000000 65535 f \r\n");
-        for (Integer offset : offsets) {
-            escreverPdf(pdf, String.format("%010d 00000 n \r\n", offset));
-        }
-        escreverPdf(pdf, "trailer\r\n");
-        escreverPdf(pdf, "<< /Size " + (objetos.size() + 1) + " /Root 1 0 R >>\r\n");
-        escreverPdf(pdf, "startxref\r\n");
-        escreverPdf(pdf, xrefOffset + "\r\n");
-        escreverPdf(pdf, "%%EOF\r\n");
-
-        return pdf.toByteArray();
-    }
-
-    private String escaparPdf(String texto) {
-        return texto
-            .replace("\\", "\\\\")
-            .replace("(", "\\(")
-            .replace(")", "\\)");
-    }
-
-    private String normalizarTextoPdf(String texto) {
-        return Normalizer.normalize(texto, Normalizer.Form.NFD)
-            .replaceAll("\\p{M}", "")
-            .replaceAll("[^\\x20-\\x7E]", "");
-    }
-
-    private void escreverPdf(ByteArrayOutputStream output, String texto) {
-        output.writeBytes(texto.getBytes(StandardCharsets.ISO_8859_1));
     }
 
     private Map<String, BigDecimal> faturacaoPorMetodo(LocalDateTime inicio, LocalDateTime fim) {
@@ -226,9 +248,107 @@ public class RelatorioService implements IRelatorioService {
         if (filtro.getDataInicio().isAfter(filtro.getDataFim())) {
             throw new IllegalArgumentException("A data de início não pode ser posterior à data de fim");
         }
+        if (filtro.getDataInicio().plusMonths(3).isBefore(filtro.getDataFim())) {
+            throw new IllegalArgumentException("Período máximo para exportação imediata é 3 meses. Selecione um intervalo menor ou contacte o suporte para processamento offline.");
+        }
         if (filtro.getAgruparPor() == null) {
             filtro.setAgruparPor(RelatorioFiltroFormDto.GrupoRelatorio.MES);
         }
+    }
+
+    private void adicionarReserva(Map<String, RelatorioAgrupamentoDto> agrupamentos,
+                                  RelatorioFiltroFormDto.GrupoRelatorio grupo,
+                                  Reserva reserva) {
+        agrupamento(agrupamentos, grupo, reserva.getDataCriacao(),
+            chaveSecundariaPadrao(grupo, reserva.getAlojamento() != null ? reserva.getAlojamento().getIdentificacao() : null, "Sem colaborador", "Sem tipo de serviço"))
+            .incrementarReservas();
+    }
+
+    private void adicionarEstadia(Map<String, RelatorioAgrupamentoDto> agrupamentos,
+                                  RelatorioFiltroFormDto.GrupoRelatorio grupo,
+                                  Estadia estadia) {
+        agrupamento(agrupamentos, grupo, estadia.getDataCriacao(),
+            chaveSecundariaPadrao(grupo,
+                estadia.getReserva() != null && estadia.getReserva().getAlojamento() != null
+                    ? estadia.getReserva().getAlojamento().getIdentificacao()
+                    : null,
+                "Sem colaborador",
+                "Sem tipo de serviço"))
+            .incrementarEstadias();
+    }
+
+    private void adicionarPagamento(Map<String, RelatorioAgrupamentoDto> agrupamentos,
+                                    RelatorioFiltroFormDto.GrupoRelatorio grupo,
+                                    Pagamento pagamento) {
+        agrupamento(agrupamentos, grupo, pagamento.getDataCriacao(),
+            chaveSecundariaPadrao(grupo,
+                pagamento.getEstadia() != null && pagamento.getEstadia().getReserva() != null
+                    && pagamento.getEstadia().getReserva().getAlojamento() != null
+                    ? pagamento.getEstadia().getReserva().getAlojamento().getIdentificacao()
+                    : null,
+                "Sem colaborador",
+                "Sem tipo de serviço"))
+            .adicionarFaturacao(pagamento.getValor());
+    }
+
+    private void adicionarServicoExtra(Map<String, RelatorioAgrupamentoDto> agrupamentos,
+                                       RelatorioFiltroFormDto.GrupoRelatorio grupo,
+                                       ServicoExtra servicoExtra) {
+        String chave = switch (grupo) {
+            case COLABORADOR -> servicoExtra.getAutorId() == null ? "Sem colaborador" : "Colaborador " + servicoExtra.getAutorId();
+            case TIPO_SERVICO -> servicoExtra.getTipoServicoExtra() == null ? "Sem tipo de serviço" : servicoExtra.getTipoServicoExtra().getNome();
+            case ALOJAMENTO -> servicoExtra.getEstadia() != null && servicoExtra.getEstadia().getReserva() != null
+                && servicoExtra.getEstadia().getReserva().getAlojamento() != null
+                ? servicoExtra.getEstadia().getReserva().getAlojamento().getIdentificacao()
+                : "Sem alojamento";
+            default -> null;
+        };
+        if (chave == null) {
+            chave = formatarChaveTemporal(grupo, servicoExtra.getDataHora());
+        }
+        agrupamento(agrupamentos, grupo, servicoExtra.getDataHora(), chave)
+            .adicionarServicosExtra(servicoExtra.getCusto());
+    }
+
+    private String chaveSecundariaPadrao(RelatorioFiltroFormDto.GrupoRelatorio grupo,
+                                         String alojamento,
+                                         String colaborador,
+                                         String tipoServico) {
+        return switch (grupo) {
+            case ALOJAMENTO -> alojamento != null ? alojamento : "Sem alojamento";
+            case COLABORADOR -> colaborador;
+            case TIPO_SERVICO -> tipoServico;
+            default -> alojamento != null ? alojamento : "Sem alojamento";
+        };
+    }
+
+    private RelatorioAgrupamentoDto agrupamento(Map<String, RelatorioAgrupamentoDto> agrupamentos,
+                                                RelatorioFiltroFormDto.GrupoRelatorio grupo,
+                                                LocalDateTime momento,
+                                                String chaveSecundaria) {
+        String chave = chaveAgrupamento(grupo, momento, chaveSecundaria);
+        return agrupamentos.computeIfAbsent(chave, RelatorioAgrupamentoDto::new);
+    }
+
+    private String chaveAgrupamento(RelatorioFiltroFormDto.GrupoRelatorio grupo,
+                                    LocalDateTime momento,
+                                    String chaveSecundaria) {
+        if (grupo == null) {
+            grupo = RelatorioFiltroFormDto.GrupoRelatorio.MES;
+        }
+        return switch (grupo) {
+            case DIA, SEMANA, MES -> formatarChaveTemporal(grupo, momento);
+            case ALOJAMENTO, COLABORADOR, TIPO_SERVICO -> chaveSecundaria;
+        };
+    }
+
+    private String formatarChaveTemporal(RelatorioFiltroFormDto.GrupoRelatorio grupo, LocalDateTime momento) {
+        return switch (grupo == null ? RelatorioFiltroFormDto.GrupoRelatorio.MES : grupo) {
+            case DIA -> momento.toLocalDate().toString();
+            case SEMANA -> momento.getYear() + "-W" + String.format(Locale.ROOT, "%02d", momento.get(WeekFields.ISO.weekOfWeekBasedYear()));
+            case MES -> momento.getYear() + "-" + String.format(Locale.ROOT, "%02d", momento.getMonthValue());
+            default -> momento.toLocalDate().toString();
+        };
     }
 
     /**
@@ -245,19 +365,17 @@ public class RelatorioService implements IRelatorioService {
     }
 
     private void publicarAuditoria(RelatorioFiltroFormDto filtro) {
-        eventPublisher.publishEvent(new AuditApplicationEvent(
-            utilizadorAtual(),
+        auditoriaOperacaoService.registarSucesso(
             "RELATORIO_GERADO",
+            "Relatorio",
+            null,
+            "READ",
             Map.of(
                 "dataInicio", filtro.getDataInicio().toString(),
                 "dataFim", filtro.getDataFim().toString(),
-                "incluirServicosExtra", filtro.isIncluirServicosExtra()
+                "incluirServicosExtra", filtro.isIncluirServicosExtra(),
+                "agruparPor", filtro.getAgruparPor().name()
             )
-        ));
-    }
-
-    private String utilizadorAtual() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null ? authentication.getName() : "sistema";
+        );
     }
 }

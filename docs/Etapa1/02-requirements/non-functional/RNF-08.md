@@ -1,8 +1,9 @@
-# RNF-08 - Cópias de segurança
+# RNF-08 - Retenção da informação
 
 **Descrição:**
-Os dados do sistema devem ser objeto de cópias de segurança automáticas diárias, garantindo a recuperação em caso de falha.
+O sistema deve preservar a informação registada durante o período necessário para consulta posterior, rastreabilidade e compreensão da evolução operacional, mesmo após a conclusão da operação que originou os dados.
 
-**Origem:** US-04, US-05
+
+**Origem:** US-05, US-07, US-24
 
 **Prioridade:** Must Have

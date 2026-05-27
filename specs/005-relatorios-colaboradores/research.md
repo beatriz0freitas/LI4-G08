@@ -37,9 +37,10 @@ Documentar decisões técnicas, alternativas e observações relevantes para a i
 - Adicionar testes de integração que validem a matriz RBAC para diretor, receção, cuidador, veterinário e limpeza.
 
 ## Auditoria
-- Decisão: usar a auditoria integrada do Spring Boot Actuator, em vez de criar um serviço próprio de auditoria.
-- Configuração prevista: adicionar `spring-boot-starter-actuator`, definir um `AuditEventRepository` e expor o endpoint operacional `auditevents` apenas quando adequado ao ambiente.
-- Eventos de negócio relevantes, como `RELATORIO_GERADO`, `COLABORADOR_CRIADO`, `COLABORADOR_ATUALIZADO` e `COLABORADOR_DESATIVADO`, devem ser publicados como `AuditApplicationEvent`.
+- Decisão revista em 2026-05-27: usar exclusivamente a auditoria persistente da aplicação, através de `AuditoriaOperacaoService` e `IAuditoriaService`/`AuditoriaService`, com eventos em `auditoria_evento`.
+- O Spring Boot Actuator pode continuar disponível para monitorização (`health`/`info`), mas não expõe `auditevents`, não fornece `AuditEventRepository` e não é um mecanismo de auditoria funcional.
+- Eventos de negócio relevantes, como `RELATORIO_GERADO`, `CRIAR_COLABORADOR`, `EDITAR_COLABORADOR` e `DESATIVAR_COLABORADOR`, devem ser registados pelo serviço próprio.
+- `RELATORIO_GERADO` não altera uma entidade persistida; por isso usa `entidade="Relatorio"`, `acao="READ"` e `entityId=null`, preservando autor, momento, filtros e resultado.
 - O conteúdo auditado deve evitar dados sensíveis: nunca incluir passwords, hashes ou campos financeiros linha a linha; incluir apenas identificadores, utilizador autenticado, tipo de operação e filtros gerais necessários à rastreabilidade.
 
 ## Próximos passos recomendados (prioridade)

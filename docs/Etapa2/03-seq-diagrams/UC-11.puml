@@ -4,28 +4,44 @@ title UC-11 - Gerir Historial Clinico
 autonumber
 actor MedicoVeterinario
 participant ClinicaController
+participant HistoricoController
 participant IClinicaService
+participant IHistoricoService
+participant IIntervencaoClinicaService
 participant AnimalRepository
-participant HistorialClinico
-participant IServicoExtraService
+participant EstadiaRepository
+participant IntervencaoClinicaRepository
+participant AlteracaoEstadoSaudeRepository
+participant AuditoriaOperacaoService
 
-MedicoVeterinario -> ClinicaController : consultar animal ou alteracoes recentes
-ClinicaController -> IClinicaService : consultarHistorial(animalId)
+MedicoVeterinario -> ClinicaController : GET /clinica/animais/{animalId}
+ClinicaController -> IClinicaService : obterFichaAnimal(animalId)
 IClinicaService -> AnimalRepository : findById(animalId)
-AnimalRepository --> IClinicaService : animal e historial
-IClinicaService --> ClinicaController : historial clinico
-ClinicaController --> MedicoVeterinario : mostrar historial
+IClinicaService -> EstadiaRepository : findByAnimalIdComDetalhes(animalId)
+IClinicaService -> AlteracaoEstadoSaudeRepository : findByEstadiaReservaAnimalId(...)
+IClinicaService -> IntervencaoClinicaRepository : findByEstadiaReservaAnimalId(...)
+IClinicaService --> ClinicaController : FichaClinicaDto
+ClinicaController --> MedicoVeterinario : mostrar ficha e timeline
 
-MedicoVeterinario -> ClinicaController : registar intervencao(prescricao, custo)
-ClinicaController -> IClinicaService : registarIntervencaoClinica(dto)
-IClinicaService -> HistorialClinico : adicionarIntervencao(dto)
-
-alt intervencao com custo associado
-  IClinicaService -> IServicoExtraService : registarServicoExtra(dto)
-  IServicoExtraService --> IClinicaService : custo adicionado a fatura
+opt consultar historico consolidado com filtros
+  MedicoVeterinario -> HistoricoController : GET /historico/eventos
+  HistoricoController -> IHistoricoService : consultar(HistoricoFiltroDto, pageable)
+  IHistoricoService --> HistoricoController : pagina de HistoricoItemDto
+  HistoricoController --> MedicoVeterinario : mostrar eventos filtrados
 end
 
-IClinicaService --> ClinicaController : intervencao registada
-ClinicaController --> MedicoVeterinario : confirmar registo
+MedicoVeterinario -> ClinicaController : POST /clinica/intervencoes/create
+ClinicaController -> IIntervencaoClinicaService : register(form, autorId)
+IIntervencaoClinicaService -> EstadiaRepository : findById(estadiaId)
+
+alt estadia nao esta em curso ou perfil invalido
+  IIntervencaoClinicaService --> ClinicaController : erro
+  ClinicaController --> MedicoVeterinario : mostrar erro
+else dados validos
+  IIntervencaoClinicaService -> IntervencaoClinicaRepository : save(intervencao)
+  IIntervencaoClinicaService -> AuditoriaOperacaoService : registarSucesso(INTERVENCAO_CLINICA)
+  IIntervencaoClinicaService --> ClinicaController : IntervencaoClinicaDto
+  ClinicaController --> MedicoVeterinario : confirmar registo
+end
 
 @enduml

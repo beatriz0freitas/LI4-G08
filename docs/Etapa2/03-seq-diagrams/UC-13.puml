@@ -3,32 +3,50 @@ title UC-13 - Consultar Dashboard e Gerar Relatorios
 
 autonumber
 actor Diretor
+participant DashboardController
 participant RelatorioController
+participant IDashboardService
 participant IRelatorioService
 participant ReservaRepository
 participant EstadiaRepository
 participant PagamentoRepository
+participant ServicoExtraRepository
+participant AuditoriaOperacaoService
+participant AuditoriaService
 
-Diretor -> RelatorioController : abrir dashboard
-RelatorioController -> IRelatorioService : gerarDashboard()
-IRelatorioService -> ReservaRepository : obter indicadores de ocupacao
-IRelatorioService -> EstadiaRepository : obter estadias em curso
-IRelatorioService -> PagamentoRepository : obter pagamentos pendentes
-IRelatorioService --> RelatorioController : dashboard
-RelatorioController --> Diretor : apresentar indicadores
+Diretor -> DashboardController : GET /dashboard
+DashboardController -> IDashboardService : obter indicadores
+IDashboardService -> ReservaRepository : contarReservasAtivas/Futuras
+IDashboardService -> EstadiaRepository : contarEstadias/Ocupacao
+IDashboardService -> PagamentoRepository : faturacaoTotal/pendentes
+IDashboardService --> DashboardController : indicadores
+DashboardController --> Diretor : mostrar dashboard
 
-Diretor -> RelatorioController : gerar relatorio(periodo)
-RelatorioController -> IRelatorioService : gerarRelatorioPeriodo(inicio, fim)
-IRelatorioService -> ReservaRepository : consultar dados do periodo
-IRelatorioService -> EstadiaRepository : consultar dados do periodo
-IRelatorioService -> PagamentoRepository : consultar dados do periodo
+Diretor -> RelatorioController : POST /relatorios/gerar
+RelatorioController -> RelatorioController : validarLimitePeriodo(filtro)
 
-alt sem dados para o periodo
-  IRelatorioService --> RelatorioController : sem dados
-  RelatorioController --> Diretor : informar ausencia de dados
-else dados disponiveis
-  IRelatorioService --> RelatorioController : relatorio gerado
-  RelatorioController --> Diretor : permitir exportacao
+alt periodo superior a 3 meses
+  RelatorioController --> Diretor : mensagem de limite sincronico
+else periodo valido
+  RelatorioController -> IRelatorioService : gerarRelatorio(filtro)
+  IRelatorioService -> ReservaRepository : findByDataCriacaoBetween(...)
+  IRelatorioService -> EstadiaRepository : findByDataCriacaoBetween(...)
+  IRelatorioService -> PagamentoRepository : findByDataCriacaoBetween(...)
+  IRelatorioService -> ServicoExtraRepository : findByDataHoraBetween(...)
+  IRelatorioService -> AuditoriaOperacaoService : registarSucesso(RELATORIO_GERADO, entityId=null)
+  AuditoriaOperacaoService -> AuditoriaService : registarEvento(..., READ, filtros)
+  IRelatorioService --> RelatorioController : RelatorioResumoDto
+  RelatorioController --> Diretor : mostrar resultados
+end
+
+opt exportar CSV ou PDF
+  Diretor -> RelatorioController : GET /relatorios/exportar/{formato}
+  RelatorioController -> IRelatorioService : gerarCsv(filtro) ou gerarPdf(filtro)
+  IRelatorioService -> IRelatorioService : gerarAgrupamentos(filtro)
+  IRelatorioService -> AuditoriaOperacaoService : registarSucesso(RELATORIO_GERADO, entityId=null)
+  AuditoriaOperacaoService -> AuditoriaService : registarEvento(..., READ, filtros)
+  IRelatorioService --> RelatorioController : bytes/conteudo exportado
+  RelatorioController --> Diretor : download CSV/PDF
 end
 
 @enduml

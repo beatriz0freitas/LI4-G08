@@ -55,7 +55,7 @@ public class AuditoriaEvento {
     @Column(name = "entidade", nullable = false, length = 100)
     private String entidade;
 
-    @Column(name = "entity_id", nullable = false)
+    @Column(name = "entity_id")
     private Long entityId;
 
     @Column(name = "acao", nullable = false, length = 50)
