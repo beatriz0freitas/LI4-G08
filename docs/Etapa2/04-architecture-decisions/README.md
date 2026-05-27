@@ -10,6 +10,7 @@ Este diretorio agrega as Decisoes Arquiteturais (ADR) da Etapa 2.
 - [ADR-05 - Autenticação e autorização com controlo de acesso por perfil](ADR-05-controlo-acesso-perfil.md)
 - [ADR-06 - Isolamento da camada de apresentação através de DTOs](ADR-06-isolamento-apresentacao-dtos.md)
 - [ADR-07 - Utilização de Docker no ambiente de desenvolvimento e testes](ADR-07-docker-desenvolvimento-testes.md)
+- [ADR-08 - Auditoria funcional persistente própria](ADR-08-auditoria-funcional-persistente.md)
 
 ## Convencoes
 - Estado: Proposto | Aceite | Rejeitado | Substituido.

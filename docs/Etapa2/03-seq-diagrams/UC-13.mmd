@@ -9,6 +9,8 @@ sequenceDiagram
     participant EstadiaRepository
     participant PagamentoRepository
     participant ServicoExtraRepository
+    participant AuditoriaOperacaoService
+    participant AuditoriaService
 
     Diretor->>DashboardController: GET /dashboard
     DashboardController->>IDashboardService: obter indicadores
@@ -28,6 +30,8 @@ sequenceDiagram
         IRelatorioService->>EstadiaRepository: findByDataCriacaoBetween(...)
         IRelatorioService->>PagamentoRepository: findByDataCriacaoBetween(...)
         IRelatorioService->>ServicoExtraRepository: findByDataHoraBetween(...)
+        IRelatorioService->>AuditoriaOperacaoService: registarSucesso(RELATORIO_GERADO, entityId=null)
+        AuditoriaOperacaoService->>AuditoriaService: registarEvento(..., READ, filtros)
         IRelatorioService-->>RelatorioController: RelatorioResumoDto
         RelatorioController-->>Diretor: mostrar resultados
     end
@@ -36,6 +40,8 @@ sequenceDiagram
         Diretor->>RelatorioController: GET /relatorios/exportar/{formato}
         RelatorioController->>IRelatorioService: gerarCsv(filtro) ou gerarPdf(filtro)
         IRelatorioService->>IRelatorioService: gerarAgrupamentos(filtro)
+        IRelatorioService->>AuditoriaOperacaoService: registarSucesso(RELATORIO_GERADO, entityId=null)
+        AuditoriaOperacaoService->>AuditoriaService: registarEvento(..., READ, filtros)
         IRelatorioService-->>RelatorioController: bytes/conteudo exportado
         RelatorioController-->>Diretor: download CSV/PDF
     end

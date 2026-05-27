@@ -60,7 +60,7 @@ As user stories de referência são as definidas em [user-stories.md](../../docs
 - **(LAC-14) FR-012**: O relatório deve suportar agrupamento explícito de dados conforme parâmetro `agruparPor`: `DIA`, `SEMANA`, `MES`, `ALOJAMENTO`, `COLABORADOR`, `TIPO_SERVICO`. O agrupamento deve ser aplicado ao nível da agregação de dados, não apenas na apresentação; os totais grupalizados devem aparecer identicamente em CSV, PDF e visualização na web.
 - **(LAC-14) FR-013**: Exportações síncronas de relatório devem completar em até 30 segundos para períodos até 3 meses (com até ~10.000 registos). Períodos > 3 meses devem indicar ao utilizador a necessidade de usar um intervalo menor ou aguardar processamento assíncrono (vide RNF-08 de planeamento futuro).
 - **FR-010**: Validações de formulário devem regressar à mesma página com mensagens claras.
-- **FR-011 *(novo, LAC-13)***: O sistema deve manter tabela de auditoria `AuditoriaEvento` com registo de todas as operações críticas: criar/editar/cancelar reserva, check-in, check-out, registo/alteração de pagamento, cuidados, intervenção clínica, limpeza e gestão de colaboradores. Cada evento deve registar `timestamp`, utilizador autenticado, operação, entidade, ID da entidade, ação, detalhes em JSON e resultado (sucesso/falha).
+- **FR-011 *(novo, LAC-13)***: O sistema deve manter tabela de auditoria `AuditoriaEvento` com registo de todas as operações críticas: criar/editar/cancelar reserva, check-in, check-out, registo/alteração de pagamento, cuidados, intervenção clínica, limpeza, geração de relatórios e gestão de colaboradores. Cada evento deve registar `timestamp`, utilizador autenticado, operação, entidade, ação, detalhes em JSON e resultado (sucesso/falha). O ID da entidade é obrigatório quando a operação afeta um registo persistido e opcional para `RELATORIO_GERADO`, que não cria nem altera entidade de domínio.
 
 ### Rotas MVC Previstas
 
@@ -85,7 +85,7 @@ As user stories de referência são as definidas em [user-stories.md](../../docs
 - **ServicoExtra**: `id`, `tipoServico`, `custo`, `dataHora`, `estadiaId`/`reservaId`.
 - **FiltroRelatorio**: `dataInicio`, `dataFim`, `tipoAlojamento`, `incluirServicosExtra`, `agruparPor`.
 - **RelatorioResumo**: métricas agregadas, filtros aplicados, `geradoEm`, `geradoPor`.
-- **AuditoriaEvento** *(novo, LAC-13)*: `id`, `timestamp`, `utilizadorId` (FK para `Colaborador`), `operacao` (string: "CRIAR_RESERVA", "CHECK_IN", "PAGAMENTO", etc.), `entidade` (string: "Reserva", "Estadia", "Pagamento", etc.), `entityId` (Long, ID da entidade afetada), `acao` (string: "CREATE", "UPDATE", "DELETE"), `detalhes` (JSON com campos alterados ou contexto), `resultado` (string: "SUCESSO", "FALHA"), `motivoFalha` (string, opcional).
+- **AuditoriaEvento** *(novo, LAC-13)*: `id`, `timestamp`, `utilizadorId` (FK para `Colaborador`), `operacao` (string: "CRIAR_RESERVA", "CHECK_IN", "RELATORIO_GERADO", etc.), `entidade` (string: "Reserva", "Estadia", "Relatorio", etc.), `entityId` (Long opcional apenas quando não há entidade persistida afetada), `acao` (string: "CREATE", "UPDATE", "DELETE", "READ"), `detalhes` (JSON com campos alterados ou contexto), `resultado` (string: "SUCESSO", "FALHA"), `motivoFalha` (string, opcional).
 
 ## Success Criteria *(mandatory)*
 
@@ -99,7 +99,7 @@ As user stories de referência são as definidas em [user-stories.md](../../docs
 - **SC-005**: O formulário de colaborador apresenta `tipoColaborador` como lista fechada baseada na enum `TipoColaborador`.
 - **SC-006**: Perfis sem permissão não conseguem aceder a relatórios financeiros nem páginas de colaboradores.
 - **SC-007**: 95% das consultas interativas de relatório para períodos até 3 meses respondem em até 2 segundos (com índices em `timestamp`, `estado`; dataset até 12 meses; sem cache aplicacional); períodos até 12 meses devem responder em até 5 segundos ou apresentar estado de processamento.
-- **SC-008 *(novo, LAC-13)***: Cada operação crítica (criar/editar/cancelar reserva, check-in, check-out, pagamento, cuidados, clínica, limpeza, colaborador) registada com sucesso cria um evento em `AuditoriaEvento` com utilizador, operação, entidade, entityId, acao e resultado.
+- **SC-008 *(novo, LAC-13)***: Cada operação crítica (criar/editar/cancelar reserva, check-in, check-out, pagamento, cuidados, clínica, limpeza, relatório, colaborador) registada com sucesso cria um evento em `AuditoriaEvento` com utilizador, operação, entidade, ação e resultado; `entityId` é preenchido quando existe registo persistido afetado.
 - **SC-009 *(novo, LAC-13)***: O `DIRETOR` consegue consultar a auditoria filtrada por data, utilizador autenticado e operação, com resultados retendo 12 meses históricos.
 
 ## RBAC
@@ -119,8 +119,8 @@ Resumo para esta feature:
 - Palavras-passe devem ser armazenadas apenas como hash BCrypt.
 - Desativar colaborador é operação lógica; não deve apagar histórico associado.
 - Pagamentos e serviços extra já faturados não devem ser alterados depois do check-out, conforme regras de imutabilidade associadas a RD-09.
-- Auditoria (vide secção "Clarifications" abaixo): todas as operações críticas (criar/editar/cancelar reserva, check-in, check-out, pagamento, cuidados, intervenção clínica, limpeza, gestão de colaboradores) devem ser auditadas em tabela relacional dedicada `AuditoriaEvento`, com retenção de 12 meses e acesso restrito a administradores.
-- Não deve existir um serviço próprio de auditoria isolado; a auditoria deve ser implementada de forma centralizada em `AuditoriaService` ou interceptor transacional.
+- Auditoria (vide secção "Clarifications" abaixo): todas as operações críticas (criar/editar/cancelar reserva, check-in, check-out, pagamento, cuidados, intervenção clínica, limpeza, geração de relatórios, gestão de colaboradores) devem ser auditadas em tabela relacional dedicada `AuditoriaEvento`, com retenção de 12 meses e acesso restrito a administradores.
+- Não deve coexistir um segundo rasto funcional (por exemplo, `AuditEventRepository`/`AuditApplicationEvent` do Actuator); a auditoria deve ser registada de forma centralizada em `AuditoriaService` através de `AuditoriaOperacaoService`.
 
 ## Documentação Técnica
 
@@ -169,12 +169,13 @@ Resumo para esta feature:
 - Q: Qual é o formato de armazenamento e estrutura de auditoria? → A: Tabela dedicada `AuditoriaEvento` com campos: `id`, `timestamp`, `utilizador`, `operacao`, `entidade`, `entityId`, `acao`, `detalhes` (JSON), `resultado`.
 - Q: Qual é a política de retenção e acesso a auditoria? → A: Retenção de 12 meses, acesso restrito a administradores (`DIRETOR`), com filtros por data, utilizador e operação.
 
-### Estado de Implementação 2026-05-26
+### Estado de Implementação 2026-05-27
 
 - A tabela `auditoria_evento` está definida por migração Flyway e mapeada pela entidade `AuditoriaEvento`.
 - O contrato `IAuditoriaService` e a implementação `AuditoriaService` estão ativos para registo, consulta e limpeza de eventos.
 - As rotas `GET /auditoria` e `GET /auditoria/exportar/csv` estão funcionais e protegidas para `DIRETOR`.
 - A retenção de 12 meses está operacional em `AuditoriaSchedulerJob`, executado diariamente às 03h00.
 - A auditoria foi integrada em colaboradores, reservas existentes, estadias, pagamentos, cuidados, intervenção clínica, serviços extra e limpeza.
+- A geração de relatórios regista `RELATORIO_GERADO` na mesma tabela através de `AuditoriaOperacaoService`; não é usado o rasto em memória do Spring Boot Actuator.
 - A operação `EDITAR_RESERVA` permanece pendente porque o fluxo de edição de reserva ainda não existe na aplicação atual.
-- A validação focada de auditoria passou; a suite global `mvn -q test` depende de ligação MySQL/Flyway indisponível neste ambiente de sandbox.
+- A validação focada de auditoria passou e `HotelAnimaisApplicationTests` carregou o contexto contra MySQL de testes, aplicando Flyway até `V13`; a suite global não foi reexecutada nesta alteração.

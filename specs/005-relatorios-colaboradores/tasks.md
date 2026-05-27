@@ -68,7 +68,7 @@
 ## Phase 7: Segurança, QA e Documentação
 
 - [x] T032 [P] Criar testes de segurança com combinações da matriz de permissões.
-- [x] T033 [P] Configurar auditoria Spring Boot Actuator para geração de relatórios e alterações de colaboradores.
+- [x] T033 [P] Configurar auditoria persistente própria para geração de relatórios e alterações de colaboradores, sem `AuditEventRepository`/`AuditApplicationEvent` do Spring Boot Actuator.
 - [x] T034 [P] Validar CSRF em todos os formulários POST.
 - [x] T035 Atualizar `quickstart.md` com passos de navegação na UI.
 - [x] T036 Registar resultados de QA em `specs/005-relatorios-colaboradores/checklists/qa-results.md`.
@@ -144,6 +144,7 @@
 - [x] T055 [P] Implementar exportação CSV em `AuditoriaController.exportarCsv()` com cabeçalhos estáveis e todos os campos de evento.
 - [x] T056 Criar `AuditoriaControllerTest` com testes: `testListarAuditoria_DireToR()`, `testListarAuditoria_OutrosPerfis()`, `testFiltrosPorData()`, `testExportarCsv()`.
 - [x] T057 Criar `AuditoriaIntegrationTest` que verifica: criar colaborador → evento em BD com resultado=SUCESSO; editar colaborador → evento com detalhes em JSON; desativar → evento registado.
+- [x] T057.1 Consolidar `RELATORIO_GERADO` em `AuditoriaOperacaoService`/`AuditoriaEvento`, permitindo `entityId` nulo para este evento consultivo e removendo o rasto Actuator em memória.
 - [x] T058 Atualizar `quickstart.md` com passos de navegação: "Consultar auditoria" → abrir `/auditoria` → filtrar por data/utilizador/operacao → exportar CSV.
 
 ## Phase 11: Auditoria — Integração com Specs 003 e 004

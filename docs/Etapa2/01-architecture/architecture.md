@@ -175,7 +175,6 @@ Implementada com **Spring Security 6** e integração com `ColaboradorUserDetail
 pt.hotel.animais/
 ├── config/
 │   ├── SecurityConfig.java
-│   ├── AuditConfig.java
 │   └── converter/
 │       └── AuditoriaDetalhesConverter.java
 ├── controller/
@@ -330,7 +329,7 @@ Templates Thymeleaf residem em `src/main/resources/templates/`, organizados por 
 | Base de dados principal | MySQL 8 |
 | Template engine | Thymeleaf |
 | CSS / UI | AdminLTE + Bootstrap 4.6 |
-| Observabilidade / auditoria | Spring Boot Actuator + auditoria interna |
+| Observabilidade / auditoria | Spring Boot Actuator (`health`/`info`) + auditoria funcional persistente própria (`AuditoriaEvento`) |
 | Gestão de dependências e construção | Maven |
 | Testes | JUnit 5 + Mockito + Spring Boot Test + Spring Security Test + Playwright |
 | Qualidade | JaCoCo + PITest |
@@ -352,7 +351,7 @@ Templates Thymeleaf residem em `src/main/resources/templates/`, organizados por 
 | RNF-06 (consistência da informação) | Repositórios Spring Data JPA, transações atómicas e regras de domínio centralizadas |
 | RNF-07 (consulta eficiente de informação acumulada) | Queries específicas, paginação e separação entre consulta operacional e histórico |
 | RNF-08 (retenção da informação) | Persistência em MySQL com migrações Flyway e testes de integração sobre a base relacional |
-| RNF-09 (rastreabilidade temporal) | Auditoria persistida, publicação de eventos e registo de autor/data-hora em operações críticas |
+| RNF-09 (rastreabilidade temporal) | Auditoria persistida exclusivamente por `AuditoriaOperacaoService`/`AuditoriaService` e registo de autor/data-hora em operações críticas |
 
 ---
 

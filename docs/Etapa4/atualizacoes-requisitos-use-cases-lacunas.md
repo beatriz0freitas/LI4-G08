@@ -21,7 +21,7 @@ As lacunas foram tratadas sem criar novos identificadores desnecessários. Sempr
 | `LAC-10` | `RF-14`, `RF-17`, `RF-18`, `RD-09`, `RD-11` | `UC-10`, `UC-11` | Serviços extra e intervenções clínicas passaram a exigir estadia ativa, tipo/catálogo válido, responsável quando aplicável e custo não negativo. |
 | `LAC-11` | `RF-05`, `RF-14` | `UC-11`, `UC-13` | Histórico consolidado clarificado com filtros combinados por animal, cliente/tutor, estadia, período e tipo de evento. |
 | `LAC-12` | Regras arquiteturais da Etapa 2 e specs `003`/`004` | `UC-02`, `UC-04`, `UC-06`, `UC-07`, `UC-11` | Controladores passaram a delegar regras em serviços de aplicação; regras críticas ficam fora da camada web. |
-| `LAC-13` | `RF-19`, `FR-011`, `SC-008`, `SC-009` | `UC-01`, `UC-05`, `UC-06`, `UC-07`, `UC-09`, `UC-10`, `UC-11`, `UC-13` | Auditoria centralizada para operações críticas com `AuditoriaEvento`, filtros, retenção e acesso restrito. |
+| `LAC-13` | `RF-19`, `FR-011`, `SC-008`, `SC-009` | `UC-01`, `UC-05`, `UC-06`, `UC-07`, `UC-09`, `UC-10`, `UC-11`, `UC-13` | Auditoria funcional exclusivamente persistida em `AuditoriaEvento`, incluindo `RELATORIO_GERADO`, com filtros, retenção e acesso restrito. |
 | `LAC-14` | `RF-03`, `FR-001`, `FR-003`, `FR-012`, `FR-013`, `SC-010`, `SC-011`, `SC-012` | `UC-13` | Relatórios passaram a exigir PDF válido, agrupamento comum web/CSV/PDF e limite síncrono de 3 meses. |
 | `LAC-15` | Critérios de verificação das specs `001`-`005` | Todos os UC críticos | Testes reforçados para fluxos de reserva, estadia, pagamento, cuidados, clínica, histórico, auditoria e relatórios. |
 
