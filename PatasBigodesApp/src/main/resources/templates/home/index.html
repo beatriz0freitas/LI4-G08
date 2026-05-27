@@ -21,42 +21,80 @@
 
 		<section class="content">
 			<div class="container-fluid">
+				<div class="card card-outline card-primary mb-4">
+					<div class="card-body d-md-flex justify-content-between align-items-center">
+						<div class="mb-3 mb-md-0">
+							<h2 class="h4 mb-2">Área de trabalho Patas&amp;Bigodes</h2>
+							<p class="text-muted mb-0">Aceda às operações disponíveis para o seu perfil e acompanhe o funcionamento diário do hotel.</p>
+						</div>
+						<div sec:authorize="hasAnyRole('DIRETOR','FUNCIONARIO_RECEPCAO')">
+							<a th:href="@{/reservas/disponibilidade}" class="btn btn-primary mr-2">
+								<i class="fas fa-calendar-check mr-1"></i> Consultar disponibilidade
+							</a>
+							<a th:href="@{/reservas/novo}" class="btn btn-outline-primary">
+								<i class="fas fa-plus mr-1"></i> Nova reserva
+							</a>
+						</div>
+					</div>
+				</div>
+
+				<h2 class="h5 mb-3">Módulos disponíveis</h2>
 				<div class="row">
 					<div class="col-lg-3 col-md-6" sec:authorize="hasRole('DIRETOR')">
 						<a th:href="@{/dashboard}" class="small-box bg-info text-white text-decoration-none d-block">
 							<div class="inner">
-								<h3>Direção</h3>
-								<p>Dashboard e relatórios</p>
+								<h3 class="h4">Direção</h3>
+								<p>Dashboard e indicadores</p>
 							</div>
 							<div class="icon"><i class="fas fa-chart-line"></i></div>
 						</a>
 					</div>
 
 					<div class="col-lg-3 col-md-6" sec:authorize="hasAnyRole('DIRETOR','FUNCIONARIO_RECEPCAO')">
-						<a th:href="@{/reservas}" class="small-box bg-success text-white text-decoration-none d-block">
+						<a th:href="@{/reservas/disponibilidade}" class="small-box bg-success text-white text-decoration-none d-block">
 							<div class="inner">
-								<h3>Receção</h3>
+								<h3 class="h4">Disponibilidade</h3>
+								<p>Consultar alojamentos livres</p>
+							</div>
+							<div class="icon"><i class="fas fa-calendar-check"></i></div>
+						</a>
+					</div>
+
+					<div class="col-lg-3 col-md-6" sec:authorize="hasAnyRole('DIRETOR','FUNCIONARIO_RECEPCAO','CUIDADOR','MEDICO_VETERINARIO')">
+						<a th:href="@{/plano-cuidados}" class="small-box bg-warning text-white text-decoration-none d-block">
+							<div class="inner">
+								<h3 class="h4">Estadias</h3>
+								<p>Planos de cuidados ativos</p>
+							</div>
+							<div class="icon"><i class="fas fa-bed"></i></div>
+						</a>
+					</div>
+
+					<div class="col-lg-3 col-md-6" sec:authorize="hasAnyRole('DIRETOR','FUNCIONARIO_RECEPCAO')">
+						<a th:href="@{/reservas}" class="small-box bg-primary text-white text-decoration-none d-block">
+							<div class="inner">
+								<h3 class="h4">Receção</h3>
 								<p>Tutores, animais e reservas</p>
 							</div>
 							<div class="icon"><i class="fas fa-users"></i></div>
 						</a>
 					</div>
 
-					<div class="col-lg-3 col-md-6" sec:authorize="hasAnyRole('DIRETOR','CUIDADOR','MEDICO_VETERINARIO')">
-						<a th:href="@{/plano-cuidados}" class="small-box bg-warning text-white text-decoration-none d-block">
+					<div class="col-lg-3 col-md-6" sec:authorize="hasAnyRole('DIRETOR','MEDICO_VETERINARIO')">
+						<a th:href="@{/clinica}" class="small-box bg-danger text-white text-decoration-none d-block">
 							<div class="inner">
-								<h3>Cuidados</h3>
-								<p>Planos e registos</p>
+								<h3 class="h4">Clínica</h3>
+								<p>Acompanhamento clínico</p>
 							</div>
 							<div class="icon"><i class="fas fa-notes-medical"></i></div>
 						</a>
 					</div>
 
-					<div class="col-lg-3 col-md-6" sec:authorize="hasAnyRole('DIRETOR','FUNCIONARIO_RECEPCAO','RESPONSAVEL_LIMPEZA')">
+					<div class="col-lg-3 col-md-6" sec:authorize="hasAnyRole('DIRETOR','RESPONSAVEL_LIMPEZA')">
 						<a th:href="@{/limpeza}" class="small-box bg-secondary text-white text-decoration-none d-block">
 							<div class="inner">
-								<h3>Operação</h3>
-								<p>Alojamentos e limpeza</p>
+								<h3 class="h4">Limpeza</h3>
+								<p>Alojamentos pendentes</p>
 							</div>
 							<div class="icon"><i class="fas fa-broom"></i></div>
 						</a>

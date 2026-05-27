@@ -53,7 +53,7 @@
 								</div>
 								<div class="card-body">
 									<div class="mb-2"><strong>Tutor:</strong> <a th:href="@{/tutores/{id}(id=${reserva.tutor.id})}" th:text="${reserva.tutor.nome}">Tutor</a></div>
-									<div class="mb-2"><strong>Animal:</strong> <a th:href="@{/tutores/animais/{id}(id=${reserva.animal.id})}" th:text="${reserva.animal.nome}">Animal</a></div>
+									<div class="mb-2"><strong>Animal:</strong> <a th:href="@{/animais/{id}(id=${reserva.animal.id})}" th:text="${reserva.animal.nome}">Animal</a></div>
 									<div class="mb-2"><strong>Alojamento:</strong> <span th:text="${reserva.alojamento.identificacao}">Alojamento</span></div>
 								</div>
 							</div>

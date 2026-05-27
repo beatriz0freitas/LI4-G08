@@ -8,11 +8,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import pt.hotel.animais.dto.PlanoCuidadosDto;
 import pt.hotel.animais.dto.TarefaCuidadoFormDto;
 import pt.hotel.animais.model.enums.PrioridadePlano;
 import pt.hotel.animais.service.IPlanoCuidadosService;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -26,7 +30,35 @@ public class PlanoCuidadosController {
      * Visualizar plano de cuidados ativo para uma estadia
      */
     @GetMapping
-    public String viewPlano(@RequestParam Long estadiaId, Model model) {
+    public String viewPlano(@RequestParam(required = false) Long estadiaId,
+                            @RequestParam(defaultValue = "0") int page,
+                            Model model) {
+        model.addAttribute("activePage", "plano-cuidados");
+        model.addAttribute("breadcrumb", "Plano de Cuidados");
+
+        if (estadiaId == null) {
+            List<PlanoCuidadosDto> planosTurno = planoCuidadosService.listarPlanosAtivosDoTurno();
+            long totalTarefas = planosTurno.stream()
+                .mapToLong(PlanoCuidadosDto::getTotalTarefas)
+                .sum();
+            long tarefasConcluidas = planosTurno.stream()
+                .mapToLong(PlanoCuidadosDto::getTarefasConcluidas)
+                .sum();
+            long tarefasPendentes = totalTarefas - tarefasConcluidas;
+
+            model.addAttribute("planosTurno", planosTurno);
+            model.addAttribute("totalAnimais", planosTurno.size());
+            model.addAttribute("totalTarefas", totalTarefas);
+            model.addAttribute("tarefasConcluidas", tarefasConcluidas);
+            model.addAttribute("tarefasPendentes", tarefasPendentes);
+            model.addAttribute("percentagemProgresso",
+                totalTarefas == 0 ? 0 : tarefasConcluidas * 100 / totalTarefas);
+            model.addAttribute("turnoAtual", determinarTurnoAtual());
+            model.addAttribute("dataTurno", LocalDate.now());
+            model.addAttribute("pageTitle", "Plano de Cuidados - Turno");
+            return "cuidados/lista-planos";
+        }
+
         try {
             var plano = planoCuidadosService.obterPlanoPorEstadia(estadiaId);
             model.addAttribute("plano", plano);
@@ -45,11 +77,12 @@ public class PlanoCuidadosController {
      * Criar novo plano de cuidados para uma estadia
      */
     @PostMapping("/criar")
-    public String criarPlano(@RequestParam Long estadiaId, @RequestParam Long animalId,
+    public String criarPlano(@RequestParam Long estadiaId,
+                             @RequestParam(required = false) Long animalId,
                              RedirectAttributes redirectAttributes) {
         try {
-            planoCuidadosService.criarPlanoParaEstadia(estadiaId, animalId);
-            redirectAttributes.addFlashAttribute("successMessage", "Plano de cuidados criado com sucesso");
+            planoCuidadosService.obterOuCriarPlanoParaEstadiaAtiva(estadiaId);
+            redirectAttributes.addFlashAttribute("successMessage", "Plano de cuidados disponível");
             return "redirect:/plano-cuidados?estadiaId=" + estadiaId;
         } catch (Exception e) {
             log.error("Erro ao criar plano: {}", e.getMessage());
@@ -163,6 +196,8 @@ public class PlanoCuidadosController {
             var planosPage = planoCuidadosService.listarPlanosDoAnimal(animalId, pageable);
             model.addAttribute("planosPage", planosPage);
             model.addAttribute("animalId", animalId);
+            model.addAttribute("activePage", "plano-cuidados");
+            model.addAttribute("breadcrumb", "Histórico de Planos");
             model.addAttribute("pageTitle", "Histórico de Planos de Cuidados");
             return "cuidados/historico";
         } catch (Exception e) {
@@ -188,5 +223,16 @@ public class PlanoCuidadosController {
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao encerrar plano: " + e.getMessage());
             return "redirect:/estadias?estadiaId=" + estadiaId;
         }
+    }
+
+    private String determinarTurnoAtual() {
+        LocalTime agora = LocalTime.now();
+        if (agora.isBefore(LocalTime.NOON)) {
+            return "manhã";
+        }
+        if (agora.isBefore(LocalTime.of(20, 0))) {
+            return "tarde";
+        }
+        return "noite";
     }
 }

@@ -14,11 +14,14 @@ import pt.hotel.animais.dto.TarefaCuidadoFormDto;
 import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.PlanoCuidados;
+import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.TarefaCuidado;
+import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.model.enums.PeriodicidadeTarefa;
 import pt.hotel.animais.model.enums.PrioridadePlano;
 import pt.hotel.animais.repository.AnimalRepository;
 import pt.hotel.animais.repository.EstadiaRepository;
+import pt.hotel.animais.repository.NotaRepository;
 import pt.hotel.animais.repository.PlanoCuidadosRepository;
 import pt.hotel.animais.repository.TarefaCuidadoRepository;
 
@@ -38,6 +41,7 @@ class PlanoCuidadosServiceTest {
     @Mock private TarefaCuidadoRepository tarefaCuidadoRepository;
     @Mock private EstadiaRepository estadiaRepository;
     @Mock private AnimalRepository animalRepository;
+    @Mock private NotaRepository notaRepository;
 
     @InjectMocks
     private PlanoCuidadosService service;
@@ -50,7 +54,6 @@ class PlanoCuidadosServiceTest {
         Animal animal = criarAnimal(2L);
 
         when(estadiaRepository.findById(1L)).thenReturn(Optional.of(estadia));
-        when(animalRepository.findById(2L)).thenReturn(Optional.of(animal));
         when(planoCuidadosRepository.findByEstadiaId(1L)).thenReturn(Optional.empty());
         when(planoCuidadosRepository.save(any())).thenAnswer(inv -> {
             PlanoCuidados p = inv.getArgument(0);
@@ -72,7 +75,6 @@ class PlanoCuidadosServiceTest {
     @Test
     void criarPlanoDeveLancarExcecaoSeJaExistePlanoParaEstadia() {
         when(estadiaRepository.findById(1L)).thenReturn(Optional.of(criarEstadia(1L)));
-        when(animalRepository.findById(2L)).thenReturn(Optional.of(criarAnimal(2L)));
         when(planoCuidadosRepository.findByEstadiaId(1L)).thenReturn(Optional.of(new PlanoCuidados()));
 
         assertThatThrownBy(() -> service.criarPlanoParaEstadia(1L, 2L))
@@ -92,13 +94,33 @@ class PlanoCuidadosServiceTest {
     }
 
     @Test
-    void criarPlanoDeveLancarExcecaoSeAnimalInexistente() {
+    void criarPlanoDeveRejeitarAnimalDiferenteDoAssociadoAEstadia() {
         when(estadiaRepository.findById(1L)).thenReturn(Optional.of(criarEstadia(1L)));
-        when(animalRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.criarPlanoParaEstadia(1L, 99L))
-                .isInstanceOf(Exception.class)
-                .hasMessageContaining("Animal");
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("não corresponde");
+    }
+
+    @Test
+    void obterOuCriarPlanoDeveDerivarAnimalEInstrucoesDaEstadiaAtiva() {
+        Estadia estadia = criarEstadia(1L);
+        Animal animal = estadia.getReserva().getAnimal();
+        animal.setNecessidadesAlimentares("Ração hipoalergénica");
+        animal.setMedicacaoCurso("Comprimido diário");
+        when(estadiaRepository.findById(1L)).thenReturn(Optional.of(estadia));
+        when(planoCuidadosRepository.findByEstadiaId(1L)).thenReturn(Optional.empty());
+        when(planoCuidadosRepository.save(any())).thenAnswer(inv -> {
+            PlanoCuidados plano = inv.getArgument(0);
+            plano.setId(10L);
+            return plano;
+        });
+        when(tarefaCuidadoRepository.findByPlanoCuidadosId(10L)).thenReturn(List.of());
+
+        PlanoCuidadosDto dto = service.obterOuCriarPlanoParaEstadiaAtiva(1L);
+
+        assertThat(dto.getAnimalId()).isEqualTo(2L);
+        assertThat(dto.getInstrucoes()).contains("Ração hipoalergénica", "Comprimido diário");
     }
 
     // ── obterPlanoPorEstadia ──────────────────────────────────────────────
@@ -122,6 +144,38 @@ class PlanoCuidadosServiceTest {
         assertThatThrownBy(() -> service.obterPlanoPorEstadia(99L))
                 .isInstanceOf(Exception.class)
                 .hasMessageContaining("não encontrado");
+    }
+
+    @Test
+    void listarPlanosAtivosDeveRetornarPaginaParaSelecaoOperacional() {
+        PlanoCuidados plano = criarPlano(5L, criarEstadia(1L), criarAnimal(2L));
+        when(planoCuidadosRepository.findByAtivoTrueOrderByDataInicioAsc(any()))
+                .thenReturn(new PageImpl<>(List.of(plano)));
+        when(tarefaCuidadoRepository.findByPlanoCuidadosId(5L)).thenReturn(List.of());
+
+        Page<PlanoCuidadosDto> resultado = service.listarPlanosAtivos(PageRequest.of(0, 10));
+
+        assertThat(resultado.getTotalElements()).isEqualTo(1);
+        assertThat(resultado.getContent().get(0).getEstadiaId()).isEqualTo(1L);
+    }
+
+    @Test
+    void listarTurnoDeveCriarPlanoEmFaltaParaEstadiaAtiva() {
+        Estadia estadia = criarEstadia(1L);
+        PlanoCuidados plano = criarPlano(5L, estadia, estadia.getReserva().getAnimal());
+        PlanoCuidados planoDeEstadiaTerminada = criarPlano(6L, criarEstadia(9L), criarAnimal(3L));
+        when(estadiaRepository.findEstadiasEmCursoComDetalhes()).thenReturn(List.of(estadia));
+        when(planoCuidadosRepository.findByEstadiaId(1L)).thenReturn(Optional.empty());
+        when(planoCuidadosRepository.save(any())).thenReturn(plano);
+        when(planoCuidadosRepository.findByAtivoTrueOrderByDataInicioAsc())
+            .thenReturn(List.of(plano, planoDeEstadiaTerminada));
+        when(tarefaCuidadoRepository.findByPlanoCuidadosId(5L)).thenReturn(List.of());
+
+        List<PlanoCuidadosDto> turno = service.listarPlanosAtivosDoTurno();
+
+        assertThat(turno).hasSize(1);
+        assertThat(turno.get(0).getEstadiaId()).isEqualTo(1L);
+        verify(planoCuidadosRepository).save(any(PlanoCuidados.class));
     }
 
     // ── listarPlanosDoAnimal ──────────────────────────────────────────────
@@ -284,12 +338,27 @@ class PlanoCuidadosServiceTest {
                 .hasMessageContaining("Plano");
     }
 
+    @Test
+    void encerrarPlanoDaEstadiaDeveEncerrarPlanoAtivoQuandoExiste() {
+        PlanoCuidados plano = criarPlano(5L, criarEstadia(1L), criarAnimal(2L));
+        when(planoCuidadosRepository.findByEstadiaId(1L)).thenReturn(Optional.of(plano));
+
+        service.encerrarPlanoDaEstadia(1L);
+
+        assertThat(plano.getAtivo()).isFalse();
+        verify(planoCuidadosRepository).save(plano);
+    }
+
     // ── helpers ───────────────────────────────────────────────────────────
 
     private Estadia criarEstadia(Long id) {
         Estadia e = new Estadia();
         e.setId(id);
         e.setDataInicio(LocalDateTime.now().minusDays(1));
+        e.setEstado(EstadoEstadia.EM_CURSO);
+        Reserva reserva = new Reserva();
+        reserva.setAnimal(criarAnimal(2L));
+        e.setReserva(reserva);
         return e;
     }
 

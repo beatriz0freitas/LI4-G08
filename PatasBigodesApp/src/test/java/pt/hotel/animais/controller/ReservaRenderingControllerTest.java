@@ -22,6 +22,7 @@ import pt.hotel.animais.repository.TutorRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import static org.hamcrest.Matchers.not;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -105,7 +106,8 @@ class ReservaRenderingControllerTest {
             .andExpect(content().string(containsString("Procura-CAN-1")))
             .andExpect(content().string(containsString("alojamentoId=" + alojamento.getId())))
             .andExpect(content().string(containsString("dataInicio=" + dataInicio)))
-            .andExpect(content().string(containsString("dataFim=" + dataFim)));
+            .andExpect(content().string(containsString("dataFim=" + dataFim)))
+            .andExpect(content().string(not(containsString("#passo1"))));
     }
 
     private Tutor criarTutor() {

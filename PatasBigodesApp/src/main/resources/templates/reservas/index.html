@@ -195,7 +195,7 @@
 													</span>
 												</td>
 												<td>
-													<a th:href="@{/reservas/novo(alojamentoId=${disponibilidade.alojamentoId},dataInicio=${#temporals.format(dataInicio,'yyyy-MM-dd')},dataFim=${#temporals.format(dataFim,'yyyy-MM-dd')})} + '#passo1'" 
+													<a th:href="@{/reservas/novo(alojamentoId=${disponibilidade.alojamentoId},dataInicio=${#temporals.format(dataInicio,'yyyy-MM-dd')},dataFim=${#temporals.format(dataFim,'yyyy-MM-dd')})}"
 													   class="btn btn-sm btn-success">
 														<i class="fas fa-arrow-right mr-1"></i>Reservar
 													</a>

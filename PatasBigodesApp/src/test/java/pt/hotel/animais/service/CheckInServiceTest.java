@@ -24,6 +24,7 @@ class CheckInServiceTest {
     @Autowired private AnimalRepository animalRepository;
     @Autowired private AlojamentoRepository alojamentoRepository;
     @Autowired private ReservaRepository reservaRepository;
+    @Autowired private PlanoCuidadosRepository planoCuidadosRepository;
 
     @Test
     void checkInCriaEstadiaEmCursoERegistaPagamentoCheckIn() {
@@ -35,6 +36,9 @@ class CheckInServiceTest {
         assertThat(estadia.getEstado()).isEqualTo(EstadoEstadia.EM_CURSO);
         assertThat(estadia.getDataInicio()).isNotNull();
         assertThat(estadia.getReserva().getId()).isEqualTo(reserva.getId());
+        PlanoCuidados plano = planoCuidadosRepository.findByEstadiaId(estadia.getId()).orElseThrow();
+        assertThat(plano.getAnimal().getId()).isEqualTo(reserva.getAnimal().getId());
+        assertThat(plano.getAtivo()).isTrue();
 
         var pagamentos = pagamentoRepository.findAll();
         assertThat(pagamentos).isNotEmpty();

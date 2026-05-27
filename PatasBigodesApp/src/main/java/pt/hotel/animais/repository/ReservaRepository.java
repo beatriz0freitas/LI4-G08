@@ -58,6 +58,19 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
         @Param("dataInicio") LocalDate dataInicio,
         @Param("dataFim") LocalDate dataFim
     );
+
+    @Query("SELECT r FROM Reserva r " +
+           "JOIN FETCH r.animal " +
+           "JOIN FETCH r.alojamento " +
+           "WHERE r.alojamento.id = :alojamentoId " +
+           "AND r.estado IN (pt.hotel.animais.model.enums.EstadoReserva.ATIVA, pt.hotel.animais.model.enums.EstadoReserva.CONFIRMADA) " +
+           "AND NOT (r.dataFim < :dataInicio OR r.dataInicio > :dataFim) " +
+           "ORDER BY r.dataInicio ASC")
+    List<Reserva> findActiveReservasInPeriodWithDetalhes(
+        @Param("alojamentoId") Long alojamentoId,
+        @Param("dataInicio") LocalDate dataInicio,
+        @Param("dataFim") LocalDate dataFim
+    );
     
     /**
      * Procura reservas ativas de um animal.

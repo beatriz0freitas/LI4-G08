@@ -21,13 +21,17 @@ import pt.hotel.animais.service.ITutorService;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -61,11 +65,20 @@ class DisponibilidadeIntegrationTest {
     @WithMockUser(username = "10", roles = {"FUNCIONARIO_RECEPCAO"})
     void getFormularioDeDisponibilidadeDeveRenderizarTemplate() throws Exception {
         assertMocksInjected();
+        DisponibilidadeAlojamentoDto dto = new DisponibilidadeAlojamentoDto(5L, "Box A1", "CANINO", 2);
+        dto.setEstado("LIVRE");
+        dto.setDisponivel(true);
+        when(alojamentoService.consultarMapaDisponibilidade(any(LocalDate.class), any(LocalDate.class), isNull()))
+            .thenReturn(List.of(dto));
+        when(alojamentoService.listarTipos()).thenReturn(List.of("CANINO"));
 
         mockMvc.perform(get("/reservas/disponibilidade"))
             .andExpect(status().isOk())
             .andExpect(view().name("reservas/disponibilidade"))
-            .andExpect(model().attribute("pageTitle", "Consultar Disponibilidade"));
+            .andExpect(model().attribute("pageTitle", "Mapa de Disponibilidade"))
+            .andExpect(model().attribute("totalLivres", 1L))
+            .andExpect(content().string(containsString("Mapa de Disponibilidade")))
+            .andExpect(content().string(containsString("Box A1")));
     }
 
     @Test

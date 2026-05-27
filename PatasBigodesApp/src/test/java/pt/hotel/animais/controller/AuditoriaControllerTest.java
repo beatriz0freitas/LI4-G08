@@ -8,6 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -53,7 +54,7 @@ class AuditoriaControllerTest {
     @WithMockUser(roles = "DIRETOR")
     void listarAuditoriaDiretorDeveRenderizarPagina() throws Exception {
         when(auditoriaService.consultarPorPeriodo(any(), any(), any(), any(Pageable.class)))
-            .thenReturn(new PageImpl<>(List.of(eventoAuditoria())));
+            .thenReturn(new PageImpl<>(List.of(eventoAuditoria()), PageRequest.of(0, 20), 21));
         when(colaboradorService.listarTodos()).thenReturn(List.of(colaborador()));
 
         mockMvc.perform(get("/auditoria")
@@ -62,7 +63,9 @@ class AuditoriaControllerTest {
             .andExpect(status().isOk())
             .andExpect(view().name("auditoria/list"))
             .andExpect(model().attributeExists("eventos"))
-            .andExpect(content().string(org.hamcrest.Matchers.containsString("CRIAR_COLABORADOR")));
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("CRIAR_COLABORADOR")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("/auditoria?page=1")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Seguinte")));
     }
 
     @Test

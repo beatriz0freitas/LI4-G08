@@ -1,6 +1,7 @@
 package pt.hotel.animais.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -31,6 +32,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/reservas")
 public class ReservaController {
+
+    private static final List<String> PASSOS_RESERVA = List.of(
+        "passo1", "passo2", "passo3", "passo4", "passo5"
+    );
     
     private final IReservaService reservaService;
     private final IAlojamentoService alojamentoService;
@@ -53,14 +58,46 @@ public class ReservaController {
     }
     
     /**
-     * GET /reservas/disponibilidade - Página de consulta de disponibilidade.
+     * GET /reservas/disponibilidade - Mapa único de disponibilidade.
      */
     @GetMapping("/disponibilidade")
-    public String disponibilidadeForm(Model model) {
-        model.addAttribute("pageTitle", "Consultar Disponibilidade");
-        model.addAttribute("breadcrumb", "Alojamentos Disponíveis");
-        model.addAttribute("activePage", "reservas");
-        
+    public String disponibilidadeForm(
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+        @RequestParam(required = false) String tipo,
+        @RequestParam(required = false) Long alojamentoId,
+        Model model
+    ) {
+        LocalDate inicio = dataInicio != null ? dataInicio : LocalDate.now();
+        LocalDate fim = dataFim != null ? dataFim : inicio.plusDays(1);
+        List<DisponibilidadeAlojamentoDto> mapa = List.of();
+
+        try {
+            mapa = alojamentoService.consultarMapaDisponibilidade(inicio, fim, tipo);
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("errorMessage", e.getMessage());
+        }
+
+        DisponibilidadeAlojamentoDto selecionado = mapa.stream()
+            .filter(item -> alojamentoId != null && alojamentoId.equals(item.getAlojamentoId()))
+            .findFirst()
+            .orElse(mapa.stream().findFirst().orElse(null));
+        List<String> tipos = alojamentoService.listarTipos();
+
+        model.addAttribute("mapaAlojamentos", mapa);
+        model.addAttribute("alojamentoSelecionado", selecionado);
+        model.addAttribute("totalLivres", contarEstado(mapa, "LIVRE"));
+        model.addAttribute("totalOcupados", contarEstado(mapa, "OCUPADO"));
+        model.addAttribute("totalReservados", contarEstado(mapa, "RESERVADO"));
+        model.addAttribute("totalLimpeza", contarEstado(mapa, "LIMPEZA"));
+        model.addAttribute("tiposAlojamento", tipos != null ? tipos : List.of());
+        model.addAttribute("tipo", tipo);
+        model.addAttribute("dataInicio", inicio);
+        model.addAttribute("dataFim", fim);
+        model.addAttribute("pageTitle", "Mapa de Disponibilidade");
+        model.addAttribute("breadcrumb", "Mapa de Disponibilidade");
+        model.addAttribute("activePage", "disponibilidade");
+
         return "reservas/disponibilidade";
     }
     
@@ -78,7 +115,7 @@ public class ReservaController {
             if (dataInicio == null || dataFim == null) {
                 model.addAttribute("errorMessage", "Datas são obrigatórias");
                 model.addAttribute("pageTitle", "Consultar Disponibilidade");
-                model.addAttribute("activePage", "reservas");
+                model.addAttribute("activePage", "disponibilidade");
                 model.addAttribute("dataInicio", dataInicio);
                 model.addAttribute("dataFim", dataFim);
                 return "reservas/disponibilidade";
@@ -87,7 +124,7 @@ public class ReservaController {
             if (!dataInicio.isBefore(dataFim)) {
                 model.addAttribute("errorMessage", "Data de início deve ser anterior a data de fim");
                 model.addAttribute("pageTitle", "Consultar Disponibilidade");
-                model.addAttribute("activePage", "reservas");
+                model.addAttribute("activePage", "disponibilidade");
                 model.addAttribute("dataInicio", dataInicio);
                 model.addAttribute("dataFim", dataFim);
                 return "reservas/disponibilidade";
@@ -106,13 +143,13 @@ public class ReservaController {
             model.addAttribute("dataFim", dataFim);
             model.addAttribute("pageTitle", "Resultados de Disponibilidade");
             model.addAttribute("breadcrumb", "Alojamentos Disponíveis");
-            model.addAttribute("activePage", "reservas");
+            model.addAttribute("activePage", "disponibilidade");
             
             return "reservas/index";
         } catch (Exception e) {
             model.addAttribute("errorMessage", e.getMessage());
             model.addAttribute("pageTitle", "Consultar Disponibilidade");
-            model.addAttribute("activePage", "reservas");
+            model.addAttribute("activePage", "disponibilidade");
             model.addAttribute("dataInicio", dataInicio);
             model.addAttribute("dataFim", dataFim);
             return "reservas/disponibilidade";
@@ -129,6 +166,7 @@ public class ReservaController {
         @RequestParam(name = "alojamentoId", required = false) Long alojamentoId,
         @RequestParam(name = "dataInicio", required = false) String dataInicio,
         @RequestParam(name = "dataFim", required = false) String dataFim,
+        @RequestParam(name = "step", defaultValue = "passo1") String step,
         Model model
     ) {
         ReservaFormDto reservaForm = new ReservaFormDto();
@@ -150,6 +188,7 @@ public class ReservaController {
         }
         
         prepararFormularioReserva(reservaForm, model);
+        model.addAttribute("activeStep", determinarPassoAtivo(step, reservaForm, model));
         
         return "reservas/form";
     }
@@ -166,6 +205,7 @@ public class ReservaController {
     ) {
         if (bindingResult.hasErrors()) {
             prepararFormularioReserva(formDto, model);
+            model.addAttribute("activeStep", passoComErros(bindingResult));
             return "reservas/form";
         }
         
@@ -177,6 +217,7 @@ public class ReservaController {
         } catch (IllegalArgumentException e) {
             model.addAttribute("errorMessage", e.getMessage());
             prepararFormularioReserva(formDto, model);
+            model.addAttribute("activeStep", determinarPassoAtivo("passo5", formDto, model));
             return "reservas/form";
         }
     }
@@ -260,17 +301,31 @@ public class ReservaController {
         return "redirect:/reservas/" + id;
     }
 
+    private long contarEstado(List<DisponibilidadeAlojamentoDto> mapa, String estado) {
+        return mapa.stream()
+            .filter(alojamento -> estado.equals(alojamento.getEstado()))
+            .count();
+    }
+
     private void prepararFormularioReserva(ReservaFormDto reservaForm, Model model) {
         List<Tutor> tutores = tutorService.listarTodos();
         List<Animal> animaisTutor = new ArrayList<>();
         List<DisponibilidadeAlojamentoDto> disponibilidades = new ArrayList<>();
         String tipoAlojamentoEsperado = null;
 
+        if (reservaForm.getTutorId() != null && tutores.stream()
+            .noneMatch(tutor -> tutor.getId().equals(reservaForm.getTutorId()))) {
+            adicionarAvisoSeAusente(model, "Tutor não encontrado. Selecione outro tutor.");
+            reservaForm.setTutorId(null);
+            reservaForm.setAnimalId(null);
+            reservaForm.setAlojamentoId(null);
+        }
+
         if (reservaForm.getTutorId() != null) {
             try {
                 animaisTutor = animalService.procurarPorTutor(reservaForm.getTutorId());
             } catch (IllegalArgumentException e) {
-                model.addAttribute("warningMessage", "Tutor não encontrado. Selecione outro tutor.");
+                adicionarAvisoSeAusente(model, "Tutor não encontrado. Selecione outro tutor.");
                 reservaForm.setTutorId(null);
                 reservaForm.setAnimalId(null);
                 reservaForm.setAlojamentoId(null);
@@ -284,14 +339,14 @@ public class ReservaController {
                     || animalSelecionado.getTutor().getId().equals(reservaForm.getTutorId());
 
                 if (!animalPertenceAoTutor) {
-                    model.addAttribute("warningMessage", "O animal selecionado não pertence ao tutor indicado.");
+                    adicionarAvisoSeAusente(model, "O animal selecionado não pertence ao tutor indicado.");
                     reservaForm.setAnimalId(null);
                     reservaForm.setAlojamentoId(null);
                 } else {
                     tipoAlojamentoEsperado = TipoAlojamentoPolicy.fromEspecie(animalSelecionado.getEspecie());
                 }
             } catch (IllegalArgumentException e) {
-                model.addAttribute("warningMessage", "Animal não encontrado. Selecione outro animal.");
+                adicionarAvisoSeAusente(model, "Animal não encontrado. Selecione outro animal.");
                 reservaForm.setAnimalId(null);
                 reservaForm.setAlojamentoId(null);
             }
@@ -300,8 +355,9 @@ public class ReservaController {
         if (tipoAlojamentoEsperado != null
             && reservaForm.getDataInicio() != null
             && reservaForm.getDataFim() != null) {
-            if (!reservaForm.getDataInicio().isBefore(reservaForm.getDataFim())) {
-                model.addAttribute("warningMessage", "Data de início deve ser anterior à data de fim.");
+            String erroPeriodo = validarPeriodo(reservaForm);
+            if (erroPeriodo != null) {
+                adicionarAvisoSeAusente(model, erroPeriodo);
                 reservaForm.setAlojamentoId(null);
             } else {
                 try {
@@ -312,14 +368,17 @@ public class ReservaController {
                         animalSelecionado.getEspecie()
                     );
                 } catch (IllegalArgumentException e) {
-                    model.addAttribute("warningMessage", e.getMessage());
+                    adicionarAvisoSeAusente(model, e.getMessage());
                 }
             }
         }
 
-        if (reservaForm.getAlojamentoId() != null && disponibilidades.stream()
+        if (reservaForm.getAlojamentoId() != null
+            && tipoAlojamentoEsperado != null
+            && validarPeriodo(reservaForm) == null
+            && disponibilidades.stream()
             .noneMatch(d -> d.getAlojamentoId().equals(reservaForm.getAlojamentoId()))) {
-            model.addAttribute("warningMessage", "O alojamento selecionado já não está disponível para estes dados.");
+            adicionarAvisoSeAusente(model, "O alojamento selecionado já não está disponível para estes dados.");
             reservaForm.setAlojamentoId(null);
         }
 
@@ -328,9 +387,69 @@ public class ReservaController {
         model.addAttribute("disponibilidades", disponibilidades);
         model.addAttribute("animaisTutor", animaisTutor);
         model.addAttribute("tipoAlojamentoEsperado", tipoAlojamentoEsperado);
+        model.addAttribute("dataMinima", LocalDate.now());
         model.addAttribute("pageTitle", "Nova Reserva");
         model.addAttribute("breadcrumb", "Criar Reserva");
         model.addAttribute("activePage", "reservas");
+    }
+
+    private String determinarPassoAtivo(String step, ReservaFormDto reservaForm, Model model) {
+        String passoPedido = PASSOS_RESERVA.contains(step) ? step : "passo1";
+        int indice = PASSOS_RESERVA.indexOf(passoPedido);
+
+        if (indice >= 1 && reservaForm.getTutorId() == null) {
+            adicionarAvisoSeAusente(model, "Selecione primeiro um tutor.");
+            return "passo1";
+        }
+        if (indice >= 2 && reservaForm.getAnimalId() == null) {
+            adicionarAvisoSeAusente(model, "Selecione primeiro um animal.");
+            return "passo2";
+        }
+        if (indice >= 3) {
+            String erroPeriodo = validarPeriodo(reservaForm);
+            if (erroPeriodo != null) {
+                adicionarAvisoSeAusente(model, erroPeriodo);
+                return "passo3";
+            }
+        }
+        if (indice >= 4 && reservaForm.getAlojamentoId() == null) {
+            adicionarAvisoSeAusente(model, "Selecione um alojamento disponível antes de avançar.");
+            return "passo4";
+        }
+
+        return passoPedido;
+    }
+
+    private String validarPeriodo(ReservaFormDto reservaForm) {
+        if (reservaForm.getDataInicio() == null || reservaForm.getDataFim() == null) {
+            return "Preencha o período antes de avançar.";
+        }
+        if (reservaForm.getDataInicio().isBefore(LocalDate.now())) {
+            return "A data de início não pode ser anterior à data atual.";
+        }
+        if (!reservaForm.getDataInicio().isBefore(reservaForm.getDataFim())) {
+            return "A data de início deve ser anterior à data de fim.";
+        }
+        return null;
+    }
+
+    private String passoComErros(BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors("tutorId")) {
+            return "passo1";
+        }
+        if (bindingResult.hasFieldErrors("animalId")) {
+            return "passo2";
+        }
+        if (bindingResult.hasFieldErrors("dataInicio") || bindingResult.hasFieldErrors("dataFim")) {
+            return "passo3";
+        }
+        return "passo4";
+    }
+
+    private void adicionarAvisoSeAusente(Model model, String mensagem) {
+        if (!model.containsAttribute("warningMessage")) {
+            model.addAttribute("warningMessage", mensagem);
+        }
     }
 
     private LocalDate parseDate(String value) {

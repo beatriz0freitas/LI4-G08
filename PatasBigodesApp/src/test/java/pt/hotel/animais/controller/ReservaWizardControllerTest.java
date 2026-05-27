@@ -70,23 +70,25 @@ class ReservaWizardControllerTest {
         mockMvc.perform(get("/reservas/novo"))
             .andExpect(status().isOk())
             .andExpect(view().name("reservas/form"))
-            .andExpect(model().attributeDoesNotExist("activeStep"));
+            .andExpect(model().attribute("activeStep", "passo1"));
 
         mockMvc.perform(get("/reservas/novo")
-                .param("tutorId", tutor.getId().toString()))
+                .param("tutorId", tutor.getId().toString())
+                .param("step", "passo2"))
             .andExpect(status().isOk())
             .andExpect(view().name("reservas/form"))
-            .andExpect(model().attributeDoesNotExist("activeStep"))
+            .andExpect(model().attribute("activeStep", "passo2"))
             .andExpect(model().attribute("animaisTutor", hasItem(hasProperty("id", is(animal.getId())))));
 
         mockMvc.perform(get("/reservas/novo")
                 .param("tutorId", tutor.getId().toString())
                 .param("animalId", animal.getId().toString())
                 .param("dataInicio", dataInicio.toString())
-                .param("dataFim", dataFim.toString()))
+                .param("dataFim", dataFim.toString())
+                .param("step", "passo4"))
             .andExpect(status().isOk())
             .andExpect(view().name("reservas/form"))
-            .andExpect(model().attributeDoesNotExist("activeStep"))
+            .andExpect(model().attribute("activeStep", "passo4"))
             .andExpect(model().attribute("disponibilidades", not(empty())))
             .andExpect(content().string(containsString("value=\"" + dataInicio + "\"")))
             .andExpect(content().string(containsString("value=\"" + dataFim + "\"")));
@@ -96,10 +98,11 @@ class ReservaWizardControllerTest {
                 .param("animalId", animal.getId().toString())
                 .param("alojamentoId", alojamento.getId().toString())
                 .param("dataInicio", dataInicio.toString())
-                .param("dataFim", dataFim.toString()))
+                .param("dataFim", dataFim.toString())
+                .param("step", "passo5"))
             .andExpect(status().isOk())
             .andExpect(view().name("reservas/form"))
-            .andExpect(model().attributeDoesNotExist("activeStep"))
+            .andExpect(model().attribute("activeStep", "passo5"))
             .andExpect(content().string(containsString("value=\"" + dataInicio + "\"")))
             .andExpect(content().string(containsString("value=\"" + dataFim + "\"")));
 
@@ -125,17 +128,81 @@ class ReservaWizardControllerTest {
 
         mockMvc.perform(get("/reservas/novo")
                 .param("tutorId", tutor.getId().toString())
-                .param("animalId", "999999"))
+                .param("animalId", "999999")
+                .param("step", "passo3"))
             .andExpect(status().isOk())
             .andExpect(view().name("reservas/form"))
-            .andExpect(model().attributeDoesNotExist("activeStep"))
+            .andExpect(model().attribute("activeStep", "passo2"))
             .andExpect(model().attribute("reservaForm", hasProperty("animalId", nullValue())));
 
         mockMvc.perform(get("/reservas/novo")
                 .param("step", "passo-inexistente"))
             .andExpect(status().isOk())
             .andExpect(view().name("reservas/form"))
-            .andExpect(model().attributeDoesNotExist("activeStep"));
+            .andExpect(model().attribute("activeStep", "passo1"));
+    }
+
+    @Test
+    @WithMockUser(username = "recepcao", roles = {"FUNCIONARIO_RECEPCAO"})
+    void assistenteNaoAvancaParaAlojamentoComDatasSemOrdemValida() throws Exception {
+        Tutor tutor = criarTutor("266666666");
+        Animal animal = criarAnimal(tutor);
+        LocalDate dataInicio = LocalDate.now().plusDays(5);
+
+        mockMvc.perform(get("/reservas/novo")
+                .param("tutorId", tutor.getId().toString())
+                .param("animalId", animal.getId().toString())
+                .param("dataInicio", dataInicio.toString())
+                .param("dataFim", dataInicio.toString())
+                .param("step", "passo4"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("reservas/form"))
+            .andExpect(model().attribute("activeStep", "passo3"))
+            .andExpect(model().attribute("warningMessage", "A data de início deve ser anterior à data de fim."));
+
+        mockMvc.perform(get("/reservas/novo")
+                .param("tutorId", tutor.getId().toString())
+                .param("animalId", animal.getId().toString())
+                .param("dataInicio", dataInicio.toString())
+                .param("dataFim", dataInicio.toString())
+                .param("step", "passo3"))
+            .andExpect(status().isOk())
+            .andExpect(model().attribute("activeStep", "passo3"));
+    }
+
+    @Test
+    @WithMockUser(username = "recepcao", roles = {"FUNCIONARIO_RECEPCAO"})
+    void assistenteNaoAvancaParaAlojamentoComInicioNoPassado() throws Exception {
+        Tutor tutor = criarTutor("255555555");
+        Animal animal = criarAnimal(tutor);
+
+        mockMvc.perform(get("/reservas/novo")
+                .param("tutorId", tutor.getId().toString())
+                .param("animalId", animal.getId().toString())
+                .param("dataInicio", LocalDate.now().minusDays(1).toString())
+                .param("dataFim", LocalDate.now().plusDays(1).toString())
+                .param("step", "passo4"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("reservas/form"))
+            .andExpect(model().attribute("activeStep", "passo3"))
+            .andExpect(model().attribute("warningMessage", "A data de início não pode ser anterior à data atual."));
+    }
+
+    @Test
+    @WithMockUser(username = "recepcao", roles = {"FUNCIONARIO_RECEPCAO"})
+    void assistentePreservaAlojamentoEscolhidoNaConsultaAteValidarOAnimal() throws Exception {
+        Alojamento alojamento = criarAlojamento("Wizard-PRE-1");
+        LocalDate dataInicio = LocalDate.now().plusDays(8);
+        LocalDate dataFim = dataInicio.plusDays(2);
+
+        mockMvc.perform(get("/reservas/novo")
+                .param("alojamentoId", alojamento.getId().toString())
+                .param("dataInicio", dataInicio.toString())
+                .param("dataFim", dataFim.toString()))
+            .andExpect(status().isOk())
+            .andExpect(view().name("reservas/form"))
+            .andExpect(model().attribute("activeStep", "passo1"))
+            .andExpect(model().attribute("reservaForm", hasProperty("alojamentoId", is(alojamento.getId()))));
     }
 
     private Tutor criarTutor(String nif) {

@@ -47,35 +47,36 @@
 							<h3 class="card-title">Assistente de Criação de Reserva</h3>
 						</div>
 						<div class="card-body">
+							<div id="wizardState" th:data-active-step="${activeStep}" class="d-none"></div>
 							<div class="row">
 								<div class="col-md-3">
 									<ul class="nav nav-pills flex-column wizard-steps">
 										<li class="nav-item">
-											<a href="#" class="nav-link" data-step-link="passo1" onclick="goToStep('passo1'); return false;">
+											<a href="#" class="nav-link" th:classappend="${activeStep == 'passo1'} ? ' active' : ''" data-step-link="passo1" onclick="goToStep('passo1'); return false;">
 												<i class="fas fa-user mr-2"></i>Tutor
 												<span th:if="${reservaForm.tutorId != null}" class="badge badge-success float-right"><i class="fas fa-check"></i></span>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="#" class="nav-link" data-step-link="passo2" onclick="goToStep('passo2'); return false;">
+											<a href="#" class="nav-link" th:classappend="${activeStep == 'passo2'} ? ' active' : ''" data-step-link="passo2" onclick="goToStep('passo2'); return false;">
 												<i class="fas fa-paw mr-2"></i>Animal
 												<span th:if="${reservaForm.animalId != null}" class="badge badge-success float-right"><i class="fas fa-check"></i></span>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="#" class="nav-link" data-step-link="passo3" onclick="goToStep('passo3'); return false;">
+											<a href="#" class="nav-link" th:classappend="${activeStep == 'passo3'} ? ' active' : ''" data-step-link="passo3" onclick="goToStep('passo3'); return false;">
 												<i class="fas fa-calendar mr-2"></i>Período
 												<span th:if="${reservaForm.dataInicio != null && reservaForm.dataFim != null}" class="badge badge-success float-right"><i class="fas fa-check"></i></span>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="#" class="nav-link" data-step-link="passo4" onclick="goToStep('passo4'); return false;">
+											<a href="#" class="nav-link" th:classappend="${activeStep == 'passo4'} ? ' active' : ''" data-step-link="passo4" onclick="goToStep('passo4'); return false;">
 												<i class="fas fa-cube mr-2"></i>Alojamento
 												<span th:if="${reservaForm.alojamentoId != null}" class="badge badge-success float-right"><i class="fas fa-check"></i></span>
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="#" class="nav-link" data-step-link="passo5" onclick="goToStep('passo5'); return false;">
+											<a href="#" class="nav-link" th:classappend="${activeStep == 'passo5'} ? ' active' : ''" data-step-link="passo5" onclick="goToStep('passo5'); return false;">
 												<i class="fas fa-check-circle mr-2"></i>Confirmação
 											</a>
 										</li>
@@ -85,7 +86,7 @@
 								<div class="col-md-9">
 									<form th:action="@{/reservas}" th:object="${reservaForm}" method="post" novalidate>
 										<div class="tab-content">
-											<div class="tab-pane fade show active" id="passo1">
+											<div class="tab-pane fade" th:classappend="${activeStep == 'passo1'} ? ' show active' : ''" id="passo1">
 												<div class="card card-primary mb-0">
 													<div class="card-header">
 														<h3 class="card-title">Passo 1: Selecione o Tutor</h3>
@@ -93,7 +94,7 @@
 													<div class="card-body">
 														<div class="form-group">
 															<label for="tutorId">Tutor <span class="text-danger">*</span></label>
-															<select th:field="*{tutorId}" id="tutorId" class="form-control" th:classappend="${#fields.hasErrors('tutorId')} ? ' is-invalid' : ''">
+															<select th:field="*{tutorId}" id="tutorId" class="form-control" th:classappend="${#fields.hasErrors('tutorId')} ? ' is-invalid' : ''" required>
 																<option value="">-- Selecione um tutor --</option>
 																<option th:each="tutor : ${tutores}" th:value="${tutor.id}" th:text="${tutor.nome + ' (NIF: ' + tutor.nif + ')'}">Tutor</option>
 															</select>
@@ -122,7 +123,7 @@
 												</div>
 											</div>
 
-											<div class="tab-pane fade" id="passo2">
+											<div class="tab-pane fade" th:classappend="${activeStep == 'passo2'} ? ' show active' : ''" id="passo2">
 												<div class="card card-primary mb-0">
 													<div class="card-header">
 														<h3 class="card-title">Passo 2: Selecione o Animal</h3>
@@ -139,7 +140,7 @@
 
 															<div class="form-group">
 																<label for="animalId">Animal <span class="text-danger">*</span></label>
-																<select th:field="*{animalId}" id="animalId" class="form-control" th:classappend="${#fields.hasErrors('animalId')} ? ' is-invalid' : ''">
+																<select th:field="*{animalId}" id="animalId" class="form-control" th:classappend="${#fields.hasErrors('animalId')} ? ' is-invalid' : ''" required>
 																	<option value="">-- Selecione um animal --</option>
 																	<option th:each="animal : ${animaisTutor}" th:value="${animal.id}" th:text="${animal.nome + ' (' + animal.especie.label + ')'}">Animal</option>
 																</select>
@@ -166,7 +167,7 @@
 														</div>
 													</div>
 													<div class="card-footer clearfix">
-														<button type="button" class="btn btn-secondary" onclick="goToStep('passo1')">
+														<button type="button" class="btn btn-secondary" onclick="goToPreviousStep('passo1')">
 															<i class="fas fa-arrow-left mr-2"></i>Anterior
 														</button>
 														<button type="button" class="btn btn-primary float-right" onclick="goToStep('passo3')">
@@ -176,7 +177,7 @@
 												</div>
 											</div>
 
-											<div class="tab-pane fade" id="passo3">
+											<div class="tab-pane fade" th:classappend="${activeStep == 'passo3'} ? ' show active' : ''" id="passo3">
 												<div class="card card-primary mb-0">
 													<div class="card-header">
 														<h3 class="card-title">Passo 3: Defina o Período</h3>
@@ -186,7 +187,7 @@
 															<div class="col-md-6">
 																<div class="form-group">
 																	<label for="dataInicio">Data de início <span class="text-danger">*</span></label>
-																	<input type="date" name="dataInicio" id="dataInicio" class="form-control" th:value="${reservaForm.dataInicio}" th:classappend="${#fields.hasErrors('dataInicio')} ? ' is-invalid' : ''">
+																	<input type="date" name="dataInicio" id="dataInicio" class="form-control" th:value="${reservaForm.dataInicio}" th:attr="min=${dataMinima}" th:classappend="${#fields.hasErrors('dataInicio')} ? ' is-invalid' : ''" required>
 																	<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('dataInicio')}">
 																		<div th:each="err : ${#fields.errors('dataInicio')}" th:text="${err}">Erro</div>
 																	</div>
@@ -195,7 +196,7 @@
 															<div class="col-md-6">
 																<div class="form-group">
 																	<label for="dataFim">Data de fim <span class="text-danger">*</span></label>
-																	<input type="date" name="dataFim" id="dataFim" class="form-control" th:value="${reservaForm.dataFim}" th:classappend="${#fields.hasErrors('dataFim')} ? ' is-invalid' : ''">
+																	<input type="date" name="dataFim" id="dataFim" class="form-control" th:value="${reservaForm.dataFim}" th:classappend="${#fields.hasErrors('dataFim')} ? ' is-invalid' : ''" required>
 																	<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('dataFim')}">
 																		<div th:each="err : ${#fields.errors('dataFim')}" th:text="${err}">Erro</div>
 																	</div>
@@ -209,7 +210,7 @@
 														</div>
 													</div>
 													<div class="card-footer clearfix">
-														<button type="button" class="btn btn-secondary" onclick="goToStep('passo2')">
+														<button type="button" class="btn btn-secondary" onclick="goToPreviousStep('passo2')">
 															<i class="fas fa-arrow-left mr-2"></i>Anterior
 														</button>
 														<button type="button" class="btn btn-primary float-right" onclick="goToStep('passo4')">
@@ -219,7 +220,7 @@
 												</div>
 											</div>
 
-											<div class="tab-pane fade" id="passo4">
+											<div class="tab-pane fade" th:classappend="${activeStep == 'passo4'} ? ' show active' : ''" id="passo4">
 												<div class="card card-primary mb-0">
 													<div class="card-header">
 														<h3 class="card-title">Passo 4: Selecione o Alojamento</h3>
@@ -239,7 +240,7 @@
 
 														<div class="form-group">
 															<label for="alojamentoId">Alojamento <span class="text-danger">*</span></label>
-															<select th:field="*{alojamentoId}" id="alojamentoId" class="form-control" th:classappend="${#fields.hasErrors('alojamentoId')} ? ' is-invalid' : ''">
+															<select th:field="*{alojamentoId}" id="alojamentoId" class="form-control" th:classappend="${#fields.hasErrors('alojamentoId')} ? ' is-invalid' : ''" required>
 																<option value="">-- Selecione um alojamento --</option>
 																<option th:each="d : ${disponibilidades}" th:value="${d.alojamentoId}" th:text="${d.identificacao + ' (' + d.tipoLabel + ', capacidade ' + d.capacidade + ')'}">Alojamento</option>
 															</select>
@@ -259,7 +260,7 @@
 														</div>
 													</div>
 													<div class="card-footer clearfix">
-														<button type="button" class="btn btn-secondary" onclick="goToStep('passo3')">
+														<button type="button" class="btn btn-secondary" onclick="goToPreviousStep('passo3')">
 															<i class="fas fa-arrow-left mr-2"></i>Anterior
 														</button>
 														<button type="button" class="btn btn-primary float-right" onclick="goToStep('passo5')">
@@ -269,7 +270,7 @@
 												</div>
 											</div>
 
-											<div class="tab-pane fade" id="passo5">
+											<div class="tab-pane fade" th:classappend="${activeStep == 'passo5'} ? ' show active' : ''" id="passo5">
 												<div class="card card-success mb-0">
 													<div class="card-header">
 														<h3 class="card-title">Passo 5: Revise e Confirme</h3>
@@ -321,7 +322,7 @@
 														</div>
 													</div>
 													<div class="card-footer clearfix">
-														<button type="button" class="btn btn-secondary" onclick="goToStep('passo4')">
+														<button type="button" class="btn btn-secondary" onclick="goToPreviousStep('passo4')">
 															<i class="fas fa-arrow-left mr-2"></i>Anterior
 														</button>
 														<button type="submit" class="btn btn-success float-right">
@@ -365,8 +366,9 @@
 			if (alojamentoId) params.set('alojamentoId', alojamentoId);
 			if (dataInicio) params.set('dataInicio', dataInicio);
 			if (dataFim) params.set('dataFim', dataFim);
+			params.set('step', stepId);
 			var query = params.toString();
-			return '/reservas/novo' + (query ? '?' + query : '') + '#' + stepId;
+			return '/reservas/novo' + (query ? '?' + query : '');
 		}
 
 		function goToStep(stepId) {
@@ -392,11 +394,20 @@
 				alert('A data de início deve ser anterior à data de fim.');
 				return;
 			}
+			var dataMinima = document.getElementById('dataInicio').getAttribute('min');
+			if ((stepId === 'passo4' || stepId === 'passo5') && dataInicio && dataMinima && dataInicio < dataMinima) {
+				alert('A data de início não pode ser anterior à data atual.');
+				return;
+			}
 			if (stepId === 'passo5' && !alojamentoId) {
 				alert('Selecione um alojamento antes de avançar.');
 				return;
 			}
 
+			window.location.href = buildWizardUrl(stepId);
+		}
+
+		function goToPreviousStep(stepId) {
 			window.location.href = buildWizardUrl(stepId);
 		}
 
@@ -424,8 +435,8 @@
 		}
 
 		(function activateCurrentStep() {
-			var hashStep = window.location.hash ? window.location.hash.substring(1) : '';
-			var activeStep = document.querySelector('[data-step-link="' + hashStep + '"]') ? hashStep : inferStepFromForm();
+			var state = document.getElementById('wizardState');
+			var activeStep = state && state.dataset.activeStep ? state.dataset.activeStep : inferStepFromForm();
 			activateStep(activeStep);
 		})();
 	</script>

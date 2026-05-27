@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 
 @WebMvcTest(AuthController.class)
 class AuthControllerTest {
@@ -26,6 +27,24 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("home/index"))
                 .andExpect(model().attribute("activePage", "home"));
+    }
+
+    @Test
+    @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
+    void homeDaRececaoDeveMostrarDisponibilidadeSemAcessoALimpeza() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("/reservas/disponibilidade")))
+                .andExpect(content().string(not(containsString("/limpeza"))));
+    }
+
+    @Test
+    @WithMockUser(roles = "RESPONSAVEL_LIMPEZA")
+    void homeDaLimpezaDeveMostrarApenasOModuloOperacionalPermitido() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("/limpeza")))
+                .andExpect(content().string(not(containsString("/reservas/disponibilidade"))));
     }
 
     @Test
