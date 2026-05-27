@@ -4,7 +4,7 @@ Este diretório concentra os artefactos conceptuais da Etapa 1 que descrevem o d
 
 ## Ficheiros 
 - `domain-model.mmd`: diagrama principal em Mermaid.
-- `domain-model.plantuml`: diagrama em PlauntUml
+- `modelo_dominio.plantuml`: diagrama equivalente em PlantUML.
 - `domain-model.md`: explicação curta das entidades, relações, multiplicidades e pressupostos.
   
 

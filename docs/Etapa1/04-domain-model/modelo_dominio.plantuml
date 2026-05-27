@@ -1,18 +1,21 @@
 @startuml modelo_dominio
-title Diagrama de Domínio - Sistema de Gestão de Hotel de Animais
+title Modelo de Domínio - Hotel de Animais
 
 skinparam style strictuml
 skinparam shadowing false
-skinparam linetype ortho
 skinparam classAttributeIconSize 0
-skinparam nodesep 75
-skinparam ranksep 85
-skinparam dpi 180
+skinparam linetype ortho
+skinparam nodesep 140
+skinparam ranksep 170
+skinparam padding 2
+skinparam ArrowThickness 1
+skinparam ArrowFontSize 9
+skinparam ClassFontSize 12
+skinparam ClassAttributeFontSize 11
 
 left to right direction
 
 class Tutor {
-  id
   nome
   nif
   contacto
@@ -20,19 +23,22 @@ class Tutor {
 }
 
 class Animal {
-  id
   nome
   especie
   raca
   dataNascimento
   peso
   estadoSaude
-  necessidadesAlimentares
-  medicacaoCurso
+  cuidadosRecorrentes
+}
+
+class TipoAlojamentoTarifa {
+  tipoAlojamento
+  tarifaDiaria
+  ativo
 }
 
 class Alojamento {
-  id
   identificacao
   tipo
   capacidade
@@ -40,77 +46,85 @@ class Alojamento {
 }
 
 class Reserva {
-  id
   dataInicio
   dataFim
   estado
-  dataCriacao
+  instrucoes
 }
 
 class Estadia {
-  id
-  dataInicio
-  dataFim
+  dataCheckIn
+  dataCheckOut
   estado
-  dataCriacao
 }
 
-class Nota {
-  id
+class PlanoCuidados {
+  instrucoes
+  prioridade
+  ativo
+}
+
+class TarefaCuidado {
   descricao
-  dataHora
+  periodicidade
+  concluida
 }
 
 class RegistoCuidado {
-  id
-  descricao
+  tipo
+  observacoes
   dataHora
 }
 
+class Nota {
+  texto
+  dataHora
+}
+
+class TipoServicoExtra {
+  nome
+  descricao
+  ativo
+}
+
 class ServicoExtra {
-  id
-  tipo
+  descricao
   custo
   dataHora
 }
 
 class IntervencaoClinica {
-  id
   descricao
+  prescricao
   custo
   dataHora
 }
 
 class AlteracaoEstadoSaude {
-  id
   descricao
   severidade
   dataHora
 }
 
-class HistoricoClinico {
-}
-
-class Fatura {
-  numero
-  dataEmissao
-  total
-}
-
 class Pagamento {
-  id
   valor
-  metodoPagamento
-  momentoPagamento
-  estadoPagamento
-  dataCriacao
+  metodo
+  momento
+  estado
+  dataHora
 }
 
 class Colaborador {
-  id
   nome
   email
-  tipoColaborador
+  perfil
+}
+
+class AuditoriaEvento {
+  timestamp
+  operacao
+  entidade
+  resultado
 }
 
 enum Especie {
@@ -122,11 +136,6 @@ enum EstadoSaude {
   NORMAL
   ALTERADO
   CRITICO
-}
-
-enum TipoAlojamento {
-  CANINO
-  FELINO
 }
 
 enum EstadoLimpeza {
@@ -151,22 +160,27 @@ enum EstadoPagamento {
   PENDENTE
 }
 
-enum MetodoPagamento {
-  NAO_DEFINIDO
-  NUMERARIO
-  CARTAO_DEBITO
-  CARTAO_CREDITO
-}
-
 enum MomentoPagamento {
   CHECK_IN
   CHECK_OUT
 }
 
-enum TipoServicoExtra {
-  BANHO
-  PASSEIO
-  OUTRO
+enum MetodoPagamento {
+  NUMERARIO
+  CARTAO_DEBITO
+  CARTAO_CREDITO
+}
+
+enum PrioridadePlano {
+  ROTINA
+  URGENTE
+  CRITICO
+}
+
+enum PeriodicidadeTarefa {
+  UNICA
+  DIARIA
+  SEMANAL
 }
 
 enum TipoColaborador {
@@ -177,92 +191,70 @@ enum TipoColaborador {
   RESPONSAVEL_LIMPEZA
 }
 
-' Organização visual orientada à leitura
-Tutor -[hidden]down- Animal
-Animal -[hidden]down- Alojamento
+enum ResultadoAuditoria {
+  SUCESSO
+  FALHA
+}
 
-Animal -[hidden]right- Reserva
-Alojamento -[hidden]right- Reserva
+Tutor "1" -down- "0..*" Animal : > responsavel
+Tutor "1" -right- "0..*" Reserva : > solicita
+Animal "1" -right- "0..*" Reserva : > tem
+TipoAlojamentoTarifa "1" -down- "0..*" Alojamento : > classifica
+Alojamento "1" -right- "0..*" Reserva : > reservado
 
-Reserva -[hidden]right- Estadia
+Reserva "1" -right- "0..1" Estadia : > origina
+Reserva "1" -down- "0..*" Nota : > contem
 
-Estadia -[hidden]right- RegistoCuidado
-RegistoCuidado -[hidden]down- ServicoExtra
-ServicoExtra -[hidden]down- IntervencaoClinica
-IntervencaoClinica -[hidden]down- AlteracaoEstadoSaude
+Animal "1" -down- "0..*" PlanoCuidados : > mantem
+Estadia "1" -down- "1" PlanoCuidados : > ativa
+PlanoCuidados "1" -right- "0..*" TarefaCuidado : > organiza
+Estadia "1" -down- "0..*" RegistoCuidado : > regista
+Estadia "1" -right- "0..*" ServicoExtra : > inclui
+Estadia "1" -right- "0..*" IntervencaoClinica : > inclui
+Estadia "1" -right- "0..*" AlteracaoEstadoSaude : > regista
+Estadia "1" -down- "0..*" Pagamento : > gera
 
-Estadia -[hidden]down- Fatura
-Fatura -[hidden]right- Pagamento
+TipoServicoExtra "1" -down- "0..*" ServicoExtra : > tipifica
 
-Animal -[hidden]down- HistoricoClinico
-HistoricoClinico -[hidden]right- IntervencaoClinica
+Colaborador "1" -up- "0..*" Nota : > escreve
+Colaborador "1" -left- "0..*" RegistoCuidado : > regista
+Colaborador "1" -left- "0..*" ServicoExtra : > regista
+Colaborador "1" -left- "0..*" IntervencaoClinica : > regista
+Colaborador "1" -left- "0..*" AlteracaoEstadoSaude : > regista
+Colaborador "1" -down- "0..*" AuditoriaEvento : > origina
 
-Colaborador -[hidden]right- Nota
-Nota -[hidden]down- RegistoCuidado
-
-' Relações principais
-Tutor "1" -down- "1..*" Animal : possui
-Tutor "1" -right- "1..*" Reserva : cria
-Animal "1" -right- "1..*" Reserva : origina
-Alojamento "1" -right- "1..*" Reserva : aloja
-
-Reserva "1" -right- "0..1" Estadia : gera
-Reserva "1" -down- "0..*" Nota : contém
-
-Estadia "1" -right- "0..*" RegistoCuidado : regista
-Estadia "1" -right- "0..*" ServicoExtra : inclui
-Estadia "1" -right- "0..*" IntervencaoClinica : inclui
-Estadia "1" -right- "0..*" AlteracaoEstadoSaude : inclui
-
-Estadia "1" -down- "1" Fatura : origina
-Estadia "1" -down- "0..2" Pagamento : gera
-Fatura "1" -right- "0..2" Pagamento : agrega
-
-Animal "1" -down- "1" HistoricoClinico : possui
-HistoricoClinico "1" -right- "0..*" IntervencaoClinica : agrega
-HistoricoClinico "1" -right- "0..*" AlteracaoEstadoSaude : agrega
-
-Colaborador "1" -right- "0..*" Nota : escreve
-Colaborador "1" -right- "0..*" RegistoCuidado : regista
-Colaborador "1" -right- "0..*" ServicoExtra : regista
-Colaborador "1" -right- "0..*" IntervencaoClinica : regista
-Colaborador "1" -right- "0..*" AlteracaoEstadoSaude : regista
-
-' Ligações às enumerações
-Animal ..> Especie : usa
-Animal ..> EstadoSaude : usa
-Alojamento ..> TipoAlojamento : usa
-Alojamento ..> EstadoLimpeza : usa
-Reserva ..> EstadoReserva : usa
-Estadia ..> EstadoEstadia : usa
-Pagamento ..> MetodoPagamento : usa
-Pagamento ..> MomentoPagamento : usa
-Pagamento ..> EstadoPagamento : usa
-ServicoExtra ..> TipoServicoExtra : usa
-Colaborador ..> TipoColaborador : usa
+Animal "1" -down- "1" Especie : > usa
+Animal "1" -down- "1" EstadoSaude : > usa
+Alojamento "1" -down- "1" EstadoLimpeza : > usa
+Reserva "1" -down- "1" EstadoReserva : > usa
+Estadia "1" -down- "1" EstadoEstadia : > usa
+PlanoCuidados "1" -down- "1" PrioridadePlano : > usa
+TarefaCuidado "1" -down- "1" PeriodicidadeTarefa : > usa
+Pagamento "1" -down- "1" EstadoPagamento : > usa
+Pagamento "1" -down- "1" MomentoPagamento : > usa
+Pagamento "1" -down- "1" MetodoPagamento : > usa
+Colaborador "1" -down- "1" TipoColaborador : > usa
+AuditoriaEvento "1" -down- "1" ResultadoAuditoria : > usa
 
 note right of Alojamento
-Disponível quando:
-- estadoLimpeza = CONCLUIDO
-- não existe estadia ativa
-- a espécie é compatível
+Um alojamento só fica disponível
+se não tiver reserva sobreposta,
+não tiver estadia ativa, estiver limpo
+e for compatível com o animal.
 end note
 
-note bottom of Estadia
-É iniciada no check-in
-e termina no check-out.
-O pagamento de entrada usa
-momentoPagamento = CHECK_IN.
+note bottom of Pagamento
+O pagamento de CHECK_IN cobre
+o valor base da estadia.
+O pagamento de CHECK_OUT cobre
+valores complementares.
 end note
 
-note bottom of Fatura
-Entidade conceptual associada
-à componente financeira.
-end note
-
-note bottom of HistoricoClinico
-Entidade conceptual mantida
-para o historial clínico do animal.
+note bottom of AuditoriaEvento
+Regista operações críticas:
+reservas, check-in, check-out,
+pagamentos, limpeza, serviços,
+intervenções e gestão de perfis.
 end note
 
 @enduml
