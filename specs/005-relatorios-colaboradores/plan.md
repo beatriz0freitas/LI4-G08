@@ -112,9 +112,9 @@ Objetivo: implementar geração/exportação de relatórios operacionais com PDF
 
 - **T0xy [LAC-14]** Integrar agrupamento `agruparPor` na agregação de dados (não apenas na apresentação):
   - Modificar `RelatorioService.calcularMetricas()` para aplicar agrupamento ao nível de queries/agregação.
-  - Exemplo: se `agruparPor=DIA`, devolver lista de `RelatorioAgregacaoDia` (com data, totais por dia). Se `agruparPor=ALOJAMENTO`, devolver `RelatorioAgregacaoAlojamento` (com alojamento, totais por alojamento).
-  - Criar DTOs: `RelatorioAgregacao` (base), `RelatorioAgregacaoDia`, `RelatorioAgregacaoSemana`, `RelatorioAgregacaoMes`, `RelatorioAgregacaoAlojamento`, `RelatorioAgregacaoColaborador`, `RelatorioAgregacaoTipoServico`.
-  - Garantir que CSV, PDF e web vizualizam a mesma agregação (reutilizar a mesma lista de agregações).
+  - Exemplo: se `agruparPor=DIA`, devolver grupos com chave diária e totais por dia; se `agruparPor=ALOJAMENTO`, devolver grupos com chave do alojamento e totais por alojamento.
+  - Usar `RelatorioAgrupamentoDto` como DTO comum de agregação (`chave`, reservas, estadias, faturação total e serviços extra).
+  - Garantir que CSV, PDF e web visualizam a mesma agregação (reutilizar a mesma lista de `RelatorioAgrupamentoDto`).
 
 - **T0xz [LAC-14]** Adicionar validação de limite de período em `RelatorioController.gerarRelatorio()`:
   - Calcular diferença entre `dataInicio` e `dataFim`.
@@ -214,7 +214,7 @@ Objetivo: implementar geração/exportação de relatórios operacionais com PDF
 
 - **Risco**: Agrupamento implementado apenas na apresentação; totais divergem entre web, CSV e PDF. **Mitigação**:
   - Implementar agrupamento ao nível de `RelatorioService.calcularMetricas()`.
-  - Reutilizar mesma estrutura agregada (ex: `List<RelatorioAgregacao>`) em todos os formatos.
+  - Reutilizar mesma estrutura agregada (`List<RelatorioAgrupamentoDto>`) em todos os formatos.
   - Testes de integração validam que web, CSV, PDF devolvem totais idênticos.
 
 - **Risco**: Exportação de período > 3 meses trava a aplicação ou demora muito tempo. **Mitigação**:
@@ -263,7 +263,7 @@ Objetivo: implementar geração/exportação de relatórios operacionais com PDF
 
 2. **Integração de Agrupamento**:
    - Aplicar `agruparPor` no nível de `RelatorioService.calcularMetricas()` (não apenas na view).
-   - Criar DTOs de agregação: `RelatorioAgregacao*` para cada tipo de agrupamento.
+   - Usar `RelatorioAgrupamentoDto` como estrutura comum para cada tipo de agrupamento.
    - Reutilizar mesma estrutura em web, CSV, PDF.
    - Testes de integração validam totais idênticos.
 

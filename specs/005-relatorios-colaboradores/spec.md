@@ -48,7 +48,7 @@ As user stories de referência são as definidas em [user-stories.md](../../docs
 
 ### Functional Requirements
 
-- **FR-001 (map: RF-01, RF-03)**: O sistema deve disponibilizar uma página de dashboard/relatórios para o `DIRETOR`, com filtros por `dataInicio`, `dataFim`, `tipoAlojamento`, `incluirServicosExtra` e `agruparPor` (`DIA`, `SEMANA`, `MES`).
+- **FR-001 (map: RF-01, RF-03)**: O sistema deve disponibilizar uma página de dashboard/relatórios para o `DIRETOR`, com filtros por `dataInicio`, `dataFim`, `tipoAlojamento`, `incluirServicosExtra` e `agruparPor` (`DIA`, `SEMANA`, `MES`, `ALOJAMENTO`, `COLABORADOR`, `TIPO_SERVICO`).
 - **FR-002 (map: RF-01, RF-03)**: A página de relatório deve apresentar taxa de ocupação, estadias ativas no período, reservas no período, faturação total, faturação por método de pagamento, pagamentos pendentes e total de serviços extra.
 - **FR-003 (map: RF-03, RF-10, RF-17)**: O `DIRETOR` deve poder exportar o relatório filtrado para `CSV` e `PDF`. A exportação deve preservar os filtros aplicados e incluir cabeçalhos/sumário. **(LAC-14)**: PDF exportado deve ser um ficheiro PDF válido e parseável (não texto simples com extensão .pdf); utilizar biblioteca robusta (ex: Apache PDFBox ou OpenPDF).
 - **FR-004 (map: RF-02, RNF-04)**: O sistema deve disponibilizar ao `DIRETOR` páginas de listagem, registo, edição e desativação de colaboradores.
