@@ -1,11 +1,9 @@
-%% Modelo de Domínio — Hotel de Animais
+%% Modelo de Domínio - Hotel de Animais
 
 classDiagram
 direction LR
 
-%% Clientes e Alojamentos
 class Tutor {
-  id
   nome
   nif
   contacto
@@ -13,103 +11,109 @@ class Tutor {
 }
 
 class Animal {
-  id
   nome
   especie
   raca
   dataNascimento
   peso
   estadoSaude
-  necessidadesAlimentares
-  medicacaoCurso
+  cuidadosRecorrentes
+}
+
+class TipoAlojamentoTarifa {
+  designacao
+  especieCompativel
+  capacidade
+  tarifaDiaria
+  ativo
 }
 
 class Alojamento {
-  id
   identificacao
-  tipo
-  capacidade
   estadoLimpeza
 }
 
 class Reserva {
-  id
   dataInicio
   dataFim
   estado
-  dataCriacao
+  instrucoes
 }
 
-class Nota {
-  id
+class Estadia {
+  dataCheckIn
+  dataCheckOut
+  estado
+}
+
+class PlanoCuidados {
+  instrucoes
+  prioridade
+  ativo
+}
+
+class TarefaCuidado {
   descricao
+  periodicidade
+  concluida
+}
+
+class RegistoCuidado {
+  tipo
+  observacoes
   dataHora
 }
 
-%% Estadias e Faturação
-class Estadia {
-  id
-  dataInicio
-  dataFim
-  estado
-  dataCriacao
+class Nota {
+  texto
+  dataHora
 }
 
-class Fatura {
-  numero
-  dataEmissao
-  total
-}
-
-class Pagamento {
-  id
-  valor
-  metodoPagamento
-  momentoPagamento
-  estadoPagamento
-  dataCriacao
+class TipoServicoExtra {
+  nome
+  precoBase
+  ativo
 }
 
 class ServicoExtra {
-  id
-  tipo
+  descricao
   custo
   dataHora
 }
 
-%% Cuidados e Clínica
-class RegistoCuidado {
-  id
-  descricao
-  dataHora
-}
-
-class HistoricoClinico {
-}
-
 class IntervencaoClinica {
-  id
   descricao
+  prescricao
   custo
   dataHora
 }
 
 class AlteracaoEstadoSaude {
-  id
   descricao
   severidade
   dataHora
 }
 
-%% Operação e Perfis
-class Colaborador {
-  id
-  nome
-  email
-  tipoColaborador
+class Pagamento {
+  valor
+  metodo
+  momento
+  estado
+  dataHora
 }
 
-%% Enumerações
+class Colaborador {
+  nome
+  email
+  perfil
+}
+
+class RegistoAuditoria {
+  operacao
+  dataHora
+  resultado
+}
+
 class Especie {
   <<enumeration>>
   CAO
@@ -121,12 +125,6 @@ class EstadoSaude {
   NORMAL
   ALTERADO
   CRITICO
-}
-
-class TipoAlojamento {
-  <<enumeration>>
-  CANINO
-  FELINO
 }
 
 class EstadoLimpeza {
@@ -155,25 +153,31 @@ class EstadoPagamento {
   PENDENTE
 }
 
-class MetodoPagamento {
-  <<enumeration>>
-  NAO_DEFINIDO
-  NUMERARIO
-  CARTAO_DEBITO
-  CARTAO_CREDITO
-}
-
 class MomentoPagamento {
   <<enumeration>>
   CHECK_IN
   CHECK_OUT
 }
 
-class TipoServicoExtra {
+class MetodoPagamento {
   <<enumeration>>
-  BANHO
-  PASSEIO
-  OUTRO
+  NUMERARIO
+  CARTAO_DEBITO
+  CARTAO_CREDITO
+}
+
+class PrioridadePlano {
+  <<enumeration>>
+  ROTINA
+  URGENTE
+  CRITICA
+}
+
+class PeriodicidadeTarefa {
+  <<enumeration>>
+  UNICA
+  DIARIA
+  SEMANAL
 }
 
 class TipoColaborador {
@@ -185,46 +189,47 @@ class TipoColaborador {
   RESPONSAVEL_LIMPEZA
 }
 
-%% Fluxo principal do domínio
-Tutor "1" -- "1..*" Animal : possui
-Tutor "1" -- "1..*" Reserva : cria
-Animal "1" -- "1..*" Reserva : origina
-Alojamento "1" -- "1..*" Reserva : aloja
+Tutor "1" -- "0..*" Animal : responsavel por
+Tutor "1" -- "0..*" Reserva : solicita
+Animal "1" -- "0..*" Reserva : tem
+TipoAlojamentoTarifa "1" -- "0..*" Alojamento : classifica
+Alojamento "1" -- "0..*" Reserva : reservado em
 
-Reserva "1" -- "0..1" Estadia : gera
-Reserva "1" -- "0..*" Nota : contém
+Reserva "1" -- "0..1" Estadia : origina
+Reserva "1" -- "0..*" Nota : contem
+Reserva "1" -- "0..*" TarefaCuidado : agenda
 
-%% Entidades dependentes da estadia
+Estadia "1" -- "1" PlanoCuidados : ativa
+PlanoCuidados "1" -- "0..*" TarefaCuidado : organiza
 Estadia "1" -- "0..*" RegistoCuidado : regista
+Estadia "1" -- "0..*" Nota : contem
 Estadia "1" -- "0..*" ServicoExtra : inclui
 Estadia "1" -- "0..*" IntervencaoClinica : inclui
-Estadia "1" -- "0..*" AlteracaoEstadoSaude : inclui
+Estadia "1" -- "0..*" AlteracaoEstadoSaude : regista
+Estadia "1" -- "0..*" Pagamento : gera
 
-Estadia "1" -- "1" Fatura : origina
-Estadia "1" -- "0..2" Pagamento : gera
-Fatura "1" -- "0..2" Pagamento : agrega
+TipoServicoExtra "1" -- "0..*" ServicoExtra : tipifica
+TipoServicoExtra "1" -- "0..*" TarefaCuidado : pode agendar
 
-%% Componente clínica
-Animal "1" -- "1" HistoricoClinico : possui
-HistoricoClinico "1" -- "0..*" IntervencaoClinica : agrega
-HistoricoClinico "1" -- "0..*" AlteracaoEstadoSaude : agrega
+Animal "1" -- "0..*" AlteracaoEstadoSaude : historico
+Animal "1" -- "0..*" IntervencaoClinica : historico
+Animal "1" -- "0..*" RegistoCuidado : historico
 
-%% Autoria operacional
 Colaborador "1" -- "0..*" Nota : escreve
 Colaborador "1" -- "0..*" RegistoCuidado : regista
 Colaborador "1" -- "0..*" ServicoExtra : regista
 Colaborador "1" -- "0..*" IntervencaoClinica : regista
 Colaborador "1" -- "0..*" AlteracaoEstadoSaude : regista
+Colaborador "1" -- "0..*" RegistoAuditoria : origina
 
-%% Ligações às enumerações
 Animal ..> Especie : usa
 Animal ..> EstadoSaude : usa
-Alojamento ..> TipoAlojamento : usa
 Alojamento ..> EstadoLimpeza : usa
 Reserva ..> EstadoReserva : usa
 Estadia ..> EstadoEstadia : usa
-Pagamento ..> MetodoPagamento : usa
-Pagamento ..> MomentoPagamento : usa
+PlanoCuidados ..> PrioridadePlano : usa
+TarefaCuidado ..> PeriodicidadeTarefa : usa
 Pagamento ..> EstadoPagamento : usa
-ServicoExtra ..> TipoServicoExtra : usa
+Pagamento ..> MomentoPagamento : usa
+Pagamento ..> MetodoPagamento : usa
 Colaborador ..> TipoColaborador : usa

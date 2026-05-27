@@ -1,78 +1,73 @@
-# Modelo de Domínio — Hotel de Animais
+# Modelo de Domínio - Hotel de Animais
 
-Diagrama: [domain-model.mmd](domain-model.mmd)
+Diagramas:
+- [domain-model.mmd](domain-model.mmd)
+- [modelo_dominio.plantuml](modelo_dominio.plantuml)
 
 ## Âmbito
 
-Este modelo descreve os principais conceitos do domínio do hotel de animais.
+O modelo de domínio representa os principais conceitos de negócio necessários para suportar reservas, estadias, pagamentos, cuidados, serviços extra, acompanhamento clínico, limpeza, perfis de colaboradores e auditoria. O objetivo é manter uma visão conceptual simples.
 
 ## Entidades do Domínio
 
 | Entidade | Papel no domínio | Origem |
 |---|---|---|
-| `Tutor` | Proprietário de um ou mais animais.  | US-09, RD-05 |
-| `Animal` | Animal hóspede do hotel. | US-09, US-16, RD-05, RD-08 |
-| `Alojamento` | Unidade física de alojamento. | US-01, US-12, US-20, US-21, RD-01 |
-| `Reserva` | Compromisso de alojamento num período. | US-06, US-12, RD-06 |
-| `Estadia` | Execução real da reserva durante o período de alojamento. | US-07, US-11, RD-02, RD-03, RD-07 |
-| `Pagamento` | Registo financeiro associado a um momento da estadia. | US-10, US-11, RF-10 |
-| `ServicoExtra` | Serviço opcional com impacto financeiro prestado durante a estadia. | US-13, US-18, US-19, RD-09 |
-| `RegistoCuidado` | Registo operacional de cuidados diários. | US-14, US-15 |
-| `IntervencaoClinica` | Ato clínico ou prescrição veterinária. | US-22, US-23 |
-| `AlteracaoEstadoSaude` | Registo de mudança de estado de saúde. | US-16, US-24 |
-| `EstadoSaude` | Estado clínico do animal em cada momento do acompanhamento. | US-16, US-24 |
-| `Nota` | Comunicação operacional entre turnos. | US-17 |
-| `Colaborador` | Profissional do hotel com responsabilidades operacionais ou clínicas. | US-03, UC-01 |
-| `HistoricoClinico` | Agregador clínico do animal ao longo do tempo. | US-16, US-22, US-23, US-24 |
-| `Fatura` | Agregador financeiro da estadia. | US-10, US-11, RF-10 |
+| `Tutor` | Pessoa responsável por animais e associada às reservas solicitadas. | US-08, US-11, RF-04, RD-05 |
+| `Animal` | Animal registado no hotel, sempre associado a um tutor e com informação relevante para reservas, cuidados e histórico. | US-10, US-11, US-16, US-24, RD-05, RD-08 |
+| `TipoAlojamentoTarifa` | Tipo de alojamento gerido pela direção, com espécie compatível, capacidade, tarifa diária e estado ativo. | US-06, RF-18, RD-01, RD-11 |
+| `Alojamento` | Unidade física onde o animal fica alojado; a sua disponibilidade depende do estado de limpeza, compatibilidade e ocupação. | US-01, US-08, US-14, US-22, US-23, RF-06, RF-15, RD-01 |
+| `Reserva` | Pedido confirmado para alojar um animal num período, antes de ser convertido em estadia. | US-08, RF-07, RD-02, RD-06 |
+| `Estadia` | Execução real de uma reserva, iniciada no check-in e terminada no check-out. | US-09, RF-08, RF-09, RD-02, RD-03, RD-07 |
+| `PlanoCuidados` | Plano ativo durante a estadia, com instruções e prioridade de acompanhamento do animal. | US-16, US-18, RF-11, RD-10 |
+| `TarefaCuidado` | Tarefa prevista no plano de cuidados ou serviço opcional agendado para execução durante a reserva/estadia. | US-15, US-16, US-21, RF-11, RF-16, RD-10 |
+| `RegistoCuidado` | Registo de cuidado prestado, com observações, autor e momento. | US-17, RF-12 |
+| `Nota` | Nota operacional associada à reserva ou estadia, usada para continuidade entre colaboradores. | US-19, RF-05 |
+| `TipoServicoExtra` | Tipo de serviço extra disponível em catálogo, gerido pela direção. | US-06, RF-18, RD-11 |
+| `ServicoExtra` | Serviço extra efetivamente realizado durante uma estadia ativa e com custo associado. | US-20, RF-17, RD-09 |
+| `IntervencaoClinica` | Intervenção ou prescrição veterinária registada durante uma estadia, podendo ter custo associado. | US-24, US-25, RF-14, RD-09 |
+| `AlteracaoEstadoSaude` | Registo de alteração ao estado de saúde do animal, com severidade e data/hora. | US-18, US-26, RF-13 |
+| `Pagamento` | Registo financeiro de valores liquidados ou pendentes no check-in ou check-out. | US-12, US-13, RF-10, RD-04 |
+| `Colaborador` | Profissional do hotel com perfil de acesso e autoria sobre operações realizadas. | US-03, RF-02, RNF-04 |
+| `RegistoAuditoria` | Registo de operação crítica realizada, identificando autor, momento, operação e resultado. | US-07, RF-19, RNF-09 |
 
 ## Relações do Domínio
 
 | Relação | Multiplicidade | Justificação |
 |---|---|---|
-| `Tutor` possui `Animal` | `1..* ↔ *` | Um tutor pode ter vários animais; cada animal fica associado a um tutor responsável. Origem: US-09, RD-05. |
-| `Tutor` cria `Reserva` | `1 ↔ *` | O tutor participa na criação e gestão das reservas dos seus animais. Origem: US-06, US-09. |
-| `Animal` origina `Reserva` | `1 ↔ *` | Um animal pode ter várias reservas ao longo do tempo. Origem: US-06, US-09. |
-| `Alojamento` aloja `Reserva` | `1 ↔ *` | Um alojamento pode ser usado por várias reservas não sobrepostas. Origem: US-01, US-12, RD-01. |
-| `Reserva` gera `Estadia` | `1 ↔ 0..1` | A reserva pode terminar sem estadia se for cancelada; quando concretizada gera uma única estadia. Origem: US-06, US-07, RD-02, RD-06. |
-| `Reserva` contém `Nota` | `1 ↔ *` | Notas operacionais ficam associadas à reserva. Origem: US-17. |
-| `Estadia` gera `Pagamento` | `1 ↔ 0..2` | A estadia pode ter pagamento de entrada e pagamento de saída. Origem: US-10, US-11, RF-10, RD-04. |
-| `Estadia` inclui `ServicoExtra` | `1 ↔ *` | Serviços extra são registados durante a estadia. Origem: US-13, US-18, US-19. |
-| `Estadia` regista `RegistoCuidado` | `1 ↔ *` | Os cuidados diários são contextualizados pela estadia em curso. Origem: US-14, US-15. |
-| `Estadia` inclui `IntervencaoClinica` | `1 ↔ *` | Intervenções clínicas acontecem no contexto da estadia. Origem: US-22, US-23. |
-| `Estadia` inclui `AlteracaoEstadoSaude` | `1 ↔ *` | Alterações de saúde são registadas durante a estadia. Origem: US-16, US-24. |
-| `Animal` possui `HistoricoClinico` | `1 ↔ 1` | O histórico clínico agrega o percurso clínico do animal. Origem: US-16, US-22, US-23, US-24. |
-| `Animal` tem `EstadoSaude` | `1 ↔ *` | O estado de saúde do animal pode variar ao longo do tempo. Origem: US-16, US-24. |
-| `Estadia` origina `Fatura` | `1 ↔ 1` | A fatura agrega os encargos financeiros de uma estadia. Origem: US-10, US-11, RF-10. |
-| `Fatura` agrega `Pagamento` | `1 ↔ 0..2` | A faturação pode ser liquidada em um ou dois momentos. Origem: US-10, US-11, RF-10. |
-| `Colaborador` escreve `Nota` | `1 ↔ *` | A autoria operacional é atribuída a um colaborador. Origem: US-17, UC-01. |
-| `Colaborador` regista `RegistoCuidado` | `1 ↔ *` | O cuidador responsável fica rastreado. Origem: US-14, US-15, UC-01. |
-| `Colaborador` regista `ServicoExtra` | `1 ↔ *` | O registo do serviço identifica o autor. Origem: US-13, US-18, US-19. |
-| `Colaborador` regista `IntervencaoClinica` | `1 ↔ *` | O médico veterinário responsável fica identificado. Origem: US-22, US-23. |
-| `Colaborador` regista `AlteracaoEstadoSaude` | `1 ↔ *` | A alteração clínica fica associada a um autor. Origem: US-16, US-24. |
-| `HistoricoClinico` agrega `IntervencaoClinica` | `1 ↔ 0..*` | O histórico clínico compila as intervenções do animal. |
-| `HistoricoClinico` agrega `AlteracaoEstadoSaude` | `1 ↔ 0..*` | O histórico clínico compila alterações de saúde. |
+| `Tutor` responsável por `Animal` | `1` para `0..*` | Um tutor pode ter vários animais; cada animal fica associado a um único tutor. |
+| `Tutor` solicita `Reserva` | `1` para `0..*` | As reservas são feitas para animais de um tutor. |
+| `Animal` tem `Reserva` | `1` para `0..*` | Um animal pode ter várias reservas ao longo do tempo. |
+| `TipoAlojamentoTarifa` classifica `Alojamento` | `1` para `0..*` | Cada alojamento pertence a um tipo com capacidade, compatibilidade e tarifa diária. |
+| `Alojamento` é reservado em `Reserva` | `1` para `0..*` | O mesmo alojamento pode ter várias reservas, desde que não exista sobreposição. |
+| `Reserva` origina `Estadia` | `1` para `0..1` | Uma reserva pode ser cancelada antes do check-in; se for concretizada, origina uma estadia. |
+| `Reserva` contém `Nota` | `1` para `0..*` | Notas operacionais podem ser registadas ainda antes da estadia. |
+| `Reserva` agenda `TarefaCuidado` | `1` para `0..*` | Serviços opcionais e instruções podem ser agendados no momento da reserva. |
+| `Estadia` ativa `PlanoCuidados` | `1` para `1` | Durante a estadia existe um plano de cuidados ativo para orientar os cuidadores. |
+| `PlanoCuidados` organiza `TarefaCuidado` | `1` para `0..*` | O plano agrupa tarefas recorrentes, instruções e serviços agendados. |
+| `Estadia` regista `RegistoCuidado` | `1` para `0..*` | Cuidados prestados ficam contextualizados pela estadia ativa. |
+| `Estadia` contém `Nota` | `1` para `0..*` | Notas podem ser acrescentadas durante o acompanhamento do animal. |
+| `Estadia` inclui `ServicoExtra` | `1` para `0..*` | Serviços extra só são registados durante uma estadia ativa. |
+| `Estadia` inclui `IntervencaoClinica` | `1` para `0..*` | Intervenções clínicas com impacto no histórico e faturação ocorrem no contexto da estadia. |
+| `Estadia` regista `AlteracaoEstadoSaude` | `1` para `0..*` | Alterações ao estado de saúde são observadas durante a estadia. |
+| `Estadia` gera `Pagamento` | `1` para `0..*` | A estadia pode ter pagamento base no check-in e pagamento complementar no check-out. |
+| `TipoServicoExtra` tipifica `ServicoExtra` | `1` para `0..*` | Serviços realizados usam o catálogo controlado pela direção. |
+| `TipoServicoExtra` pode agendar `TarefaCuidado` | `1` para `0..*` | Banhos, passeios e outros serviços podem surgir como tarefas previstas. |
+| `Animal` agrega histórico operacional e clínico | `1` para `0..*` | Registos de cuidado, alterações de saúde e intervenções formam o histórico consolidado do animal. |
+| `Colaborador` regista eventos operacionais ou clínicos | `1` para `0..*` | Notas, cuidados, serviços, intervenções e alterações de saúde mantêm autoria. |
+| `Colaborador` origina `RegistoAuditoria` | `1` para `0..*` | Operações críticas ficam auditadas com autor e momento. |
 
 ## Enumerações
 
 | Enumeração | Valores | Origem |
 |---|---|---|
 | `Especie` | `CAO`, `GATO` | RD-08 |
-| `EstadoSaude` | `NORMAL`, `ALTERADO`, `CRITICO` | US-16, US-24 |
-| `TipoAlojamento` | `CANINO`, `FELINO` | US-12, RD-08 |
-| `EstadoLimpeza` | `PENDENTE`, `CONCLUIDO` | RD-01, US-21 |
-| `EstadoReserva` | `ATIVA`, `CONFIRMADA`, `CANCELADA`, `CONCLUIDA` | US-06, RD-06 |
-| `EstadoEstadia` | `EM_CURSO`, `TERMINADA` | US-07, RD-03 |
-| `EstadoPagamento` | `LIQUIDADO`, `PENDENTE` | RF-10 |
-| `MetodoPagamento` | `NAO_DEFINIDO`, `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO` | RF-10 |
-| `MomentoPagamento` | `CHECK_IN`, `CHECK_OUT` | RD-04 |
-| `TipoServicoExtra` | `BANHO`, `PASSEIO`, `OUTRO` | US-13 |
-| `TipoColaborador` | `DIRETOR`, `FUNCIONARIO_RECEPCAO`, `CUIDADOR`, `MEDICO_VETERINARIO`, `RESPONSAVEL_LIMPEZA` | UC-01, US-03..US-24 |
-
-## Pressupostos
-
-1. **`TipoAlojamento`**: os alojamentos são classificados como `CANINO` ou `FELINO` para garantir que a reserva só apresenta unidades compatíveis com a espécie do animal (`CAO` ou `GATO`). Esta decisão substitui a enumeração provisória baseada em formato de box.
-2. **`MetodoPagamento`**: os requisitos registam a necessidade de processar pagamentos (US-10, US-11) mas não enumeram métodos. Adotaram-se `NUMERARIO`, `CARTAO_DEBITO` e `CARTAO_CREDITO` como valores típicos num hotel de animais. A lista deverá ser confirmada com os stakeholders.
-3. **`EstadoSaude`**: US-16 menciona "alterações ao estado de saúde" e US-24 refere "alterações recentes". Os valores `NORMAL`, `ALTERADO` e `CRITICO` são considerados suficientes para cobrir a variação descrita.
-4. **`RegistoCuidado` e `ServicoExtra` separados**: cuidados diários (alimentação, medicação — US-15) são distinguidos dos serviços extra faturáveis (banho, passeio — US-18) por terem natureza e impacto financeiro diferentes.
-5. **Colaborador único**: todos os papéis do sistema (cuidador, receção, etc.) são modelados como uma única entidade `Colaborador` com `TipoColaborador`, pois partilham atributos comuns (autenticação, nome, email) e diferem apenas nas permissões — UC-01, US-03.
+| `EstadoSaude` | `NORMAL`, `ALTERADO`, `CRITICO` | US-18, US-26, RF-13 |
+| `EstadoLimpeza` | `PENDENTE`, `CONCLUIDO` | US-22, US-23, RF-15, RD-01 |
+| `EstadoReserva` | `ATIVA`, `CONFIRMADA`, `CANCELADA`, `CONCLUIDA` | US-08, US-09, RD-02, RD-06 |
+| `EstadoEstadia` | `EM_CURSO`, `TERMINADA` | US-09, RD-03, RD-07 |
+| `EstadoPagamento` | `LIQUIDADO`, `PENDENTE` | US-12, US-13, RF-10 |
+| `MomentoPagamento` | `CHECK_IN`, `CHECK_OUT` | US-12, US-13, RD-04 |
+| `MetodoPagamento` | `NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO` | RF-10 |
+| `PrioridadePlano` | `ROTINA`, `URGENTE`, `CRITICA` | US-16, US-18, RD-10 |
+| `PeriodicidadeTarefa` | `UNICA`, `DIARIA`, `SEMANAL` | US-16, US-21, RD-10 |
+| `TipoColaborador` | `DIRETOR`, `FUNCIONARIO_RECEPCAO`, `CUIDADOR`, `MEDICO_VETERINARIO`, `RESPONSAVEL_LIMPEZA` | US-03, RNF-04 |
