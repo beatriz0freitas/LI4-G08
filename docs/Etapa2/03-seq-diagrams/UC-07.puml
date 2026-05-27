@@ -5,25 +5,40 @@ autonumber
 actor FuncionarioRececao
 participant EstadiaController
 participant IEstadiaService
-participant IPagamentoService
 participant EstadiaRepository
-participant AlojamentoRepository
+participant IPagamentoService
+participant ServicoExtraRepository
+participant IntervencaoClinicaRepository
+participant IReservaService
+participant IAlojamentoService
+participant AuditoriaOperacaoService
 
-FuncionarioRececao -> EstadiaController : localizar estadia em curso
-EstadiaController -> IEstadiaService : registarCheckOut(estadiaId)
-IEstadiaService -> EstadiaRepository : findEmCurso(estadiaId)
-EstadiaRepository --> IEstadiaService : resumo da estadia
+FuncionarioRececao -> EstadiaController : POST /estadias/check-out
+EstadiaController -> EstadiaController : parseMetodoPagamento(metodo)
 
-alt existem servicos adicionais
-  IEstadiaService -> IPagamentoService : registarPagamentoCheckOut(valor extras)
-  IPagamentoService --> IEstadiaService : pagamento registado
-else sem extras
-  IEstadiaService -> IEstadiaService : prosseguir sem pagamento adicional
+alt metodo ausente/invalido
+  EstadiaController --> FuncionarioRececao : erro de metodo obrigatorio
+else metodo valido
+  EstadiaController -> IEstadiaService : checkOut(estadiaId, metodo)
+  IEstadiaService -> EstadiaRepository : findById(estadiaId)
+  alt estadia inexistente ou nao EM_CURSO
+    EstadiaRepository --> IEstadiaService : vazio/estado invalido
+    IEstadiaService --> EstadiaController : erro
+    EstadiaController --> FuncionarioRececao : mostrar erro
+  else estadia em curso
+    EstadiaRepository --> IEstadiaService : Estadia
+    IEstadiaService -> IPagamentoService : registrarPagamentoCheckOut(estadiaId, metodo)
+    IPagamentoService -> ServicoExtraRepository : sumCustoByEstadia(estadiaId)
+    IPagamentoService -> IntervencaoClinicaRepository : sumCustoByEstadia(estadiaId)
+    IPagamentoService -> EstadiaRepository : findById(estadiaId)
+    IPagamentoService --> IEstadiaService : pagamento complementar liquidado
+    IEstadiaService -> EstadiaRepository : save(estadia TERMINADA)
+    IEstadiaService -> IReservaService : concluir(reservaId)
+    IEstadiaService -> IAlojamentoService : marcarPendenteLimpeza(alojamentoId)
+    IEstadiaService -> AuditoriaOperacaoService : registarSucesso(CHECK_OUT)
+    IEstadiaService --> EstadiaController : Estadia terminada
+    EstadiaController --> FuncionarioRececao : check-out registado
+  end
 end
-
-IEstadiaService -> EstadiaRepository : encerrarEstadia(estadia)
-IEstadiaService -> AlojamentoRepository : marcarLimpezaPendente(alojamento)
-IEstadiaService --> EstadiaController : check-out concluido
-EstadiaController --> FuncionarioRececao : confirmar saida
 
 @enduml

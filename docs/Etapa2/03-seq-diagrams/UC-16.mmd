@@ -1,0 +1,25 @@
+sequenceDiagram
+    autonumber
+    actor Diretor
+    participant AuditoriaController
+    participant IAuditoriaService
+    participant AuditoriaRepository
+
+    Diretor->>AuditoriaController: GET /auditoria?filtros
+    AuditoriaController->>AuditoriaController: normalizar filtros e periodo
+    AuditoriaController->>IAuditoriaService: consultarPorPeriodo(inicio, fim, filtros, pageable)
+    IAuditoriaService->>IAuditoriaService: construir Specification
+    opt filtros por utilizador, operacao, entidade ou resultado
+        IAuditoriaService->>IAuditoriaService: acrescentar criterios a Specification
+    end
+    IAuditoriaService->>AuditoriaRepository: findAll(specification, pageable)
+    AuditoriaRepository-->>IAuditoriaService: pagina de AuditoriaEvento
+    IAuditoriaService-->>AuditoriaController: eventos
+    AuditoriaController-->>Diretor: mostrar auditoria paginada
+
+    opt exportar CSV
+        Diretor->>AuditoriaController: GET /auditoria/exportar/csv
+        AuditoriaController->>IAuditoriaService: consultarPorPeriodo(inicio, fim, filtros, limite exportacao)
+        IAuditoriaService-->>AuditoriaController: eventos filtrados
+        AuditoriaController-->>Diretor: download auditoria.csv
+    end

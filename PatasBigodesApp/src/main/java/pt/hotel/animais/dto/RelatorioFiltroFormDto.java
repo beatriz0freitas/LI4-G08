@@ -25,7 +25,10 @@ public class RelatorioFiltroFormDto {
     public enum GrupoRelatorio {
         DIA,
         SEMANA,
-        MES
+        MES,
+        ALOJAMENTO,
+        COLABORADOR,
+        TIPO_SERVICO
     }
 
     public LocalDate getDataInicio() { return dataInicio; }

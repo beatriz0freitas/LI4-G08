@@ -3,7 +3,7 @@
 **Short name**: cuidados-clinica-limpeza
 **Feature directory**: specs/004-cuidados-clinica-limpeza
 **Criado**: 2026-05-18
-**Status**: Draft
+**Status**: Implementado e validado em Etapa 4
 
 ## Resumo
 Completar a rastreabilidade da operação diária e do acompanhamento clínico durante estadias: registo de cuidados diários, notas operacionais em reservas, serviços extra (banho, passeio, outro) e intervenções clínicas com histórico. Esta especificação descreve cenários de utilizador, requisitos funcionais testáveis, entidades de domínio, critérios de sucesso e dependências com a documentação existente (Etapa 1 e Etapa 2).

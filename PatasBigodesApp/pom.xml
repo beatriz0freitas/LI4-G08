@@ -90,6 +90,13 @@
             <optional>true</optional>
         </dependency>
 
+            <!-- PDF Generation (LAC-14) -->
+            <dependency>
+                <groupId>org.apache.pdfbox</groupId>
+                <artifactId>pdfbox</artifactId>
+                <version>3.0.0</version>
+            </dependency>
+
         <!-- Testes -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

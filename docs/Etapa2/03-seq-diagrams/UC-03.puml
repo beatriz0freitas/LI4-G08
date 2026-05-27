@@ -9,28 +9,31 @@ participant IAnimalService
 participant TutorRepository
 participant AnimalRepository
 
-alt tutor nao existe
-  FuncionarioRececao -> TutorAnimalController : registar tutor(dados tutor)
-  TutorAnimalController -> ITutorService : registarTutor(dto)
+FuncionarioRececao -> TutorAnimalController : POST /tutores
+TutorAnimalController -> ITutorService : registar(TutorFormDto)
+ITutorService -> TutorRepository : findByNif(nif)
+
+alt NIF duplicado
+  TutorRepository --> ITutorService : Tutor existente
+  ITutorService --> TutorAnimalController : erro de duplicacao
+  TutorAnimalController --> FuncionarioRececao : mostrar erro no formulario
+else NIF livre
+  TutorRepository --> ITutorService : vazio
   ITutorService -> TutorRepository : save(tutor)
   TutorRepository --> ITutorService : tutor criado
-  ITutorService --> TutorAnimalController : tutor registado
-else tutor ja existe
-  FuncionarioRececao -> TutorAnimalController : pesquisar tutor(nome ou NIF)
-  TutorAnimalController -> ITutorService : pesquisar(termo)
-  ITutorService -> TutorRepository : findByNomeOuNif(termo)
-  TutorRepository --> ITutorService : tutor encontrado
-  ITutorService --> TutorAnimalController : tutor existente
+  ITutorService --> TutorAnimalController : Tutor
+  TutorAnimalController --> FuncionarioRececao : redirecionar para detalhe do tutor
 end
 
-FuncionarioRececao -> TutorAnimalController : registar animal(dados animal)
-TutorAnimalController -> IAnimalService : registarAnimal(dto)
+FuncionarioRececao -> TutorAnimalController : POST /tutores/{tutorId}/animais
+TutorAnimalController -> ITutorService : obter(tutorId)
+ITutorService --> TutorAnimalController : Tutor
+TutorAnimalController -> IAnimalService : registar(AnimalFormDto)
+IAnimalService -> ITutorService : obter(tutorId)
+ITutorService --> IAnimalService : Tutor
 IAnimalService -> AnimalRepository : save(animal)
-note over IAnimalService,AnimalRepository
-  cria a ficha clinica inicial por cascata
-end note
 AnimalRepository --> IAnimalService : animal criado
-IAnimalService --> TutorAnimalController : animal registado
+IAnimalService --> TutorAnimalController : Animal
 TutorAnimalController --> FuncionarioRececao : confirmar registo
 
 @enduml

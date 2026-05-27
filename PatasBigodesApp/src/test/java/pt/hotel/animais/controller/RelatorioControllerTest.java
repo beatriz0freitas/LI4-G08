@@ -101,4 +101,14 @@ class RelatorioControllerTest {
             .andExpect(content().contentTypeCompatibleWith("application/pdf"))
             .andExpect(content().bytes("%PDF-1.4\n%%EOF\n".getBytes()));
     }
+
+    @Test
+    @WithMockUser(roles = "DIRETOR")
+    void exportarPeriodoSuperiorATresMesesDeveRetornarErro() throws Exception {
+        mockMvc.perform(get("/relatorios/exportar/pdf")
+                .param("dataInicio", "2026-01-01")
+                .param("dataFim", "2026-05-02"))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("3 meses")));
+    }
 }

@@ -39,7 +39,8 @@ Esta situação significa que a implementação compila e os testes atuais passa
 
 Cada lacuna é apresentada com a mesma estrutura:
 
-- **Problema atual**: o que existe hoje na documentação ou no código.
+- **Estado após correção**: o estado verificado depois da resolução ou mitigação aplicada.
+- **Problema identificado originalmente**: o que existia na documentação ou no código aquando da análise inicial.
 - **Impacto**: porque é que o problema é relevante.
 - **Como corrigir**: alterações esperadas na documentação, implementação e testes.
 - **Spec responsável**: spec Speckit onde a regra devia estar definida e encerrada.
@@ -50,7 +51,13 @@ Quando uma regra atravessa mais do que uma área funcional, é indicada uma spec
 
 ### LAC-01 - Estado Speckit e rastreabilidade documental inconsistentes
 
-**Problema atual**
+**Estado após correção**
+
+Regularizada em 27/05/2026 quanto às inconsistências apontadas. `.specify/feature.json` passou a apontar para `specs/005-relatorios-colaboradores`, foi criado `specs/005-relatorios-colaboradores/checklists/qa-results.md`, e `tasks.md` da spec 005 foi limpo para remover conteúdo de checklist colado incorretamente.
+
+As specs `001` a `005` passaram a refletir estado implementado/validado, as tarefas/checklists antigas com evidência técnica associada foram fechadas, e tarefas sem evidência completa continuam abertas ou documentadas como pendências explícitas, por exemplo Javadoc/cobertura/auditoria de fluxo ainda sem operação de edição de reserva.
+
+**Problema identificado originalmente**
 
 As specs Speckit aparentam estar ainda em estado `Draft` ou `Draft clarificado`, apesar de já existir implementação relevante em `PatasBigodesApp`.
 
@@ -59,7 +66,7 @@ Além disso:
 - `.specify/feature.json` aponta para `specs/004-cuidados-clinica-limpeza`, embora já exista `specs/005-relatorios-colaboradores`;
 - `specs/002-registo-clientes-alojamentos/tasks.md` mantém tarefas por assinalar, apesar de existirem funcionalidades implementadas;
 - `specs/005-relatorios-colaboradores/checklists/requirements.md` mantém itens por fechar;
-- `specs/005-relatorios-colaboradores/tasks.md` referencia `checklists/qa-results.md`, mas esse ficheiro não existe.
+- `specs/005-relatorios-colaboradores/tasks.md` referenciava `checklists/qa-results.md`, mas esse ficheiro não existia.
 
 **Impacto**
 
@@ -74,7 +81,7 @@ Também cria risco de regressões, porque uma funcionalidade pode estar codifica
    - marcar como pronta apenas quando requisitos, plano, tarefas, testes e implementação estiverem coerentes.
 2. Atualizar `.specify/feature.json` para a feature atualmente ativa ou documentar o motivo de estar fixada na spec `004`.
 3. Marcar tarefas concluídas apenas quando a implementação e os testes existirem.
-4. Criar o ficheiro `specs/005-relatorios-colaboradores/checklists/qa-results.md` ou remover a referência caso a checklist tenha sido substituída.
+4. Criar o ficheiro `specs/005-relatorios-colaboradores/checklists/qa-results.md` ou remover a referência caso a checklist tenha sido substituída. **Resolvido para a spec 005 em 27/05/2026 com a criação do ficheiro.**
 5. Acrescentar, por spec, uma pequena secção de rastreabilidade com:
    - user stories cobertas;
    - requisitos funcionais cobertos;
@@ -91,7 +98,7 @@ Também cria risco de regressões, porque uma funcionalidade pode estar codifica
 
 **Estado após correção**
 
-Mitigada em 26/05/2026 do ponto de vista de implementação e testes. `PlanoCuidadosServiceTest` valida criação de plano, consulta, listagem por animal, adição e conclusão de tarefas, atualização de prioridade, instruções e encerramento do plano. A rastreabilidade de `RF-11` foi atualizada em `docs/Etapa4/02-test-cases/casos-teste.md`.
+Resolvida em 26/05/2026 do ponto de vista de implementação, requisitos e testes. `PlanoCuidadosService` está funcional e `PlanoCuidadosServiceTest` valida criação de plano, consulta, listagem por animal, adição e conclusão de tarefas, atualização de prioridade, instruções e encerramento do plano. A rastreabilidade de `RF-11` foi atualizada em `docs/Etapa4/02-test-cases/casos-teste.md`.
 
 **Problema identificado originalmente**
 
@@ -134,6 +141,12 @@ Também enfraquece a rastreabilidade de `US-14` e `RF-11`, porque a aplicação 
 - Deve cobrir explicitamente: `US-14`, `RF-11` e os cenários de aceitação associados.
 
 ### LAC-03 - Check-out sem cobrança complementar real
+
+**Estado após correção**
+
+Resolvida. A spec `003` explicita que o check-out calcula cobrança complementar com serviços extra, intervenções clínicas e dias adicionais. `PagamentoService.calcularCobrancaComplementar(...)` agrega estes valores, `registrarPagamentoCheckOut(...)` persiste o pagamento complementar com método obrigatório, e `EstadiaService.checkOut(...)` fecha estadia/reserva apenas dentro do fluxo transacional validado.
+
+Evidência de validação: `PagamentoServiceTest`, `CheckOutSequenceServiceTest`, `EstadiaServiceTest`, `CheckOutIntegrationTest` e `FluxoOperacionalEndToEndIntegrationTest`.
 
 **Problema identificado originalmente**
 
@@ -182,7 +195,13 @@ Também reduz a validade dos relatórios financeiros, porque os dados de pagamen
 
 ### LAC-04 - Tarifa base da estadia não está especificada como regra de negócio
 
-**Problema atual**
+**Estado após correção**
+
+Resolvida. A regra foi estabilizada como tarifa diária por tipo de alojamento, com entidade/catálogo `TipoAlojamentoTarifa`, serviço próprio e regra de domínio `RD-11`. `PagamentoService.calcularValorBase(...)` usa `TipoAlojamentoTarifaService.obterValorTarifa(...)` em vez de uma constante fixa, e os requisitos/use cases de check-in e pagamento passaram a referir a tarifa ativa do tipo de alojamento.
+
+Evidência de validação: `TipoAlojamentoTarifaServiceTest`, `PagamentoServiceTest` e `PagamentoCheckInCalculoTest`.
+
+**Problema identificado originalmente**
 
 A aplicação calcula o valor base da estadia com uma tarifa fixa de `10.00` por dia. O modelo de `Alojamento` não contém uma tarifa própria, e a documentação não fecha claramente onde a tarifa deve ser definida.
 
@@ -212,7 +231,13 @@ Isto limita a utilidade da gestão de alojamentos e torna o cálculo financeiro 
 
 ### LAC-05 - Método de pagamento indefinido no check-in
 
-**Problema atual**
+**Estado após correção**
+
+Resolvida. A documentação passou a definir que o método de pagamento é obrigatório no check-in e no check-out, e o enum `MetodoPagamento` contém apenas métodos reais (`NUMERARIO`, `CARTAO_DEBITO`, `CARTAO_CREDITO`). `EstadiaService.abrirEstadiaPorReserva(...)`, `PagamentoService.registrarPagamento(...)` e `PagamentoService.registrarPagamentoCheckOut(...)` rejeitam método nulo.
+
+Evidência de validação: `CheckInServiceTest`, `CheckInIntegrationTest`, `CheckOutIntegrationTest`, `PagamentoServiceTest` e `EstadiaControllerTest`.
+
+**Problema identificado originalmente**
 
 No check-in, a aplicação cria um pagamento com `MetodoPagamento.NAO_DEFINIDO`. A documentação não esclarece se o pagamento no check-in é obrigatório, opcional, sinal, caução ou apenas registo pendente.
 
@@ -246,7 +271,13 @@ Isto afeta a auditoria e a fiabilidade dos relatórios.
 
 ### LAC-06 - Disponibilidade de alojamentos ignora estadias ativas
 
-**Problema atual**
+**Estado após correção**
+
+Resolvida. A disponibilidade foi centralizada em `AvailabilityDomainService`, que considera limpeza concluída, compatibilidade/capacidade, reservas sobrepostas e estadias ativas. O repositório de alojamentos passou a expor contagem/consulta que exclui ocupação por estadia, e a criação de reserva valida a disponibilidade com bloqueio pessimista quando aplicável.
+
+Evidência de validação: `AvailabilityDomainServiceTest`, `AlojamentoServiceTest`, `ReservaServiceCreateTest` e testes de integração de criação/disponibilidade.
+
+**Problema identificado originalmente**
 
 A consulta de disponibilidade considera reservas ativas e estado de limpeza, mas não cruza de forma completa com estadias ativas. Assim, um alojamento ocupado por uma estadia pode continuar a surgir como disponível dependendo do caminho de consulta.
 
@@ -285,7 +316,13 @@ Existe risco de dupla ocupação do mesmo alojamento. Este é um problema críti
 
 ### LAC-07 - Estados de reserva confundem confirmação com conclusão
 
-**Problema atual**
+**Estado após correção**
+
+Resolvida. O ciclo de vida documental e técnico passou a distinguir `ATIVA`, `CONFIRMADA`, `CANCELADA` e `CONCLUIDA`. A criação mantém a reserva ativa, o check-in confirma a reserva, e o check-out conclui a reserva associada. As rotas manuais `/confirmar` e `/concluir` deixam de forçar transições indevidas e informam que esses eventos pertencem ao check-in/check-out.
+
+Evidência de validação: `ReservaServiceUnitTest`, `ReservaConfirmIntegrationTest`, `CheckInServiceTest` e `CheckOutSequenceServiceTest`.
+
+**Problema identificado originalmente**
 
 O enum de estado de reserva contém apenas `ATIVA`, `CANCELADA` e `CONCLUIDA`. No controlador, a ação `/confirmar` chama um método de conclusão da reserva.
 
@@ -322,7 +359,13 @@ Sem estados distintos, a aplicação pode perder informação importante para op
 
 ### LAC-08 - Falta regra de exclusividade de estadia ativa por animal
 
-**Problema atual**
+**Estado após correção**
+
+Resolvida. A regra foi explicitada nos requisitos e use cases: um animal só pode ter uma estadia ativa de cada vez. `EstadiaService.abrirEstadiaPorReserva(...)` bloqueia o animal, consulta estadia em curso e rejeita check-in duplicado antes de criar nova estadia.
+
+Evidência de validação: `CheckInServiceTest.checkInDuplicadoParaMesmoAnimalLancaExcecao`, `EstadiaServiceTest` e `FluxoOperacionalEndToEndIntegrationTest`.
+
+**Problema identificado originalmente**
 
 O serviço de estadia abre uma nova estadia sem verificar explicitamente se o animal já tem uma estadia ativa. A regra pode estar implícita no negócio, mas não está suficientemente protegida no código.
 
@@ -352,7 +395,13 @@ O mesmo animal pode ficar associado a duas estadias ativas, o que gera inconsist
 
 ### LAC-09 - Falhas críticas no check-out são engolidas pelo serviço
 
-**Problema atual**
+**Estado após correção**
+
+Resolvida. O check-out passou a ser tratado como operação transacional: se a cobrança complementar ou a marcação do alojamento para limpeza falhar, a operação é abortada e a estadia não é apresentada como terminada. A documentação de `RF-09`, `RD-03`, `UC-07` e spec `003` reflete essa atomicidade.
+
+Evidência de validação: `EstadiaServiceTest.checkOutDeveFalharSePagamentoComplementarFalhar`, `EstadiaServiceTest.checkOutDevePropagarFalhaNaLimpeza`, `CheckOutSequenceServiceTest` e `CheckOutIntegrationTest`.
+
+**Problema identificado originalmente**
 
 No fluxo de check-out, algumas exceções associadas a pagamento e limpeza são capturadas sem bloquear a operação. O serviço fecha a estadia mesmo que tarefas críticas posteriores falhem.
 
@@ -393,7 +442,13 @@ Este comportamento contraria a expectativa de integridade transacional num fluxo
 
 ### LAC-10 - Serviços extra e intervenções clínicas têm validações incompletas
 
-**Problema atual**
+**Estado após correção**
+
+Resolvida. A spec `004`, o modelo de domínio e os requisitos passaram a usar catálogo controlado `TipoServicoExtra` e a exigir estadia ativa para serviços extra/intervenções clínicas faturáveis. `ServicoExtraService` rejeita estadias inexistentes/terminadas e custos negativos; `IntervencaoClinicaService` exige responsável veterinário, descrição, data/hora e custo não negativo.
+
+Evidência de validação: `ServicoExtraServiceTest`, `ServicoExtraControllerTest`, `IntervencaoClinicaServiceTest` e `FluxoOperacionalEndToEndIntegrationTest`.
+
+**Problema identificado originalmente**
 
 Os serviços extra persistem o tipo como `String`, apesar de existir enum `TipoServicoExtra`. O custo não tem validação explícita robusta para impedir valores negativos ou inconsistentes.
 
@@ -431,7 +486,13 @@ Isto afeta histórico, faturação e relatórios.
 
 ### LAC-11 - Histórico consolidado não aplica todos os filtros esperados
 
-**Problema atual**
+**Estado após correção**
+
+Resolvida. `HistoricoService.consultar(...)` usa `HistoricoFiltroDto` e aplica filtros combinados por cliente/tutor, animal, estadia, intervalo de datas e tipo de evento. `HistoricoController` delega a consulta consolidada no serviço, preservando a separação entre camada web e regras de agregação.
+
+Evidência de validação: `HistoricoServiceTest`, `HistoricoControllerTest`, `HistoricoRepositoryIntegrationTest` e `HistoricoAuthorizationMvcTest`.
+
+**Problema identificado originalmente**
 
 O serviço de histórico implementa a consulta consolidada principalmente quando recebe `estadiaId`. Filtros como `animalId` e datas não estão plenamente aplicados em todos os caminhos.
 
@@ -466,7 +527,13 @@ O utilizador pode obter um histórico incompleto ou excessivo. Isto é especialm
 
 ### LAC-12 - Controladores contornam a camada de serviço
 
-**Problema atual**
+**Estado após correção**
+
+Resolvida para os exemplos e fluxos apontados. `HistoricoController` passou a depender de `IHistoricoService`, e `ReservaController` delega criação, cancelamento, detalhe financeiro e validações nos serviços de aplicação (`IReservaService`, `IAlojamentoService`, `IAnimalService`, `ITutorService`). As regras críticas de disponibilidade, check-in, check-out, pagamento e histórico ficam concentradas em serviços transacionais.
+
+Evidência de validação: testes de serviço dos fluxos críticos e testes MVC de reserva/histórico.
+
+**Problema identificado originalmente**
 
 Alguns controladores injetam repositórios ou serviços de áreas vizinhas diretamente, em vez de delegarem o fluxo completo a um serviço de aplicação.
 
@@ -512,7 +579,13 @@ Também contraria a orientação arquitetural de separar controladores, serviço
 
 ### LAC-13 - Auditoria incompleta para operações críticas
 
-**Problema atual**
+**Estado após correção**
+
+Resolvida em termos de fundação, consulta e integração das operações críticas existentes. A auditoria foi consolidada em `AuditoriaEvento`, `IAuditoriaService`/`AuditoriaService`, `AuditoriaController`, job de retenção e integrações com colaboradores, reservas existentes, check-in, check-out, pagamentos, cuidados, serviços extra, intervenções clínicas e limpeza. A única exceção explicitamente mantida é `EDITAR_RESERVA`, porque a aplicação ainda não tem fluxo de edição de reserva.
+
+Evidência de validação: `AuditoriaServiceTest`, `AuditoriaControllerTest`, `AuditoriaIntegrationTest`, `AuditoriaRepositoryIntegrationTest` e `AuditoriaSchedulerJobTest`.
+
+**Problema identificado originalmente**
 
 Existe configuração de auditoria, mas os eventos auditados parecem concentrar-se em colaboradores e relatórios. Operações críticas como reserva, check-in, check-out, pagamento, cuidados, intervenções clínicas e limpeza não estão claramente auditadas.
 
@@ -544,10 +617,10 @@ Clarificação executada com sucesso em sessão de `speckit.clarify`. Respostas 
 - `specs/005-relatorios-colaboradores/lac-13-impact-analysis.md` — análise completa de impacto (novo)
 - `specs/005-relatorios-colaboradores/lac-13-resolution-summary.md` — síntese de resolução (novo)
 
-**Próximos passos**:
-1. Publicar `docs/auditoria-interface.md` com interface esperada.
-2. Implementar Fase 1 (fundação de auditoria) em spec 005.
-3. Coordenar integração com specs 003 e 004.
+**Notas de fecho**:
+1. `docs/auditoria-interface.md` foi publicado com o contrato de integração.
+2. A fundação de auditoria da spec 005 encontra-se implementada.
+3. A integração com specs 003 e 004 cobre os fluxos existentes; `EDITAR_RESERVA` fica assinalado apenas porque esse fluxo ainda não faz parte da aplicação.
 
 **Spec responsável**
 
@@ -555,9 +628,24 @@ Clarificação executada com sucesso em sessão de `speckit.clarify`. Respostas 
 - Secundárias: `specs/003-reservas-estadias-pagamentos/` e `specs/004-cuidados-clinica-limpeza/` (para integração de eventos).
 - Requisitos afetados: FR-011, SC-008, SC-009 (novos), `US-01`, `US-02`, `US-03`, `US-05`.
 
----### LAC-14 - Relatórios não cumprem totalmente exportação PDF e agrupamento
+---
 
-**Problema atual**
+### LAC-14 - Relatórios não cumprem totalmente exportação PDF e agrupamento
+
+**Estado após correção**
+
+Resolvida em 27/05/2026 para a spec `005-relatorios-colaboradores`. A implementação atual usa Apache PDFBox em `RelatorioService.gerarPdf(...)`, valida que o período síncrono não ultrapassa 3 meses e reutiliza `RelatorioAgrupamentoDto` para apresentar os mesmos agrupamentos na web, CSV e PDF.
+
+Evidência verificada:
+
+- `PatasBigodesApp/pom.xml` contém a dependência `org.apache.pdfbox:pdfbox:3.0.0`;
+- `RelatorioService.gerarPdf(...)` devolve bytes de PDF real e `RelatorioServiceTest.gerarPdfDeveSerParseavelEConterTextoEsperado` valida assinatura `%PDF-` e parseabilidade com PDFBox;
+- `RelatorioService.gerarAgrupamentos(...)` aplica `agruparPor` antes da renderização/exportação;
+- `RelatorioController` devolve `400 Bad Request` para exportações com período superior a 3 meses;
+- `spec.md`, `data-model.md`, `contracts/contract.md`, `tasks.md`, `RF-03` e `UC-13` foram alinhados com a regra corrigida;
+- `mvn test -Dtest=RelatorioServiceTest,RelatorioControllerTest` executou 15 testes, 0 falhas, 0 erros.
+
+**Problema identificado originalmente**
 
 O serviço de relatórios devolve bytes de texto simples como se fossem PDF. Existe lógica de agrupamento, mas não está claramente integrada no cálculo dos relatórios.
 
@@ -594,13 +682,14 @@ Além disso, se o agrupamento não for aplicado, relatórios por período, colab
 
 **Estado após correção**
 
-Mitigada em 26/05/2026. Foram acrescentados testes de serviço e integração para tornar os fluxos críticos mais representativos, incluindo o fluxo completo de reserva até relatório.
+Resolvida como lacuna de representatividade dos fluxos críticos. Foram acrescentados testes de serviço, integração e sequência para tornar os cenários centrais verificáveis, incluindo o fluxo completo de reserva até relatório e a validação específica da LAC-14.
 
 Evidência principal:
 
 - `CheckInServiceTest`: valida criação de estadia, pagamento de check-in, transição da reserva para `CONFIRMADA` e cenários negativos;
 - `CheckOutSequenceServiceTest`: valida check-out, pagamento final, reserva `CONCLUIDA`, estadia `TERMINADA` e cenários negativos;
 - `PlanoCuidadosServiceTest`: valida regras de criação, consulta, tarefas, prioridade e encerramento de plano de cuidados;
+- `PagamentoServiceTest`, `AvailabilityDomainServiceTest`, `ServicoExtraServiceTest`, `IntervencaoClinicaServiceTest`, `HistoricoServiceTest`, `AuditoriaServiceTest` e `RelatorioServiceTest`: cobrem regras críticas antes ausentes ou superficiais;
 - `FluxoOperacionalEndToEndIntegrationTest`: valida reserva, check-in, registo de cuidado, serviço extra, intervenção clínica, check-out, pagamento final, limpeza e relatório no mesmo fluxo integrado;
 - migrações `V10__allow_reserva_confirmada_estado.sql` e `V11__allow_servico_extra_catalog_type_only.sql`: corrigem inconsistências de schema descobertas pelos testes end-to-end.
 
@@ -612,7 +701,15 @@ mvn test -Dtest=CheckInServiceTest,CheckOutSequenceServiceTest,CheckInIntegratio
 
 Resultado: `38` testes executados, `0` falhas, `0` erros.
 
-**Problema atual**
+Validação alargada executada após consolidação das lacunas LAC-01 a LAC-15:
+
+```bash
+mvn test -Dtest=PagamentoServiceTest,EstadiaServiceTest,CheckInServiceTest,CheckOutSequenceServiceTest,AvailabilityDomainServiceTest,ReservaServiceUnitTest,ReservaConfirmIntegrationTest,ServicoExtraServiceTest,IntervencaoClinicaServiceTest,HistoricoServiceTest,PlanoCuidadosServiceTest,RelatorioServiceTest,RelatorioControllerTest,AuditoriaServiceTest,AuditoriaControllerTest,FluxoOperacionalEndToEndIntegrationTest
+```
+
+Resultado: `127` testes executados, `0` falhas, `0` erros.
+
+**Problema identificado originalmente**
 
 A suite de testes passa, mas vários testes são superficiais. Alguns exemplos:
 
@@ -655,44 +752,44 @@ A equipa pode ter uma falsa sensação de segurança. A build passa mesmo quando
 - Mais urgentes: `specs/003-reservas-estadias-pagamentos/` e `specs/004-cuidados-clinica-limpeza/`, por conterem os fluxos operacionais mais críticos.
 - Referência adicional: metas de qualidade e cobertura definidas na documentação de Etapa 4 ou nos critérios da spec `001`, quando aplicável.
 
-## 5. Correções prioritárias por spec
+## 5. Correções aplicadas por spec
 
 ### `specs/001-fundacao-hotel-animais`
 
-Deve clarificar:
+Clarificado/aplicado:
 
 - conceito de alojamento ativo;
 - estados possíveis de limpeza/ocupação;
 - relação entre alojamento, capacidade e disponibilidade;
-- eventual existência de tarifa base por alojamento ou tipo de alojamento.
+- tarifa base consolidada por tipo de alojamento, em articulação com a spec `003`.
 
-Correções técnicas associadas:
+Correções técnicas associadas verificadas:
 
-- rever modelo `Alojamento`;
-- garantir que a disponibilidade não depende apenas da limpeza;
-- acrescentar testes de fundação para estados de alojamento.
+- modelo e serviços de alojamento articulados com `AvailabilityDomainService`;
+- disponibilidade deixou de depender apenas da limpeza;
+- testes de alojamento/disponibilidade cobrem os estados relevantes.
 
 ### `specs/002-registo-clientes-alojamentos`
 
-Deve clarificar:
+Clarificado/aplicado:
 
 - dados obrigatórios de cliente;
 - dados obrigatórios de animal;
 - dados obrigatórios de alojamento;
-- se a tarifa é configurada no alojamento;
+- tarifa configurada por tipo de alojamento;
 - regras de edição quando existem reservas ou estadias associadas.
 
-Correções técnicas associadas:
+Correções técnicas associadas verificadas:
 
-- atualizar formulários e validações;
-- rever tarefas ainda por assinalar em `tasks.md`;
-- criar testes para validações de registo e edição.
+- formulários/validações existentes mantidos coerentes com a regra de espécie/capacidade;
+- tarefas antigas com evidência foram assinaladas;
+- testes de alojamento/reserva validam o impacto operacional.
 
 ### `specs/003-reservas-estadias-pagamentos`
 
-É a spec com maior concentração de lacunas críticas.
+Foi a spec com maior concentração de lacunas críticas; as regras centrais foram encerradas.
 
-Deve clarificar:
+Clarificado/aplicado:
 
 - ciclo de vida completo da reserva;
 - diferença entre reserva confirmada, reserva concluída e estadia concluída;
@@ -704,19 +801,19 @@ Deve clarificar:
 - transação de check-out;
 - comportamento em falhas parciais.
 
-Correções técnicas associadas:
+Correções técnicas associadas verificadas:
 
-- rever `EstadoReserva`;
-- rever `ReservaService` e `ReservaController`;
-- centralizar regra de disponibilidade;
-- implementar cobrança complementar;
-- impedir check-in duplicado por animal;
-- tornar check-out transacional ou explicitamente compensável;
-- criar testes end-to-end de reserva a check-out.
+- `EstadoReserva` inclui `CONFIRMADA` e separa conclusão;
+- `ReservaService`, `ReservaController`, `EstadiaService` e `PagamentoService` alinham-se com o ciclo de vida documentado;
+- regra de disponibilidade está centralizada;
+- cobrança complementar está implementada;
+- check-in duplicado por animal é bloqueado;
+- check-out é transacional;
+- testes de sequência e end-to-end cobrem reserva a check-out.
 
 ### `specs/004-cuidados-clinica-limpeza`
 
-Deve clarificar:
+Clarificado/aplicado:
 
 - plano de cuidados;
 - validações de cuidados;
@@ -727,18 +824,17 @@ Deve clarificar:
 - regras de limpeza após check-out;
 - histórico consolidado.
 
-Correções técnicas associadas:
+Correções técnicas associadas verificadas:
 
-- implementar `PlanoCuidadosService`;
-- validar tipos e custos de serviços extra;
-- validar intervenções clínicas;
-- integrar extras e clínica no pagamento final;
-- completar filtros do histórico;
-- criar testes de cuidados, clínica, extras e limpeza.
+- `PlanoCuidadosService` implementado;
+- serviços extra e intervenções clínicas validam estadia ativa, responsável e custos;
+- extras e clínica entram no pagamento final;
+- histórico consolidado aplica filtros combinados;
+- testes de cuidados, clínica, extras, histórico e fluxo integrado cobrem as regras.
 
 ### `specs/005-relatorios-colaboradores`
 
-Deve clarificar:
+Clarificado/aplicado:
 
 - relatórios obrigatórios;
 - filtros obrigatórios;
@@ -748,46 +844,45 @@ Deve clarificar:
 - permissões por perfil;
 - critérios de QA.
 
-Correções técnicas associadas:
+Correções técnicas associadas verificadas:
 
-- gerar PDF real se PDF for requisito;
-- integrar agrupamento no cálculo de relatórios;
-- completar checklist de requisitos;
-- criar `checklists/qa-results.md` ou corrigir a referência;
-- auditar operações críticas;
-- testar exportação e permissões.
+- PDF real gerado com PDFBox;
+- agrupamento integrado no cálculo e reutilizado em web/CSV/PDF;
+- checklist de requisitos e `qa-results.md` regularizados;
+- auditoria centralizada em `AuditoriaEvento`;
+- testes de exportação, permissões, auditoria e retenção existem.
 
-## 6. Ordem recomendada de implementação
+## 6. Ordem de fecho aplicada
 
 1. **Regularizar Speckit**
-   - Fechar estado das specs, tarefas e checklists.
-   - Corrigir `.specify/feature.json`.
-   - Criar ou remover referências a checklists inexistentes.
+   - Estados das specs, tarefas e checklists revistos.
+   - `.specify/feature.json` corrigido para a spec ativa.
+   - Referência a checklist inexistente resolvida com `qa-results.md`.
 
 2. **Corrigir regras críticas de estadia e disponibilidade**
-   - Disponibilidade deve excluir reservas e estadias ativas.
-   - Um animal não deve poder ter duas estadias ativas.
-   - Estados de reserva devem representar o ciclo de vida real.
+   - Disponibilidade exclui reservas e estadias ativas.
+   - Um animal não pode ter duas estadias ativas.
+   - Estados de reserva representam o ciclo de vida real.
 
 3. **Completar pagamentos**
-   - Substituir tarifa fixa por regra documentada.
-   - Exigir ou remover método de pagamento no check-in conforme decisão.
-   - Calcular extras e cobrança final no check-out.
+   - Tarifa fixa substituída por tarifa ativa por tipo de alojamento.
+   - Método de pagamento obrigatório no check-in e check-out.
+   - Extras, clínica e dias adicionais calculados no check-out.
 
 4. **Completar cuidados, clínica e limpeza**
-   - Implementar plano de cuidados.
-   - Validar serviços extra e intervenções clínicas.
-   - Garantir integração com histórico e faturação.
+   - Plano de cuidados implementado.
+   - Serviços extra e intervenções clínicas validados.
+   - Integração com histórico e faturação assegurada.
 
 5. **Completar relatórios e auditoria**
-   - Garantir agrupamentos.
-   - Gerar exportações reais.
-   - Auditar fluxos críticos.
+   - Agrupamentos garantidos.
+   - Exportações reais geradas.
+   - Fluxos críticos auditados, exceto edição de reserva por inexistência desse fluxo.
 
 6. **Reforçar testes**
-   - Criar testes orientados aos critérios de aceitação.
-   - Cobrir cenários negativos.
-   - Subir cobertura dos serviços que concentram regras de negócio.
+   - Testes orientados aos critérios de aceitação acrescentados.
+   - Cenários negativos cobertos nos fluxos críticos.
+   - Representatividade dos serviços centrais reforçada.
 
 ## 7. Definition of Done documental por spec
 
@@ -804,8 +899,8 @@ Uma spec deve ser considerada pronta apenas quando cumprir todos os pontos segui
 
 ## 8. Conclusão
 
-A implementação atual tem uma base funcional relevante e passa a suite de testes existente, mas ainda não está completamente alinhada com o nível de detalhe esperado pelas specs Speckit.
+Após a revisão de 27/05/2026, as lacunas LAC-01 a LAC-15 encontram-se resolvidas ou explicitamente encerradas com pressupostos coerentes nos artefactos de requisitos, casos de uso, specs Speckit e implementação.
 
-As lacunas mais críticas estão nos fluxos de reserva, estadia, pagamento, disponibilidade, cuidados e relatórios. O risco principal não é a falta total de implementação, mas sim a existência de comportamentos parcialmente implementados, pouco testados ou semanticamente ambíguos.
+Os fluxos mais sensíveis — reserva, disponibilidade, check-in, check-out, pagamento, cuidados, clínica, histórico, relatórios e auditoria — passaram a ter regra documentada, implementação rastreável e testes representativos.
 
-O próximo passo recomendado é tratar este documento como backlog de validação da Etapa 4, abrindo correções por spec e fechando cada uma apenas quando documentação, código e testes estiverem coerentes.
+As pendências remanescentes não reabrem lacunas funcionais: dizem respeito a melhoria de qualidade documental/técnica, como Javadoc, medição quantitativa de cobertura e a operação `EDITAR_RESERVA`, que só deverá ser auditada quando existir fluxo de edição de reserva na aplicação.
