@@ -12,6 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.data.domain.Sort;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.enums.EstadoEstadia;
+import pt.hotel.animais.model.enums.MetodoPagamento;
 import pt.hotel.animais.service.IHistoricoService;
 
 import java.time.LocalDate;
@@ -81,6 +82,7 @@ public class HistoricoController {
         model.addAttribute("dataInicio", dataInicio);
         model.addAttribute("dataFim", dataFim);
         model.addAttribute("pageSize", pageable.getPageSize());
+        model.addAttribute("metodosPagamento", MetodoPagamento.values());
         model.addAttribute("activePage", "historico");
         model.addAttribute("pageTitle", "Histórico de Estadia");
         return "historico/list";

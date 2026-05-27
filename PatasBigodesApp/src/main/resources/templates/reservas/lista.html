@@ -63,6 +63,7 @@
                         <table th:unless="${#lists.isEmpty(reservas)}" class="table table-sm table-striped table-hover">
                             <thead>
                                 <tr>
+                                    <th>Reserva</th>
                                     <th>Animal</th>
                                     <th>Tutor</th>
                                     <th>Alojamento</th>
@@ -74,6 +75,9 @@
                             <tbody>
                                 <tr th:each="reserva : ${reservas}">
                                     <td>
+                                        <strong th:text="'#' + ${reserva.id}">#1</strong>
+                                    </td>
+                                    <td>
                                         <strong th:text="${reserva.animalNome}">Animal</strong>
                                     </td>
                                     <td th:text="${reserva.tutorNome}">Tutor</td>
@@ -82,9 +86,9 @@
                                     </td>
                                     <td>
                                         <small class="text-muted">
-                                            <span th:text="${#dates.format(reserva.dataInicio, 'dd/MM/yyyy')}">01/01/2026</span>
+                                            <span th:text="${#temporals.format(reserva.dataInicio, 'dd/MM/yyyy')}">01/01/2026</span>
                                             a
-                                            <span th:text="${#dates.format(reserva.dataFim, 'dd/MM/yyyy')}">05/01/2026</span>
+                                            <span th:text="${#temporals.format(reserva.dataFim, 'dd/MM/yyyy')}">05/01/2026</span>
                                         </small>
                                     </td>
                                     <td>
@@ -94,11 +98,22 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <a th:href="@{/reservas/{id}(id=${reserva.id})}" class="btn btn-sm btn-primary" title="Ver Detalhes">
-                                            <i class="fas fa-info-circle mr-1"></i> Detalhes
+                                        <a th:href="@{/reservas/{id}(id=${reserva.id})}" class="btn btn-sm btn-primary mr-1" title="Consultar todos os detalhes da reserva">
+                                            <i class="fas fa-info-circle mr-1"></i> Consultar detalhes
                                         </a>
                                         <th:block th:if="${reserva.estado.name() == 'ATIVA'}">
+                                            <form method="post" th:action="@{/estadias/check-in}" class="d-inline-block mr-1">
+                                                <input type="hidden" name="reservaId" th:value="${reserva.id}">
+                                                <input type="hidden" name="redirectTo" th:value="@{/reservas}">
+                                                <select name="metodoPagamento" class="form-control form-control-sm d-inline-block mr-1" style="width: 145px;" required>
+                                                    <option th:each="metodo : ${metodosPagamento}" th:value="${metodo}" th:text="${metodo.name() == 'NUMERARIO' ? 'Numerário' : (metodo.name() == 'CARTAO_DEBITO' ? 'Cartão débito' : 'Cartão crédito')}">Método</option>
+                                                </select>
+                                                <button type="submit" class="btn btn-sm btn-success" title="Registar check-in">
+                                                    <i class="fas fa-right-to-bracket mr-1"></i> Check-in
+                                                </button>
+                                            </form>
                                             <form method="post" th:action="@{/reservas/{id}/cancelar(id=${reserva.id})}" style="display: inline;">
+                                                <input type="hidden" name="redirectTo" th:value="@{/reservas}">
                                                 <button type="submit" class="btn btn-sm btn-danger" title="Cancelar" onclick="return confirm('Tem a certeza que deseja cancelar esta reserva?')">
                                                     <i class="fas fa-times mr-1"></i> Cancelar
                                                 </button>

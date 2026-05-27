@@ -58,6 +58,7 @@
 
         <section class="content">
             <div class="container-fluid">
+                <th:block th:insert="~{fragments/alerts :: alerts}"></th:block>
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
@@ -90,11 +91,17 @@
                                         <td th:text="${estadia.estado}">EM_CURSO</td>
                                         <td>
                                             <span class="badge badge-info" th:text="${estadia.reserva.alojamento.identificacao}">A1</span>
-                                            <a th:if="${estadia.estado.toString() == 'EM_CURSO'}"
-                                               th:href="@{/estadias(estadiaId=${estadia.id})}"
-                                               class="btn btn-sm btn-success ml-2">
-                                                <i class="fas fa-right-from-bracket"></i> Preparar Check-out
-                                            </a>
+                                            <form th:if="${estadia.estado.toString() == 'EM_CURSO'}"
+                                                  th:action="@{/estadias/check-out}" method="post" class="d-inline-flex align-items-center ml-2">
+                                                <input type="hidden" name="estadiaId" th:value="${estadia.id}">
+                                                <input type="hidden" name="redirectTo" th:value="@{/historico}">
+                                                <select name="metodoPagamento" class="form-control form-control-sm mr-1" required>
+                                                    <option th:each="metodo : ${metodosPagamento}" th:value="${metodo}" th:text="${metodo.name() == 'NUMERARIO' ? 'Numerário' : (metodo.name() == 'CARTAO_DEBITO' ? 'Cartão de débito' : 'Cartão de crédito')}">Método</option>
+                                                </select>
+                                                <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('Tem a certeza que deseja realizar o check-out?')">
+                                                    <i class="fas fa-right-from-bracket"></i> Check-out
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                     <tr th:if="${#lists.isEmpty(estadias)}">

@@ -12,6 +12,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pt.hotel.animais.dto.EstadiaListDto;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.enums.EstadoEstadia;
+import pt.hotel.animais.model.enums.MetodoPagamento;
 import pt.hotel.animais.service.IEstadiaService;
 
 import java.time.LocalDate;
@@ -58,6 +59,7 @@ public class EstadiaController {
         model.addAttribute("dataInicio", dataInicio);
         model.addAttribute("dataFim", dataFim);
         model.addAttribute("estados", EstadoEstadia.values());
+        model.addAttribute("metodosPagamento", MetodoPagamento.values());
         model.addAttribute("pageTitle", "Estadias");
         model.addAttribute("breadcrumb", "Lista de Estadias");
         model.addAttribute("activePage", "estadias");
@@ -92,37 +94,50 @@ public class EstadiaController {
     @PostMapping("/check-in")
     public String checkIn(@RequestParam("reservaId") Long reservaId, 
                           @RequestParam(value = "metodoPagamento", required = false) String metodoPagamentoStr,
+                          @RequestParam(value = "redirectTo", required = false) String redirectTo,
                           RedirectAttributes redirectAttributes) {
         try {
-            pt.hotel.animais.model.enums.MetodoPagamento metodoPagamento = parseMetodoPagamento(metodoPagamentoStr);
+            MetodoPagamento metodoPagamento = parseMetodoPagamento(metodoPagamentoStr);
             Estadia estadia = estadiaService.abrirEstadiaPorReserva(reservaId, metodoPagamento);
             redirectAttributes.addFlashAttribute("successMessage", "Check-in registado: " + estadia.getId());
-            return "redirect:/estadias";
+            return "redirect:" + destinoSeguro(redirectTo, "/estadias");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/reservas";
+            return "redirect:" + destinoSeguro(redirectTo, "/reservas");
         }
     }
 
     @PostMapping("/check-out")
     public String checkOut(@RequestParam("estadiaId") Long estadiaId,
                            @RequestParam(value = "metodoPagamento", required = false) String metodoPagamentoStr,
+                           @RequestParam(value = "redirectTo", required = false) String redirectTo,
                            RedirectAttributes redirectAttributes) {
         try {
-            pt.hotel.animais.model.enums.MetodoPagamento metodoPagamento = parseMetodoPagamento(metodoPagamentoStr);
+            MetodoPagamento metodoPagamento = parseMetodoPagamento(metodoPagamentoStr);
             Estadia estadia = estadiaService.checkOut(estadiaId, metodoPagamento);
             redirectAttributes.addFlashAttribute("successMessage", "Check-out registado: " + estadia.getId());
-            return "redirect:/historico";
+            return "redirect:" + destinoSeguro(redirectTo, "/historico");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/historico";
+            return "redirect:" + destinoSeguro(redirectTo, "/historico");
         }
     }
 
-    private pt.hotel.animais.model.enums.MetodoPagamento parseMetodoPagamento(String metodoPagamentoStr) {
+    private MetodoPagamento parseMetodoPagamento(String metodoPagamentoStr) {
         if (metodoPagamentoStr == null || metodoPagamentoStr.isBlank()) {
             throw new IllegalArgumentException("Método de pagamento é obrigatório");
         }
-        return pt.hotel.animais.model.enums.MetodoPagamento.valueOf(metodoPagamentoStr);
+        try {
+            return MetodoPagamento.valueOf(metodoPagamentoStr);
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalArgumentException("Método de pagamento inválido");
+        }
+    }
+
+    private String destinoSeguro(String redirectTo, String fallback) {
+        if (redirectTo == null || redirectTo.isBlank() || !redirectTo.startsWith("/") || redirectTo.startsWith("//")) {
+            return fallback;
+        }
+        return redirectTo;
     }
 }

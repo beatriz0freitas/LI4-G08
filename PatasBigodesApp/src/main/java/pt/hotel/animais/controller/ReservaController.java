@@ -15,6 +15,7 @@ import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.Tutor;
 import pt.hotel.animais.model.enums.EstadoReserva;
+import pt.hotel.animais.model.enums.MetodoPagamento;
 import pt.hotel.animais.service.IAlojamentoService;
 import pt.hotel.animais.service.IAnimalService;
 import pt.hotel.animais.service.IReservaService;
@@ -66,6 +67,7 @@ public class ReservaController {
         model.addAttribute("reservas", reservas);
         model.addAttribute("filtroEstado", estado);
         model.addAttribute("estados", EstadoReserva.values());
+        model.addAttribute("metodosPagamento", MetodoPagamento.values());
         model.addAttribute("pageTitle", "Reservas");
         model.addAttribute("breadcrumb", "Lista de Reservas");
         model.addAttribute("activePage", "reservas");
@@ -107,6 +109,7 @@ public class ReservaController {
         model.addAttribute("totalReservados", contarEstado(mapa, "RESERVADO"));
         model.addAttribute("totalLimpeza", contarEstado(mapa, "LIMPEZA"));
         model.addAttribute("tiposAlojamento", tipos != null ? tipos : List.of());
+        model.addAttribute("metodosPagamento", MetodoPagamento.values());
         model.addAttribute("tipo", tipo);
         model.addAttribute("dataInicio", inicio);
         model.addAttribute("dataFim", fim);
@@ -250,6 +253,7 @@ public class ReservaController {
             Reserva reserva = reservaService.obter(id);
             
             model.addAttribute("reserva", reserva);
+            model.addAttribute("metodosPagamento", MetodoPagamento.values());
             model.addAttribute("pageTitle", "Reserva #" + id);
             model.addAttribute("breadcrumb", "Detalhes da Reserva");
             model.addAttribute("activePage", "reservas");
@@ -272,16 +276,17 @@ public class ReservaController {
     @PostMapping("/{id}/cancelar")
     public String cancelar(
         @PathVariable Long id,
+        @RequestParam(value = "redirectTo", required = false) String redirectTo,
         RedirectAttributes redirectAttributes,
         Model model
     ) {
         try {
             reservaService.cancelar(id);
             redirectAttributes.addFlashAttribute("successMessage", "Reserva cancelada com sucesso");
-            return "redirect:/reservas";
+            return "redirect:" + destinoSeguro(redirectTo, "/reservas");
         } catch (IllegalArgumentException e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "redirect:/reservas/" + id;
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:" + destinoSeguro(redirectTo, "/reservas/" + id);
         }
     }
     
@@ -473,5 +478,12 @@ public class ReservaController {
             return null;
         }
         return LocalDate.parse(value);
+    }
+
+    private String destinoSeguro(String redirectTo, String fallback) {
+        if (redirectTo == null || redirectTo.isBlank() || !redirectTo.startsWith("/") || redirectTo.startsWith("//")) {
+            return fallback;
+        }
+        return redirectTo;
     }
 }

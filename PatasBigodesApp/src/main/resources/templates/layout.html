@@ -31,6 +31,7 @@
 			<!-- Main content -->
 			<section class="content">
 				<div class="container-fluid">
+					<th:block th:insert="~{fragments/alerts :: alerts}"></th:block>
 					<th:block th:replace="~{::content}"></th:block>
 				</div>
 			</section>

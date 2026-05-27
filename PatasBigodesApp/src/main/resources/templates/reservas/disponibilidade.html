@@ -114,6 +114,8 @@
                                                 th:data-motivo="${alojamento.motivoIndisponibilidade ?: ''}"
                                                 th:data-estadia="${alojamento.estadiaId ?: ''}"
                                                 th:data-reserva="${alojamento.reservaId ?: ''}"
+                                                th:data-reserva-inicio="${alojamento.dataReservaInicio ?: ''}"
+                                                th:data-reserva-fim="${alojamento.dataReservaFim ?: ''}"
                                                 th:data-disponivel="${alojamento.disponivel}">
                                             <strong class="d-block" th:text="${alojamento.identificacao}">Box 01</strong>
                                             <small class="text-muted d-block mb-2" th:text="${alojamento.tipoLabel}">Canil</small>
@@ -191,37 +193,68 @@
             var actions = document.getElementById('modal-actions');
             var dataInicio = /*[[${dataInicio}]]*/ '';
             var dataFim = /*[[${dataFim}]]*/ '';
+            var metodosPagamento = /*[[${metodosPagamento}]]*/ [];
+            var csrfParameter = /*[[${_csrf != null ? _csrf.parameterName : ''}]]*/ '';
+            var csrfToken = /*[[${_csrf != null ? _csrf.token : ''}]]*/ '';
             var estado = box.dataset.estado;
             var estadiaId = box.dataset.estadia;
             var reservaId = box.dataset.reserva;
             var disponivel = box.dataset.disponivel === 'true';
+            var returnUrl = window.location.pathname + window.location.search;
             
             var actionsHtml = '';
+
+            function csrfInput() {
+                return csrfParameter && csrfToken
+                    ? '<input type="hidden" name="' + csrfParameter + '" value="' + csrfToken + '">'
+                    : '';
+            }
+
+            function hiddenReturn() {
+                return '<input type="hidden" name="redirectTo" value="' + returnUrl.replace(/"/g, '&quot;') + '">';
+            }
+
+            function metodoPagamentoSelect(id) {
+                var labels = {
+                    NUMERARIO: 'Numerário',
+                    CARTAO_DEBITO: 'Cartão de débito',
+                    CARTAO_CREDITO: 'Cartão de crédito'
+                };
+                var options = metodosPagamento.map(function (metodo) {
+                    return '<option value="' + metodo + '">' + (labels[metodo] || metodo) + '</option>';
+                }).join('');
+                return '<select id="' + id + '" name="metodoPagamento" class="form-control form-control-sm mb-2" required>' + options + '</select>';
+            }
             
-            // Check-in: quando alojamento está LIVRE e existe uma reserva
-            if (estado === 'Livre' && reservaId) {
-                actionsHtml = '<form class="d-inline-block mr-2" method="post" action="/estadias/check-in" style="display: inline;">' +
+            if (estado === 'Reservado' && reservaId) {
+                actionsHtml = '<form class="mb-2" method="post" action="/estadias/check-in">' +
+                              csrfInput() +
+                              hiddenReturn() +
                               '<input type="hidden" name="reservaId" value="' + reservaId + '">' +
-                              '<input type="hidden" name="metodoPagamento" value="TRANSFERENCIA_BANCARIA">' +
-                              '<button type="submit" class="btn btn-success btn-sm">Realizar Check-in</button>' +
+                              '<label class="small text-muted mb-1" for="metodoCheckIn">Pagamento do check-in</label>' +
+                              metodoPagamentoSelect('metodoCheckIn') +
+                              '<button type="submit" class="btn btn-success btn-sm btn-block">Registar check-in</button>' +
                               '</form>' +
-                              '<form class="d-inline-block mr-2" method="post" action="/reservas/' + reservaId + '/cancelar" style="display: inline;">' +
-                              '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Tem a certeza que deseja cancelar esta reserva?\')">Cancelar Reserva</button>' +
+                              '<form class="mb-2" method="post" action="/reservas/' + reservaId + '/cancelar">' +
+                              csrfInput() +
+                              hiddenReturn() +
+                              '<button type="submit" class="btn btn-outline-danger btn-sm btn-block" onclick="return confirm(\'Tem a certeza que deseja cancelar esta reserva?\')">Cancelar reserva</button>' +
                               '</form>' +
-                              '<a class="btn btn-secondary btn-sm" href="/reservas/' + reservaId + '">Ver Detalhes</a>';
+                              '<a class="btn btn-outline-secondary btn-sm btn-block" href="/reservas/' + reservaId + '">Consultar detalhes</a>';
             }
-            // Check-out: quando alojamento está OCUPADO e existe uma estadia
             else if (estado === 'Ocupado' && estadiaId) {
-                actionsHtml = '<form class="d-inline-block mr-2" method="post" action="/estadias/check-out" style="display: inline;">' +
+                actionsHtml = '<form class="mb-2" method="post" action="/estadias/check-out">' +
+                              csrfInput() +
+                              hiddenReturn() +
                               '<input type="hidden" name="estadiaId" value="' + estadiaId + '">' +
-                              '<input type="hidden" name="metodoPagamento" value="TRANSFERENCIA_BANCARIA">' +
-                              '<button type="submit" class="btn btn-warning btn-sm" onclick="return confirm(\'Tem a certeza que deseja realizar o check-out?\')">Realizar Check-out</button>' +
+                              '<label class="small text-muted mb-1" for="metodoCheckOut">Pagamento do check-out</label>' +
+                              metodoPagamentoSelect('metodoCheckOut') +
+                              '<button type="submit" class="btn btn-warning btn-sm btn-block" onclick="return confirm(\'Tem a certeza que deseja realizar o check-out?\')">Registar check-out</button>' +
                               '</form>' +
-                              '<a class="btn btn-secondary btn-sm" href="/estadias/lista">Ver Estadia</a>';
+                              (reservaId ? '<a class="btn btn-outline-secondary btn-sm btn-block" href="/reservas/' + reservaId + '">Consultar detalhes</a>' : '');
             }
-            // Criar reserva: quando alojamento está disponível
             else if (disponivel) {
-                actionsHtml = '<a class="btn btn-success btn-sm" href="/reservas/novo?alojamentoId=' + box.dataset.id + '&dataInicio=' + dataInicio + '&dataFim=' + dataFim + '">Criar Reserva</a>';
+                actionsHtml = '<a class="btn btn-success btn-sm" href="/reservas/novo?alojamentoId=' + box.dataset.id + '&dataInicio=' + dataInicio + '&dataFim=' + dataFim + '">Criar reserva</a>';
             }
             
             actions.innerHTML = actionsHtml;
