@@ -1,0 +1,252 @@
+@startuml LogicalDataModel
+title Modelo Lógico da Base de Dados - Hotel de Animais
+
+entity "colaborador" as colaborador {
+    **id** : BIGINT [PK]
+    username : VARCHAR(80) [UNIQUE]
+    nome : VARCHAR(150)
+    email : VARCHAR(150) [UNIQUE]
+    password_hash : VARCHAR(100)
+    tipo_colaborador : VARCHAR(40) [ENUM]
+    ativo : BOOLEAN
+    data_criacao : TIMESTAMP
+    ultimo_login : TIMESTAMP [NULL]
+}
+
+entity "tutor" as tutor {
+    **id** : BIGINT [PK]
+    nome : VARCHAR(150)
+    nif : VARCHAR(20) [UNIQUE]
+    contacto : VARCHAR(30)
+    email : VARCHAR(150)
+    data_registo : TIMESTAMP
+}
+
+entity "animal" as animal {
+    **id** : BIGINT [PK]
+    **tutor_id** : BIGINT [FK]
+    nome : VARCHAR(150)
+    especie : VARCHAR(20) [ENUM: CAO, GATO]
+    raca : VARCHAR(100)
+    data_nascimento : DATE
+    peso : DECIMAL(6,2)
+    estado_saude : VARCHAR(20) [ENUM]
+    necessidades_alimentares : TEXT
+    medicacao_curso : TEXT
+    data_registo : TIMESTAMP
+}
+
+entity "alojamento" as alojamento {
+    **id** : BIGINT [PK]
+    identificacao : VARCHAR(100) [UNIQUE]
+    tipo : VARCHAR(20) [ENUM: CANINO, FELINO]
+    capacidade : INT
+    estado_limpeza : VARCHAR(20) [ENUM]
+}
+
+entity "tipo_alojamento_tarifa" as tipo_alojamento_tarifa {
+    **id** : BIGINT [PK]
+    tipo : VARCHAR(50)
+    tarifa_diaria : DECIMAL(10,2)
+    ativo : BOOLEAN
+    created_at : TIMESTAMP
+    created_by : BIGINT [FK]
+}
+
+entity "reserva" as reserva {
+    **id** : BIGINT [PK]
+    **tutor_id** : BIGINT [FK]
+    **animal_id** : BIGINT [FK]
+    **alojamento_id** : BIGINT [FK]
+    data_inicio : DATE
+    data_fim : DATE
+    estado : VARCHAR(20) [ENUM]
+    data_criacao : TIMESTAMP
+}
+
+entity "nota" as nota {
+    **id** : BIGINT [PK]
+    **reserva_id** : BIGINT [FK]
+    descricao : VARCHAR(1000)
+    **autor_id** : BIGINT [FK]
+    data_hora : TIMESTAMP
+    created_at : TIMESTAMP
+    created_by : BIGINT [FK]
+}
+
+entity "estadia" as estadia {
+    **id** : BIGINT [PK]
+    **reserva_id** : BIGINT [FK]
+    data_inicio : TIMESTAMP
+    data_fim : TIMESTAMP [NULL]
+    estado : VARCHAR(30) [ENUM]
+    data_criacao : TIMESTAMP
+}
+
+entity "plano_cuidados" as plano_cuidados {
+    **id** : BIGINT [PK]
+    **animal_id** : BIGINT [FK]
+    **estadia_id** : BIGINT [FK, UNIQUE]
+    data_inicio : TIMESTAMP
+    data_fim : TIMESTAMP [NULL]
+    prioridade : VARCHAR(50) [ENUM]
+    ativo : BOOLEAN
+    instrucoes : VARCHAR(2000)
+    created_at : TIMESTAMP
+    created_by : BIGINT [FK]
+    updated_at : TIMESTAMP
+    updated_by : BIGINT [FK]
+}
+
+entity "tarefa_cuidado" as tarefa_cuidado {
+    **id** : BIGINT [PK]
+    **plano_cuidados_id** : BIGINT [FK]
+    tipo : VARCHAR(100)
+    descricao : VARCHAR(500)
+    periodicidade : VARCHAR(50) [ENUM]
+    data_hora : TIMESTAMP
+    concluida : BOOLEAN
+    **autor_conclusao_id** : BIGINT [FK, NULL]
+    created_at : TIMESTAMP
+    created_by : BIGINT [FK]
+}
+
+entity "registo_cuidado" as registo_cuidado {
+    **id** : BIGINT [PK]
+    **estadia_id** : BIGINT [FK]
+    descricao : VARCHAR(1000)
+    data_hora : TIMESTAMP
+    **autor_id** : BIGINT [FK]
+    created_at : TIMESTAMP
+    created_by : BIGINT [FK]
+}
+
+entity "alteracao_estado_saude" as alteracao_estado_saude {
+    **id** : BIGINT [PK]
+    **estadia_id** : BIGINT [FK]
+    descricao : VARCHAR(1000)
+    severidade : VARCHAR(50) [ENUM]
+    data_hora : TIMESTAMP
+    **autor_id** : BIGINT [FK]
+    created_at : TIMESTAMP
+    created_by : BIGINT [FK]
+}
+
+entity "servico_extra" as servico_extra {
+    **id** : BIGINT [PK]
+    **estadia_id** : BIGINT [FK]
+    tipo : VARCHAR(50)
+    custo : DECIMAL(10,2)
+    data_hora : TIMESTAMP
+    **autor_id** : BIGINT [FK]
+    created_at : TIMESTAMP
+    created_by : BIGINT [FK]
+}
+
+entity "tipo_servico_extra" as tipo_servico_extra {
+    **id** : BIGINT [PK]
+    nome : VARCHAR(100)
+    descricao : VARCHAR(500)
+    ativo : BOOLEAN
+    created_at : TIMESTAMP
+    created_by : BIGINT [FK]
+}
+
+entity "intervencao_clinica" as intervencao_clinica {
+    **id** : BIGINT [PK]
+    **estadia_id** : BIGINT [FK]
+    descricao : VARCHAR(1000)
+    custo : DECIMAL(10,2)
+    data_hora : TIMESTAMP
+    **medico_id** : BIGINT [FK]
+    created_at : TIMESTAMP
+    created_by : BIGINT [FK]
+}
+
+entity "pagamento" as pagamento {
+    **id** : BIGINT [PK]
+    **estadia_id** : BIGINT [FK]
+    valor : DECIMAL(12,2)
+    metodo : VARCHAR(50) [ENUM]
+    tipo : VARCHAR(30) [ENUM]
+    estado : VARCHAR(30) [ENUM]
+    data_criacao : TIMESTAMP
+}
+
+entity "auditoria_evento" as auditoria_evento {
+    **id** : BIGINT [PK]
+    **utilizador_id** : BIGINT [FK, NULL]
+    **entidade_id** : BIGINT [FK, NULL]
+    tipo_entidade : VARCHAR(100)
+    tipo_operacao : VARCHAR(50)
+    resultado : VARCHAR(20)
+    descricao : VARCHAR(500)
+    data_hora : TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+}
+
+' --- Relationships ---
+
+tutor ||--o{ animal : "responsável por"
+tutor ||--o{ reserva : "solicita"
+
+animal ||--o{ reserva : "é objeto de"
+animal ||--o{ plano_cuidados : "mantém histórico"
+
+alojamento ||--o{ reserva : "é reservado em"
+tipo_alojamento_tarifa ||--o{ alojamento : "classifica"
+
+reserva ||--|| estadia : "origina"
+reserva ||--o{ nota : "contém"
+
+estadia ||--o{ registo_cuidado : "regista"
+estadia ||--o{ servico_extra : "inclui"
+estadia ||--o{ intervencao_clinica : "inclui"
+estadia ||--o{ alteracao_estado_saude : "regista"
+estadia ||--|| pagamento : "gera"
+
+estadia ||--|| plano_cuidados : "ativa"
+
+plano_cuidados ||--o{ tarefa_cuidado : "organiza"
+
+colaborador ||--o{ nota : "cria como autor"
+colaborador ||--o{ registo_cuidado : "cria como autor"
+colaborador ||--o{ servico_extra : "cria como autor"
+colaborador ||--o{ intervencao_clinica : "cria como médico"
+colaborador ||--o{ alteracao_estado_saude : "cria como autor"
+colaborador ||--o{ tarefa_cuidado : "marca conclusão"
+colaborador ||--o{ auditoria_evento : "origina"
+colaborador ||--o{ tipo_alojamento_tarifa : "cria como autor"
+colaborador ||--o{ tipo_servico_extra : "cria como autor"
+colaborador ||--o{ plano_cuidados : "cria/atualiza como autor"
+
+nota ||--o{ alteracao_estado_saude : "instrui"
+alteracao_estado_saude ||--o{ plano_cuidados : "dispara priorização"
+
+note bottom
+  **Legenda:**
+- [PK] = Chave Primária
+- [FK] = Chave Estrangeira
+- [UNIQUE] = Restrição de unicidade
+- [ENUM] = Tipo enumerado
+- [NULL] = Pode ser nulo
+- DEFAULT = Valor padrão
+
+Convenções de nomenclatura:
+- Tabelas em snake_case minúsculo
+- Chaves estrangeiras: *_id
+- Timestamps: data_* ou *_at
+- Booleanos sem prefixo "is_"
+
+Índices principais criados para performance (RNF-01, RNF-06):
+- idx_pc_animal, idx_pc_estadia (PlanoCuidados)
+- idx_tc_plano (TarefaCuidado)
+- idx_rc_estadia_datahora (RegistoCuidado)
+- idx_se_estadia (ServicoExtra)
+- idx_ic_estadia (IntervencaoClinica)
+- idx_n_reserva (Nota)
+- idx_aes_estadia (AlteracaoEstadoSaude)
+- idx_animal_tutor_id (Animal)
+- idx_reserva_* (Reserva)
+end note
+
+@enduml

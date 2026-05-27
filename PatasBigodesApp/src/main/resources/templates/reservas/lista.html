@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt">
+<head th:insert="~{fragments/head :: head}"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <th:block th:insert="~{fragments/navbar :: navbar}"></th:block>
+    <th:block th:insert="~{fragments/sidebar :: sidebar}"></th:block>
+    <div class="content-wrapper">
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6"><h1 class="m-0">Reservas</h1></div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Início</a></li>
+                            <li class="breadcrumb-item active">Reservas</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <section class="content">
+            <div class="container-fluid">
+                <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">Erro</div>
+                <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}">Sucesso</div>
+                
+                <!-- Filtros -->
+                <div class="card card-outline card-primary mb-3">
+                    <div class="card-header">
+                        <h3 class="card-title">Filtros</h3>
+                    </div>
+                    <div class="card-body">
+                        <form class="form-inline" method="get" th:action="@{/reservas}">
+                            <div class="form-group mr-3">
+                                <label for="estado" class="mr-2">Estado:</label>
+                                <select id="estado" name="estado" class="form-control">
+                                    <option value="">Todos os estados</option>
+                                    <option th:each="est : ${estados}" 
+                                            th:value="${est.name()}"
+                                            th:text="${est.name() == 'ATIVA' ? 'Ativa' : (est.name() == 'CONFIRMADA' ? 'Confirmada' : (est.name() == 'CANCELADA' ? 'Cancelada' : 'Concluída'))}"
+                                            th:selected="${filtroEstado != null and filtroEstado == est.name()}">
+                                    </option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-filter mr-1"></i> Filtrar</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tabela de Reservas -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Lista de Reservas</h3>
+                        <div class="card-tools">
+                            <a th:href="@{/reservas/novo}" class="btn btn-success btn-sm">
+                                <i class="fas fa-plus mr-1"></i> Nova Reserva
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(reservas)}" class="alert alert-info">
+                            Não existem reservas para os filtros selecionados.
+                        </div>
+                        <table th:unless="${#lists.isEmpty(reservas)}" class="table table-sm table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Animal</th>
+                                    <th>Tutor</th>
+                                    <th>Alojamento</th>
+                                    <th>Período</th>
+                                    <th>Estado</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="reserva : ${reservas}">
+                                    <td>
+                                        <strong th:text="${reserva.animalNome}">Animal</strong>
+                                    </td>
+                                    <td th:text="${reserva.tutorNome}">Tutor</td>
+                                    <td>
+                                        <code th:text="${reserva.alojamentoIdentificacao}">Box-01</code>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            <span th:text="${#dates.format(reserva.dataInicio, 'dd/MM/yyyy')}">01/01/2026</span>
+                                            a
+                                            <span th:text="${#dates.format(reserva.dataFim, 'dd/MM/yyyy')}">05/01/2026</span>
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <span class="badge"
+                                              th:classappend="${reserva.estadoCss == 'st-ocupado' ? 'badge-danger' : (reserva.estadoCss == 'st-reservado' ? 'badge-primary' : (reserva.estadoCss == 'st-limpeza' ? 'badge-warning' : 'badge-success'))}"
+                                              th:text="${reserva.estadoLabel}">
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{/reservas/{id}(id=${reserva.id})}" class="btn btn-sm btn-primary" title="Ver Detalhes">
+                                            <i class="fas fa-info-circle mr-1"></i> Detalhes
+                                        </a>
+                                        <th:block th:if="${reserva.estado.name() == 'ATIVA'}">
+                                            <form method="post" th:action="@{/reservas/{id}/cancelar(id=${reserva.id})}" style="display: inline;">
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Cancelar" onclick="return confirm('Tem a certeza que deseja cancelar esta reserva?')">
+                                                    <i class="fas fa-times mr-1"></i> Cancelar
+                                                </button>
+                                            </form>
+                                        </th:block>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <th:block th:insert="~{fragments/footer :: footer}"></th:block>
+</div>
+</body>
+</html>
