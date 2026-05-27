@@ -1,34 +1,60 @@
 sequenceDiagram
     autonumber
-    actor Cuidador
-    participant EstadiaController
-    participant IEstadiaService
+    actor ColaboradorAutorizado
+    participant PlanoCuidadosController
+    participant RegistoCuidadoController
+    participant NotaController
+    participant ClinicaController
+    participant IPlanoCuidadosService
+    participant IRegistoCuidadoService
+    participant INotaService
+    participant IAlteracaoEstadoSaudeService
+    participant EstadiaRepository
+    participant PlanoCuidadosRepository
+    participant TarefaCuidadoRepository
     participant RegistoCuidadoRepository
     participant NotaRepository
 
-    Cuidador->>EstadiaController: consultar animais em estadia
-    EstadiaController->>IEstadiaService: listarAnimaisEmEstadia()
-    IEstadiaService-->>EstadiaController: lista de animais e planos
-    EstadiaController-->>Cuidador: mostrar lista
+    ColaboradorAutorizado->>PlanoCuidadosController: GET /plano-cuidados?estadiaId=...
+    PlanoCuidadosController->>IPlanoCuidadosService: obterPlanoPorEstadia(estadiaId)
+    IPlanoCuidadosService->>PlanoCuidadosRepository: findByEstadiaId(estadiaId)
+    IPlanoCuidadosService->>TarefaCuidadoRepository: findByPlanoCuidadosId(planoId)
+    IPlanoCuidadosService-->>PlanoCuidadosController: PlanoCuidadosDto
+    PlanoCuidadosController-->>ColaboradorAutorizado: mostrar plano e tarefas
 
-    Cuidador->>EstadiaController: registar cuidado(animal, tipo)
-    EstadiaController->>IEstadiaService: registarCuidadoDiario(dto)
-    IEstadiaService->>RegistoCuidadoRepository: save(registo)
-    RegistoCuidadoRepository-->>IEstadiaService: registo criado
-    IEstadiaService-->>EstadiaController: cuidado registado
-
-    opt adicionar nota a reserva
-        Cuidador->>EstadiaController: adicionar nota(texto)
-        EstadiaController->>IEstadiaService: adicionarNotaReserva(dto)
-        IEstadiaService->>NotaRepository: save(nota)
-        NotaRepository-->>IEstadiaService: nota criada
-        IEstadiaService-->>EstadiaController: nota guardada
+    opt registar cuidado prestado
+        ColaboradorAutorizado->>RegistoCuidadoController: POST /cuidados/create
+        RegistoCuidadoController->>IRegistoCuidadoService: create(form, autorId)
+        IRegistoCuidadoService->>EstadiaRepository: findById(estadiaId)
+        IRegistoCuidadoService->>RegistoCuidadoRepository: save(registo)
+        IRegistoCuidadoService-->>RegistoCuidadoController: RegistoCuidadoDto
+        RegistoCuidadoController-->>ColaboradorAutorizado: confirmar registo
     end
 
-    opt registar alteracao ao estado de saude
-        Cuidador->>EstadiaController: registar alteracao saude(descricao)
-        EstadiaController->>IEstadiaService: registarAlteracaoSaude(dto)
-        IEstadiaService-->>EstadiaController: registo disponivel para veterinario
+    opt concluir tarefa do plano
+        ColaboradorAutorizado->>PlanoCuidadosController: POST /plano-cuidados/tarefa/{id}/concluir
+        PlanoCuidadosController->>IPlanoCuidadosService: marcarTarefaConcluida(tarefaId, autorId)
+        IPlanoCuidadosService->>TarefaCuidadoRepository: findById(tarefaId)
+        IPlanoCuidadosService->>TarefaCuidadoRepository: save(tarefa concluida)
+        PlanoCuidadosController-->>ColaboradorAutorizado: confirmar conclusao
     end
 
-    EstadiaController-->>Cuidador: confirmar registos
+    opt adicionar nota de reserva
+        ColaboradorAutorizado->>NotaController: POST /notas/create
+        NotaController->>INotaService: create(form, autorId)
+        INotaService->>NotaRepository: save(nota)
+        INotaService-->>NotaController: NotaDto
+        NotaController-->>ColaboradorAutorizado: confirmar nota
+    end
+
+    opt registar alteracao de saude
+        ColaboradorAutorizado->>ClinicaController: POST /clinica/alteracoes/create
+        ClinicaController->>IAlteracaoEstadoSaudeService: register(form)
+        IAlteracaoEstadoSaudeService->>EstadiaRepository: findById(estadiaId)
+        IAlteracaoEstadoSaudeService->>PlanoCuidadosRepository: findByEstadiaId(estadiaId)
+        opt severidade CRITICO e plano existente
+            IAlteracaoEstadoSaudeService->>IPlanoCuidadosService: atualizarPrioridade(CRITICO)
+        end
+        IAlteracaoEstadoSaudeService-->>ClinicaController: AlteracaoEstadoSaudeDto
+        ClinicaController-->>ColaboradorAutorizado: confirmar alteracao
+    end

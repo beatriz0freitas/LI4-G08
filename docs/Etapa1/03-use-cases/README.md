@@ -14,6 +14,9 @@
 - [UC-11 - Gerir Historial Clinico](UC-11.md)
 - [UC-12 - Registar Limpeza de Alojamento](UC-12.md)
 - [UC-13 - Consultar Dashboard e Gerar Relatorios](UC-13.md)
+- [UC-14 - Gerir Colaboradores e Perfis](UC-14.md)
+- [UC-15 - Gerir Tarifas e Catalogos](UC-15.md)
+- [UC-16 - Consultar Auditoria](UC-16.md)
 
 ## Apoio de rastreabilidade
 

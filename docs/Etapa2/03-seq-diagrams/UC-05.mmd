@@ -4,14 +4,20 @@ sequenceDiagram
     participant ReservaController
     participant IReservaService
     participant ReservaRepository
-    participant AlojamentoRepository
+    participant AuditoriaOperacaoService
 
-    FuncionarioRececao->>ReservaController: cancelar reserva(id)
-    ReservaController->>IReservaService: cancelarReserva(reservaId)
-    IReservaService->>ReservaRepository: findById(reservaId)
-    ReservaRepository-->>IReservaService: reserva ativa
-    IReservaService->>ReservaRepository: updateEstado(CANCELADA)
-    IReservaService->>AlojamentoRepository: libertarPeriodo(alojamento)
-    ReservaRepository-->>IReservaService: reserva atualizada
-    IReservaService-->>ReservaController: cancelamento concluido
-    ReservaController-->>FuncionarioRececao: confirmar cancelamento
+    FuncionarioRececao->>ReservaController: POST /reservas/{id}/cancelar
+    ReservaController->>IReservaService: cancelar(id)
+    IReservaService->>ReservaRepository: findWithDetalhesById(id)
+    alt reserva inexistente ou nao cancelavel
+        ReservaRepository-->>IReservaService: vazio ou estado invalido
+        IReservaService-->>ReservaController: erro
+        ReservaController-->>FuncionarioRececao: mostrar mensagem de erro
+    else reserva ATIVA
+        ReservaRepository-->>IReservaService: Reserva
+        IReservaService->>IReservaService: setEstado(CANCELADA)
+        IReservaService->>ReservaRepository: save(reserva)
+        IReservaService->>AuditoriaOperacaoService: registarSucesso(CANCELAR_RESERVA)
+        IReservaService-->>ReservaController: Reserva cancelada
+        ReservaController-->>FuncionarioRececao: confirmar cancelamento
+    end

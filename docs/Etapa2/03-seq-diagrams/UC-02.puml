@@ -2,22 +2,25 @@
 title UC-02 - Consultar Disponibilidade de Alojamentos
 
 autonumber
-actor FuncionarioOuDiretor
-participant AlojamentoController
+actor UtilizadorAutorizado
+participant ReservaController
+participant IAnimalService
 participant IAlojamentoService
 participant AlojamentoRepository
 
-FuncionarioOuDiretor -> AlojamentoController : consultar disponibilidade(periodo, especie)
-AlojamentoController -> IAlojamentoService : consultarDisponibilidade(inicio, fim, especie)
-IAlojamentoService -> AlojamentoRepository : findDisponiveis(inicio, fim, especie)
-AlojamentoRepository --> IAlojamentoService : lista de alojamentos
+UtilizadorAutorizado -> ReservaController : POST /reservas/procurar-disponibilidade
+ReservaController -> IAnimalService : obter(animalId)
+IAnimalService --> ReservaController : Animal com especie
+ReservaController -> IAlojamentoService : consultarDisponibilidade(inicio, fim, especie)
+IAlojamentoService -> AlojamentoRepository : findAvailableForPeriodAndTipo(inicio, fim, tipo)
+AlojamentoRepository --> IAlojamentoService : alojamentos limpos, compativeis e sem conflitos
 
 alt lista vazia
-  IAlojamentoService --> AlojamentoController : sem alojamentos disponiveis
-  AlojamentoController --> FuncionarioOuDiretor : apresentar indisponibilidade
+  IAlojamentoService --> ReservaController : []
+  ReservaController --> UtilizadorAutorizado : apresentar indisponibilidade
 else alojamentos encontrados
-  IAlojamentoService --> AlojamentoController : lista de alojamentos disponiveis
-  AlojamentoController --> FuncionarioOuDiretor : apresentar resultados
+  IAlojamentoService --> ReservaController : DisponibilidadeAlojamentoDto[]
+  ReservaController --> UtilizadorAutorizado : apresentar alojamentos disponiveis
 end
 
 @enduml

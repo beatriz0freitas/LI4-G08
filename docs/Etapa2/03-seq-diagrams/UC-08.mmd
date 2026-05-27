@@ -3,17 +3,27 @@ sequenceDiagram
     actor FuncionarioRececao
     participant PagamentoController
     participant IPagamentoService
+    participant EstadiaRepository
     participant PagamentoRepository
-    participant Fatura
+    participant AuditoriaOperacaoService
 
-    FuncionarioRececao->>PagamentoController: registar pagamento(valor, metodo)
-    PagamentoController->>IPagamentoService: registarPagamento(dto)
-    IPagamentoService->>PagamentoRepository: save(pagamento)
-    IPagamentoService->>Fatura: emitir(numero, total)
-    alt pagamento liquidado
-        IPagamentoService-->>PagamentoController: pagamento liquidado e fatura emitida
-        PagamentoController-->>FuncionarioRececao: apresentar comprovativo
-    else pagamento pendente
-        IPagamentoService-->>PagamentoController: pagamento pendente
-        PagamentoController-->>FuncionarioRececao: informar divida pendente
+    FuncionarioRececao->>PagamentoController: POST /pagamentos
+    PagamentoController->>IPagamentoService: registrarPagamento(PagamentoDto)
+    alt metodo ausente
+        IPagamentoService-->>PagamentoController: erro metodo obrigatorio
+        PagamentoController-->>FuncionarioRececao: mostrar erro
+    else metodo indicado
+        IPagamentoService->>EstadiaRepository: findById(estadiaId)
+        alt estadia inexistente
+            EstadiaRepository-->>IPagamentoService: vazio
+            IPagamentoService-->>PagamentoController: erro
+            PagamentoController-->>FuncionarioRececao: mostrar erro
+        else estadia encontrada
+            EstadiaRepository-->>IPagamentoService: Estadia
+            IPagamentoService->>PagamentoRepository: save(pagamento)
+            PagamentoRepository-->>IPagamentoService: Pagamento
+            IPagamentoService->>AuditoriaOperacaoService: registarSucesso(PAGAMENTO_CRIADO)
+            IPagamentoService-->>PagamentoController: Pagamento
+            PagamentoController-->>FuncionarioRececao: confirmar pagamento
+        end
     end
