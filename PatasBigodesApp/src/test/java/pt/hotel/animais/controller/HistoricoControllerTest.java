@@ -94,8 +94,9 @@ class HistoricoControllerTest {
             .andExpect(view().name("historico/list"))
             .andExpect(model().attribute("clienteId", 2L))
             .andExpect(model().attribute("animalId", 5L))
-            .andExpect(content().string(containsString("/estadias?estadiaId=3")))
-            .andExpect(content().string(containsString("Preparar Check-out")))
+            .andExpect(content().string(containsString("/estadias/check-out?estadiaId=3")))
+            .andExpect(content().string(containsString("Check-out")))
+            .andExpect(content().string(containsString("/estadias/3")))
             .andExpect(content().string(containsString("/historico?page=1")))
             .andExpect(content().string(not(containsString("action=\"/estadias/check-out\""))));
     }

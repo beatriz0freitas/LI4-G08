@@ -161,6 +161,15 @@ public class EstadiaService implements IEstadiaService {
         return saved;
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Estadia> obterComDetalhes(Long estadiaId) {
+        if (estadiaId == null) {
+            return Optional.empty();
+        }
+        return estadiaRepository.findByIdComDetalhes(estadiaId);
+    }
+
     @Transactional(readOnly = true)
     public Optional<ResumoCheckInDto> obterResumoCheckIn(Long reservaId) {
         if (reservaId == null) {

@@ -5,6 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -59,12 +60,27 @@ public class EstadiaController {
         model.addAttribute("dataInicio", dataInicio);
         model.addAttribute("dataFim", dataFim);
         model.addAttribute("estados", EstadoEstadia.values());
-        model.addAttribute("metodosPagamento", MetodoPagamento.values());
         model.addAttribute("pageTitle", "Estadias");
         model.addAttribute("breadcrumb", "Lista de Estadias");
         model.addAttribute("activePage", "estadias");
         
         return "estadias/lista";
+    }
+
+    @GetMapping("/{id}")
+    public String detalhe(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        return estadiaService.obterComDetalhes(id)
+            .map(estadia -> {
+                model.addAttribute("estadia", estadia);
+                model.addAttribute("pageTitle", "Estadia #" + id);
+                model.addAttribute("breadcrumb", "Detalhes da Estadia");
+                model.addAttribute("activePage", "estadias");
+                return "estadias/detalhe";
+            })
+            .orElseGet(() -> {
+                redirectAttributes.addFlashAttribute("errorMessage", "Estadia não encontrada.");
+                return "redirect:/estadias/lista";
+            });
     }
 
     private void carregarResumoCheckIn(Long reservaId, Model model) {
@@ -89,6 +105,34 @@ public class EstadiaController {
             model.addAttribute("estadiaSelecionada", resumo.getEstadia());
             model.addAttribute("valorCheckOut", resumo.getValorCheckOut());
         }, () -> model.addAttribute("erroCheckOut", "Estadia não encontrada."));
+    }
+
+    @GetMapping("/check-in")
+    public String paginaCheckIn(@RequestParam("reservaId") Long reservaId,
+                                @RequestParam(value = "redirectTo", required = false) String redirectTo,
+                                Model model) {
+        carregarResumoCheckIn(reservaId, model);
+        model.addAttribute("metodosPagamento", MetodoPagamento.values());
+        model.addAttribute("redirectTo", destinoSeguro(redirectTo, "/reservas"));
+        model.addAttribute("voltarPara", destinoSeguro(redirectTo, "/reservas"));
+        model.addAttribute("pageTitle", "Registar Check-in");
+        model.addAttribute("breadcrumb", "Check-in");
+        model.addAttribute("activePage", "reservas");
+        return "estadias/check-in";
+    }
+
+    @GetMapping("/check-out")
+    public String paginaCheckOut(@RequestParam("estadiaId") Long estadiaId,
+                                 @RequestParam(value = "redirectTo", required = false) String redirectTo,
+                                 Model model) {
+        carregarResumoCheckOut(estadiaId, model);
+        model.addAttribute("metodosPagamento", MetodoPagamento.values());
+        model.addAttribute("redirectTo", destinoSeguro(redirectTo, "/estadias/lista"));
+        model.addAttribute("voltarPara", destinoSeguro(redirectTo, "/estadias/lista"));
+        model.addAttribute("pageTitle", "Registar Check-out");
+        model.addAttribute("breadcrumb", "Check-out");
+        model.addAttribute("activePage", "estadias");
+        return "estadias/check-out";
     }
 
     @PostMapping("/check-in")

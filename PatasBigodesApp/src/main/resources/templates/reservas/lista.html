@@ -102,16 +102,9 @@
                                             <i class="fas fa-info-circle mr-1"></i> Consultar detalhes
                                         </a>
                                         <th:block th:if="${reserva.estado.name() == 'ATIVA'}">
-                                            <form method="post" th:action="@{/estadias/check-in}" class="d-inline-block mr-1">
-                                                <input type="hidden" name="reservaId" th:value="${reserva.id}">
-                                                <input type="hidden" name="redirectTo" th:value="@{/reservas}">
-                                                <select name="metodoPagamento" class="form-control form-control-sm d-inline-block mr-1" style="width: 145px;" required>
-                                                    <option th:each="metodo : ${metodosPagamento}" th:value="${metodo}" th:text="${metodo.name() == 'NUMERARIO' ? 'Numerário' : (metodo.name() == 'CARTAO_DEBITO' ? 'Cartão débito' : 'Cartão crédito')}">Método</option>
-                                                </select>
-                                                <button type="submit" class="btn btn-sm btn-success" title="Registar check-in">
-                                                    <i class="fas fa-right-to-bracket mr-1"></i> Check-in
-                                                </button>
-                                            </form>
+                                            <a th:href="@{/estadias/check-in(reservaId=${reserva.id},redirectTo=${'/reservas'})}" class="btn btn-sm btn-success mr-1" title="Registar check-in">
+                                                <i class="fas fa-right-to-bracket mr-1"></i> Check-in
+                                            </a>
                                             <form method="post" th:action="@{/reservas/{id}/cancelar(id=${reserva.id})}" style="display: inline;">
                                                 <input type="hidden" name="redirectTo" th:value="@{/reservas}">
                                                 <button type="submit" class="btn btn-sm btn-danger" title="Cancelar" onclick="return confirm('Tem a certeza que deseja cancelar esta reserva?')">

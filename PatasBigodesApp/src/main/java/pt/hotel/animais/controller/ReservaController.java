@@ -15,7 +15,6 @@ import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.Tutor;
 import pt.hotel.animais.model.enums.EstadoReserva;
-import pt.hotel.animais.model.enums.MetodoPagamento;
 import pt.hotel.animais.service.IAlojamentoService;
 import pt.hotel.animais.service.IAnimalService;
 import pt.hotel.animais.service.IReservaService;
@@ -67,7 +66,6 @@ public class ReservaController {
         model.addAttribute("reservas", reservas);
         model.addAttribute("filtroEstado", estado);
         model.addAttribute("estados", EstadoReserva.values());
-        model.addAttribute("metodosPagamento", MetodoPagamento.values());
         model.addAttribute("pageTitle", "Reservas");
         model.addAttribute("breadcrumb", "Lista de Reservas");
         model.addAttribute("activePage", "reservas");
@@ -109,7 +107,6 @@ public class ReservaController {
         model.addAttribute("totalReservados", contarEstado(mapa, "RESERVADO"));
         model.addAttribute("totalLimpeza", contarEstado(mapa, "LIMPEZA"));
         model.addAttribute("tiposAlojamento", tipos != null ? tipos : List.of());
-        model.addAttribute("metodosPagamento", MetodoPagamento.values());
         model.addAttribute("tipo", tipo);
         model.addAttribute("dataInicio", inicio);
         model.addAttribute("dataFim", fim);
@@ -253,7 +250,6 @@ public class ReservaController {
             Reserva reserva = reservaService.obter(id);
             
             model.addAttribute("reserva", reserva);
-            model.addAttribute("metodosPagamento", MetodoPagamento.values());
             model.addAttribute("pageTitle", "Reserva #" + id);
             model.addAttribute("breadcrumb", "Detalhes da Reserva");
             model.addAttribute("activePage", "reservas");

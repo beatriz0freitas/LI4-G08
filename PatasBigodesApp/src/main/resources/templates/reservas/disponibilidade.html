@@ -193,7 +193,6 @@
             var actions = document.getElementById('modal-actions');
             var dataInicio = /*[[${dataInicio}]]*/ '';
             var dataFim = /*[[${dataFim}]]*/ '';
-            var metodosPagamento = /*[[${metodosPagamento}]]*/ [];
             var csrfParameter = /*[[${_csrf != null ? _csrf.parameterName : ''}]]*/ '';
             var csrfToken = /*[[${_csrf != null ? _csrf.token : ''}]]*/ '';
             var estado = box.dataset.estado;
@@ -213,28 +212,9 @@
             function hiddenReturn() {
                 return '<input type="hidden" name="redirectTo" value="' + returnUrl.replace(/"/g, '&quot;') + '">';
             }
-
-            function metodoPagamentoSelect(id) {
-                var labels = {
-                    NUMERARIO: 'Numerário',
-                    CARTAO_DEBITO: 'Cartão de débito',
-                    CARTAO_CREDITO: 'Cartão de crédito'
-                };
-                var options = metodosPagamento.map(function (metodo) {
-                    return '<option value="' + metodo + '">' + (labels[metodo] || metodo) + '</option>';
-                }).join('');
-                return '<select id="' + id + '" name="metodoPagamento" class="form-control form-control-sm mb-2" required>' + options + '</select>';
-            }
             
             if (estado === 'Reservado' && reservaId) {
-                actionsHtml = '<form class="mb-2" method="post" action="/estadias/check-in">' +
-                              csrfInput() +
-                              hiddenReturn() +
-                              '<input type="hidden" name="reservaId" value="' + reservaId + '">' +
-                              '<label class="small text-muted mb-1" for="metodoCheckIn">Pagamento do check-in</label>' +
-                              metodoPagamentoSelect('metodoCheckIn') +
-                              '<button type="submit" class="btn btn-success btn-sm btn-block">Registar check-in</button>' +
-                              '</form>' +
+                actionsHtml = '<a class="btn btn-success btn-sm btn-block mb-2" href="/estadias/check-in?reservaId=' + encodeURIComponent(reservaId) + '&redirectTo=' + encodeURIComponent(returnUrl) + '">Registar check-in</a>' +
                               '<form class="mb-2" method="post" action="/reservas/' + reservaId + '/cancelar">' +
                               csrfInput() +
                               hiddenReturn() +
@@ -243,14 +223,7 @@
                               '<a class="btn btn-outline-secondary btn-sm btn-block" href="/reservas/' + reservaId + '">Consultar detalhes</a>';
             }
             else if (estado === 'Ocupado' && estadiaId) {
-                actionsHtml = '<form class="mb-2" method="post" action="/estadias/check-out">' +
-                              csrfInput() +
-                              hiddenReturn() +
-                              '<input type="hidden" name="estadiaId" value="' + estadiaId + '">' +
-                              '<label class="small text-muted mb-1" for="metodoCheckOut">Pagamento do check-out</label>' +
-                              metodoPagamentoSelect('metodoCheckOut') +
-                              '<button type="submit" class="btn btn-warning btn-sm btn-block" onclick="return confirm(\'Tem a certeza que deseja realizar o check-out?\')">Registar check-out</button>' +
-                              '</form>' +
+                actionsHtml = '<a class="btn btn-warning btn-sm btn-block mb-2" href="/estadias/check-out?estadiaId=' + encodeURIComponent(estadiaId) + '&redirectTo=' + encodeURIComponent(returnUrl) + '">Registar check-out</a>' +
                               (reservaId ? '<a class="btn btn-outline-secondary btn-sm btn-block" href="/reservas/' + reservaId + '">Consultar detalhes</a>' : '');
             }
             else if (disponivel) {

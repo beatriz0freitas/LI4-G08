@@ -99,21 +99,16 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <a th:if="${estadia.reservaId != null}" th:href="@{/reservas/{id}(id=${estadia.reservaId})}" class="btn btn-sm btn-info mr-1" title="Consultar detalhes da reserva">
+                                        <a th:href="@{/estadias/{id}(id=${estadia.id})}" class="btn btn-sm btn-primary mr-1" title="Consultar detalhes da estadia">
                                             <i class="fas fa-eye mr-1"></i> Detalhes
                                         </a>
+                                        <a th:if="${estadia.reservaId != null}" th:href="@{/reservas/{id}(id=${estadia.reservaId})}" class="btn btn-sm btn-info mr-1" title="Consultar detalhes da reserva">
+                                            <i class="fas fa-calendar-check mr-1"></i> Reserva
+                                        </a>
                                         <th:block th:if="${estadia.estado.name() == 'EM_CURSO'}">
-                                            <form method="post" th:action="@{/estadias/check-out}" style="display: inline;">
-                                                <input type="hidden" name="estadiaId" th:value="${estadia.id}">
-                                                <input type="hidden" name="redirectTo" th:value="@{/estadias/lista}">
-                                                <select name="metodoPagamento" class="form-control form-control-sm d-inline-block mr-1" style="width: 145px;" required>
-                                                    <option th:each="metodo : ${metodosPagamento}" th:value="${metodo}" th:text="${metodo.name() == 'NUMERARIO' ? 'Numerário' : (metodo.name() == 'CARTAO_DEBITO' ? 'Cartão débito' : 'Cartão crédito')}">Método</option>
-                                                </select>
-                                                <button type="submit" class="btn btn-sm btn-success" title="Realizar Check-out" 
-                                                        onclick="return confirm('Tem a certeza que deseja realizar o check-out?')">
-                                                    <i class="fas fa-sign-out-alt"></i> Check-out
-                                                </button>
-                                            </form>
+                                            <a th:href="@{/estadias/check-out(estadiaId=${estadia.id},redirectTo=${'/estadias/lista'})}" class="btn btn-sm btn-success" title="Realizar check-out">
+                                                <i class="fas fa-sign-out-alt mr-1"></i> Check-out
+                                            </a>
                                         </th:block>
                                     </td>
                                 </tr>

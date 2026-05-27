@@ -27,6 +27,11 @@
 			<section class="content">
 				<div class="container-fluid">
 					<th:block th:insert="~{fragments/alerts :: alerts}"></th:block>
+					<div class="mb-3">
+						<a th:href="@{/reservas}" class="btn btn-outline-secondary">
+							<i class="fas fa-arrow-left mr-2"></i>Voltar à lista de reservas
+						</a>
+					</div>
 					<div class="row">
 						<div class="col-md-6">
 							<div class="card">
@@ -64,35 +69,20 @@
 									<h3 class="card-title">Ações</h3>
 								</div>
 								<div class="card-body">
-									<form th:if="${reserva.podeFazerCheckIn()}" th:action="@{/estadias/check-in}" method="post" class="mb-3">
-										<input type="hidden" name="reservaId" th:value="${reserva.id}">
-										<input type="hidden" name="redirectTo" th:value="@{/reservas/{id}(id=${reserva.id})}">
-										<div class="form-group">
-											<label for="metodoPagamentoCheckIn">Método de pagamento do check-in</label>
-											<select id="metodoPagamentoCheckIn" name="metodoPagamento" class="form-control" required>
-												<option th:each="metodo : ${metodosPagamento}" th:value="${metodo}" th:text="${metodo.name() == 'NUMERARIO' ? 'Numerário' : (metodo.name() == 'CARTAO_DEBITO' ? 'Cartão de débito' : 'Cartão de crédito')}">Método</option>
-											</select>
-										</div>
-										<button type="submit" class="btn btn-success btn-block">
-											<i class="fas fa-right-to-bracket mr-2"></i>Registar check-in
-										</button>
-									</form>
-									<form th:if="${estadiaId != null and reserva.isConfirmada()}" th:action="@{/estadias/check-out}" method="post" class="mb-3">
-										<input type="hidden" name="estadiaId" th:value="${estadiaId}">
-										<input type="hidden" name="redirectTo" th:value="@{/reservas/{id}(id=${reserva.id})}">
-										<div class="form-group">
-											<label for="metodoPagamentoCheckOut">Método de pagamento do check-out</label>
-											<select id="metodoPagamentoCheckOut" name="metodoPagamento" class="form-control" required>
-												<option th:each="metodo : ${metodosPagamento}" th:value="${metodo}" th:text="${metodo.name() == 'NUMERARIO' ? 'Numerário' : (metodo.name() == 'CARTAO_DEBITO' ? 'Cartão de débito' : 'Cartão de crédito')}">Método</option>
-											</select>
-										</div>
+									<a th:if="${reserva.podeFazerCheckIn()}"
+									   th:href="@{/estadias/check-in(reservaId=${reserva.id},redirectTo=${'/reservas/' + reserva.id})}"
+									   class="btn btn-success btn-block mb-3">
+										<i class="fas fa-right-to-bracket mr-2"></i>Registar check-in
+									</a>
+									<div th:if="${estadiaId != null and reserva.isConfirmada()}" class="mb-3">
 										<div th:if="${extrasTotal != null}" class="small text-muted mb-2">
 											Valor complementar estimado: <strong><span th:text="${extrasTotal}">0.00</span> EUR</strong>
 										</div>
-										<button type="submit" class="btn btn-warning btn-block" onclick="return confirm('Tem a certeza que deseja realizar o check-out?')">
+										<a th:href="@{/estadias/check-out(estadiaId=${estadiaId},redirectTo=${'/reservas/' + reserva.id})}"
+										   class="btn btn-warning btn-block">
 											<i class="fas fa-right-from-bracket mr-2"></i>Registar check-out
-										</button>
-									</form>
+										</a>
+									</div>
 									<form th:if="${reserva.podeSerCancelada()}" th:action="@{/reservas/{id}/cancelar(id=${reserva.id})}" method="post" class="d-inline">
 										<input type="hidden" name="redirectTo" th:value="@{/reservas/{id}(id=${reserva.id})}">
 										<button type="submit" class="btn btn-danger btn-block mb-2" onclick="return confirm('Tem a certeza que deseja cancelar?')">

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt">
+<head th:insert="~{fragments/head :: head}"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <th:block th:insert="~{fragments/navbar :: navbar}"></th:block>
+    <th:block th:insert="~{fragments/sidebar :: sidebar}"></th:block>
+
+    <div class="content-wrapper">
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Registar Check-out</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Início</a></li>
+                            <li class="breadcrumb-item"><a th:href="@{/estadias/lista}">Estadias</a></li>
+                            <li class="breadcrumb-item active">Check-out</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="content">
+            <div class="container-fluid">
+                <th:block th:insert="~{fragments/alerts :: alerts}"></th:block>
+
+                <div class="mb-3">
+                    <a th:href="${voltarPara}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar
+                    </a>
+                </div>
+
+                <div th:if="${erroCheckOut}" class="callout callout-warning bg-white border-left border-warning shadow-sm">
+                    <strong>Aviso</strong>
+                    <div th:text="${erroCheckOut}">Estadia não encontrada.</div>
+                </div>
+
+                <div th:if="${estadiaSelecionada != null}" class="row">
+                    <div class="col-lg-7">
+                        <div class="card">
+                            <div class="card-header bg-primary">
+                                <h3 class="card-title">Dados da Estadia</h3>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row mb-0">
+                                    <dt class="col-sm-4">Estadia</dt>
+                                    <dd class="col-sm-8" th:text="'#' + ${estadiaSelecionada.id}">#1</dd>
+                                    <dt class="col-sm-4">Reserva</dt>
+                                    <dd class="col-sm-8" th:text="'#' + ${estadiaSelecionada.reserva.id}">#1</dd>
+                                    <dt class="col-sm-4">Tutor</dt>
+                                    <dd class="col-sm-8" th:text="${estadiaSelecionada.reserva.tutor.nome}">Tutor</dd>
+                                    <dt class="col-sm-4">Animal</dt>
+                                    <dd class="col-sm-8" th:text="${estadiaSelecionada.reserva.animal.nome}">Animal</dd>
+                                    <dt class="col-sm-4">Alojamento</dt>
+                                    <dd class="col-sm-8">
+                                        <span th:text="${estadiaSelecionada.reserva.alojamento.identificacao}">A1</span>
+                                        <span class="text-muted" th:text="'(' + ${estadiaSelecionada.reserva.alojamento.tipo} + ')'">(CANINO)</span>
+                                    </dd>
+                                    <dt class="col-sm-4">Entrada</dt>
+                                    <dd class="col-sm-8" th:text="${#temporals.format(estadiaSelecionada.dataInicio, 'dd/MM/yyyy HH:mm')}">01/01/2026 10:00</dd>
+                                    <dt class="col-sm-4">Saída prevista</dt>
+                                    <dd class="col-sm-8" th:text="${#temporals.format(estadiaSelecionada.reserva.dataFim, 'dd/MM/yyyy')}">02/01/2026</dd>
+                                    <dt class="col-sm-4">Estado</dt>
+                                    <dd class="col-sm-8" th:text="${estadiaSelecionada.estado}">EM_CURSO</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <div class="card">
+                            <div class="card-header bg-warning">
+                                <h3 class="card-title">Pagamento e Confirmação</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="callout callout-info bg-white border-left border-info">
+                                    <strong>Valor complementar a pagar</strong>
+                                    <div class="h4 mb-0"><span th:text="${valorCheckOut}">0.00</span> EUR</div>
+                                </div>
+                                <form th:action="@{/estadias/check-out}" method="post">
+                                    <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <input type="hidden" name="estadiaId" th:value="${estadiaSelecionada.id}">
+                                    <input type="hidden" name="redirectTo" th:value="${redirectTo}">
+                                    <div class="form-group">
+                                        <label for="metodoPagamento">Método de pagamento</label>
+                                        <select id="metodoPagamento" name="metodoPagamento" class="form-control" required>
+                                            <option value="">Selecionar método</option>
+                                            <option th:each="metodo : ${metodosPagamento}"
+                                                    th:value="${metodo}"
+                                                    th:text="${metodo.name() == 'NUMERARIO' ? 'Numerário' : (metodo.name() == 'CARTAO_DEBITO' ? 'Cartão de débito' : 'Cartão de crédito')}">Método</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-warning btn-block" onclick="return confirm('Tem a certeza que deseja realizar o check-out?')">
+                                        <i class="fas fa-right-from-bracket mr-2"></i>Confirmar check-out
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <th:block th:insert="~{fragments/footer :: footer}"></th:block>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+</html>
