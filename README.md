@@ -1,44 +1,70 @@
-# LI4
+# LI4 — Projeto "Patas & Bigodes"
 
-# Ferramentas para bom uso de LLM's 
+Este repositório contém o projeto LI4 (Laboratórios de Informática IV) sobre com a aplicação PatasBigodesApp — um protótipo de um "hotel de animais" que suporta registo de tutores, gestão de alojamentos, reservas, estadias, cuidados clínicos, serviços extra e faturação. Além do código, o repositório inclui especificações, casos de uso, modelos de domínio e diagramas de suporte para rastreabilidade.
 
-- [Speck Kit](https://github.com/github/spec-kit)
+Alunos:
 
-## 🛠️ Instalação de Dependências para Spec Kit
+- A106804 — Alice Isabel Faria Soares
+- A106853 — Ana Beatriz Ribeiro Freitas
+- A107365 — Beatriz Martins Miranda
+- A107367 — João Paulo Batista Azevedo
 
-Para usar as funcionalidades automáticas do Spec Kit/Specify CLI, é necessário instalar a ferramenta:
+Conteúdo principal:
 
-```bash
-# Instalar o Specify CLI (recomendado)
-pip install uv
-#Ou 
-brew install uv
+- `PatasBigodesApp/` — código fonte, Dockerfile, Makefile e artefactos de execução.
+- `docs/` — diagramas, design e decisões arquiteturais por etapa.
+- `specs/` — especificações detalhadas, tarefas e checklists por funcionalidade.
 
+Uso do Spec Kit / Specify CLI (opcional):
 
-uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
-# Ou, se preferires, consulta a documentação oficial para versões mais recentes
-```
-
-**Nota:**
-- A pasta `.github/` criada pelo Specify pode (e deve) ser versionada e comitada no repositório, pois contém prompts, templates e configurações importantes para automação e colaboração.
-- Não adicionar `.github/` ao `.gitignore`.
+Se estiveres a usar o Spec Kit para automatizar especificações e geração de tarefas, ver o subdiretório `.github/` e a documentação do Spec Kit. Estas ferramentas são opcionais e não são necessárias para compilar ou executar a aplicação.
 
 ---
 
-# 🚀 Comandos Slash do Spec Kit (Specify CLI)
+## Comandos `make` (PatasBigodesApp)
 
-Depois de instalar e inicializar o Specify CLI, podes usar estes comandos diretamente no chat do teu AI agent (ex: Copilot Chat):
+Os comandos abaixo são os alvos mais usados no `Makefile` localizado em `PatasBigodesApp/Makefile`. Executa-os a partir da raiz do repositório com `make -C PatasBigodesApp <target>` ou muda para a pasta `PatasBigodesApp/` antes de executar `make`.
 
-### Comandos principais:
-- `/speckit.constitution` — Estabelece os princípios do projeto
-- `/speckit.specify` — Cria a especificação base
-- `/speckit.plan` — Gera o plano de implementação
-- `/speckit.tasks` — Gera tarefas acionáveis
-- `/speckit.implement` — Executa a implementação
+Nota: os valores de portas e credenciais podem ser parametrizados através de variáveis de ambiente.
 
-### Comandos opcionais (para melhorar qualidade/confiança):
-- `/speckit.clarify` — Fazer perguntas estruturadas para clarificar áreas ambíguas (antes do /speckit.plan)
-- `/speckit.analyze` — Relatório de consistência e alinhamento entre artefatos (após /speckit.tasks, antes do /speckit.implement)
-- `/speckit.checklist` — Gerar checklists de qualidade para validar requisitos (após /speckit.plan)
+Comandos usuais:
 
-Usa estes comandos no chat do Copilot ou outro LLM para acelerar e garantir qualidade no ciclo de especificação e implementação!
+```bash
+# Subir a stack completa (app + bd) com rebuild das imagens
+make -C PatasBigodesApp up
+
+# Subir apenas o serviço de base de dados (MySQL)
+make -C PatasBigodesApp db-up
+
+# Parar a stack completa
+make -C PatasBigodesApp down
+
+# Remover a stack e volumes persistentes
+make -C PatasBigodesApp destroy
+
+# Arrancar a aplicação localmente (usa variáveis de ambiente para a BD)
+make -C PatasBigodesApp run
+
+# Empacotar a aplicação (mvn clean package)
+make -C PatasBigodesApp package
+
+# Executar a suite de testes (recria db-tests e corre mvn test)
+make -C PatasBigodesApp test
+
+# Recriar o serviço de testes MySQL
+make -C PatasBigodesApp db-reset-test
+
+# Mostrar logs agregados da stack
+make -C PatasBigodesApp logs
+
+# Entrar no shell da BD
+make -C PatasBigodesApp db-shell
+```
+
+Se preferires executar os comandos sem `-C`, muda primeiro para a pasta da aplicação:
+
+```bash
+cd PatasBigodesApp
+make up
+```
+
