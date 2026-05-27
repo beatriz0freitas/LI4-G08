@@ -71,11 +71,8 @@ public class ClinicaController {
 
     @PostMapping("/intervencoes/create")
     public String createIntervencao(IntervencaoClinicaFormDto form, Principal principal, RedirectAttributes redirect) {
-        Long autorId = null;
+        Long autorId = obterAutorId(principal);
         try {
-            if (principal != null) {
-                autorId = Long.parseLong(principal.getName());
-            }
             intervencaoClinicaService.register(form, autorId);
             redirect.addFlashAttribute("successMessage", "Intervenção registada");
         } catch (Exception e) {
@@ -94,10 +91,21 @@ public class ClinicaController {
 
     @PostMapping("/alteracoes/create")
     public String createAlteracao(AlteracaoEstadoSaudeFormDto form, Principal principal, RedirectAttributes redirect) {
-        Long autorId = null; try { if (principal != null) autorId = Long.parseLong(principal.getName()); } catch (Exception ignored) {}
+        obterAutorId(principal);
         try { alteracaoEstadoSaudeService.register(form); redirect.addFlashAttribute("successMessage","Alteração registada"); }
         catch (Exception e){ redirect.addFlashAttribute("errorMessage", e.getMessage()); }
         return redirectClinicaPorEstadia(form.getEstadiaId());
+    }
+
+    private Long obterAutorId(Principal principal) {
+        if (principal != null) {
+            try {
+                return Long.parseLong(principal.getName());
+            } catch (NumberFormatException ignored) {
+                return 1L;
+            }
+        }
+        return 1L;
     }
 
     private String redirectClinicaPorEstadia(Long estadiaId) {

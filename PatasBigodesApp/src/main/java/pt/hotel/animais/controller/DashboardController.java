@@ -18,6 +18,8 @@ public class DashboardController {
 
     @GetMapping
     public String index(Model model) {
+        model.addAttribute("pageTitle", "Dashboard");
+        model.addAttribute("breadcrumb", "Dashboard");
         model.addAttribute("alojamentosDisponiveis", dashboardService.contarAlojamentosDisponiveis());
         model.addAttribute("alojamentosTotal", dashboardService.contarAlojamentosTotal());
         model.addAttribute("alojamentosOcupados", dashboardService.contarAlojamentosOcupados());
