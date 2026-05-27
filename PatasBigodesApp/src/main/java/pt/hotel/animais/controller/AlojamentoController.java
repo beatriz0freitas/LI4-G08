@@ -17,7 +17,7 @@ public class AlojamentoController {
     @GetMapping("/alojamentos")
     @PreAuthorize("hasAnyRole('DIRETOR', 'FUNCIONARIO_RECEPCAO')")
     public String listar(Model model) {
-        model.addAttribute("activePage", "alojamentos");
+        model.addAttribute("activePage", "disponibilidade");
         model.addAttribute("alojamentos", alojamentoService.listarTodos());
         model.addAttribute("alojamentosComReservasAtivas", alojamentoService.contarAlojamentosComReservasAtivas());
         return "alojamento/listar";
@@ -26,7 +26,7 @@ public class AlojamentoController {
     @GetMapping("/alojamentos/{id}")
     @PreAuthorize("hasAnyRole('DIRETOR', 'FUNCIONARIO_RECEPCAO')")
     public String detalhe(@PathVariable Long id, Model model) {
-        model.addAttribute("activePage", "alojamentos");
+        model.addAttribute("activePage", "disponibilidade");
         model.addAttribute("alojamento", alojamentoService.obter(id));
         return "alojamento/detalhe";
     }
