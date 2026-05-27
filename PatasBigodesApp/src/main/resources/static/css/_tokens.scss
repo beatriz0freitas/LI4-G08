@@ -1,0 +1,24 @@
+// Future theming tokens for PatasBigodesApp
+// Keep these variables aligned with `ui-tokens.css` when the build pipeline is migrated to Sass.
+
+$ui-bg: #f5f7f9;
+$ui-surface: #ffffff;
+$ui-surface-alt: #f8fafc;
+$ui-border: rgba(15, 23, 36, 0.08);
+$ui-text: #0f1724;
+$ui-muted-text: #6b7280;
+$ui-primary: #2b6cb0;
+$ui-success: #2e7d32;
+$ui-warning: #b27b00;
+$ui-info: #1e6fb8;
+$ui-danger: #b2312c;
+
+$ui-radius: 0.95rem;
+$ui-shadow: 0 10px 30px rgba(15, 23, 36, 0.05);
+
+$ui-status-colors: (
+  success: $ui-success,
+  warning: $ui-warning,
+  info: $ui-info,
+  danger: $ui-danger
+);

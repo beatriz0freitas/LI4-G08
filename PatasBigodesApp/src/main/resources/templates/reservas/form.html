@@ -173,7 +173,7 @@
 															<div class="col-md-6">
 																<div class="form-group">
 																	<label for="dataInicio">Data de início <span class="text-danger">*</span></label>
-																	<input type="date" name="dataInicio" id="dataInicio" class="form-control" th:value="${reservaForm.dataInicio}" th:attr="min=${dataMinima}" th:classappend="${#fields.hasErrors('dataInicio')} ? ' is-invalid' : ''" required>
+																	<input type="datetime-local" name="dataInicio" id="dataInicio" class="form-control" th:value="${reservaForm.dataInicio}" th:attr="min=${dataMinima}" th:classappend="${#fields.hasErrors('dataInicio')} ? ' is-invalid' : ''" required>
 																	<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('dataInicio')}">
 																		<div th:each="err : ${#fields.errors('dataInicio')}" th:text="${err}">Erro</div>
 																	</div>
@@ -182,7 +182,7 @@
 															<div class="col-md-6">
 																<div class="form-group">
 																	<label for="dataFim">Data de fim <span class="text-danger">*</span></label>
-																	<input type="date" name="dataFim" id="dataFim" class="form-control" th:value="${reservaForm.dataFim}" th:classappend="${#fields.hasErrors('dataFim')} ? ' is-invalid' : ''" required>
+																	<input type="datetime-local" name="dataFim" id="dataFim" class="form-control" th:value="${reservaForm.dataFim}" th:classappend="${#fields.hasErrors('dataFim')} ? ' is-invalid' : ''" required>
 																	<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('dataFim')}">
 																		<div th:each="err : ${#fields.errors('dataFim')}" th:text="${err}">Erro</div>
 																	</div>
@@ -318,6 +318,19 @@
 											</div>
 										</div>
 									</form>
+									<script>
+										(function () {
+											// Normalize date-only values to datetime-local (append T00:00)
+											['dataInicio', 'dataFim'].forEach(function (id) {
+												var el = document.getElementById(id);
+												if (!el) return;
+												var v = el.value || '';
+												if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
+													el.value = v + 'T00:00';
+												}
+											});
+										})();
+									</script>
 								</div>
 							</div>
 						</div>

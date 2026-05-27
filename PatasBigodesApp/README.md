@@ -172,3 +172,19 @@ Se também quiseres eliminar os dados persistidos:
 ```bash
 make destroy
 ```
+
+## 10. Sistema de interface
+
+A aplicação usa uma base de estilos partilhada e simples:
+
+- `src/main/resources/static/css/_tokens.scss` — fonte de tokens Sass com as cores, raios e sombras do sistema.
+- `src/main/resources/static/css/ui-tokens.css` — stylesheet final consumido pelos templates.
+
+As páginas principais usam classes semânticas para estados e contexto visual:
+
+- `.status-success`, `.status-warning`, `.status-info`, `.status-danger`
+- `.section-tag`
+- `.filter-panel`
+- `.empty-state`
+
+Isto mantém a linguagem visual coerente sem duplicar estilos dentro dos templates.
