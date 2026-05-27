@@ -1,72 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-	<th:block th:replace="fragments/head :: head"></th:block>
+	<th:block th:replace="~{fragments/head :: head}"></th:block>
 	<style>
-		.home-hero {
-			background: var(--ui-surface);
-			border: 1px solid var(--ui-border);
-			border-radius: var(--ui-radius);
-			box-shadow: var(--ui-shadow);
-			padding: 1.5rem;
-		}
-		.home-hero .hero-copy h1 {
-			font-size: clamp(2rem, 3.8vw, 3.2rem);
-			line-height: 1.05;
-			margin-bottom: .6rem;
-		}
-		.home-hero .hero-copy p {
-			max-width: 44rem;
-			color: var(--ui-muted-text);
-			font-size: 1.02rem;
-		}
-		.home-hero .hero-actions {
-			display: flex;
-			flex-wrap: wrap;
-			gap: .65rem;
-		}
-		.hero-panel {
-			background: rgba(255, 255, 255, .85);
-			border: 1px solid var(--ui-border);
-			border-radius: var(--ui-radius);
-			padding: 1rem;
-			height: 100%;
-		}
-		.hero-orbit {
-			position: relative;
-			width: 220px;
-			height: 220px;
-			margin: 0 auto;
-			border-radius: 50%;
-			background: var(--ui-surface);
-			padding: 10px;
-		}
-		.hero-orbit-inner {
-			width: 100%;
-			height: 100%;
-			border-radius: 50%;
-			background: #fff;
-			border: 1px solid var(--ui-border);
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			text-align: center;
-			padding: 1rem;
-		}
-		.hero-orbit-inner strong {
-			display: block;
-			font-size: 2rem;
-			line-height: 1;
-		}
-		.hero-orbit-inner span {
-			color: var(--ui-muted-text);
-			font-weight: 700;
-			font-size: .9rem;
+		.home-top-grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 1rem;
+			align-items: stretch;
 		}
 		.quick-grid {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+			grid-template-columns: repeat(3, minmax(0, 1fr));
 			gap: 1rem;
 			align-items: stretch;
 		}
@@ -74,7 +19,7 @@
 			display: flex;
 			flex-direction: column;
 			justify-content: space-between;
-			min-height: 150px;
+			min-height: 190px;
 			border: 1px solid var(--ui-border);
 			border-radius: var(--ui-radius);
 			background: #fff;
@@ -87,33 +32,10 @@
 			box-shadow: 0 14px 35px rgba(15, 23, 36, .08);
 		}
 
-		/* Uniformizar conteúdo interno dos cartões: ícone consistente e ações alinhadas ao fundo */
-		.quick-card .icon {
-			width: 56px;
-			height: 56px;
-			border-radius: .9rem;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			font-size: 1.15rem;
-		}
-
-		.quick-card .card-actions {
-			margin-top: auto;
-			display: flex;
-			gap: .5rem;
-			flex-wrap: wrap;
-		}
-
-		/* Forçar alinhamento uniforme do conteúdo do hero */
-		.home-hero { display: grid; grid-template-columns: 1fr 360px; gap: 1rem; align-items: center; }
-		.home-hero .hero-copy { padding-right: .5rem; }
-		.home-hero .hero-actions { justify-content: flex-end; }
-		@media (max-width: 991.98px) { .home-hero { grid-template-columns: 1fr; } .home-hero .hero-actions { justify-content: flex-start; } }
 		.quick-card .icon {
 			width: 52px;
 			height: 52px;
-			border-radius: 1rem;
+			border-radius: .9rem;
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
@@ -129,6 +51,7 @@
 			margin-bottom: .8rem;
 		}
 		.quick-card .card-actions {
+			margin-top: auto;
 			display: flex;
 			flex-wrap: wrap;
 			gap: .5rem;
@@ -181,33 +104,47 @@
 			padding: 1rem 1.15rem;
 		}
 		@media (max-width: 991.98px) {
+			.home-top-grid,
 			.workflow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+			.quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 		}
 		@media (max-width: 575.98px) {
-			.home-hero { padding: 1rem; }
+			.home-top-grid,
 			.workflow { grid-template-columns: 1fr; }
-			.hero-orbit { width: 180px; height: 180px; }
+			.quick-grid { grid-template-columns: 1fr; }
 		}
 	</style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
-	<th:block th:replace="fragments/navbar :: navbar"></th:block>
-	<th:block th:replace="fragments/sidebar :: sidebar"></th:block>
+	<th:block th:replace="~{fragments/navbar :: navbar}"></th:block>
+	<th:block th:replace="~{fragments/sidebar :: sidebar}"></th:block>
 
 	<div class="content-wrapper">
 		<section class="content">
 			<div class="container-fluid">
 				
-				<div class="card card-outline card-primary mb-4">
-					<div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+				<div class="home-top-grid mb-4">
+					<div class="quick-card">
 						<div>
-							<h2 class="h5 mb-2">Ação recomendada agora</h2>
-							<p class="text-muted mb-0">Se estiveres a começar o turno, a melhor porta de entrada costuma ser a disponibilidade.</p>
+							<span class="section-tag mb-2"><i class="fas fa-home"></i> Início</span>
+							<h2>Ação recomendada</h2>
+							<p>Começa pela disponibilidade para perceber ocupação, reservas e alojamentos prontos.</p>
 						</div>
-						<div class="d-flex flex-wrap gap-2" sec:authorize="hasAnyRole('DIRETOR','FUNCIONARIO_RECEPCAO')">
+						<div class="card-actions" sec:authorize="hasAnyRole('DIRETOR','FUNCIONARIO_RECEPCAO')">
 							<a th:href="@{/reservas/disponibilidade}" class="btn btn-primary"><i class="fas fa-search mr-2"></i>Ver disponibilidade</a>
 							<a th:href="@{/reservas/novo}" class="btn btn-outline-primary"><i class="fas fa-calendar-plus mr-2"></i>Criar reserva</a>
+						</div>
+					</div>
+					<div class="quick-card">
+						<div>
+							<span class="section-tag mb-2"><i class="fas fa-route"></i> Fluxo</span>
+							<h2>Operação diária</h2>
+							<p>Os módulos abaixo estão agrupados por função para reduzires saltos entre páginas.</p>
+						</div>
+						<div class="card-actions">
+							<a th:href="@{/plano-cuidados}" class="btn btn-outline-primary btn-sm">Planos de cuidados</a>
+							<a th:href="@{/historico}" class="btn btn-outline-secondary btn-sm">Histórico</a>
 						</div>
 					</div>
 				</div>
@@ -290,7 +227,7 @@
 		</section>
 	</div>
 
-	<th:block th:replace="fragments/footer :: footer"></th:block>
+	<th:block th:replace="~{fragments/footer :: footer}"></th:block>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>

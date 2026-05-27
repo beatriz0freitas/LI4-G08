@@ -17,7 +17,7 @@ Trabalho pratico da unidade curricular LI4 (Laboratorios de Informatica IV) da l
 - Rever coerencia global do projeto antes de entrega.
 
 ## Procedimento
-1. Ler por ordem `docs/Etapa0/Enunciado.md`, `docs/Etapa0/tema.md`, os artefactos da etapa atual e os artefactos imediatamente anteriores que a suportam.
+1. Ler por ordem `docs/Etapa0/Enunciado.md`, `docs/Etapa0/Tema.md`, os artefactos da etapa atual e os artefactos imediatamente anteriores que a suportam.
 2. Identificar o artefacto alvo, a etapa de origem e os IDs, decisoes ou diagramas que transitam para a etapa seguinte.
 3. Confirmar a gate da etapa na [checklist](./references/stage-gates.md) antes de criar novo material.
 4. Produzir ou rever apenas o artefacto pedido, preservando nomenclatura, estrutura e terminologia ja estabilizadas no repositorio.

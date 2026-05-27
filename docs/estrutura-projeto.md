@@ -62,10 +62,6 @@ docs/
 - `docs/Etapa1/`
 - `docs/Etapa2/`
 
-### Estrutura ainda planeada
-- `docs/Etapa3/`
-- `docs/Etapa4/`
-
 ### Etapa 3
 - Código-fonte, testes automatizados, scripts de apoio e guias operacionais.
 - Se houver frontend e backend, dividir `01-source/` por módulos ou aplicações.
