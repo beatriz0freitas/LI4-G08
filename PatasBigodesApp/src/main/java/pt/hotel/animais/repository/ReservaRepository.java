@@ -90,6 +90,11 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
        List<Reserva> findByDataCriacaoBetweenOrderByDataCriacaoAsc(LocalDateTime inicio, LocalDateTime fim);
 
     /**
+     * Procura reservas por estado ordenadas por data de início decrescente.
+     */
+    List<Reserva> findByEstadoOrderByDataInicioDesc(EstadoReserva estado);
+
+    /**
      * Conta as reservas num determinado estado.
      */
     @Query("SELECT COUNT(r) FROM Reserva r WHERE r.estado = :estado")

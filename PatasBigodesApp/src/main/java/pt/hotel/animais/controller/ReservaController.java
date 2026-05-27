@@ -10,9 +10,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.validation.Valid;
 import pt.hotel.animais.dto.DisponibilidadeAlojamentoDto;
 import pt.hotel.animais.dto.ReservaFormDto;
+import pt.hotel.animais.dto.ReservaListDto;
 import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Reserva;
 import pt.hotel.animais.model.Tutor;
+import pt.hotel.animais.model.enums.EstadoReserva;
 import pt.hotel.animais.service.IAlojamentoService;
 import pt.hotel.animais.service.IAnimalService;
 import pt.hotel.animais.service.IReservaService;
@@ -43,18 +45,32 @@ public class ReservaController {
     private final IAnimalService animalService;
     
     /**
-     * GET /reservas - Lista de reservas (geralmente com filtros).
+     * GET /reservas - Lista de reservas com filtro opcional por estado.
      */
     @GetMapping
-    public String listar(Model model) {
-        List<Reserva> reservas = reservaService.listarTodas();
+    public String listar(
+        @RequestParam(required = false) String estado,
+        Model model
+    ) {
+        EstadoReserva filtroEstado = null;
+        if (estado != null && !estado.isEmpty()) {
+            try {
+                filtroEstado = EstadoReserva.valueOf(estado.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                model.addAttribute("errorMessage", "Estado inválido: " + estado);
+            }
+        }
+        
+        List<ReservaListDto> reservas = reservaService.listarComFiltros(filtroEstado);
         
         model.addAttribute("reservas", reservas);
+        model.addAttribute("filtroEstado", estado);
+        model.addAttribute("estados", EstadoReserva.values());
         model.addAttribute("pageTitle", "Reservas");
         model.addAttribute("breadcrumb", "Lista de Reservas");
         model.addAttribute("activePage", "reservas");
         
-        return "reservas/index";
+        return "reservas/lista";
     }
     
     /**

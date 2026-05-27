@@ -161,7 +161,6 @@
                 <span id="modal-state" class="detail-state mb-3">Livre</span>
                 <dl class="row mt-3 mb-0">
                     <dt class="col-5">Tipo</dt><dd class="col-7" id="modal-type">Canil</dd>
-                    <dt class="col-5">Capacidade</dt><dd class="col-7" id="modal-capacity">1</dd>
                     <dt class="col-5">Animal</dt><dd class="col-7" id="modal-animal">Sem animal associado</dd>
                     <dt class="col-5">Contexto</dt><dd class="col-7" id="modal-reason">Disponível para reserva</dd>
                 </dl>
@@ -182,7 +181,6 @@
             // Atualizar dados do modal
             document.getElementById('modal-name').textContent = box.dataset.identificacao;
             document.getElementById('modal-type').textContent = box.dataset.tipo;
-            document.getElementById('modal-capacity').textContent = box.dataset.capacidade || '-';
             document.getElementById('modal-animal').textContent = box.dataset.animal || 'Sem animal associado';
             document.getElementById('modal-reason').textContent = box.dataset.motivo || 'Disponível para reserva';
             
@@ -194,16 +192,40 @@
             var actions = document.getElementById('modal-actions');
             var dataInicio = /*[[${dataInicio}]]*/ '';
             var dataFim = /*[[${dataFim}]]*/ '';
+            var estado = box.dataset.estado;
+            var estadiaId = box.dataset.estadia;
+            var reservaId = box.dataset.reserva;
+            var disponivel = box.dataset.disponivel === 'true';
             
-            if (box.dataset.estadia) {
-                actions.innerHTML = '<a class="btn btn-primary" href="/estadias?estadiaId=' + box.dataset.estadia + '">Ver estadia</a>';
-            } else if (box.dataset.reserva) {
-                actions.innerHTML = '<a class="btn btn-primary" href="/reservas/' + box.dataset.reserva + '">Ver reserva</a>';
-            } else if (box.dataset.disponivel === 'true') {
-                actions.innerHTML = '<a class="btn btn-success" href="/reservas/novo?alojamentoId=' + box.dataset.id + '&dataInicio=' + dataInicio + '&dataFim=' + dataFim + '">Criar reserva</a>';
-            } else {
-                actions.innerHTML = '';
+            var actionsHtml = '';
+            
+            // Check-in: quando alojamento está LIVRE e existe uma reserva
+            if (estado === 'Livre' && reservaId) {
+                actionsHtml = '<form class="d-inline-block mr-2" method="post" action="/estadias/check-in" style="display: inline;">' +
+                              '<input type="hidden" name="reservaId" value="' + reservaId + '">' +
+                              '<input type="hidden" name="metodoPagamento" value="TRANSFERENCIA_BANCARIA">' +
+                              '<button type="submit" class="btn btn-success btn-sm">Realizar Check-in</button>' +
+                              '</form>' +
+                              '<form class="d-inline-block mr-2" method="post" action="/reservas/' + reservaId + '/cancelar" style="display: inline;">' +
+                              '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Tem a certeza que deseja cancelar esta reserva?\')">Cancelar Reserva</button>' +
+                              '</form>' +
+                              '<a class="btn btn-secondary btn-sm" href="/reservas/' + reservaId + '">Ver Detalhes</a>';
             }
+            // Check-out: quando alojamento está OCUPADO e existe uma estadia
+            else if (estado === 'Ocupado' && estadiaId) {
+                actionsHtml = '<form class="d-inline-block mr-2" method="post" action="/estadias/check-out" style="display: inline;">' +
+                              '<input type="hidden" name="estadiaId" value="' + estadiaId + '">' +
+                              '<input type="hidden" name="metodoPagamento" value="TRANSFERENCIA_BANCARIA">' +
+                              '<button type="submit" class="btn btn-warning btn-sm" onclick="return confirm(\'Tem a certeza que deseja realizar o check-out?\')">Realizar Check-out</button>' +
+                              '</form>' +
+                              '<a class="btn btn-secondary btn-sm" href="/estadias/lista">Ver Estadia</a>';
+            }
+            // Criar reserva: quando alojamento está disponível
+            else if (disponivel) {
+                actionsHtml = '<a class="btn btn-success btn-sm" href="/reservas/novo?alojamentoId=' + box.dataset.id + '&dataInicio=' + dataInicio + '&dataFim=' + dataFim + '">Criar Reserva</a>';
+            }
+            
+            actions.innerHTML = actionsHtml;
         });
     });
 </script>

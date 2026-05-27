@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.hotel.animais.dto.ReservaDetalheFinanceiroDto;
 import pt.hotel.animais.dto.ReservaFormDto;
+import pt.hotel.animais.dto.ReservaListDto;
 import pt.hotel.animais.model.Animal;
 import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.Reserva;
@@ -19,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Serviço para gerenciar reservas.
@@ -238,6 +240,62 @@ public class ReservaService implements IReservaService {
     @Transactional(readOnly = true)
     public List<Reserva> listarTodas() {
         return reservaRepository.findAllWithDetalhes();
+    }
+
+    /**
+     * Lista reservas com filtro opcional por estado.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservaListDto> listarComFiltros(EstadoReserva estado) {
+        List<Reserva> reservas;
+        
+        if (estado != null) {
+            reservas = reservaRepository.findByEstadoOrderByDataInicioDesc(estado);
+        } else {
+            reservas = reservaRepository.findAllWithDetalhes();
+        }
+        
+        return reservas.stream()
+            .map(this::converterParaDto)
+            .collect(Collectors.toList());
+    }
+
+    private ReservaListDto converterParaDto(Reserva reserva) {
+        String estadoLabel = obterLabelEstado(reserva.getEstado());
+        String estadoCss = obterClassCssEstado(reserva.getEstado());
+        
+        return new ReservaListDto(
+            reserva.getId(),
+            reserva.getAnimal() != null ? reserva.getAnimal().getNome() : "-",
+            reserva.getTutor() != null ? reserva.getTutor().getNome() : "-",
+            reserva.getAlojamento() != null ? reserva.getAlojamento().getIdentificacao() : "-",
+            reserva.getDataInicio(),
+            reserva.getDataFim(),
+            reserva.getEstado(),
+            estadoLabel,
+            estadoCss
+        );
+    }
+
+    private String obterLabelEstado(EstadoReserva estado) {
+        return switch (estado) {
+            case ATIVA -> "Ativa";
+            case CONFIRMADA -> "Confirmada";
+            case CANCELADA -> "Cancelada";
+            case CONCLUIDA -> "Concluída";
+            default -> "Desconhecido";
+        };
+    }
+
+    private String obterClassCssEstado(EstadoReserva estado) {
+        return switch (estado) {
+            case ATIVA -> "st-reservado";
+            case CONFIRMADA -> "st-ocupado";
+            case CANCELADA -> "st-limpeza";
+            case CONCLUIDA -> "st-livre";
+            default -> "";
+        };
     }
 
     private Map<String, Object> detalhesReserva(Reserva reserva) {
