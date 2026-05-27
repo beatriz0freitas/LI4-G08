@@ -54,7 +54,6 @@ package "Aplicacao" {
   interface IColaboradorService
   interface IRegraDominioService
   interface IAvailabilityDomainService
-  interface IAuditoriaService
 
   class DashboardService <<service>>
   class AlojamentoService <<service>>
@@ -78,8 +77,66 @@ package "Aplicacao" {
   class TipoServicoExtraService <<service>>
   class RegraDominioService <<service>>
   class AvailabilityDomainService <<service>>
-  class AuditoriaService <<service>>
-  class AuditoriaOperacaoService <<service>>
+  class ColaboradorUserDetailsService <<security-adapter>>
+  class TipoAlojamentoPolicy <<utility>>
+  class EstadiaExistenteException <<exception>>
+
+  package "Auditoria" {
+    interface IAuditoriaService
+    class AuditoriaService <<service>>
+    class AuditoriaOperacaoService <<service>>
+    class AuditoriaSchedulerJob <<job>>
+  }
+}
+
+package "Configuracao" {
+  class SecurityConfig <<configuration>>
+  class AuditoriaDetalhesConverter <<converter>>
+}
+
+package "DTO" {
+  package "Entrada" {
+    class AnimalFormDto <<dto>>
+    class TutorFormDto <<dto>>
+    class ReservaFormDto <<dto>>
+    class PagamentoDto <<dto>>
+    class RegistoCuidadoFormDto <<dto>>
+    class TarefaCuidadoFormDto <<dto>>
+    class NotaFormDto <<dto>>
+    class ServicoExtraFormDto <<dto>>
+    class IntervencaoClinicaFormDto <<dto>>
+    class AlteracaoEstadoSaudeFormDto <<dto>>
+    class ColaboradorFormDto <<dto>>
+    class RelatorioFiltroFormDto <<dto>>
+  }
+
+  package "Saida" {
+    class DashboardEstadiaDto <<dto>>
+    class DisponibilidadeAlojamentoDto <<dto>>
+    class EstadiaListDto <<dto>>
+    class ReservaListDto <<dto>>
+    class ReservaDetalheFinanceiroDto <<dto>>
+    class ResumoCheckInDto <<dto>>
+    class ResumoCheckOutDto <<dto>>
+    class RegistoCuidadoDto <<dto>>
+    class PlanoCuidadosDto <<dto>>
+    class TarefaCuidadoDto <<dto>>
+    class NotaDto <<dto>>
+    class ServicoExtraDto <<dto>>
+    class FichaClinicaDto <<dto>>
+    class EventoClinicoDto <<dto>>
+    class IntervencaoClinicaDto <<dto>>
+    class AlteracaoEstadoSaudeDto <<dto>>
+    class HistoricoFiltroDto <<dto>>
+    class HistoricoItemDto <<dto>>
+    class RelatorioAgrupamentoDto <<dto>>
+    class RelatorioResumoDto <<dto>>
+  }
+
+  package "Auditoria" {
+    class AuditoriaEventoDTO <<dto>>
+    class AuditoriaFiltroDTO <<dto>>
+  }
 }
 
 package "Dados" {
@@ -103,6 +160,93 @@ package "Dados" {
 }
 
 package "Dominio" {
+  package "Auditoria" {
+    class AuditoriaEvento <<entity>> {
+      -id: Long
+      -timestamp: LocalDateTime
+      -utilizador: Colaborador
+      -operacao: String
+      -entidade: String
+      -entityId: Long
+      -acao: String
+      -detalhes: Map<String, Object>
+      -resultado: ResultadoAuditoria
+      -motivoFalha: String
+    }
+  }
+
+  package "Enums" {
+    enum TipoColaborador {
+      DIRETOR
+      FUNCIONARIO_RECEPCAO
+      CUIDADOR
+      MEDICO_VETERINARIO
+      RESPONSAVEL_LIMPEZA
+    }
+
+    enum Especie {
+      CAO
+      GATO
+    }
+
+    enum EstadoSaude {
+      NORMAL
+      ALTERADO
+      CRITICO
+    }
+
+    enum EstadoLimpeza {
+      PENDENTE
+      CONCLUIDO
+    }
+
+    enum EstadoReserva {
+      ATIVA
+      CONFIRMADA
+      CANCELADA
+      CONCLUIDA
+    }
+
+    enum EstadoEstadia {
+      EM_CURSO
+      TERMINADA
+    }
+
+    enum MetodoPagamento {
+      NUMERARIO
+      CARTAO_DEBITO
+      CARTAO_CREDITO
+    }
+
+    enum MomentoPagamento {
+      CHECK_IN
+      CHECK_OUT
+      EXTRAS
+    }
+
+    enum EstadoPagamento {
+      LIQUIDADO
+      PENDENTE
+    }
+
+    enum PrioridadePlano {
+      ROTINA
+      URGENTE
+      CRITICO
+    }
+
+    enum PeriodicidadeTarefa {
+      UNICA
+      DIARIA
+      SEMANAL
+    }
+
+    enum ResultadoAuditoria {
+      SUCESSO
+      FALHA
+    }
+  }
+
   class Colaborador <<entity>> {
     -id: Long
     -username: String
@@ -122,10 +266,13 @@ package "Dominio" {
     -contacto: String
     -email: String
     -dataRegisto: LocalDateTime
+    -animais: List<Animal>
+    -reservas: List<Reserva>
   }
 
   class Animal <<entity>> {
     -id: Long
+    -tutor: Tutor
     -nome: String
     -especie: Especie
     -raca: String
@@ -135,6 +282,7 @@ package "Dominio" {
     -necessidadesAlimentares: String
     -medicacaoCurso: String
     -dataRegisto: LocalDateTime
+    -reservas: List<Reserva>
   }
 
   class Alojamento <<entity>> {
@@ -143,10 +291,14 @@ package "Dominio" {
     -tipo: String
     -capacidade: Integer
     -estadoLimpeza: EstadoLimpeza
+    -reservas: List<Reserva>
   }
 
   class Reserva <<entity>> {
     -id: Long
+    -tutor: Tutor
+    -animal: Animal
+    -alojamento: Alojamento
     -dataInicio: LocalDate
     -dataFim: LocalDate
     -estado: EstadoReserva
@@ -160,6 +312,7 @@ package "Dominio" {
 
   class Estadia <<entity>> {
     -id: Long
+    -reserva: Reserva
     -dataInicio: LocalDateTime
     -dataFim: LocalDateTime
     -estado: EstadoEstadia
@@ -168,6 +321,7 @@ package "Dominio" {
 
   class Pagamento <<entity>> {
     -id: Long
+    -estadia: Estadia
     -valor: BigDecimal
     -metodoPagamento: MetodoPagamento
     -momentoPagamento: MomentoPagamento
@@ -177,6 +331,7 @@ package "Dominio" {
 
   class RegistoCuidado <<entity>> {
     -id: Long
+    -estadia: Estadia
     -descricao: String
     -dataHora: LocalDateTime
     -autorId: Long
@@ -185,19 +340,25 @@ package "Dominio" {
 
   class PlanoCuidados <<entity>> {
     -id: Long
+    -animal: Animal
+    -estadia: Estadia
     -dataInicio: LocalDateTime
     -dataFim: LocalDateTime
     -prioridade: PrioridadePlano
     -ativo: Boolean
     -instrucoes: String
+    -tarefas: List<TarefaCuidado>
     -createdAt: LocalDateTime
     -createdBy: Long
     -updatedAt: LocalDateTime
     -updatedBy: Long
+    +onCreate(): void
+    +onUpdate(): void
   }
 
   class TarefaCuidado <<entity>> {
     -id: Long
+    -planoCuidados: PlanoCuidados
     -tipo: String
     -descricao: String
     -periodicidade: PeriodicidadeTarefa
@@ -210,6 +371,7 @@ package "Dominio" {
 
   class Nota <<entity>> {
     -id: Long
+    -reserva: Reserva
     -descricao: String
     -autorId: Long
     -dataHora: LocalDateTime
@@ -218,10 +380,13 @@ package "Dominio" {
 
   class ServicoExtra <<entity>> {
     -id: Long
+    -estadia: Estadia
+    -tipoServicoExtra: TipoServicoExtra
     -custo: BigDecimal
     -dataHora: LocalDateTime
     -autorId: Long
     -createdAt: LocalDateTime
+    +validarCusto(): void
   }
 
   class TipoServicoExtra <<entity>> {
@@ -234,15 +399,18 @@ package "Dominio" {
 
   class IntervencaoClinica <<entity>> {
     -id: Long
+    -estadia: Estadia
     -descricao: String
     -custo: BigDecimal
     -dataHora: LocalDateTime
     -medicoId: Long
     -createdAt: LocalDateTime
+    +validarCusto(): void
   }
 
   class AlteracaoEstadoSaude <<entity>> {
     -id: Long
+    -estadia: Estadia
     -descricao: String
     -severidade: EstadoSaude
     -dataHora: LocalDateTime
@@ -256,88 +424,7 @@ package "Dominio" {
     -tarifaDiaria: BigDecimal
     -ativo: Boolean
     -dataCriacao: LocalDateTime
-  }
-
-  class AuditoriaEvento <<entity>> {
-    -id: Long
-    -timestamp: LocalDateTime
-    -operacao: String
-    -entidade: String
-    -entityId: Long
-    -acao: String
-    -detalhes: Map<String,Object>
-    -resultado: ResultadoAuditoria
-    -motivoFalha: String
-  }
-
-  enum TipoColaborador {
-    DIRETOR
-    FUNCIONARIO_RECEPCAO
-    CUIDADOR
-    MEDICO_VETERINARIO
-    RESPONSAVEL_LIMPEZA
-  }
-
-  enum Especie {
-    CAO
-    GATO
-  }
-
-  enum EstadoSaude {
-    NORMAL
-    ALTERADO
-    CRITICO
-  }
-
-  enum EstadoLimpeza {
-    PENDENTE
-    CONCLUIDO
-  }
-
-  enum EstadoReserva {
-    ATIVA
-    CONFIRMADA
-    CANCELADA
-    CONCLUIDA
-  }
-
-  enum EstadoEstadia {
-    EM_CURSO
-    TERMINADA
-  }
-
-  enum MetodoPagamento {
-    NUMERARIO
-    CARTAO_DEBITO
-    CARTAO_CREDITO
-  }
-
-  enum MomentoPagamento {
-    CHECK_IN
-    CHECK_OUT
-    EXTRAS
-  }
-
-  enum EstadoPagamento {
-    LIQUIDADO
-    PENDENTE
-  }
-
-  enum PrioridadePlano {
-    ROTINA
-    URGENTE
-    CRITICO
-  }
-
-  enum PeriodicidadeTarefa {
-    UNICA
-    DIARIA
-    SEMANAL
-  }
-
-  enum ResultadoAuditoria {
-    SUCESSO
-    FALHA
+    +validarTarifa(): void
   }
 }
 
@@ -351,7 +438,9 @@ ReservaController ..> IReservaService
 ReservaController ..> IAlojamentoService
 ReservaController ..> ITutorService
 ReservaController ..> IAnimalService
+ReservaController ..> TipoAlojamentoPolicy
 EstadiaController ..> IEstadiaService
+EstadiaController ..> MetodoPagamento
 PagamentoController ..> IPagamentoService
 RegistoCuidadoController ..> IRegistoCuidadoService
 PlanoCuidadosController ..> IPlanoCuidadosService
@@ -367,6 +456,8 @@ ColaboradorController ..> IColaboradorService
 TipoAlojamentoTarifaController ..> TipoAlojamentoTarifaService
 TipoServicoExtraController ..> TipoServicoExtraService
 AuditoriaController ..> IAuditoriaService
+AuditoriaController ..> IColaboradorService
+SecurityConfig ..> PasswordEncoder
 
 IDashboardService <|.. DashboardService
 IAlojamentoService <|.. AlojamentoService
@@ -397,48 +488,78 @@ DashboardService ..> IAlojamentoService
 DashboardService ..> AlojamentoRepository
 DashboardService ..> EstadiaRepository
 DashboardService ..> PagamentoRepository
+
 AlojamentoService ..> AlojamentoRepository
 AlojamentoService ..> IAvailabilityDomainService
+AlojamentoService ..> ReservaRepository
+AlojamentoService ..> EstadiaRepository
+AlojamentoService ..> TipoAlojamentoPolicy
+
 TutorService ..> TutorRepository
+
 AnimalService ..> AnimalRepository
 AnimalService ..> ITutorService
+
 ReservaService ..> ReservaRepository
 ReservaService ..> ITutorService
 ReservaService ..> IAnimalService
 ReservaService ..> IAvailabilityDomainService
 ReservaService ..> EstadiaRepository
 ReservaService ..> IPagamentoService
+ReservaService ..> AuditoriaOperacaoService
+
 EstadiaService ..> EstadiaRepository
 EstadiaService ..> IReservaService
 EstadiaService ..> IPagamentoService
 EstadiaService ..> IAlojamentoService
+EstadiaService ..> IPlanoCuidadosService
 EstadiaService ..> AnimalRepository
+EstadiaService ..> AuditoriaOperacaoService
+EstadiaService ..> EstadiaExistenteException
+
 PagamentoService ..> PagamentoRepository
 PagamentoService ..> EstadiaRepository
 PagamentoService ..> ServicoExtraRepository
 PagamentoService ..> IntervencaoClinicaRepository
+PagamentoService ..> TipoAlojamentoTarifaService
+PagamentoService ..> AuditoriaOperacaoService
+
 RegistoCuidadoService ..> RegistoCuidadoRepository
 RegistoCuidadoService ..> EstadiaRepository
+RegistoCuidadoService ..> AuditoriaOperacaoService
+
 PlanoCuidadosService ..> PlanoCuidadosRepository
 PlanoCuidadosService ..> TarefaCuidadoRepository
 PlanoCuidadosService ..> EstadiaRepository
 PlanoCuidadosService ..> AnimalRepository
+PlanoCuidadosService ..> NotaRepository
+
 NotaService ..> NotaRepository
 NotaService ..> ReservaRepository
+
 ServicoExtraService ..> ServicoExtraRepository
 ServicoExtraService ..> EstadiaRepository
 ServicoExtraService ..> IPagamentoService
+ServicoExtraService ..> TipoServicoExtraService
+ServicoExtraService ..> AuditoriaOperacaoService
+
 ClinicaService ..> AnimalRepository
 ClinicaService ..> EstadiaRepository
 ClinicaService ..> IntervencaoClinicaRepository
 ClinicaService ..> AlteracaoEstadoSaudeRepository
+
 IntervencaoClinicaService ..> IntervencaoClinicaRepository
 IntervencaoClinicaService ..> EstadiaRepository
+IntervencaoClinicaService ..> AuditoriaOperacaoService
+
 AlteracaoEstadoSaudeService ..> AlteracaoEstadoSaudeRepository
 AlteracaoEstadoSaudeService ..> EstadiaRepository
 AlteracaoEstadoSaudeService ..> PlanoCuidadosRepository
 AlteracaoEstadoSaudeService ..> IPlanoCuidadosService
+
 LimpezaService ..> AlojamentoRepository
+LimpezaService ..> AuditoriaOperacaoService
+
 HistoricoService ..> EstadiaRepository
 HistoricoService ..> RegistoCuidadoRepository
 HistoricoService ..> ServicoExtraRepository
@@ -446,22 +567,101 @@ HistoricoService ..> IntervencaoClinicaRepository
 HistoricoService ..> NotaRepository
 HistoricoService ..> AlteracaoEstadoSaudeRepository
 HistoricoService ..> PagamentoRepository
+
 RelatorioService ..> AlojamentoRepository
 RelatorioService ..> EstadiaRepository
 RelatorioService ..> ReservaRepository
 RelatorioService ..> PagamentoRepository
 RelatorioService ..> ServicoExtraRepository
+RelatorioService ..> AuditoriaOperacaoService
+
 ColaboradorService ..> ColaboradorRepository
+ColaboradorService ..> PasswordEncoder
+ColaboradorService ..> AuditoriaOperacaoService
+
 TipoAlojamentoTarifaService ..> TipoAlojamentoTarifaRepository
 TipoServicoExtraService ..> TipoServicoExtraRepository
+
 RegraDominioService ..> AlojamentoRepository
 RegraDominioService ..> ReservaRepository
 RegraDominioService ..> EstadiaRepository
+
 AvailabilityDomainService ..> AlojamentoRepository
+AvailabilityDomainService ..> TipoAlojamentoPolicy
+
+ColaboradorUserDetailsService ..> ColaboradorRepository
+ColaboradorUserDetailsService ..|> UserDetailsService
+AuditoriaDetalhesConverter ..> AuditoriaEvento
+TipoAlojamentoPolicy ..> Especie
+AuditoriaSchedulerJob ..> IAuditoriaService
+
 AuditoriaService ..> AuditoriaRepository
 AuditoriaService ..> ColaboradorRepository
 AuditoriaOperacaoService ..> IAuditoriaService
 AuditoriaOperacaoService ..> ColaboradorRepository
+
+DashboardController ..> DashboardEstadiaDto
+AlojamentoController ..> DisponibilidadeAlojamentoDto
+TutorAnimalController ..> TutorFormDto
+TutorAnimalController ..> AnimalFormDto
+AnimalController ..> AnimalFormDto
+ReservaController ..> DisponibilidadeAlojamentoDto
+ReservaController ..> ReservaFormDto
+ReservaController ..> ReservaListDto
+EstadiaController ..> EstadiaListDto
+EstadiaController ..> ResumoCheckInDto
+EstadiaController ..> ResumoCheckOutDto
+PagamentoController ..> PagamentoDto
+RegistoCuidadoController ..> RegistoCuidadoFormDto
+PlanoCuidadosController ..> PlanoCuidadosDto
+PlanoCuidadosController ..> TarefaCuidadoFormDto
+NotaController ..> NotaFormDto
+ServicoExtraController ..> ServicoExtraFormDto
+ClinicaController ..> FichaClinicaDto
+ClinicaController ..> IntervencaoClinicaFormDto
+ClinicaController ..> AlteracaoEstadoSaudeFormDto
+HistoricoController ..> HistoricoFiltroDto
+HistoricoController ..> HistoricoItemDto
+RelatorioController ..> RelatorioFiltroFormDto
+ColaboradorController ..> ColaboradorFormDto
+AuditoriaController ..> AuditoriaFiltroDTO
+AuditoriaController ..> AuditoriaEventoDTO
+
+DashboardService ..> DashboardEstadiaDto
+AlojamentoService ..> DisponibilidadeAlojamentoDto
+ReservaService ..> ReservaFormDto
+ReservaService ..> ReservaListDto
+ReservaService ..> ReservaDetalheFinanceiroDto
+EstadiaService ..> EstadiaListDto
+EstadiaService ..> ResumoCheckInDto
+EstadiaService ..> ResumoCheckOutDto
+RegistoCuidadoService ..> RegistoCuidadoDto
+RegistoCuidadoService ..> RegistoCuidadoFormDto
+PlanoCuidadosService ..> PlanoCuidadosDto
+PlanoCuidadosService ..> TarefaCuidadoDto
+PlanoCuidadosService ..> TarefaCuidadoFormDto
+NotaService ..> NotaDto
+NotaService ..> NotaFormDto
+ServicoExtraService ..> ServicoExtraDto
+ServicoExtraService ..> ServicoExtraFormDto
+ClinicaService ..> FichaClinicaDto
+ClinicaService ..> EventoClinicoDto
+IntervencaoClinicaService ..> IntervencaoClinicaDto
+IntervencaoClinicaService ..> IntervencaoClinicaFormDto
+AlteracaoEstadoSaudeService ..> AlteracaoEstadoSaudeDto
+AlteracaoEstadoSaudeService ..> AlteracaoEstadoSaudeFormDto
+HistoricoService ..> HistoricoFiltroDto
+HistoricoService ..> HistoricoItemDto
+RelatorioService ..> RelatorioFiltroFormDto
+RelatorioService ..> RelatorioAgrupamentoDto
+RelatorioService ..> RelatorioResumoDto
+ColaboradorService ..> ColaboradorFormDto
+AuditoriaService ..> AuditoriaFiltroDTO
+AuditoriaService ..> AuditoriaEventoDTO
+
+PlanoCuidadosDto --> TarefaCuidadoDto
+FichaClinicaDto --> EventoClinicoDto
+AuditoriaEventoDTO --> Colaborador
 
 Tutor "1" o-- "0..*" Animal : animais
 Tutor "1" o-- "0..*" Reserva : reservas
