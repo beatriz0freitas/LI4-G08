@@ -34,7 +34,7 @@ node "Rede local do hotel" as LAN {
 
   node "Servidor / Host Docker" as Host {
     node "hotelanimais-app" as AppContainer {
-      artifact "app.jar\nanimais-0.0.1-SNAPSHOT.jar" as AppJar
+      artifact "app.jar" as AppJar
       artifact "Recursos da aplicacao web" as WebArtifacts
     }
 
