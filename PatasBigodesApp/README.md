@@ -1,8 +1,6 @@
 # PatasBigodesApp
 
-Manual técnico de execução e manutenção da aplicação **PatasBigodesApp**, desenvolvida com Spring Boot e preparada para correr com MySQL via Docker Compose.
-
-## 1. Visão geral
+Manual técnico de execução e manutenção da aplicação **PatasBigodesApp**, desenvolvida com Spring Boot e preparada para correr com MySQL via Docker Compose.## 1. Visão geral
 
 A aplicação expõe-se na porta `8080` e, por defeito, trabalha com o perfil `mysql`. Isso significa que a base de dados deve estar disponível antes de arrancar a aplicação em modo local.
 
@@ -188,3 +186,11 @@ As páginas principais usam classes semânticas para estados e contexto visual:
 - `.empty-state`
 
 Isto mantém a linguagem visual coerente sem duplicar estilos dentro dos templates.
+
+
+Alunos:
+
+- A106804 — Alice Isabel Faria Soares
+- A106853 — Ana Beatriz Ribeiro Freitas
+- A107365 — Beatriz Martins Miranda
+- A107367 — João Paulo Batista Azevedo
