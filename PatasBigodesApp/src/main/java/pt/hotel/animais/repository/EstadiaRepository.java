@@ -2,6 +2,7 @@ package pt.hotel.animais.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,6 +23,7 @@ public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
 		JOIN e.reserva r
 		JOIN r.tutor t
 		JOIN r.animal a
+		JOIN r.alojamento al
 		WHERE (:clienteId IS NULL OR t.id = :clienteId)
 		  AND (:animalId IS NULL OR a.id = :animalId)
 		  AND (:estado IS NULL OR e.estado = :estado)
@@ -34,12 +36,14 @@ public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
 		JOIN e.reserva r
 		JOIN r.tutor t
 		JOIN r.animal a
+		JOIN r.alojamento al
 		WHERE (:clienteId IS NULL OR t.id = :clienteId)
 		  AND (:animalId IS NULL OR a.id = :animalId)
 		  AND (:estado IS NULL OR e.estado = :estado)
 		  AND (:dataInicio IS NULL OR e.dataInicio >= :dataInicio)
 		  AND (:dataFim IS NULL OR e.dataFim <= :dataFim)
 		""")
+	@EntityGraph(attributePaths = {"reserva", "reserva.tutor", "reserva.animal", "reserva.alojamento"})
 	Page<Estadia> pesquisarHistorico(
 		@Param("clienteId") Long clienteId,
 		@Param("animalId") Long animalId,

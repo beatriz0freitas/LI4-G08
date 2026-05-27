@@ -37,18 +37,7 @@ class EstadiaControllerTest {
 
     @Test
     @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
-    void operacoesDeveRenderizarPagina() throws Exception {
-        when(estadiaService.listarComFiltros(any(), any(), any())).thenReturn(Collections.emptyList());
-
-        mockMvc.perform(get("/estadias/lista"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("estadias/lista"))
-                .andExpect(model().attribute("activePage", "estadias"));
-    }
-
-    @Test
-    @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
-    void operacoesComEstadiaIdDeveAdicionarExtrasAoModelo() throws Exception {
+    void raizDeveRedirecionarParaListaDeEstadias() throws Exception {
         mockMvc.perform(get("/estadias"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/estadias/lista"));
@@ -56,13 +45,31 @@ class EstadiaControllerTest {
 
     @Test
     @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
-    void operacoesComReservaIdDeveAdicionarReservaEValorAoModelo() throws Exception {
-        when(estadiaService.listarComFiltros(any(), any(), any())).thenReturn(Collections.emptyList());
+    void paginaCheckOutComEstadiaIdDeveAdicionarExtrasAoModelo() throws Exception {
+        Estadia e = new Estadia();
+        e.setId(1L);
+        e.setDataInicio(LocalDateTime.now());
+        e.setReserva(criarReservaComDetalhes());
+        when(estadiaService.obterResumoCheckOut(1L))
+                .thenReturn(Optional.of(new ResumoCheckOutDto(e, new BigDecimal("25.00"))));
 
-        mockMvc.perform(get("/estadias/lista"))
+        mockMvc.perform(get("/estadias/check-out").param("estadiaId", "1"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("estadias/lista"))
-                .andExpect(model().attributeExists("estadias"));
+                .andExpect(view().name("estadias/check-out"))
+                .andExpect(model().attributeExists("estadiaSelecionada", "valorCheckOut"));
+    }
+
+    @Test
+    @WithMockUser(roles = "FUNCIONARIO_RECEPCAO")
+    void paginaCheckInComReservaIdDeveAdicionarReservaEValorAoModelo() throws Exception {
+        Reserva reserva = criarReservaComDetalhes();
+        when(estadiaService.obterResumoCheckIn(10L))
+                .thenReturn(Optional.of(new ResumoCheckInDto(reserva, new BigDecimal("45.00"))));
+
+        mockMvc.perform(get("/estadias/check-in").param("reservaId", "10"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("estadias/check-in"))
+                .andExpect(model().attributeExists("reservaSelecionada", "valorCheckIn"));
     }
 
     @Test
@@ -153,4 +160,25 @@ class EstadiaControllerTest {
         verify(estadiaService, never()).checkOut(anyLong(), any());
     }
 
+    private Reserva criarReservaComDetalhes() {
+        Tutor tutor = new Tutor();
+        tutor.setNome("Ana Silva");
+
+        Animal animal = new Animal();
+        animal.setNome("Boby");
+
+        Alojamento alojamento = new Alojamento();
+        alojamento.setIdentificacao("A1");
+        alojamento.setTipo("CANINO");
+
+        Reserva reserva = new Reserva();
+        reserva.setId(10L);
+        reserva.setTutor(tutor);
+        reserva.setAnimal(animal);
+        reserva.setAlojamento(alojamento);
+        reserva.setDataInicio(LocalDate.now());
+        reserva.setDataFim(LocalDate.now().plusDays(3));
+        reserva.setEstado(pt.hotel.animais.model.enums.EstadoReserva.ATIVA);
+        return reserva;
+    }
 }

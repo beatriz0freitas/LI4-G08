@@ -272,16 +272,17 @@ public class ReservaController {
     @PostMapping("/{id}/cancelar")
     public String cancelar(
         @PathVariable Long id,
+        @RequestParam(value = "redirectTo", required = false) String redirectTo,
         RedirectAttributes redirectAttributes,
         Model model
     ) {
         try {
             reservaService.cancelar(id);
             redirectAttributes.addFlashAttribute("successMessage", "Reserva cancelada com sucesso");
-            return "redirect:/reservas";
+            return "redirect:" + destinoSeguro(redirectTo, "/reservas");
         } catch (IllegalArgumentException e) {
-            model.addAttribute("errorMessage", e.getMessage());
-            return "redirect:/reservas/" + id;
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:" + destinoSeguro(redirectTo, "/reservas/" + id);
         }
     }
     
@@ -473,5 +474,12 @@ public class ReservaController {
             return null;
         }
         return LocalDate.parse(value);
+    }
+
+    private String destinoSeguro(String redirectTo, String fallback) {
+        if (redirectTo == null || redirectTo.isBlank() || !redirectTo.startsWith("/") || redirectTo.startsWith("//")) {
+            return fallback;
+        }
+        return redirectTo;
     }
 }

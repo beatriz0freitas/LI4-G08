@@ -2,11 +2,6 @@
 <html lang="pt" xmlns:th="http://www.thymeleaf.org">
 <head>
 	<th:block th:replace="fragments/head :: head"></th:block>
-	<style>
-		.limpeza-table tbody tr:hover {
-			background-color: #fff3cd;
-		}
-	</style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -18,6 +13,7 @@
 			<div class="container-fluid">
 				<div class="row mb-2">
 					<div class="col-sm-6">
+						<span class="section-tag mb-2"><i class="fas fa-broom"></i> Limpeza</span>
 						<h1>Alojamentos pendentes de Limpeza</h1>
 					</div>
 				</div>
@@ -26,10 +22,10 @@
 
 		<section class="content">
 			<div class="container-fluid">
-				<div class="alert alert-success" th:if="${msgSucesso}" th:text="${msgSucesso}"></div>
-				<div class="alert alert-danger" th:if="${msgErro}" th:text="${msgErro}"></div>
+				<div class="alert alert-success alert-dismissible fade show" th:if="${msgSucesso}" th:text="${msgSucesso}"></div>
+				<div class="alert alert-danger alert-dismissible fade show" th:if="${msgErro}" th:text="${msgErro}"></div>
 
-				<div class="callout callout-warning">
+				<div class="callout callout-warning filter-panel mb-3">
 					<i class="fas fa-exclamation-triangle mr-2"></i>
 					<strong th:text="${(totalPendentesLimpeza != null ? totalPendentesLimpeza : 0) + ' alojamentos pendentes de limpeza'}">0 alojamentos pendentes de limpeza</strong>
 				</div>
@@ -39,7 +35,7 @@
 						<h3 class="card-title">Alojamentos pendentes de Limpeza</h3>
 					</div>
 					<div class="card-body table-responsive p-0">
-						<table class="table limpeza-table text-nowrap mb-0">
+						<table class="table table-hover text-nowrap mb-0">
 							<thead>
 							<tr>
 								<th>Alojamento</th>
@@ -53,19 +49,25 @@
 								<td><strong th:text="${alojamento.identificacao}">01</strong></td>
 								<td th:text="${alojamento.tipo}">CANINO</td>
 								<td>
-									<span class="badge badge-warning" th:text="${alojamento.estadoLimpeza}">PENDENTE</span>
+										<span class="badge status-warning" th:text="${alojamento.estadoLimpeza}">PENDENTE</span>
 								</td>
 								<td>
 									<form th:action="@{/limpeza/{id}/limpo(id=${alojamento.id})}" method="post" class="mb-0">
 										<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-										<button type="submit" class="btn btn-success btn-sm">
+											<button type="submit" class="btn btn-primary btn-sm">
 											Marcar como limpo
 										</button>
 									</form>
 								</td>
 							</tr>
 							<tr th:if="${#lists.isEmpty(alojamentosPendentes)}">
-								<td colspan="4" class="text-center text-muted py-4">Não existem alojamentos pendentes de limpeza.</td>
+									<td colspan="4">
+										<div class="empty-state my-3">
+											<i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+											<div class="font-weight-bold mb-1">Não existem alojamentos pendentes de limpeza.</div>
+											<div class="text-muted small">Tudo pronto para novas reservas.</div>
+										</div>
+									</td>
 							</tr>
 							</tbody>
 						</table>

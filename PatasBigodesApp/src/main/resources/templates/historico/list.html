@@ -58,6 +58,7 @@
 
         <section class="content">
             <div class="container-fluid">
+                <th:block th:insert="~{fragments/alerts :: alerts}"></th:block>
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
@@ -90,10 +91,13 @@
                                         <td th:text="${estadia.estado}">EM_CURSO</td>
                                         <td>
                                             <span class="badge badge-info" th:text="${estadia.reserva.alojamento.identificacao}">A1</span>
+                                            <a th:href="@{/estadias/{id}(id=${estadia.id})}" class="btn btn-sm btn-outline-primary ml-2">
+                                                <i class="fas fa-eye mr-1"></i>Detalhes
+                                            </a>
                                             <a th:if="${estadia.estado.toString() == 'EM_CURSO'}"
-                                               th:href="@{/estadias(estadiaId=${estadia.id})}"
-                                               class="btn btn-sm btn-success ml-2">
-                                                <i class="fas fa-right-from-bracket"></i> Preparar Check-out
+                                               th:href="@{/estadias/check-out(estadiaId=${estadia.id},redirectTo=${'/historico'})}"
+                                               class="btn btn-sm btn-warning ml-1">
+                                                <i class="fas fa-right-from-bracket mr-1"></i>Check-out
                                             </a>
                                         </td>
                                     </tr>

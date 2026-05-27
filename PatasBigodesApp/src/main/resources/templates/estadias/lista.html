@@ -24,15 +24,15 @@
                 <th:block th:insert="~{fragments/alerts :: alerts}"></th:block>
                 
                 <!-- Filtros -->
-                <div class="card card-outline card-primary mb-3">
+                <div class="filter-panel mb-3">
                     <div class="card-header">
                         <h3 class="card-title">Filtros</h3>
                     </div>
                     <div class="card-body">
-                        <form class="form-inline" method="get" th:action="@{/estadias/lista}">
-                            <div class="form-group mr-3">
-                                <label for="estado" class="mr-2">Estado:</label>
-                                <select id="estado" name="estado" class="form-control">
+                        <form id="estadiasFiltersForm" class="form-inline flex-wrap" method="get" th:action="@{/estadias/lista}" aria-describedby="estadiasFiltersHint">
+                            <div class="form-group mr-3 mb-2">
+                                <label for="estado" class="mr-2 font-weight-normal">Estado:</label>
+                                <select id="estado" name="estado" class="custom-select">
                                     <option value="">Todos os estados</option>
                                     <option value="EM_CURSO"
                                             th:selected="${filtroEstado != null and filtroEstado == 'EM_CURSO'}">
@@ -44,18 +44,22 @@
                                     </option>
                                 </select>
                             </div>
-                            <div class="form-group mr-3">
-                                <label for="dataInicio" class="mr-2">De:</label>
+                            <div class="form-group mr-3 mb-2">
+                                <label for="dataInicio" class="mr-2 font-weight-normal">De:</label>
                                 <input id="dataInicio" name="dataInicio" type="date" class="form-control" 
                                        th:value="${dataInicio}">
                             </div>
-                            <div class="form-group mr-3">
-                                <label for="dataFim" class="mr-2">Até:</label>
+                            <div class="form-group mr-3 mb-2">
+                                <label for="dataFim" class="mr-2 font-weight-normal">Até:</label>
                                 <input id="dataFim" name="dataFim" type="date" class="form-control" 
                                        th:value="${dataFim}">
                             </div>
-                            <button type="submit" class="btn btn-primary"><i class="fas fa-filter mr-1"></i> Filtrar</button>
+                            <button type="submit" class="btn btn-primary mb-2" id="estadiasFilterButton">
+                                <span class="button-label"><i class="fas fa-filter mr-1"></i> Filtrar</span>
+                                <span class="button-loading d-none"><i class="fas fa-spinner fa-spin mr-1"></i>A aplicar...</span>
+                            </button>
                         </form>
+                        <div id="estadiasFiltersHint" class="small text-muted mt-2">Use os filtros para refinar a lista. O botão mostra feedback enquanto a pesquisa é aplicada.</div>
                     </div>
                 </div>
 
@@ -94,23 +98,21 @@
                                     <td th:text="${estadia.duracao}">Duração</td>
                                     <td>
                                         <span class="badge"
-                                              th:classappend="${estadia.estadoCss == 'st-ocupado' ? 'badge-warning' : 'badge-success'}"
+                                              th:classappend="${estadia.estadoCss == 'st-ocupado' ? 'status-warning' : 'status-success'}"
                                               th:text="${estadia.estadoLabel}">
                                         </span>
                                     </td>
                                     <td>
-                                        <a th:href="@{/estadias/{id}(id=${estadia.id})}" class="btn btn-sm btn-info mr-1" title="Ver">
-                                            <i class="fas fa-eye"></i>
+                                        <a th:href="@{/estadias/{id}(id=${estadia.id})}" class="btn btn-sm btn-outline-primary mr-1" title="Consultar detalhes da estadia">
+                                            <i class="fas fa-eye mr-1"></i> Detalhes
+                                        </a>
+                                        <a th:if="${estadia.reservaId != null}" th:href="@{/reservas/{id}(id=${estadia.reservaId})}" class="btn btn-sm btn-outline-primary mr-1" title="Consultar detalhes da reserva">
+                                            <i class="fas fa-calendar-check mr-1"></i> Reserva
                                         </a>
                                         <th:block th:if="${estadia.estado.name() == 'EM_CURSO'}">
-                                            <form method="post" th:action="@{/estadias/check-out}" style="display: inline;">
-                                                <input type="hidden" name="estadiaId" th:value="${estadia.id}">
-                                                <input type="hidden" name="metodoPagamento" value="TRANSFERENCIA_BANCARIA">
-                                                <button type="submit" class="btn btn-sm btn-success" title="Realizar Check-out" 
-                                                        onclick="return confirm('Tem a certeza que deseja realizar o check-out?')">
-                                                    <i class="fas fa-sign-out-alt"></i> Check-out
-                                                </button>
-                                            </form>
+                                            <a th:href="@{/estadias/check-out(estadiaId=${estadia.id},redirectTo=${'/estadias/lista'})}" class="btn btn-sm btn-primary" title="Realizar check-out">
+                                                <i class="fas fa-sign-out-alt mr-1"></i> Check-out
+                                            </a>
                                         </th:block>
                                     </td>
                                 </tr>
@@ -126,5 +128,28 @@
     </div>
     <th:block th:insert="~{fragments/footer :: footer}"></th:block>
 </div>
+<script>
+    (function () {
+        const form = document.getElementById('estadiasFiltersForm');
+        const button = document.getElementById('estadiasFilterButton');
+
+        if (!form || !button) {
+            return;
+        }
+
+        form.addEventListener('submit', function () {
+            const label = button.querySelector('.button-label');
+            const loading = button.querySelector('.button-loading');
+
+            button.disabled = true;
+            if (label) {
+                label.classList.add('d-none');
+            }
+            if (loading) {
+                loading.classList.remove('d-none');
+            }
+        });
+    })();
+</script>
 </body>
 </html>

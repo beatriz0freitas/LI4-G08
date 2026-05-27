@@ -69,7 +69,7 @@ public class PlanoCuidadosController {
         } catch (Exception e) {
             log.error("Erro ao obter plano para estadia {}: {}", estadiaId, e.getMessage());
             model.addAttribute("error", "Plano de cuidados não encontrado");
-            return "redirect:/estadias?error=plano-nao-encontrado";
+            return "redirect:/estadias/lista?error=plano-nao-encontrado";
         }
     }
 
@@ -87,7 +87,7 @@ public class PlanoCuidadosController {
         } catch (Exception e) {
             log.error("Erro ao criar plano: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao criar plano: " + e.getMessage());
-            return "redirect:/estadias?estadiaId=" + estadiaId;
+            return "redirect:/estadias/" + estadiaId;
         }
     }
 
@@ -217,11 +217,11 @@ public class PlanoCuidadosController {
         try {
             planoCuidadosService.encerrarPlano(planoCuidadosId);
             redirectAttributes.addFlashAttribute("successMessage", "Plano de cuidados encerrado");
-            return "redirect:/estadias?estadiaId=" + estadiaId;
+            return "redirect:/estadias/check-out?estadiaId=" + estadiaId + "&redirectTo=/estadias/" + estadiaId;
         } catch (Exception e) {
             log.error("Erro ao encerrar plano: {}", e.getMessage());
             redirectAttributes.addFlashAttribute("errorMessage", "Erro ao encerrar plano: " + e.getMessage());
-            return "redirect:/estadias?estadiaId=" + estadiaId;
+            return "redirect:/estadias/check-out?estadiaId=" + estadiaId + "&redirectTo=/estadias/" + estadiaId;
         }
     }
 

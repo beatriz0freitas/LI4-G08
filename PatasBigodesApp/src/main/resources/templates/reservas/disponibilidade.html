@@ -103,23 +103,37 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-sm-6 col-md-4 col-lg-3 mb-3" th:each="alojamento : ${mapaAlojamentos}">
-                                        <button type="button" class="map-box js-map-box" data-toggle="modal" data-target="#alojamentoModal"
-                                                th:classappend="${alojamento.estadoCss}"
-                                                th:data-id="${alojamento.alojamentoId}"
-                                                th:data-identificacao="${alojamento.identificacao}"
-                                                th:data-tipo="${alojamento.tipoLabel}"
-                                                th:data-estado="${alojamento.estadoLabel}"
-                                                th:data-css="${alojamento.estadoCss}"
-                                                th:data-animal="${alojamento.animalNome ?: ''}"
-                                                th:data-motivo="${alojamento.motivoIndisponibilidade ?: ''}"
-                                                th:data-estadia="${alojamento.estadiaId ?: ''}"
-                                                th:data-reserva="${alojamento.reservaId ?: ''}"
-                                                th:data-disponivel="${alojamento.disponivel}">
+                                        <div tabindex="0" role="button" class="map-box js-map-box" 
+                                             th:classappend="${alojamento.estadoCss}"
+                                             th:data-id="${alojamento.alojamentoId}"
+                                             th:data-identificacao="${alojamento.identificacao}"
+                                             th:data-tipo="${alojamento.tipoLabel}"
+                                             th:data-estado="${alojamento.estadoLabel}"
+                                             th:data-css="${alojamento.estadoCss}"
+                                             th:data-animal="${alojamento.animalNome ?: ''}"
+                                             th:data-motivo="${alojamento.motivoIndisponibilidade ?: ''}"
+                                             th:data-estadia="${alojamento.estadiaId ?: ''}"
+                                             th:data-reserva="${alojamento.reservaId ?: ''}"
+                                             th:data-reserva-inicio="${alojamento.dataReservaInicio ?: ''}"
+                                             th:data-reserva-fim="${alojamento.dataReservaFim ?: ''}"
+                                             th:data-disponivel="${alojamento.disponivel}">
                                             <strong class="d-block" th:text="${alojamento.identificacao}">Box 01</strong>
                                             <small class="text-muted d-block mb-2" th:text="${alojamento.tipoLabel}">Canil</small>
                                             <span class="badge" th:classappend="${alojamento.estado == 'LIVRE' ? 'badge-success' : (alojamento.estado == 'OCUPADO' ? 'badge-danger' : (alojamento.estado == 'RESERVADO' ? 'badge-primary' : 'badge-warning'))}"
                                                   th:text="${alojamento.estadoLabel}">Livre</span>
-                                        </button>
+                                        </div>
+
+                                        <div class="map-box-details mt-2 d-none" th:attr="id=${'details-' + alojamento.alojamentoId}">
+                                            <h5 class="mb-1" th:text="${alojamento.identificacao}">Box 01</h5>
+                                            <span class="detail-state mb-2" th:classappend="${alojamento.estadoCss}" th:text="${alojamento.estadoLabel}">Livre</span>
+                                            <dl class="row mt-2 mb-2 small">
+                                                <dt class="col-5">Tipo</dt><dd class="col-7" th:text="${alojamento.tipoLabel}">Canil</dd>
+                                                <dt class="col-5">Animal</dt><dd class="col-7" th:text="${alojamento.animalNome ?: 'Sem animal associado'}">Sem animal</dd>
+                                            </dl>
+                                            <div class="d-flex flex-wrap align-items-center">
+                                                <div class="action-buttons" th:attr="data-id=${alojamento.alojamentoId}"></div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-12 text-center text-muted py-4"
                                          th:if="${mapaAlojamentos == null or #lists.isEmpty(mapaAlojamentos)}">
@@ -145,88 +159,75 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
-<!-- Modal de Detalhe do Alojamento -->
-<div class="modal fade" id="alojamentoModal" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modal-title">Detalhe do Alojamento</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <h4 id="modal-name" class="mb-2">Box 01</h4>
-                <span id="modal-state" class="detail-state mb-3">Livre</span>
-                <dl class="row mt-3 mb-0">
-                    <dt class="col-5">Tipo</dt><dd class="col-7" id="modal-type">Canil</dd>
-                    <dt class="col-5">Animal</dt><dd class="col-7" id="modal-animal">Sem animal associado</dd>
-                    <dt class="col-5">Contexto</dt><dd class="col-7" id="modal-reason">Disponível para reserva</dd>
-                </dl>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-                <div id="modal-actions"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script th:inline="javascript">
-    document.querySelectorAll('.js-map-box').forEach(function (box) {
-        box.addEventListener('click', function (e) {
-            e.preventDefault();
-            
-            // Atualizar dados do modal
-            document.getElementById('modal-name').textContent = box.dataset.identificacao;
-            document.getElementById('modal-type').textContent = box.dataset.tipo;
-            document.getElementById('modal-animal').textContent = box.dataset.animal || 'Sem animal associado';
-            document.getElementById('modal-reason').textContent = box.dataset.motivo || 'Disponível para reserva';
-            
-            var state = document.getElementById('modal-state');
-            state.textContent = box.dataset.estado;
-            state.className = 'detail-state mb-3 ' + box.dataset.css;
-            
-            // Atualizar ações
-            var actions = document.getElementById('modal-actions');
-            var dataInicio = /*[[${dataInicio}]]*/ '';
-            var dataFim = /*[[${dataFim}]]*/ '';
-            var estado = box.dataset.estado;
-            var estadiaId = box.dataset.estadia;
-            var reservaId = box.dataset.reserva;
-            var disponivel = box.dataset.disponivel === 'true';
-            
-            var actionsHtml = '';
-            
-            // Check-in: quando alojamento está LIVRE e existe uma reserva
-            if (estado === 'Livre' && reservaId) {
-                actionsHtml = '<form class="d-inline-block mr-2" method="post" action="/estadias/check-in" style="display: inline;">' +
-                              '<input type="hidden" name="reservaId" value="' + reservaId + '">' +
-                              '<input type="hidden" name="metodoPagamento" value="TRANSFERENCIA_BANCARIA">' +
-                              '<button type="submit" class="btn btn-success btn-sm">Realizar Check-in</button>' +
-                              '</form>' +
-                              '<form class="d-inline-block mr-2" method="post" action="/reservas/' + reservaId + '/cancelar" style="display: inline;">' +
-                              '<button type="submit" class="btn btn-danger btn-sm" onclick="return confirm(\'Tem a certeza que deseja cancelar esta reserva?\')">Cancelar Reserva</button>' +
-                              '</form>' +
-                              '<a class="btn btn-secondary btn-sm" href="/reservas/' + reservaId + '">Ver Detalhes</a>';
-            }
-            // Check-out: quando alojamento está OCUPADO e existe uma estadia
-            else if (estado === 'Ocupado' && estadiaId) {
-                actionsHtml = '<form class="d-inline-block mr-2" method="post" action="/estadias/check-out" style="display: inline;">' +
-                              '<input type="hidden" name="estadiaId" value="' + estadiaId + '">' +
-                              '<input type="hidden" name="metodoPagamento" value="TRANSFERENCIA_BANCARIA">' +
-                              '<button type="submit" class="btn btn-warning btn-sm" onclick="return confirm(\'Tem a certeza que deseja realizar o check-out?\')">Realizar Check-out</button>' +
-                              '</form>' +
-                              '<a class="btn btn-secondary btn-sm" href="/estadias/lista">Ver Estadia</a>';
-            }
-            // Criar reserva: quando alojamento está disponível
-            else if (disponivel) {
-                actionsHtml = '<a class="btn btn-success btn-sm" href="/reservas/novo?alojamentoId=' + box.dataset.id + '&dataInicio=' + dataInicio + '&dataFim=' + dataFim + '">Criar Reserva</a>';
-            }
-            
-            actions.innerHTML = actionsHtml;
+    (function () {
+        document.querySelectorAll('.js-map-box').forEach(function (box) {
+            box.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                var id = box.getAttribute('data-id') || box.dataset.id;
+                var details = document.getElementById('details-' + id);
+                if (!details) return;
+
+                var isOpen = !details.classList.contains('d-none');
+                // close other open details
+                document.querySelectorAll('.map-box-details').forEach(function (d) { if (d !== details) d.classList.add('d-none'); });
+                if (isOpen) { details.classList.add('d-none'); return; }
+
+                // populate inline details
+                var nameEl = details.querySelector('h5');
+                var stateEl = details.querySelector('.detail-state');
+                var dd = details.querySelectorAll('dd.col-7');
+
+                if (nameEl) nameEl.textContent = box.dataset.identificacao || '';
+                if (stateEl) {
+                    stateEl.textContent = box.dataset.estado || '';
+                    stateEl.className = 'detail-state mb-2 ' + (box.dataset.css || '');
+                }
+                if (dd && dd.length >= 1) dd[0].textContent = box.dataset.tipo || '';
+                if (dd && dd.length >= 2) dd[1].textContent = box.dataset.animal || 'Sem animal associado';
+
+                // build actions horizontally
+                var actionsContainer = details.querySelector('.action-buttons');
+                var dataInicio = /*[[${dataInicio}]]*/ '';
+                var dataFim = /*[[${dataFim}]]*/ '';
+                var csrfParameter = /*[[${_csrf != null ? _csrf.parameterName : ''}]]*/ '';
+                var csrfToken = /*[[${_csrf != null ? _csrf.token : ''}]]*/ '';
+                var estado = box.dataset.estado;
+                var estadiaId = box.dataset.estadia;
+                var reservaId = box.dataset.reserva;
+                var disponivel = box.dataset.disponivel === 'true';
+                var returnUrl = window.location.pathname + window.location.search;
+
+                function csrfInput() { return csrfParameter && csrfToken ? '<input type="hidden" name="' + csrfParameter + '" value="' + csrfToken + '">' : ''; }
+                function hiddenReturn() { return '<input type="hidden" name="redirectTo" value="' + returnUrl.replace(/"/g, '&quot;') + '">'; }
+
+                var html = '';
+                if (estado === 'Reservado' && reservaId) {
+                    html = '<a class="btn btn-success btn-sm mr-2" href="/estadias/check-in?reservaId=' + encodeURIComponent(reservaId) + '&redirectTo=' + encodeURIComponent(returnUrl) + '">Registar check-in</a>' +
+                           '<form class="mb-0 mr-2" method="post" action="/reservas/' + reservaId + '/cancelar" style="display:inline-block">' + csrfInput() + hiddenReturn() +
+                           '<button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm(\'Tem a certeza que deseja cancelar esta reserva?\')">Cancelar reserva</button>' +
+                           '</form>' +
+                           '<a class="btn btn-outline-secondary btn-sm" href="/reservas/' + reservaId + '">Consultar detalhes</a>';
+                } else if (estado === 'Ocupado' && estadiaId) {
+                    html = '<a class="btn btn-warning btn-sm mr-2" href="/estadias/check-out?estadiaId=' + encodeURIComponent(estadiaId) + '&redirectTo=' + encodeURIComponent(returnUrl) + '">Registar check-out</a>' +
+                           (reservaId ? '<a class="btn btn-outline-secondary btn-sm" href="/reservas/' + reservaId + '">Consultar detalhes</a>' : '');
+                } else if (disponivel) {
+                    html = '<a class="btn btn-success btn-sm" href="/reservas/novo?alojamentoId=' + box.dataset.id + '&dataInicio=' + dataInicio + '&dataFim=' + dataFim + '">Criar reserva</a>';
+                }
+
+                actionsContainer.innerHTML = html;
+                details.classList.remove('d-none');
+
+                // accessibility: focus first action
+                var firstAction = details.querySelector('.action-buttons a, .action-buttons button');
+                if (firstAction) firstAction.focus();
+            });
+
+            // allow keyboard activation
+            box.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); box.click(); } });
         });
-    });
+    })();
 </script>
 </body>
 </html>

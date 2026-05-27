@@ -26,21 +26,7 @@
 
 			<section class="content">
 				<div class="container-fluid">
-					<div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-						<i class="fas fa-exclamation-circle mr-2"></i>
-						<span th:text="${errorMessage}">Erro</span>
-						<button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-
-					<div th:if="${warningMessage}" class="alert alert-warning alert-dismissible fade show" role="alert">
-						<i class="fas fa-exclamation-triangle mr-2"></i>
-						<span th:text="${warningMessage}">Aviso</span>
-						<button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
+					<th:block th:insert="~{fragments/alerts :: alerts}"></th:block>
 
 					<div class="card card-primary card-outline">
 						<div class="card-header">
@@ -187,7 +173,7 @@
 															<div class="col-md-6">
 																<div class="form-group">
 																	<label for="dataInicio">Data de início <span class="text-danger">*</span></label>
-																	<input type="date" name="dataInicio" id="dataInicio" class="form-control" th:value="${reservaForm.dataInicio}" th:attr="min=${dataMinima}" th:classappend="${#fields.hasErrors('dataInicio')} ? ' is-invalid' : ''" required>
+																	<input type="datetime-local" name="dataInicio" id="dataInicio" class="form-control" th:value="${reservaForm.dataInicio}" th:attr="min=${dataMinima}" th:classappend="${#fields.hasErrors('dataInicio')} ? ' is-invalid' : ''" required>
 																	<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('dataInicio')}">
 																		<div th:each="err : ${#fields.errors('dataInicio')}" th:text="${err}">Erro</div>
 																	</div>
@@ -196,7 +182,7 @@
 															<div class="col-md-6">
 																<div class="form-group">
 																	<label for="dataFim">Data de fim <span class="text-danger">*</span></label>
-																	<input type="date" name="dataFim" id="dataFim" class="form-control" th:value="${reservaForm.dataFim}" th:classappend="${#fields.hasErrors('dataFim')} ? ' is-invalid' : ''" required>
+																	<input type="datetime-local" name="dataFim" id="dataFim" class="form-control" th:value="${reservaForm.dataFim}" th:classappend="${#fields.hasErrors('dataFim')} ? ' is-invalid' : ''" required>
 																	<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('dataFim')}">
 																		<div th:each="err : ${#fields.errors('dataFim')}" th:text="${err}">Erro</div>
 																	</div>
@@ -242,7 +228,7 @@
 															<label for="alojamentoId">Alojamento <span class="text-danger">*</span></label>
 															<select th:field="*{alojamentoId}" id="alojamentoId" class="form-control" th:classappend="${#fields.hasErrors('alojamentoId')} ? ' is-invalid' : ''" required>
 																<option value="">-- Selecione um alojamento --</option>
-																<option th:each="d : ${disponibilidades}" th:value="${d.alojamentoId}" th:text="${d.identificacao + ' (' + d.tipoLabel + ', capacidade ' + d.capacidade + ')'}">Alojamento</option>
+																<option th:each="d : ${disponibilidades}" th:value="${d.alojamentoId}" th:text="${d.identificacao + ' (' + d.tipoLabel + ')'}">Alojamento</option>
 															</select>
 															<div class="invalid-feedback d-block" th:if="${#fields.hasErrors('alojamentoId')}">
 																<div th:each="err : ${#fields.errors('alojamentoId')}" th:text="${err}">Erro</div>
@@ -255,7 +241,6 @@
 															<div th:each="d : ${disponibilidades}" th:if="${d.alojamentoId == reservaForm.alojamentoId}">
 																<div><strong>Identificação:</strong> <span th:text="${d.identificacao}">Alojamento</span></div>
 																<div><strong>Tipo:</strong> <span th:text="${d.tipoLabel}">Tipo</span></div>
-																<div><strong>Capacidade:</strong> <span th:text="${d.capacidade + ' lugar(es)'}">Capacidade</span></div>
 															</div>
 														</div>
 													</div>
@@ -333,6 +318,19 @@
 											</div>
 										</div>
 									</form>
+									<script>
+										(function () {
+											// Normalize date-only values to datetime-local (append T00:00)
+											['dataInicio', 'dataFim'].forEach(function (id) {
+												var el = document.getElementById(id);
+												if (!el) return;
+												var v = el.value || '';
+												if (/^\d{4}-\d{2}-\d{2}$/.test(v)) {
+													el.value = v + 'T00:00';
+												}
+											});
+										})();
+									</script>
 								</div>
 							</div>
 						</div>

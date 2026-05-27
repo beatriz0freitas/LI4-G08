@@ -195,7 +195,7 @@ class PlanoCuidadosControllerTest {
                 .with(csrf())
                 .param("estadiaId", "1"))
             .andExpect(status().is3xxRedirection())
-            .andExpect(redirectedUrl("/estadias?estadiaId=1"));
+            .andExpect(redirectedUrl("/estadias/check-out?estadiaId=1&redirectTo=/estadias/1"));
 
         verify(planoCuidadosService).encerrarPlano(1L);
     }
