@@ -1,153 +1,254 @@
 @startuml
-title Sistema Patas & Bigodes - Diagrama de Componentes
+title Sistema Patas & Bigodes - Diagrama de Componentes 
 
 skinparam style strictuml
 skinparam componentStyle uml2
-skinparam packageStyle rectangle
 skinparam shadowing false
-skinparam linetype ortho
 skinparam backgroundColor white
 skinparam defaultFontName Arial
-skinparam nodesep 95
-skinparam ranksep 110
 
-left to right direction
+' Força o uso de linhas retas diretas (oblíquas/diagonais) sem curvas
+skinparam linetype polyline
 
-actor "Utilizador" as Utilizador
+' Aumenta o espaçamento para expandir os componentes grandes e evitar interceções
+skinparam nodesep 120
+skinparam ranksep 180
+skinparam padding 15
+skinparam componentPadding 20
 
-() "IColaboradorService" as IColaboradorService
-() "IDashboardService" as IDashboardService
-() "IAlojamentoService" as IAlojamentoService
-() "ITutorService" as ITutorService
-() "IAnimalService" as IAnimalService
-() "IReservaService" as IReservaService
-() "IEstadiaService" as IEstadiaService
-() "IPagamentoService" as IPagamentoService
-() "IRegistoCuidadoService" as IRegistoCuidadoService
-() "IPlanoCuidadosService" as IPlanoCuidadosService
-() "INotaService" as INotaService
-() "IServicoExtraService" as IServicoExtraService
-() "IClinicaService" as IClinicaService
-() "IIntervencaoClinicaService" as IIntervencaoClinicaService
-() "IAlteracaoEstadoSaudeService" as IAlteracaoEstadoSaudeService
-() "ILimpezaService" as ILimpezaService
-() "IHistoricoService" as IHistoricoService
-() "IRelatorioService" as IRelatorioService
-() "IRegraDominioService" as IRegraDominioService
-() "IAvailabilityDomainService" as IAvailabilityDomainService
-() "IAuditoriaService" as IAuditoriaService
-
-package "pt.hotel.animais.controller" as ControllerPkg {
-  component "AuthController" as AuthController
-  component "DashboardController" as DashboardController
-  component "AlojamentoController" as AlojamentoController
-  component "TutorAnimalController" as TutorAnimalController
-  component "AnimalController" as AnimalController
-  component "ReservaController" as ReservaController
-  component "EstadiaController" as EstadiaController
-  component "PagamentoController" as PagamentoController
-  component "RegistoCuidadoController" as RegistoCuidadoController
-  component "PlanoCuidadosController" as PlanoCuidadosController
-  component "NotaController" as NotaController
-  component "ServicoExtraController" as ServicoExtraController
-  component "ClinicaController" as ClinicaController
-  component "LimpezaController" as LimpezaController
-  component "HistoricoController" as HistoricoController
-  component "RelatorioController" as RelatorioController
-  component "ColaboradorController" as ColaboradorController
-  component "TipoAlojamentoTarifaController" as TipoAlojamentoTarifaController
-  component "TipoServicoExtraController" as TipoServicoExtraController
-  component "AuditoriaController" as AuditoriaController
-}
-
-package "pt.hotel.animais.service" as ServicePkg {
-  component "ColaboradorService" as ColaboradorService
-  component "DashboardService" as DashboardService
-  component "AlojamentoService" as AlojamentoService
-  component "TutorService" as TutorService
-  component "AnimalService" as AnimalService
-  component "ReservaService" as ReservaService
-  component "EstadiaService" as EstadiaService
-  component "PagamentoService" as PagamentoService
-  component "RegistoCuidadoService" as RegistoCuidadoService
-  component "PlanoCuidadosService" as PlanoCuidadosService
-  component "NotaService" as NotaService
-  component "ServicoExtraService" as ServicoExtraService
-  component "ClinicaService" as ClinicaService
-  component "IntervencaoClinicaService" as IntervencaoClinicaService
-  component "AlteracaoEstadoSaudeService" as AlteracaoEstadoSaudeService
-  component "LimpezaService" as LimpezaService
-  component "HistoricoService" as HistoricoService
-  component "RelatorioService" as RelatorioService
-  component "TipoAlojamentoTarifaService" as TipoAlojamentoTarifaService
-  component "TipoServicoExtraService" as TipoServicoExtraService
-  component "RegraDominioService" as RegraDominioService
-  component "AvailabilityDomainService" as AvailabilityDomainService
-}
-
-package "pt.hotel.animais.service.auditoria" as AuditoriaServicePkg {
-  component "AuditoriaService" as AuditoriaService
-  component "AuditoriaOperacaoService" as AuditoriaOperacaoService
-}
-
-package "pt.hotel.animais.repository" as RepositoryPkg {
-  component "ColaboradorRepository" as ColaboradorRepository
-  component "AlojamentoRepository" as AlojamentoRepository
-  component "TutorRepository" as TutorRepository
-  component "AnimalRepository" as AnimalRepository
-  component "ReservaRepository" as ReservaRepository
-  component "EstadiaRepository" as EstadiaRepository
-  component "PagamentoRepository" as PagamentoRepository
-  component "RegistoCuidadoRepository" as RegistoCuidadoRepository
-  component "PlanoCuidadosRepository" as PlanoCuidadosRepository
-  component "TarefaCuidadoRepository" as TarefaCuidadoRepository
-  component "NotaRepository" as NotaRepository
-  component "ServicoExtraRepository" as ServicoExtraRepository
-  component "TipoServicoExtraRepository" as TipoServicoExtraRepository
-  component "IntervencaoClinicaRepository" as IntervencaoClinicaRepository
-  component "AlteracaoEstadoSaudeRepository" as AlteracaoEstadoSaudeRepository
-  component "TipoAlojamentoTarifaRepository" as TipoAlojamentoTarifaRepository
-  component "AuditoriaRepository" as AuditoriaRepository
-}
-
+top to bottom direction
 database "hotelanimais" as DB
 
-Utilizador -[hidden]right-> ControllerPkg
-ControllerPkg -[hidden]right-> ServicePkg
-ServicePkg -[hidden]right-> AuditoriaServicePkg
-AuditoriaServicePkg -[hidden]right-> RepositoryPkg
-RepositoryPkg -[hidden]right-> DB
 
-Utilizador --> AuthController
-Utilizador --> DashboardController
+' ==========================================
+' CAMADA 1: CONTROLLERS
+' ==========================================
+component "Controllers" as LayerControllers {
+  portin " " as PIn_Ctrl
+  portout " " as POut_Ctrl
 
-ColaboradorService - IColaboradorService
-DashboardService - IDashboardService
-AlojamentoService - IAlojamentoService
-TutorService - ITutorService
-AnimalService - IAnimalService
-ReservaService - IReservaService
-EstadiaService - IEstadiaService
-PagamentoService - IPagamentoService
-RegistoCuidadoService - IRegistoCuidadoService
-PlanoCuidadosService - IPlanoCuidadosService
-NotaService - INotaService
-ServicoExtraService - IServicoExtraService
-ClinicaService - IClinicaService
-IntervencaoClinicaService - IIntervencaoClinicaService
-AlteracaoEstadoSaudeService - IAlteracaoEstadoSaudeService
-LimpezaService - ILimpezaService
-HistoricoService - IHistoricoService
-RelatorioService - IRelatorioService
-RegraDominioService - IRegraDominioService
-AvailabilityDomainService - IAvailabilityDomainService
-AuditoriaService - IAuditoriaService
+  component "AuthController"
+  component "DashboardController"
+  component "AlojamentoController"
+  component "TutorAnimalController"
+  component "AnimalController"
+  component "ReservaController"
+  component "EstadiaController"
+  component "PagamentoController"
+  component "RegistoCuidadoController"
+  component "PlanoCuidadosController"
+  component "NotaController"
+  component "ServicoExtraController"
+  component "ClinicaController"
+  component "LimpezaController"
+  component "HistoricoController"
+  component "RelatorioController"
+  component "ColaboradorController"
+  component "TipoAlojamentoTarifaController"
+  component "TipoServicoExtraController"
+  component "AuditoriaController"
 
-ControllerPkg ..> ServicePkg
-ControllerPkg ..> AuditoriaServicePkg
-ServicePkg ..> AuditoriaServicePkg
-ServicePkg ..> RepositoryPkg
-AuditoriaServicePkg ..> RepositoryPkg
-RepositoryPkg --> DB
+  ' Ligações diretas da porta de entrada aos controllers (sem lollipops)
+  PIn_Ctrl --> AuthController
+  PIn_Ctrl --> DashboardController
+  PIn_Ctrl --> AlojamentoController
+  PIn_Ctrl --> TutorAnimalController
+  PIn_Ctrl --> AnimalController
+  PIn_Ctrl --> ReservaController
+  PIn_Ctrl --> EstadiaController
+  PIn_Ctrl --> PagamentoController
+  PIn_Ctrl --> RegistoCuidadoController
+  PIn_Ctrl --> PlanoCuidadosController
+  PIn_Ctrl --> NotaController
+  PIn_Ctrl --> ServicoExtraController
+  PIn_Ctrl --> ClinicaController
+  PIn_Ctrl --> LimpezaController
+  PIn_Ctrl --> HistoricoController
+  PIn_Ctrl --> RelatorioController
+  PIn_Ctrl --> ColaboradorController
+  PIn_Ctrl --> TipoAlojamentoTarifaController
+  PIn_Ctrl --> TipoServicoExtraController
+  PIn_Ctrl --> AuditoriaController
+  
+  AuthController --> POut_Ctrl
+  DashboardController --> POut_Ctrl
+  AlojamentoController --> POut_Ctrl
+  TutorAnimalController --> POut_Ctrl
+  AnimalController --> POut_Ctrl
+  ReservaController --> POut_Ctrl
+  EstadiaController --> POut_Ctrl
+  PagamentoController --> POut_Ctrl
+  RegistoCuidadoController --> POut_Ctrl
+  PlanoCuidadosController --> POut_Ctrl
+  NotaController --> POut_Ctrl
+  ServicoExtraController --> POut_Ctrl
+  ClinicaController --> POut_Ctrl
+  LimpezaController --> POut_Ctrl
+  HistoricoController --> POut_Ctrl
+  RelatorioController --> POut_Ctrl
+  ColaboradorController --> POut_Ctrl
+  TipoAlojamentoTarifaController --> POut_Ctrl
+  TipoServicoExtraController --> POut_Ctrl
+  AuditoriaController --> POut_Ctrl
+}
+
+' ==========================================
+' CAMADA 2: SERVICES
+' ==========================================
+component "Services" as LayerServices {
+  portin " " as PIn_Srv
+  portout " " as POut_Srv
+
+  component "ColaboradorService"
+  component "DashboardService"
+  component "AlojamentoService"
+  component "TutorService"
+  component "AnimalService"
+  component "ReservaService"
+  component "EstadiaService"
+  component "PagamentoService"
+  component "RegistoCuidadoService"
+  component "PlanoCuidadosService"
+  component "NotaService"
+  component "ServicoExtraService"
+  component "ClinicaService"
+  component "IntervencaoClinicaService"
+  component "AlteracaoEstadoSaudeService"
+  component "LimpezaService"
+  component "HistoricoService"
+  component "RelatorioService"
+  component "TipoAlojamentoTarifaService"
+  component "TipoServicoExtraService"
+  component "RegraDominioService"
+  component "AvailabilityDomainService"
+  component "AuditoriaService"
+  component "AuditoriaOperacaoService"
+
+  PIn_Srv -(0)- ColaboradorService : IColaboradorService
+  PIn_Srv -(0)- DashboardService : IDashboardService
+  PIn_Srv -(0)- AlojamentoService : IAlojamentoService
+  PIn_Srv -(0)- TutorService : ITutorService
+  PIn_Srv -(0)- AnimalService : IAnimalService
+  PIn_Srv -(0)- ReservaService : IReservaService
+  PIn_Srv -(0)- EstadiaService : IEstadiaService
+  PIn_Srv -(0)- PagamentoService : IPagamentoService
+  PIn_Srv -(0)- RegistoCuidadoService : IRegistoCuidadoService
+  PIn_Srv -(0)- PlanoCuidadosService : IPlanoCuidadosService
+  PIn_Srv -(0)- NotaService : INotaService
+  PIn_Srv -(0)- ServicoExtraService : IServicoExtraService
+  PIn_Srv -(0)- ClinicaService : IClinicaService
+  PIn_Srv -(0)- IntervencaoClinicaService : IIntervencaoClinicaService
+  PIn_Srv -(0)- AlteracaoEstadoSaudeService : IAlteracaoEstadoSaudeService
+  PIn_Srv -(0)- LimpezaService : ILimpezaService
+  PIn_Srv -(0)- HistoricoService : IHistoricoService
+  PIn_Srv -(0)- RelatorioService : IRelatorioService
+  PIn_Srv -(0)- TipoAlojamentoTarifaService : ITipoAlojamentoTarifaService
+  PIn_Srv -(0)- TipoServicoExtraService : ITipoServicoExtraService
+  PIn_Srv -(0)- RegraDominioService : IRegraDominioService
+  PIn_Srv -(0)- AvailabilityDomainService : IAvailabilityDomainService
+  PIn_Srv -(0)- AuditoriaService : IAuditoriaService
+  PIn_Srv -(0)- AuditoriaOperacaoService : IAuditoriaOperacaoService
+
+  ColaboradorService --> POut_Srv
+  DashboardService --> POut_Srv
+  AlojamentoService --> POut_Srv
+  TutorService --> POut_Srv
+  AnimalService --> POut_Srv
+  ReservaService --> POut_Srv
+  EstadiaService --> POut_Srv
+  PagamentoService --> POut_Srv
+  RegistoCuidadoService --> POut_Srv
+  PlanoCuidadosService --> POut_Srv
+  NotaService --> POut_Srv
+  ServicoExtraService --> POut_Srv
+  ClinicaService --> POut_Srv
+  IntervencaoClinicaService --> POut_Srv
+  AlteracaoEstadoSaudeService --> POut_Srv
+  LimpezaService --> POut_Srv
+  HistoricoService --> POut_Srv
+  RelatorioService --> POut_Srv
+  TipoAlojamentoTarifaService --> POut_Srv
+  TipoServicoExtraService --> POut_Srv
+  RegraDominioService --> POut_Srv
+  AvailabilityDomainService --> POut_Srv
+  AuditoriaService --> POut_Srv
+  AuditoriaOperacaoService --> POut_Srv
+}
+
+' ==========================================
+' CAMADA 3: REPOSITORIES
+' ==========================================
+component "Repositories" as LayerRepositories {
+  portin " " as PIn_Repo
+  portout " " as POut_Repo
+
+  component "ColaboradorRepository"
+  component "AlojamentoRepository"
+  component "TutorRepository"
+  component "AnimalRepository"
+  component "ReservaRepository"
+  component "EstadiaRepository"
+  component "PagamentoRepository"
+  component "RegistoCuidadoRepository"
+  component "PlanoCuidadosRepository"
+  component "TarefaCuidadoRepository"
+  component "NotaRepository"
+  component "ServicoExtraRepository"
+  component "TipoServicoExtraRepository"
+  component "IntervencaoClinicaRepository"
+  component "AlteracaoEstadoSaudeRepository"
+  component "TipoAlojamentoTarifaRepository"
+  component "AuditoriaRepository"
+
+  PIn_Repo -(0)- ColaboradorRepository : ColaboradorRepository
+  PIn_Repo -(0)- AlojamentoRepository : AlojamentoRepository
+  PIn_Repo -(0)- TutorRepository : TutorRepository
+  PIn_Repo -(0)- AnimalRepository : AnimalRepository
+  PIn_Repo -(0)- ReservaRepository : ReservaRepository
+  PIn_Repo -(0)- EstadiaRepository : EstadiaRepository
+  PIn_Repo -(0)- PagamentoRepository : PagamentoRepository
+  PIn_Repo -(0)- RegistoCuidadoRepository : RegistoCuidadoRepository
+  PIn_Repo -(0)- PlanoCuidadosRepository : PlanoCuidadosRepository
+  PIn_Repo -(0)- TarefaCuidadoRepository : TarefaCuidadoRepository
+  PIn_Repo -(0)- NotaRepository : NotaRepository
+  PIn_Repo -(0)- ServicoExtraRepository : ServicoExtraRepository
+  PIn_Repo -(0)- TipoServicoExtraRepository : TipoServicoExtraRepository
+  PIn_Repo -(0)- IntervencaoClinicaRepository : IntervencaoClinicaRepository
+  PIn_Repo -(0)- AlteracaoEstadoSaudeRepository : AlteracaoEstadoSaudeRepository
+  PIn_Repo -(0)- TipoAlojamentoTarifaRepository : TipoAlojamentoTarifaRepository
+  PIn_Repo -(0)- AuditoriaRepository : AuditoriaRepository
+  
+  ColaboradorRepository --> POut_Repo
+  AlojamentoRepository --> POut_Repo
+  TutorRepository --> POut_Repo
+  AnimalRepository --> POut_Repo
+  ReservaRepository --> POut_Repo
+  EstadiaRepository --> POut_Repo
+  PagamentoRepository --> POut_Repo
+  RegistoCuidadoRepository --> POut_Repo
+  PlanoCuidadosRepository --> POut_Repo
+  TarefaCuidadoRepository --> POut_Repo
+  NotaRepository --> POut_Repo
+  ServicoExtraRepository --> POut_Repo
+  TipoServicoExtraRepository --> POut_Repo
+  IntervencaoClinicaRepository --> POut_Repo
+  AlteracaoEstadoSaudeRepository --> POut_Repo
+  TipoAlojamentoTarifaRepository --> POut_Repo
+  AuditoriaRepository --> POut_Repo
+}
+
+' ==========================================
+' LIGAÇÕES EXTERNAS (MACRO LOLLIPOPS)
+' ==========================================
+
+() "API" as API
+
+API -- PIn_Ctrl 
+
+POut_Ctrl -(0)- PIn_Srv 
+
+POut_Srv -(0)- PIn_Repo
+
+POut_Repo --> DB
 
 @enduml
