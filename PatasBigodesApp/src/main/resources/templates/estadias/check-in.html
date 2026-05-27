@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt">
+<head th:insert="~{fragments/head :: head}"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    <th:block th:insert="~{fragments/navbar :: navbar}"></th:block>
+    <th:block th:insert="~{fragments/sidebar :: sidebar}"></th:block>
+
+    <div class="content-wrapper">
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Registar Check-in</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a th:href="@{/}">Início</a></li>
+                            <li class="breadcrumb-item"><a th:href="@{/reservas}">Reservas</a></li>
+                            <li class="breadcrumb-item active">Check-in</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="content">
+            <div class="container-fluid">
+                <th:block th:insert="~{fragments/alerts :: alerts}"></th:block>
+
+                <div class="mb-3">
+                    <a th:href="${voltarPara}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left mr-2"></i>Voltar
+                    </a>
+                </div>
+
+                <div th:if="${erroCheckIn}" class="callout callout-warning bg-white border-left border-warning shadow-sm">
+                    <strong>Aviso</strong>
+                    <div th:text="${erroCheckIn}">Reserva não encontrada.</div>
+                </div>
+
+                <div th:if="${reservaSelecionada != null}" class="row">
+                    <div class="col-lg-7">
+                        <div class="card">
+                            <div class="card-header bg-primary">
+                                <h3 class="card-title">Dados da Reserva</h3>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row mb-0">
+                                    <dt class="col-sm-4">Reserva</dt>
+                                    <dd class="col-sm-8" th:text="'#' + ${reservaSelecionada.id}">#1</dd>
+                                    <dt class="col-sm-4">Tutor</dt>
+                                    <dd class="col-sm-8" th:text="${reservaSelecionada.tutor.nome}">Tutor</dd>
+                                    <dt class="col-sm-4">Animal</dt>
+                                    <dd class="col-sm-8" th:text="${reservaSelecionada.animal.nome}">Animal</dd>
+                                    <dt class="col-sm-4">Alojamento</dt>
+                                    <dd class="col-sm-8">
+                                        <span th:text="${reservaSelecionada.alojamento.identificacao}">A1</span>
+                                        <span class="text-muted" th:text="'(' + ${reservaSelecionada.alojamento.tipo} + ')'">(CANINO)</span>
+                                    </dd>
+                                    <dt class="col-sm-4">Período</dt>
+                                    <dd class="col-sm-8">
+                                        <span th:text="${#temporals.format(reservaSelecionada.dataInicio, 'dd/MM/yyyy')}">01/01/2026</span>
+                                        <span> a </span>
+                                        <span th:text="${#temporals.format(reservaSelecionada.dataFim, 'dd/MM/yyyy')}">02/01/2026</span>
+                                    </dd>
+                                    <dt class="col-sm-4">Estado</dt>
+                                    <dd class="col-sm-8" th:text="${reservaSelecionada.estado.label}">Ativa</dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <div class="card">
+                            <div class="card-header bg-success">
+                                <h3 class="card-title">Pagamento e Confirmação</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="callout callout-info bg-white border-left border-info">
+                                    <strong>Valor a pagar no check-in</strong>
+                                    <div class="h4 mb-0"><span th:text="${valorCheckIn}">0.00</span> EUR</div>
+                                </div>
+                                <form th:action="@{/estadias/check-in}" method="post">
+                                    <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                    <input type="hidden" name="reservaId" th:value="${reservaSelecionada.id}">
+                                    <input type="hidden" name="redirectTo" th:value="${redirectTo}">
+                                    <div class="form-group">
+                                        <label for="metodoPagamento">Método de pagamento</label>
+                                        <select id="metodoPagamento" name="metodoPagamento" class="form-control" required>
+                                            <option value="">Selecionar método</option>
+                                            <option th:each="metodo : ${metodosPagamento}"
+                                                    th:value="${metodo}"
+                                                    th:text="${metodo.name() == 'NUMERARIO' ? 'Numerário' : (metodo.name() == 'CARTAO_DEBITO' ? 'Cartão de débito' : 'Cartão de crédito')}">Método</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-success btn-block">
+                                        <i class="fas fa-right-to-bracket mr-2"></i>Confirmar check-in
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <th:block th:insert="~{fragments/footer :: footer}"></th:block>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+</body>
+</html>

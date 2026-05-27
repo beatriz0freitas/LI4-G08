@@ -181,6 +181,7 @@ public class AlojamentoService implements IAlojamentoService {
             dto.setEstado("OCUPADO");
             dto.setDisponivel(false);
             dto.setEstadiaId(estadia.getId());
+            dto.setReservaId(estadia.getReserva() != null ? estadia.getReserva().getId() : null);
             dto.setMotivoIndisponibilidade("Estadia em curso");
             if (estadia.getReserva() != null && estadia.getReserva().getAnimal() != null) {
                 dto.setAnimalNome(estadia.getReserva().getAnimal().getNome());

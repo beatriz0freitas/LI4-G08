@@ -3,11 +3,11 @@
 <head><meta charset="utf-8"><title>Alterações Estado de Saúde</title></head>
 <body>
 <h1>Alterações do Estado de Saúde (Estadia [[${estadiaId}]])</h1>
-<form th:action="@{/clinica/alteracoes/create}" method="post">
+<form th:action="@{/clinica/alteracoes/create}" method="post" class="registo-clinico-form">
     <input type="hidden" name="estadiaId" th:value="${estadiaId}" />
     <label>Descrição: <input type="text" name="descricao" /></label>
     <label>Severidade: <input type="text" name="severidade" /></label>
-    <label>DataHora: <input type="datetime-local" name="dataHora" /></label>
+    <label>DataHora: <input type="datetime-local" name="dataHora" class="registo-datahora" readonly /></label>
     <button type="submit">Registar Alteração</button>
 </form>
 <hr/>

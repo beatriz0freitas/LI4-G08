@@ -1,36 +1,29 @@
 <div th:fragment="alerts">
-    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="fas fa-exclamation-circle mr-2"></i>
-        <strong>Erro:</strong>
-        <span th:text="${errorMessage}"></span>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
-            <span aria-hidden="true">&times;</span>
-        </button>
+    <div th:if="${errorMessage != null or error != null}" class="callout callout-danger bg-white border-left border-danger shadow-sm py-3" role="alert">
+        <div class="d-flex align-items-start">
+            <i class="fas fa-exclamation-circle text-danger mr-2 mt-1"></i>
+            <div><strong>Erro</strong><div th:text="${errorMessage != null ? errorMessage : error}">Ocorreu um erro.</div></div>
+        </div>
     </div>
 
-    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fas fa-check-circle mr-2"></i>
-        <strong>Sucesso:</strong>
-        <span th:text="${successMessage}"></span>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
-            <span aria-hidden="true">&times;</span>
-        </button>
+    <div th:if="${successMessage}" class="callout callout-success bg-white border-left border-success shadow-sm py-3" role="alert">
+        <div class="d-flex align-items-start">
+            <i class="fas fa-check-circle text-success mr-2 mt-1"></i>
+            <div><strong>Sucesso</strong><div th:text="${successMessage}">Operação concluída.</div></div>
+        </div>
     </div>
 
-    <div th:if="${warningMessage}" class="alert alert-warning alert-dismissible fade show" role="alert">
-        <i class="fas fa-exclamation-triangle mr-2"></i>
-        <strong>Aviso:</strong>
-        <span th:text="${warningMessage}"></span>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
-            <span aria-hidden="true">&times;</span>
-        </button>
+    <div th:if="${warningMessage}" class="callout callout-warning bg-white border-left border-warning shadow-sm py-3" role="alert">
+        <div class="d-flex align-items-start">
+            <i class="fas fa-exclamation-triangle text-warning mr-2 mt-1"></i>
+            <div><strong>Aviso</strong><div th:text="${warningMessage}">Verifique os dados.</div></div>
+        </div>
     </div>
 
-    <div th:if="${infoMessage}" class="alert alert-info alert-dismissible fade show" role="alert">
-        <i class="fas fa-info-circle mr-2"></i>
-        <span th:text="${infoMessage}"></span>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Fechar">
-            <span aria-hidden="true">&times;</span>
-        </button>
+    <div th:if="${infoMessage}" class="callout callout-info bg-white border-left border-info shadow-sm py-3" role="alert">
+        <div class="d-flex align-items-start">
+            <i class="fas fa-info-circle text-info mr-2 mt-1"></i>
+            <div><strong>Informação</strong><div th:text="${infoMessage}">Informação adicional.</div></div>
+        </div>
     </div>
 </div>

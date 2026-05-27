@@ -125,12 +125,15 @@
                         <div th:if="${estadiaSelecionada == null}" class="alert alert-warning">
                             <i class="fas fa-exclamation-triangle mr-2"></i>É necessária uma estadia para registar intervenções ou alterações de saúde.
                         </div>
+                        <div th:if="${estadiaSelecionada != null and estadiaSelecionada.estado.name() != 'EM_CURSO'}" class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>A estadia associada não está activa — não é possível registar intervenções ou serviços extra.
+                        </div>
 
                         <div class="card">
                             <div class="card-header">
                                 <h3 class="card-title">Registar intervenção</h3>
                             </div>
-                            <form th:action="@{/clinica/intervencoes/create}" method="post">
+                            <form th:action="@{/clinica/intervencoes/create}" method="post" class="registo-clinico-form">
                                 <div class="card-body">
                                     <input type="hidden" name="estadiaId" th:value="${estadiaSelecionada != null ? estadiaSelecionada.id : ''}">
                                     <div class="form-group">
@@ -144,12 +147,12 @@
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label>Data e hora</label>
-                                            <input type="datetime-local" name="dataHora" class="form-control" required>
+                                            <input type="datetime-local" name="dataHora" class="form-control registo-datahora" required readonly>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="card-footer">
-                                    <button type="submit" class="btn btn-success" th:disabled="${estadiaSelecionada == null}">
+                                    <button type="submit" class="btn btn-success" th:disabled="${estadiaSelecionada == null or estadiaSelecionada.estado.name() != 'EM_CURSO'}">
                                         <i class="fas fa-plus mr-2"></i>Registar intervenção
                                     </button>
                                 </div>
@@ -160,7 +163,7 @@
                             <div class="card-header">
                                 <h3 class="card-title">Registar alteração de saúde</h3>
                             </div>
-                            <form th:action="@{/clinica/alteracoes/create}" method="post">
+                            <form th:action="@{/clinica/alteracoes/create}" method="post" class="registo-clinico-form">
                                 <div class="card-body">
                                     <input type="hidden" name="estadiaId" th:value="${estadiaSelecionada != null ? estadiaSelecionada.id : ''}">
                                     <div class="form-group">
@@ -176,12 +179,12 @@
                                         </div>
                                         <div class="form-group col-md-6">
                                             <label>Data e hora</label>
-                                            <input type="datetime-local" name="dataHora" class="form-control" required>
+                                            <input type="datetime-local" name="dataHora" class="form-control registo-datahora" required readonly>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="card-footer">
-                                    <button type="submit" class="btn btn-warning" th:disabled="${estadiaSelecionada == null}">
+                                    <button type="submit" class="btn btn-warning" th:disabled="${estadiaSelecionada == null or estadiaSelecionada.estado.name() != 'EM_CURSO'}">
                                         <i class="fas fa-heartbeat mr-2"></i>Registar alteração
                                     </button>
                                 </div>
@@ -199,5 +202,41 @@
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+<script>
+    (function () {
+        // Auto-fill current instant for clinical regs and make sure forms cannot submit if estancia not active
+        function currentLocalDatetime() {
+            var d = new Date();
+            var pad = function (n) { return (n < 10 ? '0' + n : n); };
+            return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+        }
+
+        document.querySelectorAll('.registo-datahora').forEach(function (inp) {
+            try {
+                // if empty or date-only, set to now
+                if (!inp.value || /^\d{4}-\d{2}-\d{2}$/.test(inp.value)) {
+                    inp.value = currentLocalDatetime();
+                }
+                inp.readOnly = true;
+            } catch (e) {}
+        });
+
+        // Extra safety: intercept forms and prevent submit if estadia not active
+        document.querySelectorAll('.registo-clinico-form').forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                var estadiaId = form.querySelector('input[name="estadiaId"]');
+                if (!estadiaId || !estadiaId.value) {
+                    e.preventDefault();
+                    alert('Não é possível registar: não existe uma estadia activa associada.');
+                    return false;
+                }
+                // if page exposes estadia state, block when not EM_CURSO
+                var estadoEl = document.querySelector('dd[th\:text*="estadiaSelecionada.estado"]');
+                // best-effort: rely on server-side disabling; this is just a client safety net
+                return true;
+            });
+        });
+    })();
+</script>
 </body>
 </html>

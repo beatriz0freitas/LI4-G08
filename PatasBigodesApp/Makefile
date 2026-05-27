@@ -1,7 +1,6 @@
 .DEFAULT_GOAL := help
 
-# Java 21 (necessário para Spring Boot 3.x)
-# Primeiro tenta o caminho Linux usado pela equipa; se não existir, deteta no macOS.
+# ─── Java 21 ──────────────────────────────────────────────────────────────────
 LINUX_JAVA_HOME ?= /usr/lib/jvm/jdk-21.0.2+13
 JAVA_HOME ?= $(shell \
 	if [ -d "$(LINUX_JAVA_HOME)" ]; then \
@@ -11,70 +10,23 @@ JAVA_HOME ?= $(shell \
 	fi)
 export JAVA_HOME
 
-DB_HOST ?= localhost
-HOST_DB_PORT ?= 3307
-DB_PORT ?= $(HOST_DB_PORT)
-DB_NAME ?= hotelanimais
-TEST_HOST_DB_PORT ?= 3308
-TEST_DB_PORT ?= $(TEST_HOST_DB_PORT)
+# ─── Base de dados ────────────────────────────────────────────────────────────
+DB_HOST      ?= localhost
+DB_PORT      ?= 3307
+DB_NAME      ?= hotelanimais
+DB_USERNAME  ?= hoteluser
+DB_PASSWORD  ?= hotelpass
+
+TEST_DB_PORT ?= 3308
 TEST_DB_NAME ?= hotelanimais_test
-DB_USERNAME ?= hoteluser
-DB_PASSWORD ?= hotelpass
 
-export HOST_DB_PORT
-export TEST_HOST_DB_PORT
+export DB_PORT TEST_DB_PORT
 
-.PHONY: help test test-unit test-integration coverage coverage-unit mutation open-coverage open-mutation e2e playwright-install concurrent-test backup-test package run run-mysql verify config db-up db-reset-test db-stop db-shell up down restart destroy ps logs logs-app logs-db docs docs-code docs-clean clean
+# ─── Variáveis internas ───────────────────────────────────────────────────────
+TEST_ENV = DB_HOST=$(DB_HOST) DB_PORT=$(TEST_DB_PORT) DB_NAME=$(TEST_DB_NAME) \
+           DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD)
 
-help:
-	@echo ""
-	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-	@echo "  PatasBigodesApp — Comandos disponíveis"
-	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-	@echo ""
-	@echo "  TESTES"
-	@echo "  make test-unit         Testes unitários + WebMvcTest (sem Docker)"
-	@echo "  make test-integration  Testes de integração com MySQL (requer Docker)"
-	@echo "  make test              Todos os testes (requer Docker)"
-	@echo ""
-	@echo "  COBERTURA"
-	@echo "  make coverage-unit     JaCoCo para testes unitários (sem Docker)"
-	@echo "  make coverage          JaCoCo para todos os testes (requer Docker)"
-	@echo "  make open-coverage     Abrir relatório JaCoCo no browser"
-	@echo ""
-	@echo "  MUTATION TESTING"
-	@echo "  make mutation          PITest mutation coverage (sem Docker)"
-	@echo "  make open-mutation     Abrir relatório PITest no browser"
-	@echo ""
-	@echo "  APLICAÇÃO"
-	@echo "  make run               Arrancar a app (requer Docker para MySQL)"
-	@echo "  make up                Subir stack completa (db + app)"
-	@echo "  make down              Parar e remover a stack completa"
-	@echo "  make restart           Reiniciar a stack"
-	@echo "  make package           Gerar jar Spring Boot"
-	@echo ""
-	@echo "  BASE DE DADOS"
-	@echo "  make db-up             Subir apenas MySQL"
-	@echo "  make db-reset-test     Recriar BD de testes"
-	@echo "  make db-stop           Parar MySQL"
-	@echo "  make db-shell          Abrir cliente MySQL"
-	@echo ""
-	@echo "  TESTES NÃO-FUNCIONAIS"
-	@echo "  make concurrent-test   RNF-01: 10 utilizadores em simultâneo (requer Docker)"
-	@echo "  make e2e               Browser E2E com Playwright (requer Docker)"
-	@echo "  make playwright-install  Descarregar browsers Playwright (uma vez)"
-	@echo "  make backup-test       RNF-08: teste de backup e recuperação (requer Docker)"
-	@echo ""
-	@echo "  OUTROS"
-	@echo "  make ps                Estado dos contentores"
-	@echo "  make logs              Logs da stack"
-	@echo "  make docs              Gerar Javadoc"
-	@echo "  make clean             Limpar artefactos Maven"
-	@echo "  make verify            Validar testes + docker compose config"
-	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-	@echo ""
-
-# Testes unitários e WebMvcTest — não precisam de Docker
+# Testes que precisam de Docker (excluídos dos alvos *-unit)
 UNIT_EXCLUDES := "!ReservaServiceTests,!TutorServiceTimingTests,!PagamentoCheckInCalculoTest,\
 !CheckInServiceTest,!CheckOutSequenceServiceTest,!CheckInServiceSimpleTest,\
 !LimpezaControllerTest,!HotelAnimaisApplicationTests,!DashboardServiceIntegrationTest,\
@@ -85,109 +37,118 @@ UNIT_EXCLUDES := "!ReservaServiceTests,!TutorServiceTimingTests,!PagamentoCheckI
 !ReservaWizardControllerTest,!TutorAnimalControllerTemplateTest,!AlojamentoServiceTimingTests,\
 !ConcurrentAccessTest,!PlaywrightE2ETest"
 
+UNIT_FLAGS = -Dtest=$(UNIT_EXCLUDES) -Dsurefire.failIfNoSpecifiedTests=false
+
+.PHONY: help \
+        test test-unit test-integration \
+        coverage coverage-unit open-coverage \
+        mutation open-mutation \
+        e2e playwright-install concurrent-test backup-test \
+        run package \
+        db-up db-reset-test db-stop db-shell \
+        up down restart destroy ps logs \
+        docs clean
+help:
+	@echo ""
+	@echo "  PatasBigodesApp — comandos disponíveis"
+	@echo ""
+	@echo "  TESTES"
+	@echo "  make test-unit         Unitários + WebMvcTest (sem Docker)"
+	@echo "  make test-integration  Integração com MySQL (requer Docker)"
+	@echo "  make test              Todos os testes (requer Docker)"
+	@echo ""
+	@echo "  COBERTURA & MUTAÇÃO"
+	@echo "  make coverage-unit     JaCoCo — só unitários"
+	@echo "  make coverage          JaCoCo — todos os testes (requer Docker)"
+	@echo "  make open-coverage     Abrir relatório JaCoCo no browser"
+	@echo "  make mutation          PITest mutation testing (sem Docker)"
+	@echo "  make open-mutation     Abrir relatório PITest no browser"
+	@echo ""
+	@echo "  TESTES NÃO-FUNCIONAIS"
+	@echo "  make concurrent-test   RNF-01: 10 utilizadores em simultâneo"
+	@echo "  make e2e               E2E com Playwright (requer Docker)"
+	@echo "  make playwright-install  Instalar browsers Playwright (uma vez)"
+	@echo "  make backup-test       RNF-08: backup e recuperação"
+	@echo ""
+	@echo "  APLICAÇÃO"
+	@echo "  make run               Arrancar a app (requer db-up)"
+	@echo "  make package           Gerar jar Spring Boot"
+	@echo ""
+	@echo "  BASE DE DADOS"
+	@echo "  make db-up             Subir MySQL principal"
+	@echo "  make db-reset-test     Recriar BD de testes"
+	@echo "  make db-stop           Parar MySQL principal"
+	@echo "  make db-shell          Abrir cliente MySQL"
+	@echo ""
+	@echo "  INFRA"
+	@echo "  make up                Subir stack completa (db + app)"
+	@echo "  make down              Parar stack"
+	@echo "  make restart           Rebuild e reiniciar stack"
+	@echo "  make destroy           Parar stack e apagar volumes"
+	@echo "  make ps                Estado dos contentores"
+	@echo "  make logs              Logs da stack (seguir)"
+	@echo ""
+	@echo "  make docs              Gerar Javadoc"
+	@echo "  make clean             Limpar artefactos Maven"
+	@echo ""
+
 test-unit:
-	@echo "→ A correr testes unitários (sem Docker)..."
-	mvn test -Dtest=$(UNIT_EXCLUDES) -Dsurefire.failIfNoSpecifiedTests=false
-	@echo "→ Concluído."
+	mvn test $(UNIT_FLAGS)
 
-test-integration:
-	@echo "→ A iniciar MySQL de testes..."
-	$(MAKE) db-reset-test
-	@echo "→ A correr testes de integração..."
-	DB_HOST=$(DB_HOST) DB_PORT=$(TEST_DB_PORT) DB_NAME=$(TEST_DB_NAME) \
-	  DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) \
-	  mvn test
-	@echo "→ Concluído."
+test-integration: db-reset-test
+	$(TEST_ENV) mvn test
 
-test:
-	$(MAKE) db-reset-test
-	DB_HOST=$(DB_HOST) DB_PORT=$(TEST_DB_PORT) DB_NAME=$(TEST_DB_NAME) \
-	  DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) \
-	  mvn test
+test: db-reset-test
+	$(TEST_ENV) mvn test
 
 coverage-unit:
-	@echo "→ A correr testes unitários com JaCoCo (sem Docker)..."
-	mvn test jacoco:report -Dtest=$(UNIT_EXCLUDES) -Dsurefire.failIfNoSpecifiedTests=false
-	@echo ""
-	@echo "→ Relatório gerado em: target/site/jacoco/index.html"
-	@echo "   Usa 'make open-coverage' para abrir no browser."
+	mvn test jacoco:report $(UNIT_FLAGS)
+	@echo "→ target/site/jacoco/index.html"
 
-coverage:
-	$(MAKE) db-reset-test
-	DB_HOST=$(DB_HOST) DB_PORT=$(TEST_DB_PORT) DB_NAME=$(TEST_DB_NAME) \
-	  DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) \
-	  mvn test jacoco:report
-	@echo "→ Relatório JaCoCo em: target/site/jacoco/index.html"
+coverage: db-reset-test
+	$(TEST_ENV) mvn test jacoco:report
+	@echo "→ target/site/jacoco/index.html"
 
 open-coverage:
-	@xdg-open target/site/jacoco/index.html 2>/dev/null || open target/site/jacoco/index.html 2>/dev/null || \
-	  echo "Abre manualmente: target/site/jacoco/index.html"
+	@xdg-open target/site/jacoco/index.html 2>/dev/null || \
+	 open     target/site/jacoco/index.html 2>/dev/null || \
+	 echo "Abre manualmente: target/site/jacoco/index.html"
 
 mutation:
-	@echo "→ A correr PITest mutation testing (pode demorar alguns minutos)..."
-	mvn org.pitest:pitest-maven:mutationCoverage \
-	  -Dtest=$(UNIT_EXCLUDES) -Dsurefire.failIfNoSpecifiedTests=false
-	@echo ""
-	@echo "→ Relatório PITest em: target/pit-reports/index.html"
-	@echo "   Usa 'make open-mutation' para abrir no browser."
+	mvn org.pitest:pitest-maven:mutationCoverage $(UNIT_FLAGS)
+	@echo "→ target/pit-reports/index.html"
 
 open-mutation:
-	@xdg-open target/pit-reports/index.html 2>/dev/null || open target/pit-reports/index.html 2>/dev/null || \
-	  echo "Abre manualmente: target/pit-reports/index.html"
+	@xdg-open target/pit-reports/index.html 2>/dev/null || \
+	 open     target/pit-reports/index.html 2>/dev/null || \
+	 echo "Abre manualmente: target/pit-reports/index.html"
 
-# RNF-01 — 10 utilizadores em simultâneo
-concurrent-test:
-	@echo "→ A iniciar MySQL de testes..."
-	$(MAKE) db-reset-test
-	@echo "→ A correr teste de carga concorrente (RNF-01)..."
-	DB_HOST=$(DB_HOST) DB_PORT=$(TEST_DB_PORT) DB_NAME=$(TEST_DB_NAME) \
-	  DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) \
-	  mvn test -Dtest="ConcurrentAccessTest" -Dsurefire.failIfNoSpecifiedTests=false
-	@echo "→ Concluído."
+concurrent-test: db-reset-test
+	$(TEST_ENV) mvn test -Dtest="ConcurrentAccessTest" -Dsurefire.failIfNoSpecifiedTests=false
 
-# Browser E2E com Playwright
 playwright-install:
-	@echo "→ A descarregar browsers Playwright..."
-	mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install chromium" -Dexec.classpathScope=test
-	@echo "→ Browsers instalados."
+	mvn exec:java -e \
+	  -Dexec.mainClass=com.microsoft.playwright.CLI \
+	  -Dexec.args="install chromium" \
+	  -Dexec.classpathScope=test
 
-e2e:
-	@echo "→ A iniciar MySQL de testes..."
-	$(MAKE) db-reset-test
-	@echo "→ A correr testes E2E com Playwright..."
-	DB_HOST=$(DB_HOST) DB_PORT=$(TEST_DB_PORT) DB_NAME=$(TEST_DB_NAME) \
-	  DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) \
-	  mvn test -Dtest="PlaywrightE2ETest" -Dsurefire.failIfNoSpecifiedTests=false
-	@echo "→ Concluído."
+e2e: db-reset-test
+	$(TEST_ENV) mvn test -Dtest="PlaywrightE2ETest" -Dsurefire.failIfNoSpecifiedTests=false
 
-# RNF-08 — Backup e recuperação
-backup-test:
-	@echo "→ A iniciar MySQL de testes..."
-	$(MAKE) db-reset-test
-	@echo "→ A aplicar migrações Flyway no esquema de testes..."
+backup-test: db-reset-test
 	mvn flyway:migrate \
 	  -Dflyway.url="jdbc:mysql://$(DB_HOST):$(TEST_DB_PORT)/$(TEST_DB_NAME)?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Lisbon" \
 	  -Dflyway.user=$(DB_USERNAME) -Dflyway.password=$(DB_PASSWORD) \
 	  -Dflyway.locations=classpath:db/migration -q
-	@echo "→ A executar teste de backup e recuperação (RNF-08)..."
 	TEST_DB_NAME=$(TEST_DB_NAME) DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) \
 	  bash scripts/test-backup-recovery.sh
+run:
+	DB_HOST=$(DB_HOST) DB_PORT=$(DB_PORT) DB_NAME=$(DB_NAME) \
+	  DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) \
+	  mvn spring-boot:run
 
 package:
 	mvn clean package
-
-run:
-	DB_HOST=$(DB_HOST) DB_PORT=$(DB_PORT) DB_NAME=$(DB_NAME) DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) mvn spring-boot:run
-
-run-mysql: run
-
-verify:
-	make db-reset-test
-	DB_HOST=$(DB_HOST) DB_PORT=$(TEST_DB_PORT) DB_NAME=$(TEST_DB_NAME) DB_USERNAME=$(DB_USERNAME) DB_PASSWORD=$(DB_PASSWORD) mvn test
-	docker compose config
-
-config:
-	docker compose config
 
 db-up:
 	docker compose up -d db
@@ -220,19 +181,9 @@ ps:
 logs:
 	docker compose logs -f
 
-logs-app:
-	docker compose logs -f app
-
-logs-db:
-	docker compose logs -f db
-
-docs: 
+docs:
 	mvn javadoc:javadoc -DskipTests
-	@echo "Documentação gerada:"
-	@echo "  Código: target/generated-docs/index.html"
-
-docs-clean:
-	rm -rf target/generated-docs
+	@echo "→ target/generated-docs/index.html"
 
 clean:
 	mvn clean

@@ -16,6 +16,8 @@ public interface IEstadiaService {
 
     Estadia checkOut(Long estadiaId, MetodoPagamento metodoPagamento);
 
+    Optional<Estadia> obterComDetalhes(Long estadiaId);
+
     Optional<ResumoCheckInDto> obterResumoCheckIn(Long reservaId);
 
     Optional<ResumoCheckOutDto> obterResumoCheckOut(Long estadiaId);

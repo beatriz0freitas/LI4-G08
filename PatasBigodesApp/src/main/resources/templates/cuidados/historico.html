@@ -6,10 +6,6 @@
 </head>
 <body>
 <main th:fragment="content">
-    <!-- Alertas -->
-    <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
-    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
-
     <!-- Cabeçalho -->
     <div class="container-fluid">
         <h1>Histórico de Planos de Cuidados</h1>
