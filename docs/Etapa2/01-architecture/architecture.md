@@ -13,8 +13,18 @@ O sistema é uma aplicação web monolítica, organizada segundo o padrão arqui
 
 A escolha do monólito em camadas justifica-se pela dimensão do hotel (até 10 utilizadores simultâneos — RNF-01), pela necessidade de disponibilidade contínua em rede local (RNF-03) e pela exigência de uma implementação incremental controlada nas 3 semanas previstas para a Etapa 3.
 
-Diagrama de componentes: [components.mmd](components.mmd)  
-Diagrama de implantação: [deployment.mmd](deployment.mmd)
+Diagramas de componentes:
+- [components.plantuml](components.plantuml) (PlantUML)
+- [components.mmd](components.mmd) (Mermaid)
+- [components-simple.plantuml](components-simple.plantuml) (PlantUML simplificado)
+
+Diagramas de implantação:
+- [deployment-view.puml](deployment-view.puml) (PlantUML)
+- [deployment.mmd](deployment.mmd) (Mermaid)
+- [deployment-simple.plantuml](deployment-simple.plantuml) (PlantUML simplificado)
+
+Diagrama de packages:
+- [packages-simple.plantuml](packages-simple.plantuml) (PlantUML simplificado)
 
 ---
 
