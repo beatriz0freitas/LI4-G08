@@ -25,20 +25,11 @@ public class EstadiaController {
     private final IEstadiaService estadiaService;
 
     /**
-     * GET /estadias - Exibe resumo de check-in ou check-out.
+     * GET /estadias - Redireciona para lista de estadias.
      */
     @GetMapping
-    public String operacoes(@RequestParam(required = false) Long reservaId,
-                            @RequestParam(required = false) Long estadiaId,
-                            Model model) {
-        model.addAttribute("activePage", "estadias");
-        model.addAttribute("pageTitle", "Check-in / Check-out");
-        model.addAttribute("metodosPagamento", pt.hotel.animais.model.enums.MetodoPagamento.values());
-
-        carregarResumoCheckIn(reservaId, model);
-        carregarResumoCheckOut(estadiaId, model);
-
-        return "estadias/checkin-checkout";
+    public String listarEstadias() {
+        return "redirect:/estadias/lista";
     }
 
     /**
