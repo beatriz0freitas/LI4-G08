@@ -6,7 +6,10 @@ skinparam shadowing false
 skinparam classAttributeIconSize 0
 skinparam linetype ortho
 skinparam nodesep 140
-skinparam ranksep 170
+skinparam ranksep 220
+skinparam packageStyle rectangle
+skinparam packageBorderColor transparent
+skinparam packageBackgroundColor transparent
 skinparam padding 2
 skinparam ArrowThickness 1
 skinparam ArrowFontSize 9
@@ -15,185 +18,193 @@ skinparam ClassAttributeFontSize 11
 
 left to right direction
 
-class Tutor {
-  nome
-  nif
-  contacto
-  email
+frame {
+  class Tutor {
+    nome
+    nif
+    contacto
+    email
+  }
+
+  class Animal {
+    nome
+    especie
+    raca
+    dataNascimento
+    peso
+    estadoSaude
+    cuidadosRecorrentes
+  }
+
+  class TipoAlojamentoTarifa {
+    tipoAlojamento
+    tarifaDiaria
+    ativo
+  }
+
+  class Alojamento {
+    identificacao
+    tipo
+    capacidade
+    estadoLimpeza
+  }
+
+  enum Especie {
+    CAO
+    GATO
+  }
+
+  enum EstadoSaude {
+    NORMAL
+    ALTERADO
+    CRITICO
+  }
+
+  enum EstadoLimpeza {
+    PENDENTE
+    CONCLUIDO
+  }
 }
 
-class Animal {
-  nome
-  especie
-  raca
-  dataNascimento
-  peso
-  estadoSaude
-  cuidadosRecorrentes
+frame {
+  class Reserva {
+    dataInicio
+    dataFim
+    estado
+    instrucoes
+  }
+
+  class Estadia {
+    dataCheckIn
+    dataCheckOut
+    estado
+  }
+
+  class PlanoCuidados {
+    instrucoes
+    prioridade
+    ativo
+  }
+
+  class TarefaCuidado {
+    descricao
+    periodicidade
+    concluida
+  }
+
+  class RegistoCuidado {
+    tipo
+    observacoes
+    dataHora
+  }
+
+  class Nota {
+    texto
+    dataHora
+  }
+
+  enum EstadoReserva {
+    ATIVA
+    CONFIRMADA
+    CANCELADA
+    CONCLUIDA
+  }
+
+  enum EstadoEstadia {
+    EM_CURSO
+    TERMINADA
+  }
+
+  enum PrioridadePlano {
+    ROTINA
+    URGENTE
+    CRITICO
+  }
+
+  enum PeriodicidadeTarefa {
+    UNICA
+    DIARIA
+    SEMANAL
+  }
 }
 
-class TipoAlojamentoTarifa {
-  tipoAlojamento
-  tarifaDiaria
-  ativo
+frame {
+  class TipoServicoExtra {
+    nome
+    descricao
+    ativo
+  }
+
+  class ServicoExtra {
+    descricao
+    custo
+    dataHora
+  }
+
+  class IntervencaoClinica {
+    descricao
+    prescricao
+    custo
+    dataHora
+  }
+
+  class Pagamento {
+    valor
+    metodo
+    momento
+    estado
+    dataHora
+  }
+
+  class AlteracaoEstadoSaude {
+    descricao
+    severidade
+    dataHora
+  }
+
+  enum EstadoPagamento {
+    LIQUIDADO
+    PENDENTE
+  }
+
+  enum MomentoPagamento {
+    CHECK_IN
+    CHECK_OUT
+  }
+
+  enum MetodoPagamento {
+    NUMERARIO
+    CARTAO_DEBITO
+    CARTAO_CREDITO
+  }
 }
 
-class Alojamento {
-  identificacao
-  tipo
-  capacidade
-  estadoLimpeza
-}
+frame {
+  class Colaborador {
+    nome
+    email
+    perfil
+  }
 
-class Reserva {
-  dataInicio
-  dataFim
-  estado
-  instrucoes
-}
+  class AuditoriaEvento {
+    timestamp
+    operacao
+    entidade
+    resultado
+  }
 
-class Estadia {
-  dataCheckIn
-  dataCheckOut
-  estado
-}
+  enum TipoColaborador {
+    DIRETOR
+    FUNCIONARIO_RECEPCAO
+    CUIDADOR
+    MEDICO_VETERINARIO
+    RESPONSAVEL_LIMPEZA
+  }
 
-class PlanoCuidados {
-  instrucoes
-  prioridade
-  ativo
-}
-
-class TarefaCuidado {
-  descricao
-  periodicidade
-  concluida
-}
-
-class RegistoCuidado {
-  tipo
-  observacoes
-  dataHora
-}
-
-class Nota {
-  texto
-  dataHora
-}
-
-class TipoServicoExtra {
-  nome
-  descricao
-  ativo
-}
-
-class ServicoExtra {
-  descricao
-  custo
-  dataHora
-}
-
-class IntervencaoClinica {
-  descricao
-  prescricao
-  custo
-  dataHora
-}
-
-class AlteracaoEstadoSaude {
-  descricao
-  severidade
-  dataHora
-}
-
-class Pagamento {
-  valor
-  metodo
-  momento
-  estado
-  dataHora
-}
-
-class Colaborador {
-  nome
-  email
-  perfil
-}
-
-class AuditoriaEvento {
-  timestamp
-  operacao
-  entidade
-  resultado
-}
-
-enum Especie {
-  CAO
-  GATO
-}
-
-enum EstadoSaude {
-  NORMAL
-  ALTERADO
-  CRITICO
-}
-
-enum EstadoLimpeza {
-  PENDENTE
-  CONCLUIDO
-}
-
-enum EstadoReserva {
-  ATIVA
-  CONFIRMADA
-  CANCELADA
-  CONCLUIDA
-}
-
-enum EstadoEstadia {
-  EM_CURSO
-  TERMINADA
-}
-
-enum EstadoPagamento {
-  LIQUIDADO
-  PENDENTE
-}
-
-enum MomentoPagamento {
-  CHECK_IN
-  CHECK_OUT
-}
-
-enum MetodoPagamento {
-  NUMERARIO
-  CARTAO_DEBITO
-  CARTAO_CREDITO
-}
-
-enum PrioridadePlano {
-  ROTINA
-  URGENTE
-  CRITICO
-}
-
-enum PeriodicidadeTarefa {
-  UNICA
-  DIARIA
-  SEMANAL
-}
-
-enum TipoColaborador {
-  DIRETOR
-  FUNCIONARIO_RECEPCAO
-  CUIDADOR
-  MEDICO_VETERINARIO
-  RESPONSAVEL_LIMPEZA
-}
-
-enum ResultadoAuditoria {
-  SUCESSO
-  FALHA
+  enum ResultadoAuditoria {
+    SUCESSO
+    FALHA
+  }
 }
 
 Tutor "1" -down- "0..*" Animal : > responsavel
