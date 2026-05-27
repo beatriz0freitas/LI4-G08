@@ -77,7 +77,7 @@ class ReservaRenderingControllerTest {
 
         mockMvc.perform(get("/reservas"))
             .andExpect(status().isOk())
-            .andExpect(view().name("reservas/index"))
+            .andExpect(view().name("reservas/lista"))
             .andExpect(content().string(containsString("Tutor Lista Reserva")))
             .andExpect(content().string(containsString("Luna Lista Reserva")))
             .andExpect(content().string(containsString("Render-CAN-1")));

@@ -32,9 +32,9 @@ class CheckInIntegrationTest {
     @Test
     @WithMockUser(roles = "DIRETOR")
     void getFormCheckInCheckOutRetornaOk() throws Exception {
-        mockMvc.perform(get("/estadias"))
+        mockMvc.perform(get("/estadias/lista"))
                .andExpect(status().isOk())
-               .andExpect(model().attributeExists("metodosPagamento"));
+               .andExpect(model().attributeExists("estadias"));
     }
 
     @Test
