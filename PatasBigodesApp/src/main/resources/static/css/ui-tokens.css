@@ -16,6 +16,9 @@
 	--ui-radius: 0.95rem;
 	--ui-radius-sm: 0.6rem;
 	--ui-shadow: 0 10px 30px rgba(15, 23, 36, 0.05);
+
+	/* Cor usada na navbar e cabeçalhos dos cards para contraste consistente */
+	--navbar-bg: var(--ui-muted-text);
 }
 
 html, body {
@@ -33,10 +36,10 @@ html, body {
 }
 
 .main-header.navbar {
-	background: rgba(255, 255, 255, 0.92);
-	backdrop-filter: blur(10px);
-	border-bottom: 1px solid var(--ui-border);
-	box-shadow: 0 1px 0 rgba(15, 23, 36, 0.03);
+	background: var(--navbar-bg);
+	color: #fff;
+	border-bottom: 1px solid rgba(0,0,0,0.06);
+	box-shadow: 0 2px 8px rgba(15, 23, 36, 0.08);
 }
 
 .brand-link {
@@ -57,10 +60,34 @@ html, body {
 }
 
 .card-header {
-	background: var(--ui-surface-alt);
-	border-bottom: 1px solid var(--ui-border-strong);
+	/* Cabeçalhos uniformes: sem gradients, cor sólida igual à navbar */
+	background: var(--navbar-bg) !important;
+	color: #ffffff !important;
+	border-bottom: 1px solid rgba(0,0,0,0.06) !important;
 	padding-top: .9rem;
 	padding-bottom: .8rem;
+	background-image: none !important;
+}
+
+/* Uniformizar cabeçalhos com cores específicas (bg-*) para reduzir variedade visual
+   Força todos os cabeçalhos de cards a usarem o mesmo fundo neutro e texto legível. */
+.card-header.bg-primary,
+.card-header.bg-info,
+.card-header.bg-warning,
+.card-header.bg-success,
+.card-header.bg-danger,
+.card-header.bg-secondary,
+.card-header.bg-light {
+	background: var(--ui-surface-alt) !important;
+	color: var(--ui-text) !important;
+	border-bottom: 1px solid var(--ui-border-strong) !important;
+}
+
+/* Garantir título legível quando templates aplicam classes bg-* diretamente */
+.card-header .card-title,
+.card-header h3,
+.card-header h5 {
+	color: var(--ui-text) !important;
 }
 
 .card-title,
@@ -143,11 +170,12 @@ button:focus {
 }
 
 .table thead th {
-	color: var(--ui-text);
+	color: #ffffff;
 	font-weight: 700;
 	border-top: none;
-	border-bottom: 1px solid var(--ui-border-strong);
-	background: linear-gradient(180deg, var(--ui-surface-alt), var(--ui-surface));
+	border-bottom: 1px solid rgba(0,0,0,0.06);
+	background: var(--navbar-bg) !important;
+	background-image: none !important;
 }
 
 .table-hover tbody tr:hover {
@@ -274,7 +302,7 @@ button:focus {
 }
 
 .filter-panel {
-	background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(248,250,252,.92));
+	background: var(--ui-surface);
 	border: 1px solid var(--ui-border);
 	border-radius: var(--ui-radius);
 	box-shadow: var(--ui-shadow);
@@ -291,6 +319,22 @@ button:focus {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 	gap: 1rem;
+}
+
+/* Grid container used on Plano de Cuidados - Turno */
+.card-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 1rem;
+	align-items: stretch;
+}
+.card-grid > .card {
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+}
+.card-grid .card-body {
+	flex: 1 1 auto;
 }
 
 @media (max-width: 576px) {

@@ -27,13 +27,13 @@
 						<a href="#" class="nav-link"
 						   th:classappend="${activePage == 'dashboard' or activePage == 'relatorios' or activePage == 'colaboradores' or activePage == 'auditoria' or activePage == 'tarifas' or activePage == 'tipos-servicos-extra'} ? ' active' : ''">
 							<i class="nav-icon fas fa-chart-line"></i>
-							<p>Dashboard Direção<i class="right fas fa-angle-left"></i></p>
+							<p>Direção<i class="right fas fa-angle-left"></i></p>
 						</a>
 						<ul class="nav nav-treeview">
 							<li class="nav-item">
 								<a th:href="@{/dashboard}" class="nav-link" th:classappend="${activePage == 'dashboard'} ? ' active' : ''">
 									<i class="far fa-circle nav-icon"></i>
-									<p>Visão geral</p>
+									<p>Dashboard</p>
 								</a>
 							</li>
 							<li class="nav-item">

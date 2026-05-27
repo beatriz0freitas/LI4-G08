@@ -21,68 +21,49 @@
         </a>
     </div>
     <div class="row">
-        <div class="col-lg-8">
-            <div class="card mb-3 border-left"
-                 th:each="plano : ${planosTurno}"
-                 th:attr="id=${'plano-' + plano.id}"
-                th:classappend="${plano.prioridade != null && plano.prioridade.name() == 'CRITICO' ? ' border-left-danger' : (plano.prioridade != null && plano.prioridade.name() == 'URGENTE' ? ' border-left-warning' : ' border-left-info')}">
-                <div class="card-header bg-white d-flex justify-content-between align-items-start">
-                    <div>
-                        <h3 class="card-title font-weight-bold mb-1" th:text="${plano.animalNome ?: ('Animal #' + plano.animalId)}">Luna</h3>
-                        <div class="small text-muted">
-                            <span th:text="${plano.especieLabel}">Cão</span>
-                            <span th:if="${plano.raca != null and !#strings.isEmpty(plano.raca)}" th:text="${' · ' + plano.raca}"> · Labrador</span>
-                            <span th:if="${plano.alojamentoIdentificacao != null}" th:text="${' · ' + plano.alojamentoIdentificacao}"> · Box 03</span>
-                            <span th:if="${plano.tutorNome != null}" th:text="${' · Tutor: ' + plano.tutorNome}"> · Tutor</span>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-start">
-                        <div class="mr-2 text-right">
-                            <span th:if="${plano.medicacaoCurso != null and !#strings.isEmpty(plano.medicacaoCurso)}" class="badge status-warning mr-1">MEDICAÇÃO</span>
-                            <span class="badge"
-                                  th:classappend="${plano.estadoSaude == 'Crítico' ? 'status-danger' : (plano.estadoSaude == 'Alterado' ? 'status-warning' : 'status-success') }"
-                                  th:text="${plano.estadoSaude ?: 'Normal'}">Normal</span>
-                        </div>
-                        <div class="text-right">
-                            <button type="button" class="btn btn-sm btn-outline-secondary btn-toggle-details" aria-expanded="false">Detalhes</button>
-                            <a th:href="@{/plano-cuidados(estadiaId=${plano.estadiaId})}" class="btn btn-primary btn-sm ml-2">
-                                <i class="fas fa-clipboard-list mr-1"></i> Abrir plano
-                            </a>
-                        </div>
+        <div class="col-12 col-lg-9">
+            <div class="row">
+                <div class="col-12" th:if="${planosTurno == null or #lists.isEmpty(planosTurno)}">
+                    <div class="card">
+                        <div class="card-body text-center text-muted py-5">Não existem estadias em curso para acompanhamento neste turno.</div>
                     </div>
                 </div>
 
-                <div class="card-body d-none plano-details">
-                    <p class="text-muted mb-3" th:if="${plano.instrucoes != null and !#strings.isEmpty(plano.instrucoes)}"
-                       th:text="${plano.instrucoes}">Instruções</p>
-                    <div class="list-group list-group-flush" th:if="${plano.tarefas != null and !#lists.isEmpty(plano.tarefas)}">
-                        <div class="list-group-item px-0 d-flex justify-content-between align-items-center" th:each="tarefa : ${plano.tarefas}">
-                            <div th:classappend="${tarefa.concluida} ? 'task-done' : ''">
-                                <i class="far mr-2" th:classappend="${tarefa.concluida} ? 'fa-check-square text-success' : 'fa-square'"></i>
-                                <span th:text="${tarefa.descricao}">Alimentação</span>
-                                <small class="text-muted ml-2" th:if="${tarefa.dataHora != null}" th:text="${#temporals.format(tarefa.dataHora, 'HH:mm')}">09:00</small>
+                <div class="col-6 col-md-4 col-lg-3 mb-3" th:each="plano : ${planosTurno}" th:attr="id=${'plano-' + plano.id}">
+                    <div class="card summary-card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-start">
+                            <div>
+                                <h5 class="card-title mb-0" th:text="${plano.animalNome ?: ('Animal #' + plano.animalId)}">Animal</h5>
+                                <small class="text-muted" th:text="${plano.especieLabel}">Espécie</small>
                             </div>
-                            <div class="d-flex align-items-center">
-                                <form th:if="${!tarefa.concluida}" method="post"
-                                      th:action="@{/plano-cuidados/tarefa/{id}/concluir(id=${tarefa.id})}" class="mb-0 mr-2 d-inline-block">
-                                    <input type="hidden" name="estadiaId" th:value="${plano.estadiaId}">
-                                    <button type="submit" class="btn btn-outline-primary btn-sm">Concluir</button>
-                                </form>
-                                <a th:href="@{/plano-cuidados/tarefa/{id}(id=${tarefa.id})}" class="btn btn-outline-secondary btn-sm">Ver</a>
+                            <div class="text-right">
+                                <small class="d-block text-muted" th:text="${plano.alojamentoIdentificacao}">Box</small>
+                                <span class="badge" th:classappend="${plano.estadoSaude == 'Crítico' ? 'badge-danger' : (plano.estadoSaude == 'Alterado' ? 'badge-warning' : 'badge-success') }" th:text="${plano.estadoSaude ?: 'Normal'}">Normal</span>
+                            </div>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <p class="small text-muted mb-2" th:if="${plano.instrucoes != null and !#strings.isEmpty(plano.instrucoes)}" th:text="${plano.instrucoes}">Instruções</p>
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <small class="text-muted">Tarefas</small>
+                                        <div><strong th:text="${plano.tarefasPendentes + ' pendentes'}">0 pendentes</strong></div>
+                                    </div>
+                                    <div class="text-right">
+                                        <a th:href="@{/plano-cuidados(estadiaId=${plano.estadiaId})}" class="btn btn-sm btn-primary">Abrir</a>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a th:if="${plano.animalId != null}" th:href="@{/clinica/animais/{animalId}(animalId=${plano.animalId})}" class="btn btn-outline-info btn-sm flex-fill">Detalhes</a>
+                                    <a th:href="@{/plano-cuidados/animal/{animalId}/historico(animalId=${plano.animalId})}" class="btn btn-outline-secondary btn-sm flex-fill">Histórico</a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <p class="text-muted mb-0" th:if="${plano.tarefas == null or #lists.isEmpty(plano.tarefas)}">
-                        Sem tarefas agendadas. Consulte as instruções e registe cuidados no plano.
-                    </p>
                 </div>
             </div>
-            </div>
-            <div class="card" th:if="${planosTurno == null or #lists.isEmpty(planosTurno)}">
-                <div class="card-body text-center text-muted py-5">Não existem estadias em curso para acompanhamento neste turno.</div>
-            </div>
         </div>
-        <div class="col-lg-4">
+        <div class="col-12 col-lg-3">
             <div class="card">
                 <div class="card-header"><h3 class="card-title">Progresso do turno</h3></div>
                 <div class="card-body">
