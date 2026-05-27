@@ -64,6 +64,8 @@ Testes relevantes:
 mvn test -Dtest=PagamentoServiceTest,EstadiaServiceTest,CheckInServiceTest,CheckOutSequenceServiceTest,AvailabilityDomainServiceTest,ReservaServiceUnitTest,ReservaConfirmIntegrationTest,ServicoExtraServiceTest,IntervencaoClinicaServiceTest,HistoricoServiceTest,PlanoCuidadosServiceTest,RelatorioServiceTest,RelatorioControllerTest,AuditoriaServiceTest,AuditoriaControllerTest,FluxoOperacionalEndToEndIntegrationTest
 ```
 
+Resultado da validação após recriação limpa da BD `db-tests`: `127` testes executados, `0` falhas, `0` erros.
+
 ## Pressupostos e Limites
 
 - A operação `EDITAR_RESERVA` permanece apenas como expectativa de auditoria futura porque não existe fluxo de edição de reserva na aplicação atual.

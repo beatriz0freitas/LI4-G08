@@ -701,6 +701,14 @@ mvn test -Dtest=CheckInServiceTest,CheckOutSequenceServiceTest,CheckInIntegratio
 
 Resultado: `38` testes executados, `0` falhas, `0` erros.
 
+Validação alargada executada após consolidação das lacunas LAC-01 a LAC-15:
+
+```bash
+mvn test -Dtest=PagamentoServiceTest,EstadiaServiceTest,CheckInServiceTest,CheckOutSequenceServiceTest,AvailabilityDomainServiceTest,ReservaServiceUnitTest,ReservaConfirmIntegrationTest,ServicoExtraServiceTest,IntervencaoClinicaServiceTest,HistoricoServiceTest,PlanoCuidadosServiceTest,RelatorioServiceTest,RelatorioControllerTest,AuditoriaServiceTest,AuditoriaControllerTest,FluxoOperacionalEndToEndIntegrationTest
+```
+
+Resultado: `127` testes executados, `0` falhas, `0` erros.
+
 **Problema identificado originalmente**
 
 A suite de testes passa, mas vários testes são superficiais. Alguns exemplos:
