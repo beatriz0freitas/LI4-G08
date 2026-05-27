@@ -94,6 +94,51 @@ package "Configuracao" {
   class AuditoriaDetalhesConverter <<converter>>
 }
 
+package "DTO" {
+  package "Entrada" {
+    class AnimalFormDto <<dto>>
+    class TutorFormDto <<dto>>
+    class ReservaFormDto <<dto>>
+    class PagamentoDto <<dto>>
+    class RegistoCuidadoFormDto <<dto>>
+    class TarefaCuidadoFormDto <<dto>>
+    class NotaFormDto <<dto>>
+    class ServicoExtraFormDto <<dto>>
+    class IntervencaoClinicaFormDto <<dto>>
+    class AlteracaoEstadoSaudeFormDto <<dto>>
+    class ColaboradorFormDto <<dto>>
+    class RelatorioFiltroFormDto <<dto>>
+  }
+
+  package "Saida" {
+    class DashboardEstadiaDto <<dto>>
+    class DisponibilidadeAlojamentoDto <<dto>>
+    class EstadiaListDto <<dto>>
+    class ReservaListDto <<dto>>
+    class ReservaDetalheFinanceiroDto <<dto>>
+    class ResumoCheckInDto <<dto>>
+    class ResumoCheckOutDto <<dto>>
+    class RegistoCuidadoDto <<dto>>
+    class PlanoCuidadosDto <<dto>>
+    class TarefaCuidadoDto <<dto>>
+    class NotaDto <<dto>>
+    class ServicoExtraDto <<dto>>
+    class FichaClinicaDto <<dto>>
+    class EventoClinicoDto <<dto>>
+    class IntervencaoClinicaDto <<dto>>
+    class AlteracaoEstadoSaudeDto <<dto>>
+    class HistoricoFiltroDto <<dto>>
+    class HistoricoItemDto <<dto>>
+    class RelatorioAgrupamentoDto <<dto>>
+    class RelatorioResumoDto <<dto>>
+  }
+
+  package "Auditoria" {
+    class AuditoriaEventoDTO <<dto>>
+    class AuditoriaFiltroDTO <<dto>>
+  }
+}
+
 package "Dados" {
   interface ColaboradorRepository <<repository>>
   interface TutorRepository <<repository>>
@@ -171,12 +216,6 @@ package "Dominio" {
       NUMERARIO
       CARTAO_DEBITO
       CARTAO_CREDITO
-    }
-
-    enum TipoPagamento {
-      CHECK_IN
-      CHECK_OUT
-      EXTRAS
     }
 
     enum MomentoPagamento {
@@ -418,6 +457,7 @@ TipoAlojamentoTarifaController ..> TipoAlojamentoTarifaService
 TipoServicoExtraController ..> TipoServicoExtraService
 AuditoriaController ..> IAuditoriaService
 AuditoriaController ..> IColaboradorService
+SecurityConfig ..> PasswordEncoder
 
 IDashboardService <|.. DashboardService
 IAlojamentoService <|.. AlojamentoService
@@ -559,6 +599,69 @@ AuditoriaService ..> AuditoriaRepository
 AuditoriaService ..> ColaboradorRepository
 AuditoriaOperacaoService ..> IAuditoriaService
 AuditoriaOperacaoService ..> ColaboradorRepository
+
+DashboardController ..> DashboardEstadiaDto
+AlojamentoController ..> DisponibilidadeAlojamentoDto
+TutorAnimalController ..> TutorFormDto
+TutorAnimalController ..> AnimalFormDto
+AnimalController ..> AnimalFormDto
+ReservaController ..> DisponibilidadeAlojamentoDto
+ReservaController ..> ReservaFormDto
+ReservaController ..> ReservaListDto
+EstadiaController ..> EstadiaListDto
+EstadiaController ..> ResumoCheckInDto
+EstadiaController ..> ResumoCheckOutDto
+PagamentoController ..> PagamentoDto
+RegistoCuidadoController ..> RegistoCuidadoFormDto
+PlanoCuidadosController ..> PlanoCuidadosDto
+PlanoCuidadosController ..> TarefaCuidadoFormDto
+NotaController ..> NotaFormDto
+ServicoExtraController ..> ServicoExtraFormDto
+ClinicaController ..> FichaClinicaDto
+ClinicaController ..> IntervencaoClinicaFormDto
+ClinicaController ..> AlteracaoEstadoSaudeFormDto
+HistoricoController ..> HistoricoFiltroDto
+HistoricoController ..> HistoricoItemDto
+RelatorioController ..> RelatorioFiltroFormDto
+ColaboradorController ..> ColaboradorFormDto
+AuditoriaController ..> AuditoriaFiltroDTO
+AuditoriaController ..> AuditoriaEventoDTO
+
+DashboardService ..> DashboardEstadiaDto
+AlojamentoService ..> DisponibilidadeAlojamentoDto
+ReservaService ..> ReservaFormDto
+ReservaService ..> ReservaListDto
+ReservaService ..> ReservaDetalheFinanceiroDto
+EstadiaService ..> EstadiaListDto
+EstadiaService ..> ResumoCheckInDto
+EstadiaService ..> ResumoCheckOutDto
+RegistoCuidadoService ..> RegistoCuidadoDto
+RegistoCuidadoService ..> RegistoCuidadoFormDto
+PlanoCuidadosService ..> PlanoCuidadosDto
+PlanoCuidadosService ..> TarefaCuidadoDto
+PlanoCuidadosService ..> TarefaCuidadoFormDto
+NotaService ..> NotaDto
+NotaService ..> NotaFormDto
+ServicoExtraService ..> ServicoExtraDto
+ServicoExtraService ..> ServicoExtraFormDto
+ClinicaService ..> FichaClinicaDto
+ClinicaService ..> EventoClinicoDto
+IntervencaoClinicaService ..> IntervencaoClinicaDto
+IntervencaoClinicaService ..> IntervencaoClinicaFormDto
+AlteracaoEstadoSaudeService ..> AlteracaoEstadoSaudeDto
+AlteracaoEstadoSaudeService ..> AlteracaoEstadoSaudeFormDto
+HistoricoService ..> HistoricoFiltroDto
+HistoricoService ..> HistoricoItemDto
+RelatorioService ..> RelatorioFiltroFormDto
+RelatorioService ..> RelatorioAgrupamentoDto
+RelatorioService ..> RelatorioResumoDto
+ColaboradorService ..> ColaboradorFormDto
+AuditoriaService ..> AuditoriaFiltroDTO
+AuditoriaService ..> AuditoriaEventoDTO
+
+PlanoCuidadosDto --> TarefaCuidadoDto
+FichaClinicaDto --> EventoClinicoDto
+AuditoriaEventoDTO --> Colaborador
 
 Tutor "1" o-- "0..*" Animal : animais
 Tutor "1" o-- "0..*" Reserva : reservas
