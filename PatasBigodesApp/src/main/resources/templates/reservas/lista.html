@@ -21,8 +21,7 @@
         </div>
         <section class="content">
             <div class="container-fluid">
-                <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">Erro</div>
-                <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}">Sucesso</div>
+                <th:block th:insert="~{fragments/alerts :: alerts}"></th:block>
                 
                 <!-- Filtros -->
                 <div class="card card-outline card-primary mb-3">
@@ -83,9 +82,9 @@
                                     </td>
                                     <td>
                                         <small class="text-muted">
-                                            <span th:text="${#dates.format(reserva.dataInicio, 'dd/MM/yyyy')}">01/01/2026</span>
+                                            <span th:text="${#temporals.format(reserva.dataInicio, 'dd/MM/yyyy')}">01/01/2026</span>
                                             a
-                                            <span th:text="${#dates.format(reserva.dataFim, 'dd/MM/yyyy')}">05/01/2026</span>
+                                            <span th:text="${#temporals.format(reserva.dataFim, 'dd/MM/yyyy')}">05/01/2026</span>
                                         </small>
                                     </td>
                                     <td>
