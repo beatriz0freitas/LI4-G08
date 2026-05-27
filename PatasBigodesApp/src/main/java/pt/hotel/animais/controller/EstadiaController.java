@@ -1,6 +1,7 @@
 package pt.hotel.animais.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,8 +9,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import pt.hotel.animais.dto.EstadiaListDto;
 import pt.hotel.animais.model.Estadia;
+import pt.hotel.animais.model.enums.EstadoEstadia;
 import pt.hotel.animais.service.IEstadiaService;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -18,6 +24,9 @@ public class EstadiaController {
 
     private final IEstadiaService estadiaService;
 
+    /**
+     * GET /estadias - Exibe resumo de check-in ou check-out.
+     */
     @GetMapping
     public String operacoes(@RequestParam(required = false) Long reservaId,
                             @RequestParam(required = false) Long estadiaId,
@@ -30,6 +39,39 @@ public class EstadiaController {
         carregarResumoCheckOut(estadiaId, model);
 
         return "estadias/checkin-checkout";
+    }
+
+    /**
+     * GET /estadias/lista - Lista estadias com filtros.
+     */
+    @GetMapping("/lista")
+    public String listar(
+        @RequestParam(required = false) String estado,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
+        Model model
+    ) {
+        EstadoEstadia filtroEstado = null;
+        if (estado != null && !estado.isEmpty()) {
+            try {
+                filtroEstado = EstadoEstadia.valueOf(estado.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                model.addAttribute("errorMessage", "Estado inválido: " + estado);
+            }
+        }
+        
+        List<EstadiaListDto> estadias = estadiaService.listarComFiltros(filtroEstado, dataInicio, dataFim);
+        
+        model.addAttribute("estadias", estadias);
+        model.addAttribute("filtroEstado", estado);
+        model.addAttribute("dataInicio", dataInicio);
+        model.addAttribute("dataFim", dataFim);
+        model.addAttribute("estados", EstadoEstadia.values());
+        model.addAttribute("pageTitle", "Estadias");
+        model.addAttribute("breadcrumb", "Lista de Estadias");
+        model.addAttribute("activePage", "estadias");
+        
+        return "estadias/lista";
     }
 
     private void carregarResumoCheckIn(Long reservaId, Model model) {

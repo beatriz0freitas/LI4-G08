@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import pt.hotel.animais.model.Estadia;
 import pt.hotel.animais.model.enums.EstadoEstadia;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -136,5 +137,24 @@ public interface EstadiaRepository extends JpaRepository<Estadia, Long> {
 		ORDER BY al.identificacao ASC, a.nome ASC
 		""")
 	List<Estadia> findEstadiasEmCursoComDetalhes();
+
+	/**
+	 * Lista estadias com filtros opcionais, ordenadas por data de início DESC.
+	 */
+	@Query("""
+		SELECT e FROM Estadia e
+		JOIN FETCH e.reserva r
+		JOIN FETCH r.animal a
+		JOIN FETCH r.alojamento al
+		WHERE (:estado IS NULL OR e.estado = :estado)
+		  AND (:dataInicio IS NULL OR e.dataInicio >= :dataInicio)
+		  AND (:dataFim IS NULL OR e.dataInicio <= :dataFim)
+		ORDER BY e.dataInicio DESC
+		""")
+	List<Estadia> findComFiltros(
+		@Param("estado") EstadoEstadia estado,
+		@Param("dataInicio") LocalDateTime dataInicio,
+		@Param("dataFim") LocalDateTime dataFim
+	);
 
 }
