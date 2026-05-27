@@ -2,18 +2,36 @@
 title UC-10 - Registar Servico Extra
 
 autonumber
-actor CuidadorOuVeterinario
+actor ColaboradorAutorizado
 participant ServicoExtraController
 participant IServicoExtraService
+participant EstadiaRepository
+participant TipoServicoExtraService
 participant ServicoExtraRepository
-participant Fatura
+participant AuditoriaOperacaoService
 
-CuidadorOuVeterinario -> ServicoExtraController : registar servico extra(animal, tipo, custo)
-ServicoExtraController -> IServicoExtraService : registarServicoExtra(dto)
-IServicoExtraService -> ServicoExtraRepository : save(servico)
-ServicoExtraRepository --> IServicoExtraService : servico criado
-IServicoExtraService -> Fatura : atualizarTotal(custo)
-IServicoExtraService --> ServicoExtraController : servico registado
-ServicoExtraController --> CuidadorOuVeterinario : confirmar registo
+ColaboradorAutorizado -> ServicoExtraController : POST /extras/create
+ServicoExtraController -> IServicoExtraService : register(form, autorId)
+IServicoExtraService -> EstadiaRepository : findById(estadiaId)
+
+alt estadia inexistente ou terminada
+  EstadiaRepository --> IServicoExtraService : vazio/estado invalido
+  IServicoExtraService --> ServicoExtraController : erro
+  ServicoExtraController --> ColaboradorAutorizado : mostrar erro
+else estadia EM_CURSO
+  EstadiaRepository --> IServicoExtraService : Estadia
+  IServicoExtraService -> TipoServicoExtraService : obterPorNome(tipo)
+  alt tipo inexistente/inativo ou custo invalido
+    TipoServicoExtraService --> IServicoExtraService : erro
+    IServicoExtraService --> ServicoExtraController : erro
+    ServicoExtraController --> ColaboradorAutorizado : mostrar erro
+  else tipo ativo
+    TipoServicoExtraService --> IServicoExtraService : TipoServicoExtra
+    IServicoExtraService -> ServicoExtraRepository : save(servicoExtra)
+    IServicoExtraService -> AuditoriaOperacaoService : registarSucesso(SERVICO_EXTRA)
+    IServicoExtraService --> ServicoExtraController : ServicoExtraDto
+    ServicoExtraController --> ColaboradorAutorizado : confirmar registo
+  end
+end
 
 @enduml

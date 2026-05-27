@@ -1,0 +1,44 @@
+@startuml UC-14
+title UC-14 - Gerir Colaboradores e Perfis
+
+autonumber
+actor Diretor
+participant ColaboradorController
+participant IColaboradorService
+participant ColaboradorRepository
+participant PasswordEncoder
+participant AuditoriaOperacaoService
+
+Diretor -> ColaboradorController : GET /colaboradores
+ColaboradorController -> IColaboradorService : listarTodos()
+IColaboradorService -> ColaboradorRepository : findAll()
+ColaboradorRepository --> IColaboradorService : colaboradores
+IColaboradorService --> ColaboradorController : lista
+ColaboradorController --> Diretor : mostrar colaboradores
+
+Diretor -> ColaboradorController : POST /colaboradores
+ColaboradorController -> IColaboradorService : criar(ColaboradorFormDto)
+IColaboradorService -> ColaboradorRepository : existsByUsername / existsByEmail
+
+alt username/email duplicado ou dados invalidos
+  ColaboradorRepository --> IColaboradorService : duplicado
+  IColaboradorService --> ColaboradorController : erro
+  ColaboradorController --> Diretor : mostrar erro
+else dados validos
+  IColaboradorService -> PasswordEncoder : encode(password)
+  IColaboradorService -> ColaboradorRepository : save(colaborador)
+  IColaboradorService -> AuditoriaOperacaoService : registarSucesso(CRIAR_COLABORADOR)
+  IColaboradorService --> ColaboradorController : Colaborador
+  ColaboradorController --> Diretor : confirmar criacao
+end
+
+opt editar ou desativar
+  Diretor -> ColaboradorController : POST /colaboradores/{id} ou /desativar
+  ColaboradorController -> IColaboradorService : atualizar(...) ou desativar(id)
+  IColaboradorService -> ColaboradorRepository : findById(id)
+  IColaboradorService -> ColaboradorRepository : save(colaborador)
+  IColaboradorService -> AuditoriaOperacaoService : registarSucesso(EDITAR/DESATIVAR_COLABORADOR)
+  ColaboradorController --> Diretor : confirmar operacao
+end
+
+@enduml

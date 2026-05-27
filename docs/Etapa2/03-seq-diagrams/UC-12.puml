@@ -4,21 +4,31 @@ title UC-12 - Registar Limpeza de Alojamento
 autonumber
 actor ResponsavelLimpeza
 participant LimpezaController
-participant IAlojamentoService
+participant ILimpezaService
 participant AlojamentoRepository
+participant AuditoriaOperacaoService
 
-ResponsavelLimpeza -> LimpezaController : consultar alojamentos pendentes
-LimpezaController -> IAlojamentoService : listarPendenteLimpeza()
-IAlojamentoService -> AlojamentoRepository : findPendentesLimpeza()
-AlojamentoRepository --> IAlojamentoService : lista de alojamentos
-IAlojamentoService --> LimpezaController : alojamentos pendentes
-LimpezaController --> ResponsavelLimpeza : mostrar lista
+ResponsavelLimpeza -> LimpezaController : GET /limpeza
+LimpezaController -> ILimpezaService : listarAlojamentosPendentes()
+ILimpezaService -> AlojamentoRepository : findByEstadoLimpeza(PENDENTE)
+AlojamentoRepository --> ILimpezaService : alojamentos pendentes
+ILimpezaService --> LimpezaController : lista
+LimpezaController --> ResponsavelLimpeza : mostrar pendentes
 
-ResponsavelLimpeza -> LimpezaController : marcar alojamento como limpo
-LimpezaController -> IAlojamentoService : registarLimpezaConcluida(alojamentoId)
-IAlojamentoService -> AlojamentoRepository : updateEstadoLimpeza(CONCLUIDO)
-IAlojamentoService -> AlojamentoRepository : verificar disponibilidade para nova reserva
-IAlojamentoService --> LimpezaController : alojamento limpo
-LimpezaController --> ResponsavelLimpeza : confirmar conclusao
+ResponsavelLimpeza -> LimpezaController : POST /limpeza/{id}/limpo
+LimpezaController -> ILimpezaService : marcarComoLimpo(id)
+ILimpezaService -> AlojamentoRepository : findById(id)
+
+alt alojamento inexistente
+  AlojamentoRepository --> ILimpezaService : vazio
+  ILimpezaService --> LimpezaController : false
+  LimpezaController --> ResponsavelLimpeza : mostrar erro
+else alojamento encontrado
+  AlojamentoRepository --> ILimpezaService : Alojamento
+  ILimpezaService -> AlojamentoRepository : save(estado CONCLUIDO)
+  ILimpezaService -> AuditoriaOperacaoService : registarSucesso(LIMPEZA_REALIZADA)
+  ILimpezaService --> LimpezaController : true
+  LimpezaController --> ResponsavelLimpeza : confirmar limpeza
+end
 
 @enduml
