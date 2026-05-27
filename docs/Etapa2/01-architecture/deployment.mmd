@@ -1,41 +1,42 @@
-%% Diagrama de Implantação — Hotel de Animais
-%% Ambiente de produção: rede local do hotel
+%% Diagrama de Implantacao - Sistema Patas & Bigodes
 
-graph LR
+flowchart TB
+    subgraph LAN["Rede local do hotel"]
+        subgraph Workstations["Postos de trabalho"]
+            subgraph PostoRececao["Posto Rececao"]
+                BrowserRececao["Browser"]
+            end
 
-    subgraph LAN["Rede Local do Hotel"]
+            subgraph PostoDirecao["Posto Direcao"]
+                BrowserDirecao["Browser"]
+            end
 
-        subgraph ClienteA["Posto de Receção"]
-            BrowserRC["Browser\n(Chrome/Firefox)"]
+            subgraph PostoCuidados["Posto Cuidados"]
+                BrowserCuidados["Browser"]
+            end
+
+            subgraph PostoVeterinario["Posto Veterinario"]
+                BrowserVeterinario["Browser"]
+            end
+
+            subgraph PostoLimpeza["Posto Limpeza"]
+                BrowserLimpeza["Browser"]
+            end
         end
 
-        subgraph ClienteB["Posto de Cuidados"]
-            BrowserCU["Browser\n(Chrome/Firefox)"]
-        end
+        subgraph Host["Servidor / Host Docker"]
+            subgraph AppContainer["hotelanimais-app"]
+                AppJar["app.jar<br/>animais-0.0.1-SNAPSHOT.jar"]
+                WebArtifacts["Recursos da aplicacao web"]
+            end
 
-        subgraph ClienteC["Posto Veterinário"]
-            BrowserVT["Browser\n(Chrome/Firefox)"]
+            subgraph DbContainer["hotelanimais-db"]
+                Db[("hotelanimais")]
+                MysqlVolume["mysql_data"]
+            end
         end
-
-        subgraph ClienteD["Posto de Limpeza"]
-            BrowserLP["Browser\n(Chrome/Firefox)"]
-        end
-
-        subgraph Servidor["Servidor de Aplicação (Linux / Windows Server)"]
-            JVM["JVM 21\nSpring Boot 3\n(Tomcat embarcado :8080)"]
-        end
-
-        subgraph BDServer["Servidor de Base de Dados"]
-            MySQL["MySQL 8\n(:3306)"]
-            Backup["Backup diário\n(mysqldump agendado)"]
-        end
-
     end
 
-    BrowserRC -->|HTTP :8080| JVM
-    BrowserCU -->|HTTP :8080| JVM
-    BrowserVT -->|HTTP :8080| JVM
-    BrowserLP -->|HTTP :8080| JVM
+    Workstations -->|:8080| AppContainer
 
-    JVM -->|JDBC :3306| MySQL
-    MySQL -.->|agendado| Backup
+    AppContainer -->|:3306| DbContainer
