@@ -81,6 +81,44 @@ class AuditoriaServiceTest {
     }
 
     @Test
+    void registarEventoSemEntidadePersistidaDevePermitirEntityIdNulo() {
+        Colaborador colaborador = colaborador(7L);
+        when(colaboradorRepository.findById(7L)).thenReturn(Optional.of(colaborador));
+        when(auditoriaRepository.save(any(AuditoriaEvento.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        AuditoriaEvento evento = service.registarEvento(
+            7L,
+            "RELATORIO_GERADO",
+            "Relatorio",
+            null,
+            "READ",
+            Map.of("dataInicio", "2026-05-01", "dataFim", "2026-05-31"),
+            ResultadoAuditoria.SUCESSO,
+            null
+        );
+
+        assertThat(evento.getEntityId()).isNull();
+        assertThat(evento.getOperacao()).isEqualTo("RELATORIO_GERADO");
+        verify(auditoriaRepository).save(evento);
+    }
+
+    @Test
+    void registarOutroEventoSemEntityIdDeveFalhar() {
+        assertThatThrownBy(() -> service.registarEvento(
+            7L,
+            "CRIAR_COLABORADOR",
+            "Colaborador",
+            null,
+            "CREATE",
+            Map.of(),
+            ResultadoAuditoria.SUCESSO,
+            null
+        ))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("EntityId");
+    }
+
+    @Test
     void limparEventosAntigosDeveDelegarParaRepositorio() {
         when(auditoriaRepository.deleteByTimestampBefore(any(LocalDateTime.class))).thenReturn(3L);
 

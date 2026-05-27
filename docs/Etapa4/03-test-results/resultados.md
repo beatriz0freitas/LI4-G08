@@ -26,7 +26,30 @@ reserva → check-in → registo de cuidado → serviço extra → intervenção
 
 Durante esta validação foram confirmadas as migrações Flyway `V10__allow_reserva_confirmada_estado.sql` e `V11__allow_servico_extra_catalog_type_only.sql`, necessárias para alinhar a base de dados com os estados e associações usados pela implementação.
 
-### 1.2 Execução completa anterior
+### 1.2 Validação da auditoria própria para relatórios
+
+**Data de execução:** 2026-05-27
+**Comando:** `JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 mvn -q -Dtest=RelatorioServiceTest,AuditoriaServiceTest test`
+**Java:** OpenJDK 21
+
+| Categoria | Testes | Passaram | Falharam | Erros | Ignorados |
+|-----------|--------|----------|----------|-------|-----------|
+| Relatórios e persistência de auditoria personalizada | 16 | 16 | 0 | 0 | 0 |
+
+Esta execução valida que `RELATORIO_GERADO` é encaminhado para `AuditoriaOperacaoService`, que o evento consultivo admite `entityId` nulo e que os restantes eventos continuam a exigir identificador de entidade. O PDFBox produziu avisos durante a construção da cache de fontes do ambiente, sem provocar falhas.
+
+### 1.3 Validação da migração de auditoria
+
+**Data de execução:** 2026-05-27
+**Comando:** `DB_PORT=3308 DB_NAME=hotelanimais_test mvn -q -Dtest=HotelAnimaisApplicationTests test` com JDK 21 e MySQL `db-tests`
+
+| Categoria | Testes | Passaram | Falharam | Erros | Ignorados |
+|-----------|--------|----------|----------|-------|-----------|
+| Contexto Spring e migrações Flyway até `V13` | 1 | 1 | 0 | 0 | 0 |
+
+Esta execução aplicou com sucesso as 13 migrações numa base MySQL vazia, incluindo `V12__create_auditoria_evento.sql` e `V13__allow_auditoria_evento_without_entity_id.sql`.
+
+### 1.4 Execução completa anterior
 
 | Categoria | Testes | Passaram | Falharam | Erros | Ignorados |
 |-----------|--------|----------|----------|-------|-----------|
@@ -50,6 +73,7 @@ Durante a execução foram emitidos avisos de Thymeleaf sobre a sintaxe antiga d
 | `AlojamentoServiceTest` | 10 | PASS |
 | `AlteracaoEstadoSaudeServiceTest` | 7 | PASS |
 | `AnimalServiceTest` | 8 | PASS |
+| `AuditoriaServiceTest` | 7 | PASS |
 | `ColaboradorServiceTest` | 11 | PASS |
 | `DisponibilidadeServiceTest` | 4 | PASS |
 | `EstadiaServiceTest` | 10 | PASS |
@@ -59,7 +83,7 @@ Durante a execução foram emitidos avisos de Thymeleaf sobre a sintaxe antiga d
 | `PagamentoServiceTest` | 8 | PASS |
 | `RegistoCuidadoServiceTest` | 5 | PASS |
 | `RegraDominioServiceTest` | 10 | PASS |
-| `RelatorioServiceTest` | 7 | PASS |
+| `RelatorioServiceTest` | 9 | PASS |
 | `ReservaServiceCancelTest` | 2 | PASS |
 | `ReservaServiceCreateTest` | 2 | PASS |
 | `ReservaServiceUnitTest` | 13 | PASS |
@@ -138,7 +162,7 @@ Durante a execução foram emitidos avisos de Thymeleaf sobre a sintaxe antiga d
 | `controller` | Coberto por WebMvcTest e por testes SpringBootTest com MySQL para fluxos que precisam de BD. |
 | `model` e `model.enums` | Parcialmente cobertos por testes de serviços e validações de regras de domínio. |
 | `dto` | Cobertura indireta através de controllers e serviços. |
-| `config` | Segurança coberta por testes de autorização; auditoria fica sobretudo como validação de configuração. |
+| `config` | Segurança coberta por testes de autorização; o rasto funcional não depende de configuração Actuator. |
 
 ---
 

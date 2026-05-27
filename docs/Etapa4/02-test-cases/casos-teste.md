@@ -236,6 +236,16 @@
 
 ---
 
+## RF-19 — Auditoria de operações críticas
+
+| ID | Descrição | Tipo | Teste automatizado |
+|----|-----------|------|--------------------|
+| TC-19.1 | Geração de relatório delega `RELATORIO_GERADO` para a auditoria persistente própria | Unit | `RelatorioServiceTest.gerarRelatorioDeveAgregarMetricasPrincipais` |
+| TC-19.2 | Evento consultivo de relatório pode ser persistido sem `entityId` artificial | Unit | `AuditoriaServiceTest.registarEventoSemEntidadePersistidaDevePermitirEntityIdNulo` |
+| TC-19.3 | Eventos de alteração continuam a exigir `entityId` | Unit | `AuditoriaServiceTest.registarOutroEventoSemEntityIdDeveFalhar` |
+
+---
+
 ## Resumo de Rastreabilidade
 
 | RF | Nº TCs | Cobertura |
@@ -257,7 +267,8 @@
 | RF-15 | 6 | ✅ |
 | RF-16 | 4 | ✅ |
 | RF-17 | 7 | ✅ |
-| **Total** | **108** | **17/17 ✅** |
+| RF-19 | 3 | ✅ |
+| **Total** | **111** | **18 RF com evidência** |
 
 ---
 
@@ -272,6 +283,7 @@ Esta secção resume a satisfação dos requisitos da SRS com base nos testes au
 | RF-01 a RF-10 | Verificado | Casos TC-01.1 a TC-10.7 |
 | RF-11 | Verificado | Casos TC-11.1 a TC-11.6 |
 | RF-12 a RF-17 | Verificado | Casos TC-12.1 a TC-17.7 |
+| RF-19 | Verificado | Casos TC-19.1 a TC-19.3 |
 
 ### Regras de Domínio
 

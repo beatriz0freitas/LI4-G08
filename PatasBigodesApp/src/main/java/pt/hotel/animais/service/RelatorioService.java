@@ -1,9 +1,5 @@
 package pt.hotel.animais.service;
 
-import org.springframework.boot.actuate.audit.listener.AuditApplicationEvent;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pt.hotel.animais.dto.RelatorioAgrupamentoDto;
@@ -19,6 +15,7 @@ import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.repository.PagamentoRepository;
 import pt.hotel.animais.repository.ReservaRepository;
 import pt.hotel.animais.repository.ServicoExtraRepository;
+import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
@@ -45,7 +42,7 @@ import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
  * Serviço de aplicação para geração de relatórios operacionais e financeiros.
  *
  * Agrega dados de alojamentos, estadias, reservas, pagamentos e serviços extra.
- * Cada geração publica evento de auditoria com os filtros gerais utilizados, sem
+ * Cada geração regista auditoria persistente com os filtros gerais utilizados, sem
  * expor detalhe financeiro linha a linha.
  */
 @Service
@@ -57,20 +54,20 @@ public class RelatorioService implements IRelatorioService {
     private final ReservaRepository reservaRepository;
     private final PagamentoRepository pagamentoRepository;
     private final ServicoExtraRepository servicoExtraRepository;
-    private final ApplicationEventPublisher eventPublisher;
+    private final AuditoriaOperacaoService auditoriaOperacaoService;
 
     public RelatorioService(AlojamentoRepository alojamentoRepository,
                             EstadiaRepository estadiaRepository,
                             ReservaRepository reservaRepository,
                             PagamentoRepository pagamentoRepository,
                             ServicoExtraRepository servicoExtraRepository,
-                            ApplicationEventPublisher eventPublisher) {
+                            AuditoriaOperacaoService auditoriaOperacaoService) {
         this.alojamentoRepository = alojamentoRepository;
         this.estadiaRepository = estadiaRepository;
         this.reservaRepository = reservaRepository;
         this.pagamentoRepository = pagamentoRepository;
         this.servicoExtraRepository = servicoExtraRepository;
-        this.eventPublisher = eventPublisher;
+        this.auditoriaOperacaoService = auditoriaOperacaoService;
     }
 
     /**
@@ -81,6 +78,7 @@ public class RelatorioService implements IRelatorioService {
      * @throws IllegalArgumentException quando o período é inválido
      */
     @Override
+    @Transactional
     public RelatorioResumoDto gerarRelatorio(RelatorioFiltroFormDto filtro) {
         validarPeriodo(filtro);
         LocalDateTime inicio = filtro.getDataInicio().atStartOfDay();
@@ -115,6 +113,7 @@ public class RelatorioService implements IRelatorioService {
      * @return conteúdo CSV com cabeçalhos estáveis
      */
     @Override
+    @Transactional
     public String gerarCsv(RelatorioFiltroFormDto filtro) {
         RelatorioResumoDto resumo = gerarRelatorio(filtro);
         StringBuilder csv = new StringBuilder();
@@ -146,6 +145,7 @@ public class RelatorioService implements IRelatorioService {
      */
     @Override
     //NOTA: REVER ISTO
+    @Transactional
     public byte[] gerarPdf(RelatorioFiltroFormDto filtro) {
         RelatorioResumoDto resumo = gerarRelatorio(filtro);
         List<String> linhas = new ArrayList<>();
@@ -365,19 +365,17 @@ public class RelatorioService implements IRelatorioService {
     }
 
     private void publicarAuditoria(RelatorioFiltroFormDto filtro) {
-        eventPublisher.publishEvent(new AuditApplicationEvent(
-            utilizadorAtual(),
+        auditoriaOperacaoService.registarSucesso(
             "RELATORIO_GERADO",
+            "Relatorio",
+            null,
+            "READ",
             Map.of(
                 "dataInicio", filtro.getDataInicio().toString(),
                 "dataFim", filtro.getDataFim().toString(),
-                "incluirServicosExtra", filtro.isIncluirServicosExtra()
+                "incluirServicosExtra", filtro.isIncluirServicosExtra(),
+                "agruparPor", filtro.getAgruparPor().name()
             )
-        ));
-    }
-
-    private String utilizadorAtual() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication != null ? authentication.getName() : "sistema";
+        );
     }
 }

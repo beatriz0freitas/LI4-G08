@@ -117,7 +117,7 @@ public class AuditoriaService implements IAuditoriaService {
         if (entidade == null || entidade.isBlank()) {
             throw new IllegalArgumentException("Entidade é obrigatória para auditoria");
         }
-        if (entityId == null) {
+        if (entityId == null && !permiteEntidadeNaoPersistida(operacao, entidade)) {
             throw new IllegalArgumentException("EntityId é obrigatório para auditoria");
         }
         if (acao == null || acao.isBlank()) {
@@ -126,6 +126,11 @@ public class AuditoriaService implements IAuditoriaService {
         if (resultado == null) {
             throw new IllegalArgumentException("Resultado é obrigatório para auditoria");
         }
+    }
+
+    private boolean permiteEntidadeNaoPersistida(String operacao, String entidade) {
+        return "RELATORIO_GERADO".equals(operacao.trim())
+            && "Relatorio".equals(entidade.trim());
     }
 
     private void validarTamanhoDetalhes(Map<String, Object> detalhes) {

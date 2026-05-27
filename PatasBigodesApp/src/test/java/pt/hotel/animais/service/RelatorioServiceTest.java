@@ -3,7 +3,6 @@ package pt.hotel.animais.service;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationEventPublisher;
 import pt.hotel.animais.dto.RelatorioFiltroFormDto;
 import pt.hotel.animais.model.Alojamento;
 import pt.hotel.animais.model.Estadia;
@@ -17,17 +16,20 @@ import pt.hotel.animais.repository.EstadiaRepository;
 import pt.hotel.animais.repository.PagamentoRepository;
 import pt.hotel.animais.repository.ReservaRepository;
 import pt.hotel.animais.repository.ServicoExtraRepository;
+import pt.hotel.animais.service.auditoria.AuditoriaOperacaoService;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class RelatorioServiceTest {
@@ -37,7 +39,7 @@ class RelatorioServiceTest {
     private final ReservaRepository reservaRepository = mock(ReservaRepository.class);
     private final PagamentoRepository pagamentoRepository = mock(PagamentoRepository.class);
     private final ServicoExtraRepository servicoExtraRepository = mock(ServicoExtraRepository.class);
-    private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+    private final AuditoriaOperacaoService auditoriaOperacaoService = mock(AuditoriaOperacaoService.class);
 
     private final RelatorioService service = new RelatorioService(
         alojamentoRepository,
@@ -45,7 +47,7 @@ class RelatorioServiceTest {
         reservaRepository,
         pagamentoRepository,
         servicoExtraRepository,
-        eventPublisher
+        auditoriaOperacaoService
     );
 
     @Test
@@ -62,6 +64,18 @@ class RelatorioServiceTest {
         assertThat(resumo.getFaturacaoPorMetodo()).containsEntry("NUMERARIO", new BigDecimal("50.00"));
         assertThat(resumo.getAlojamentosTotal()).isEqualTo(10L);
         assertThat(resumo.getPagamentosPendentes()).isEqualTo(2L);
+        verify(auditoriaOperacaoService).registarSucesso(
+            "RELATORIO_GERADO",
+            "Relatorio",
+            null,
+            "READ",
+            Map.of(
+                "dataInicio", "2026-05-01",
+                "dataFim", "2026-05-31",
+                "incluirServicosExtra", true,
+                "agruparPor", "MES"
+            )
+        );
     }
 
     @Test
