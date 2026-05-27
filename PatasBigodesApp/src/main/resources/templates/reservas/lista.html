@@ -82,9 +82,9 @@
                                     </td>
                                     <td>
                                         <small class="text-muted">
-                                            <span th:text="${#dates.format(reserva.dataInicio, 'dd/MM/yyyy')}">01/01/2026</span>
+                                            <span th:text="${#temporals.format(reserva.dataInicio, 'dd/MM/yyyy')}">01/01/2026</span>
                                             a
-                                            <span th:text="${#dates.format(reserva.dataFim, 'dd/MM/yyyy')}">05/01/2026</span>
+                                            <span th:text="${#temporals.format(reserva.dataFim, 'dd/MM/yyyy')}">05/01/2026</span>
                                         </small>
                                     </td>
                                     <td>
